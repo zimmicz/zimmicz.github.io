@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}{{ SITENAME }} | {{ article.title }}{% endblock %}
+{% block head %}
+  {{ super() }}
+  {% for keyword in article.keywords %}
+    <meta name="keywords" contents="{{keyword}}" />
+  {% endfor %}
+
+  {% for description in article.description %}
+    <meta name="description" contents="{{description}}" />
+  {% endfor %}
+
+  {% for tag in article.tags %}
+    <meta name="tags" content="{{tag}}" />
+  {% endfor %}
+  <meta property="og:image" content="https://pbs.twimg.com/profile_images/770323886290440192/3G5hqp11_400x400.jpg" />
+  <meta property="og:title" content="{{ article.title|striptags }}" />
+  <meta property="og:description" content="{{ article.content|striptags|truncate }}" />
+  <meta property="og:url" content="{{ SITEURL }}/{{ article.url }}" />
+{% endblock %}
+
+{% block content %}
+<div class="panel card card-1">
+    <div class="post-name">
+        <h1><a href="{{ SITEURL }}/{{ article.url }}" rel="bookmark" title="Permalink to {{ article.title|striptags }}">{{ article.title }}</a></h1>
+        <small>Written on {{ article.date.strftime("%b %-d, %Y") }}
+    {% if tags %}
+    and marked as
+    {% for tag in article.tags %}
+    <a href="{{ SITEURL }}/{{ tag.url }}">{{ tag }}</a>{% if not loop.last %}, {% endif %}
+    {% endfor %}
+    {% endif %}
+    {% if article.category %}
+    | <a href="{{ SITEURL }}/{{ article.category.url }}">{{ article.category }}</a>
+    {% endif %}
+    </small>
+    <section>
+        {{ article.content }}
+    </section>
+    </div>
+      {% include 'neighbors.html' %}
+</div>
+{% endblock %}

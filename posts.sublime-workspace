@@ -1,0 +1,1315 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"twee",
+				"tweets_sorted"
+			],
+			[
+				"Date",
+				"dateObject"
+			],
+			[
+				"bm",
+				"bm_users"
+			],
+			[
+				"conn",
+				"connectionString"
+			],
+			[
+				"con",
+				"connectionString"
+			],
+			[
+				"src",
+				"src_lpis"
+			],
+			[
+				"par",
+				"par_lpis"
+			],
+			[
+				"sr",
+				"src_lpis"
+			],
+			[
+				"datum",
+				"datum_vyhotoveni"
+			],
+			[
+				"datumyv",
+				"datum_vykonatelnosti"
+			],
+			[
+				"datumvy",
+				"datum_vyhotoveni"
+			],
+			[
+				"datumv",
+				"datum_vykonatelnosti"
+			],
+			[
+				"popis",
+				"popis_typu_listiny"
+			],
+			[
+				"ops",
+				"opsub_id_pro"
+			],
+			[
+				"titu",
+				"titul_za_jmenem"
+			],
+			[
+				"ome",
+				"omezeni"
+			],
+			[
+				"katuze",
+				"katuze_kod"
+			],
+			[
+				"opsub",
+				"opsub_id_orig"
+			],
+			[
+				"opsb",
+				"opsub_id_orig"
+			],
+			[
+				"katuzenaze",
+				"katuze_nazev_puv"
+			],
+			[
+				"katuzekod",
+				"katuze_kod_puv"
+			],
+			[
+				"katu",
+				"katuze_kod"
+			],
+			[
+				"do",
+				"do_delivery_pozadovane_parcely"
+			],
+			[
+				"C",
+				"C_DELIVERY_NAME"
+			],
+			[
+				"vstup",
+				"vstup_kn_ruian"
+			],
+			[
+				"select",
+				"SELECT"
+			],
+			[
+				"suma",
+				"suma_plateb_3"
+			],
+			[
+				"transakce_coun",
+				"transakce_count_0"
+			],
+			[
+				"tran",
+				"transakce_count"
+			],
+			[
+				"drupoz",
+				"drupoz_kod"
+			],
+			[
+				"katuna",
+				"katuze_nazev_puv"
+			],
+			[
+				"vstup_kn_och",
+				"vstup_kn_ochrana_bud"
+			],
+			[
+				"cast",
+				"cast_obce"
+			],
+			[
+				"vymera",
+				"vymera_parcely"
+			],
+			[
+				"katuz",
+				"katuze_kod_puv"
+			],
+			[
+				"ka",
+				"katuze_nazev"
+			],
+			[
+				"proj",
+				"p_project_key"
+			],
+			[
+				"api_dtsr",
+				"api_dtsrc_symap"
+			],
+			[
+				"datu",
+				"datum_platnosti_dat"
+			],
+			[
+				"api",
+				"api_dtsrc_symap"
+			],
+			[
+				"knv",
+				"knvyuz"
+			],
+			[
+				"lre",
+				"l_request_uid"
+			],
+			[
+				"dtsrc",
+				"cm-dtsrc-symap"
+			],
+			[
+				"res_ochrana",
+				"res_ochrana_bud"
+			],
+			[
+				"resjpvb",
+				"res_jpv_opsub"
+			],
+			[
+				"cr",
+				"cm-dtsrc-symap"
+			],
+			[
+				"api_",
+				"api_symap"
+			],
+			[
+				"cm-dt",
+				"cm-dtsrc-symap"
+			],
+			[
+				"cm-d",
+				"cm-dtsrc-symap"
+			],
+			[
+				"car",
+				"card_key"
+			],
+			[
+				"zame",
+				"zamestnanci_cs"
+			],
+			[
+				"klie",
+				"klient_premier"
+			],
+			[
+				"store",
+				"store_id"
+			],
+			[
+				"card",
+				"cardmereq_key"
+			],
+			[
+				"equ",
+				"equipments_subset"
+			],
+			[
+				"tra",
+				"transactions"
+			],
+			[
+				"ca",
+				"card_key"
+			],
+			[
+				"ti",
+				"timestamp"
+			],
+			[
+				"ST",
+				"ST_StartPoint"
+			],
+			[
+				"_fau",
+				"_faults_lines"
+			],
+			[
+				"_fault",
+				"_faults_areas"
+			],
+			[
+				"_",
+				"_faults"
+			],
+			[
+				"stanice",
+				"staniceni_start"
+			],
+			[
+				"a2v",
+				"k_aeo_eafrd_a2v"
+			],
+			[
+				"PR_PH",
+				"PR_PHOTO_PREVIEW_URL"
+			],
+			[
+				"vs",
+				"vstup_mm_fotky"
+			],
+			[
+				"colum",
+				"column_name"
+			],
+			[
+				"vst",
+				"vstup_sdb_staniceni"
+			],
+			[
+				"locat",
+				"location_type"
+			],
+			[
+				"get",
+				"getElementsByClassName"
+			],
+			[
+				"voz",
+				"vozejkmap-infobox-nearest"
+			],
+			[
+				"Dom",
+				"DomUtil"
+			],
+			[
+				"cate",
+				"categories"
+			],
+			[
+				"categ",
+				"categories"
+			],
+			[
+				"net",
+				"network"
+			],
+			[
+				"cz",
+				"czech-republic-latest"
+			],
+			[
+				"pi",
+				"pilot_zakaznici_snap"
+			],
+			[
+				"prov",
+				"provider_kwargs"
+			],
+			[
+				"OU",
+				"OUTPUTPATH"
+			],
+			[
+				"vstup_",
+				"vstup_geom_cervena"
+			],
+			[
+				"OUT",
+				"OUTPUTPATH"
+			],
+			[
+				"outp",
+				"OUTPUTFILE"
+			],
+			[
+				"OUTPU",
+				"OUTPUTDIR"
+			],
+			[
+				"pageb",
+				"page-break-before"
+			],
+			[
+				"page",
+				"page-break-after"
+			],
+			[
+				"border-bot",
+				"border-bottom-color"
+			],
+			[
+				"border-rad",
+				"border-top-left-radius"
+			],
+			[
+				"sh",
+				"shuffleOptions"
+			],
+			[
+				"cre",
+				"_createOptions"
+			],
+			[
+				"opti",
+				"options"
+			],
+			[
+				"crea",
+				"createElement"
+			],
+			[
+				"righ",
+				"rightOption"
+			],
+			[
+				"rig",
+				"rightOption"
+			],
+			[
+				"F",
+				"f"
+			],
+			[
+				"geoj",
+				"geojsonTileLayer"
+			],
+			[
+				"river",
+				"river_style"
+			],
+			[
+				"inter",
+				"intersection_mimo"
+			],
+			[
+				"division",
+				"division_union"
+			],
+			[
+				"divis",
+				"division_union"
+			],
+			[
+				"di",
+				"di_pardubice"
+			],
+			[
+				"divsio",
+				"division_union"
+			],
+			[
+				"zpf",
+				"zpf_dz_nad_1_rok"
+			],
+			[
+				"tbo",
+				"tbo_zabor_zpf"
+			],
+			[
+				"vstup_di_poruchy_2",
+				"vstup_di_poruchy_2013"
+			],
+			[
+				"vstup_di_por",
+				"vstup_di_poruchy_2013"
+			],
+			[
+				"vstup_di_use",
+				"vstup_di_useky_opravy_2013"
+			],
+			[
+				"podi",
+				"podil_jmenovatel"
+			],
+			[
+				"pod",
+				"podil_citatel"
+			],
+			[
+				"divi",
+				"division_parcel_id"
+			],
+			[
+				"cisl",
+				"cislo_useku"
+			],
+			[
+				"di_usek",
+				"di_useky_navrh_2013"
+			],
+			[
+				"pkc_useky",
+				"pkc_useky_navrh"
+			],
+			[
+				"border",
+				"borderwidth"
+			],
+			[
+				"dib",
+				"di_bloky_100m_navrh_2013"
+			],
+			[
+				"MUT",
+				"MULTIPOLYGON"
+			],
+			[
+				"di_",
+				"di_useky_hodnoceni_2014"
+			],
+			[
+				"diuse",
+				"di_useky_hodnoceni_2013"
+			],
+			[
+				"admi",
+				"adminj_n"
+			],
+			[
+				"sa",
+				"staniceni1"
+			],
+			[
+				"MULTI",
+				"MULTILINESTRING"
+			],
+			[
+				"kod",
+				"kod_tr_kom"
+			],
+			[
+				"MUL",
+				"MULTILINESTRINGZ"
+			],
+			[
+				"getElem",
+				"getElementById"
+			],
+			[
+				"RES",
+				"RES_LAT_ID"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "/home/zimmi/dev/promap.docker",
+			"settings":
+			{
+				"buffer_size": 0,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 179.0,
+		"last_filter": "rename",
+		"selected_items":
+		[
+			[
+				"rename",
+				"File: Rename"
+			],
+			[
+				"css",
+				"Set Syntax: CSS"
+			],
+			[
+				"filename",
+				"File: Copy Name"
+			],
+			[
+				"bash",
+				"Set Syntax: Shell Script (Bash)"
+			],
+			[
+				"MARkdo",
+				"Set Syntax: Markdown"
+			],
+			[
+				"MARKD",
+				"Set Syntax: Markdown"
+			],
+			[
+				"sql",
+				"Set Syntax: SQL"
+			],
+			[
+				"swl",
+				"HTML: Wrap Selection With Tag"
+			],
+			[
+				"SQL",
+				"Set Syntax: SQL"
+			],
+			[
+				"yml",
+				"Set Syntax: YAML"
+			],
+			[
+				"SQ",
+				"Set Syntax: SQL"
+			],
+			[
+				"sl",
+				"Sort Lines"
+			],
+			[
+				"YML",
+				"Set Syntax: YAML"
+			],
+			[
+				"ya",
+				"Set Syntax: YAML"
+			],
+			[
+				"log",
+				"Git: Log Current File"
+			],
+			[
+				"SWL",
+				"Set Syntax: Markdown Light"
+			],
+			[
+				"y",
+				"Set Syntax: YAML"
+			],
+			[
+				"ja",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"reso",
+				"PackageResourceViewer: Open Resource"
+			],
+			[
+				"glue",
+				"Glue - Launch"
+			],
+			[
+				"diff",
+				"Git: Diff Tool Current File"
+			],
+			[
+				"dif",
+				"Git: Diff Current File"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"packa",
+				"Package Control: Add Channel"
+			],
+			[
+				"java",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"xml",
+				"Set Syntax: XML"
+			],
+			[
+				"previe",
+				"Markdown Preview: Preview in Browser"
+			],
+			[
+				"jaa",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"gle",
+				"Glue - Launch"
+			],
+			[
+				"instal",
+				"Package Control: Install Package"
+			],
+			[
+				"remove",
+				"Package Control: Remove Package"
+			],
+			[
+				"markdo",
+				"Set Syntax: Markdown Light"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"markdown",
+				"Set Syntax: Markdown"
+			],
+			[
+				"mark",
+				"Set Syntax: Markdown"
+			]
+		],
+		"width": 529.0
+	},
+	"console":
+	{
+		"height": 132.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = '2915d1851351e5ee549c20394736b442' + '8bc59f460fa1548d1514676163dafc88'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/etc/apt/sources.list",
+		"/home/zimmi/dev/zimmi.cz/posts/content/theme/simple/templates/article.html",
+		"/home/zimmi/documents/st_windrose.sql",
+		"/home/zimmi/.ssh/config",
+		"/home/zimmi/dev/zimmi.cz/posts/content/2016/dead-simple-random-points-in-polygons-with-postgis.md",
+		"/home/zimmi/dev/zimmi.cz/posts/output/category/tools.html",
+		"/home/zimmi/dev/zimmi.cz/posts/output/index.html",
+		"/home/zimmi/dev/zimmi.cz/posts/content/2016/syncing-two-postgresql-databases-faster.md",
+		"/home/zimmi/dev/zimmi.cz/posts/content/theme/simple/templates/pagination.html",
+		"/home/zimmi/dev/zimmi.cz/posts/content/theme/simple/templates/index.html",
+		"/home/zimmi/dev/zimmi.cz/posts/content/theme/simple/static/css/screen.css",
+		"/home/zimmi/downloads/cervena/process.sh",
+		"/home/zimmi/dev/zimmi.cz/posts/pelicanconf.py",
+		"/home/zimmi/dev/zimmi.cz/posts/Makefile",
+		"/home/zimmi/dev/zimmi.cz/posts/content/theme/simple/templates/base.html",
+		"/home/zimmi/dev/zimmi.cz/posts/content/2016/a-month-of-commuting-on-my-own.md",
+		"/home/zimmi/dev/zimmi.cz/posts/output/2016/a-month-of-commuting-on-my-own/index.html",
+		"/home/zimmi/documents/zimmi/misc/maps/commute/circle.svg",
+		"/home/zimmi/documents/zimmi/misc/maps/commute/map.svg",
+		"/home/zimmi/dev/zimmi.cz/posts/content/2014/analyzing-twitter-languages-with-streaming-api.md",
+		"/home/zimmi/downloads/mapgentoolbox_v1_1_sept2013/readme.txt",
+		"/home/zimmi/dev/zimmi.cz/posts/content/2015/leaflet-with-custom-crs-epsg-5514.md",
+		"/home/zimmi/documents/zimmi/dizertace/post-processing/twitter/stats/plots.r",
+		"/home/zimmi/documents/zimmi/posts/content/2015/twitter-rest-api-data-mining-on-openshift-part-ii.md",
+		"/home/zimmi/documents/zimmi/dizertace/post-processing/twitter/stats/languages.r",
+		"/home/zimmi/documents/zimmi/posts/.git/COMMIT_EDITMSG",
+		"/home/zimmi/documents/zimmi/posts/Makefile",
+		"/home/zimmi/documents/zimmi/dizertace/post-processing/twitter/stats/hours.r",
+		"/home/zimmi/documents/zimmi/dizertace/post-processing/twitter/stats/authors.r",
+		"/home/zimmi/documents/zimmi/posts/content/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick.md",
+		"/home/zimmi/documents/zimmi/misc/bookmap/src/bookmap/server/routes/auth.js",
+		"/home/zimmi/documents/zimmi/misc/bookmap/src/bookmap/ngClient/js/auth/auth.factory.js",
+		"/home/zimmi/documents/zimmi/misc/bookmap/src/bookmap/ngClient/js/auth/auth.controller.js",
+		"/home/zimmi/documents/zimmi/misc/bookmap/db/bm_bookmap/install/bm_roles.yml",
+		"/home/zimmi/documents/zimmi/misc/bookmap/db/bm_bookmap/install/bm_users.yml",
+		"/home/zimmi/documents/zimmi/misc/bookmap/db/bm_bookmap/install/master.yml",
+		"/home/zimmi/documents/zimmi/misc/bookmap/src/bookmap/ngClient/js/app.js",
+		"/home/zimmi/documents/zimmi/misc/bookmap/src/bookmap/ngClient/js/controllers.js",
+		"/home/zimmi/documents/zimmi/misc/bookmap/src/bookmap/ngClient/js/factory.js",
+		"/home/zimmi/documents/zimmi/misc/bookmap/src/bookmap/main.js",
+		"/home/zimmi/documents/zimmi/misc/bookmap/src/bookmap/ngClient/partials/page3.html",
+		"/home/zimmi/documents/zimmi/misc/bookmap/src/bookmap/server/middlewares/validateRequest.js",
+		"/home/zimmi/documents/zimmi/misc/bookmap/src/bookmap/client/public/javascripts/auth.factory.js",
+		"/home/zimmi/documents/zimmi/misc/bookmap/src/bookmap/ngClient/partials/login.html",
+		"/home/zimmi/documents/zimmi/misc/bookmap/src/bookmap/ngClient/js/directives.js",
+		"/home/zimmi/documents/zimmi/misc/bookmap/src/bookmap/ngClient/js/filters.js",
+		"/home/zimmi/documents/zimmi/misc/bookmap/src/bookmap/client/public/javascripts/app.js",
+		"/home/zimmi/documents/zimmi/misc/bookmap/src/bookmap/ngClient/partials/header.html",
+		"/home/zimmi/documents/zimmi/misc/bookmap/src/bookmap/ngClient/index.html",
+		"/home/zimmi/documents/zimmi/misc/bookmap/src/bookmap/client/public/javascripts/auth.controller.js",
+		"/home/zimmi/documents/zimmi/misc/bookmap/src/bookmap/ngClient/gulpfile.js",
+		"/home/zimmi/documents/zimmi/misc/bookmap/src/bookmap/client/views/index.html",
+		"/home/zimmi/documents/zimmi/misc/bookmap/src/bookmap/server/routes/index.js",
+		"/home/zimmi/documents/zimmi/misc/bookmap/src/bookmap/server/routes/users.js",
+		"/home/zimmi/documents/zimmi/misc/bookmap/src/bookmap/secret.js",
+		"/home/zimmi/documents/zimmi/misc/bookmap/src/bookmap/server/models/database.js",
+		"/home/zimmi/documents/zimmi/misc/bookmap/src/bookmap/client/public/views/index.html",
+		"/home/zimmi/documents/zimmi/misc/bookmap/db/bm_bookmap/share/example/fill_bm_users.sql",
+		"/home/zimmi/documents/zimmi/misc/bookmap/src/bookmap/config.js",
+		"/home/zimmi/documents/zimmi/misc/bookmap/src/bookmap/package.json",
+		"/home/zimmi/documents/zimmi/misc/bookmap/db/bm_bookmap/share/example/fill_bm_authors.sql",
+		"/home/zimmi/documents/zimmi/misc/bookmap/db/bm_bookmap/install/bm_books.yml",
+		"/home/zimmi/documents/zimmi/misc/bookmap/db/bm_bookmap/install/bm_authors_books.yml",
+		"/home/zimmi/documents/zimmi/misc/bookmap/db/bm_bookmap/install/bm_events.yml",
+		"/home/zimmi/documents/zimmi/misc/bookmap/db/bm_bookmap/install/bm_authors.yml",
+		"/home/zimmi/documents/zimmi/misc/bookmap/db/bm_bookmap/etc/example/liquibase-install-pgsql.properties",
+		"/home/zimmi/documents/clevermaps/cm-datasources/api_symap/db/install/res_rizeni.yml",
+		"/home/zimmi/documents/clevermaps/cm-datasources/api_symap/db/install/res_pozadovane_parcely.yml",
+		"/home/zimmi/documents/clevermaps/cm-datasources/api_symap/db/install/res_parcely.yml",
+		"/home/zimmi/documents/clevermaps/cm-datasources/api_symap/db/install/res_omezeni.yml",
+		"/home/zimmi/documents/clevermaps/cm-datasources/api_symap/db/install/res_ochrana_par.yml",
+		"/home/zimmi/documents/clevermaps/cm-datasources/api_symap/db/install/res_ochrana_bud.yml",
+		"/home/zimmi/documents/clevermaps/cm-datasources/api_symap/db/install/res_lv.yml",
+		"/home/zimmi/documents/clevermaps/cm-datasources/api_symap/db/install/res_listiny.yml",
+		"/home/zimmi/documents/clevermaps/cm-datasources/api_symap/db/install/res_jpv_par.yml",
+		"/home/zimmi/documents/clevermaps/cm-datasources/api_symap/db/install/res_jpv_opsub.yml",
+		"/home/zimmi/documents/clevermaps/cm-datasources/api_symap/db/install/res_jpv_jed.yml",
+		"/home/zimmi/documents/clevermaps/cm-datasources/api_symap/db/install/res_jpv_bud.yml",
+		"/home/zimmi/documents/clevermaps/cm-datasources/api_symap/db/install/res_jine.yml",
+		"/home/zimmi/documents/clevermaps/cm-datasources/api_symap/db/install/res_geom.yml",
+		"/home/zimmi/documents/clevermaps/cm-datasources/api_symap/db/install/res_datum_aktualizace.yml",
+		"/home/zimmi/documents/clevermaps/cm-datasources/api_symap/db/install/res_budovy.yml",
+		"/home/zimmi/documents/clevermaps/cm-datasources/api_symap/db/install/res_budouc_zplatnene.yml",
+		"/home/zimmi/documents/clevermaps/cm-datasources/api_symap/db/install/res_bpej.yml",
+		"/home/zimmi/documents/clevermaps/cm-datasources/api_symap/db/install/requests.yml",
+		"/home/zimmi/documents/clevermaps/cm-datasources/api_symap/db/install/req_kn_ruian.yml",
+		"/home/zimmi/documents/clevermaps/cm-datasources/api_symap/db/install/req_kn_man.yml",
+		"/home/zimmi/documents/clevermaps/cm-datasources/api_symap/db/install/req_kn_budouc.yml",
+		"/home/zimmi/documents/clevermaps/cm-datasources/api_symap/db/install/master.yml",
+		"/home/zimmi/documents/clevermaps/cm-datasources/api_symap/db/install/create-schema.yml",
+		"/home/zimmi/documents/clevermaps/cm-datasources/api_symap/db/reinstallable/do_delivery_omezeni.yml",
+		"/home/zimmi/documents/zimmi/misc/bookmap/db/bm_bookmap/install/create_schema.yml",
+		"/home/zimmi/documents/zimmi/misc/bookmap/db/INSTALL",
+		"/home/zimmi/documents/clevermaps/cm-temp/batch.dat",
+		"/home/zimmi/documents/clevermaps/cm-roads/cr-15020/data/diagnostika/images_1.dat",
+		"/home/zimmi/documents/zimmi/misc/bookmap/db/db/install/master.yml",
+		"/home/zimmi/documents/clevermaps/cm-datasources/src_ruian/db/install/master.yml",
+		"/home/zimmi/documents/clevermaps/cm-datasources/src_ruian/db/install/rn_zsj.yml",
+		"/home/zimmi/documents/clevermaps/cm-datasources/db/install/master.yml",
+		"/home/zimmi/documents/zimmi/misc/bookmap/db/db/etc/example/liquibase-install-pgsql.properties",
+		"/home/zimmi/documents/clevermaps/cm-datasources/etc/example/liquibase-install-pgsql.properties",
+		"/home/zimmi/documents/zimmi/misc/bookmap/.gitignore",
+		"/home/zimmi/.psqlrc",
+		"/home/zimmi/.gitconfig",
+		"/home/zimmi/documents/zimmi/misc/dotfiles/psqlrc",
+		"/home/zimmi/documents/zimmi/misc/bookmap/db/db/etc/example/liquibase-init-pgsql.properties",
+		"/home/zimmi/documents/zimmi/misc/bookmap/db/db/install/init.yml",
+		"/home/zimmi/documents/clevermaps/cm-datasources/db/install/init.yml",
+		"/home/zimmi/documents/clevermaps/cm-datasources/INSTALL",
+		"/home/zimmi/documents/clevermaps/cm-datasources/api_ca_mgeo/db/reinstallable/do_delivery_lpis.yml",
+		"/home/zimmi/documents/zimmi/misc/dotfiles/install.sh",
+		"/home/zimmi/documents/zimmi/misc/dotfiles/screenrc",
+		"/home/zimmi/documents/zimmi/dizertace/post-processing/twitter/stats.sql",
+		"/home/zimmi/documents/zimmi/dizertace/post-processing/twitter/stats/first.r",
+		"/home/zimmi/documents/zimmi/homepage/well_known/acme-challenge/LBk1FepDPFOjWXA8U2h3nmBboAjyi6N10H37FZpkQIA",
+		"/home/zimmi/documents/zimmi/homepage/server.js",
+		"/home/zimmi/documents/zimmi/homepage/.well-known/acme-challenge/bxOxqoqmP1L8yzj_10sm79K3nx0t_4BSERd2-hC1RXk",
+		"/home/zimmi/documents/zimmi/homepage/.well-known/acme-challenge/GihXIUCdmpzg0JnO2ulG8eHKjORtYPSqlZ4Xc1eWAZs",
+		"/home/zimmi/documents/zimmi/homepage/.git/COMMIT_EDITMSG",
+		"/home/zimmi/documents/zimmi/homepage/.well-known/acme-challenge/LFYcESs2eGDp6zWEva6Flfjqves9JxQgvBQabnuUIMI",
+		"/home/zimmi/documents/zimmi/homepage/.git/MERGE_MSG",
+		"/home/zimmi/documents/clevermaps/cm-datasources/api_ca_mgeo/db/install/lpis.yml",
+		"/home/zimmi/downloads/geoserver-2.8.1/data_dir/user_projections/epsg.properties",
+		"/home/zimmi/documents/clevermaps/cm-datasources/src_lpis/db/reinstallable/do_update_pudni_bloky.yml",
+		"/home/zimmi/documents/clevermaps/cm-datasources/src_lpis/db/reinstallable/do_update_par_lpis.yml",
+		"/home/zimmi/documents/clevermaps/cm-datasources/api_symap/share/client/plpgsql/create_funcs.sql",
+		"/home/zimmi/bin/cm-aktualizace",
+		"/home/zimmi/documents/clevermaps/cm-datasources/src_cmkn/old/update_scripts/5_road_tables/01_sy_55-breclav/02_SYMAP_kn_data.sql"
+	],
+	"find":
+	{
+		"height": 38.0
+	},
+	"find_in_files":
+	{
+		"height": 104.0,
+		"where_history":
+		[
+			"/home/zimmi/documents/zimmi/misc/bookmap/src/bookmap",
+			"/home/zimmi/documents/clevermaps/cm-datasources/",
+			"/home/zimmi/documents/clevermaps/cm-datasources/src_kn",
+			"<open files>,<open folders>",
+			"<open files>",
+			"/home/zimmi/documents/clevermaps/cm-datasources",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"cz.archive",
+			" card-2 card",
+			"dotted",
+			"png",
+			"bg=\"white\"",
+			"tweets_geo_sorted",
+			"tweets_cnt",
+			"validateUser",
+			"'",
+			"access-key",
+			"AuthenticationFactory",
+			"UserAuthFactory",
+			"myApp",
+			"products",
+			"prod",
+			"auth",
+			"'",
+			"dbUser",
+			"userObject",
+			"params",
+			"\\",
+			"“",
+			"”",
+			"17",
+			"username",
+			"cm",
+			"cm_bookmap",
+			"TOWGS84",
+			"589,76,480,0,0,0,0",
+			"6377397.155,299.1528128",
+			"${schema.name}",
+			"par_lpis",
+			"pdf",
+			"png",
+			"decimal",
+			"MinScaleDenominator",
+			"${schema.name}.lpis",
+			"api_ca_mgeo.lpis",
+			"a",
+			"st_difference",
+			"dimap",
+			"OPTIONS .+",
+			"OPTIONS (schema_name 'api_symap', table_name 'req_kn_budouc');",
+			"^OPTIONS.+",
+			"FOREIGN ",
+			"FOREIGN",
+			"SERVER \"cm-dtsrc-symap\"",
+			"then",
+			"${role.adm.name}",
+			"${schema.name}",
+			"api_symap",
+			"parcely",
+			"omezeni",
+			"sy_omezeni",
+			"sy_jpv_bud",
+			"omezeni",
+			"vstup_kn_man",
+			"opsub",
+			"omezeni",
+			"budovy",
+			"omezeni omezeni",
+			"install-data-${schema.name}",
+			"install-data-src_kn",
+			"INSERT INTO",
+			"INSERT",
+			"metadata_kn_tables",
+			"INSERT * metadata_kn_tables",
+			"INSERT INTO ${schema.name}.metadata_kn_tables",
+			"table_name, table_type, version_from version_to",
+			"metadata_kn_tables",
+			"version_from",
+			"version_from version_to)",
+			"subli",
+			"dimap",
+			"$HOME",
+			"s3cmd",
+			"gz",
+			"prez",
+			"spadd",
+			"count",
+			"cardtr_amount_czk",
+			"pocet_plateb",
+			"SUM",
+			"l_res",
+			"FOREIGN DATA WRAPPER",
+			"dimap",
+			"not exists",
+			"bloky_poruchy",
+			"vstup_di_100m_bloky_poruchy",
+			"CREATE TABLE",
+			"plochy",
+			"linie",
+			"plochy",
+			"linie",
+			"plochy",
+			"plochy.",
+			"linie",
+			"plochy",
+			"pocet_obyvatel_zsj_d",
+			"ELSE",
+			"THEN 1",
+			"p20150630",
+			"20150531",
+			"20150630",
+			"20150531",
+			"transactions_p20150430",
+			"transactions_p20150531",
+			"transactions_p20150630",
+			"kaufland",
+			"src_ruian",
+			"cardmereqh_geo_latitude",
+			"cardmereqh_geo_longitude",
+			"cardmereqh_geo_latitude",
+			"equipments",
+			"latitude",
+			"..",
+			"  ",
+			"UNLOGGED",
+			"mon",
+			"CREATE",
+			"df.",
+			"res_100m_bloky_poruchy",
+			"res_di_poruch",
+			"vstup_mm_100_m_neprasna",
+			"di_pardubice_6_roads",
+			"vyp_",
+			"vyp_1",
+			"plochy"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"archive",
+			"tiff",
+			"\"",
+			"api_ca_mgeo",
+			"",
+			";",
+			"",
+			"api_symap",
+			"vstup_di_100_m_opravy",
+			"THEN 1\nELSE 0",
+			" ",
+			"public",
+			" ",
+			"",
+			"CREATE UNLOGGED",
+			"",
+			"vstup_di_100_m_opravy",
+			"useky_100m",
+			"cr15020",
+			"linie",
+			"cr15020",
+			"useky_100m",
+			"di_pardubice_6_roads",
+			"%1$s",
+			"_blocks",
+			"&",
+			"di_pardubice_6_roads",
+			"&",
+			" ",
+			"",
+			"zimmi",
+			"can_kmv",
+			" ",
+			"",
+			",",
+			"",
+			",",
+			"",
+			",",
+			"",
+			"&\n",
+			"",
+			",",
+			"",
+			"&\n",
+			"&",
+			"",
+			"\n",
+			"",
+			",",
+			"$2 $1",
+			"$",
+			"6_roads",
+			"vstup_sdb_staniceni",
+			"di_pardubice",
+			" ",
+			"videos",
+			"documents",
+			"';",
+			" IS",
+			"';",
+			"'",
+			" ",
+			" text",
+			" ",
+			"",
+			" ON COLUMN",
+			"",
+			"PropertyIsEqualTo",
+			"",
+			"0.25",
+			"div"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "/home/zimmi/dev/promap.docker",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 0,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"bracket_highlighter.busy": false,
+							"bracket_highlighter.locations":
+							{
+								"close":
+								{
+								},
+								"icon":
+								{
+								},
+								"open":
+								{
+								},
+								"unmatched":
+								{
+								}
+							},
+							"bracket_highlighter.regions":
+							[
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content"
+							],
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 26.0
+	},
+	"input":
+	{
+		"height": 35.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "posts.sublime-project",
+	"replace":
+	{
+		"height": 72.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"output",
+				"output/category/tools.html"
+			],
+			[
+				"analyzin",
+				"content/2014/analyzing-twitter-languages-with-streaming-api.md"
+			],
+			[
+				"leaflet",
+				"content/2015/leaflet-with-custom-crs-epsg-5514.md"
+			],
+			[
+				"roadtables",
+				"src_cmkn/old/update_scripts/5_road_tables/01_sy_55-breclav/02_SYMAP_kn_data.sql"
+			],
+			[
+				"resdatum",
+				"api_symap/db/install/res_datum_aktualizace.yml"
+			],
+			[
+				"symapres",
+				"api_symap/db/install/res_bpej.yml"
+			],
+			[
+				"roadtabl",
+				"src_cmkn/old/update_scripts/5_road_tables/02_symap_moravia/03_SYMAP_rizeni_a_listiny.sql"
+			],
+			[
+				"ochranapar",
+				"api_symap/db/reinstallable/do_delivery_ochrana_par.yml"
+			],
+			[
+				"setup.",
+				"setup.sh"
+			],
+			[
+				"setup",
+				"setup.sh"
+			],
+			[
+				"install-data",
+				"src_kn/db/install/install-data.yml"
+			],
+			[
+				"set",
+				"setup.sh"
+			],
+			[
+				"dolpis",
+				"api_ca_mgeo/db/reinstallable/do_delivery_lpis.yml"
+			],
+			[
+				"dodeliv",
+				"api_ca_mgeo/db/reinstallable/do_delivery.yml"
+			],
+			[
+				"import",
+				"api_ca_mgeo/db/reinstallable/import_manual_parcel_geometry.yml"
+			],
+			[
+				"parcurg",
+				"api_ca_mgeo/db/reinstallable/par_cur_qgis.yml"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"",
+				"~/dev/bookmap/bookmap.sublime-project"
+			]
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 195.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
