@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+          <title>Michal Zimmermann | Clip Raster With Vector Using <span class="caps">GDAL</span></title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+
+
+
+    <meta name="tags" content="linux" />
+    <meta name="tags" content="gdal" />
+  <meta property="og:image" content="https://pbs.twimg.com/profile_images/770323886290440192/3G5hqp11_400x400.jpg" />
+  <meta property="og:title" content="Clip Raster With Vector Using GDAL" />
+  <meta property="og:description" content="Recently I needed to clip several raster files with polygonal layer of municipalities. A solution to this task is pretty straightforward using GDAL and a bit of Bash and QGIS thrown in. The necessary steps are: Put each polygon to a separate file. ..." />
+  <meta property="og:url" content="https://www.zimmi.cz/posts/2015/clip-raster-with-vector-using-gdal/" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?d5d1e141">
+</head>
+
+<body id="index" class="home">
+    <nav class="top-bar card-1" data-topbar role="navigation">
+        <ul class="title-area">
+            <li class="name">
+                <h1><a href="/posts">Home</a></h1>
+            </li>
+     <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+            <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+        </ul>
+        <section class="top-bar-section">
+    <!-- Right Nav Section -->
+            <ul class="right">
+                <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+                <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+                <li><a href="https://www.zimmi.cz/posts/feed.xml">RSS feed</a></li>
+            </ul>
+        </section>
+    </nav>
+        <div class="row">
+          <div class="large-12 columns header">
+            <h1><a href="/posts">Michal Zimmermann</a> <small>Pieces of knowledge from the world of GIS.</small></h1>
+          </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns">
+<div class="panel card card-1">
+    <div class="post-name">
+        <h1><a href="https://www.zimmi.cz/posts/2015/clip-raster-with-vector-using-gdal/" rel="bookmark" title="Permalink to Clip Raster With Vector Using GDAL">Clip Raster With Vector Using <span class="caps">GDAL</span></a></h1>
+        <small>Written on Jul 21, 2015
+    and marked as
+    <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>,     <a href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    | <a href="https://www.zimmi.cz/posts/category/automation.html">automation</a>
+    </small>
+    <section>
+        <p>Recently I needed to clip several raster files with polygonal layer of municipalities. A solution to this task is pretty straightforward using <a href="http://gdal.org/"><span class="caps">GDAL</span></a> and a bit of Bash and <span class="caps">QGIS</span> thrown&nbsp;in.</p>
+<p>The necessary steps&nbsp;are:</p>
+<ol>
+<li>Put each polygon to a separate file. This can be done easily with <code>Vector - Data Management Tools - Split Vector Layer</code> in <span class="caps">QGIS</span>. The solution below assumes that each shapefile has the same basename as the raster&nbsp;file.</li>
+<li>These polygons are stored in the <code>obce</code> subfolder relative to the folder with&nbsp;rasters.</li>
+<li>An <code>output</code> folder exists that is used for&#8230; output,&nbsp;yes.</li>
+<li>Rasters are saved with output alpha band for nodata (<code>-dstalpha</code> flag).</li>
+<li>The script takes one argument - raster&nbsp;name.</li>
+<li>Profit!</li>
+</ol>
+<div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env bash</span>
+
+<span class="nv">OBEC</span><span class="o">=</span><span class="nv">$1</span>
+<span class="nv">BASE</span><span class="o">=</span><span class="k">$(</span>basename <span class="nv">$OBEC</span> _jpeg.tif<span class="k">)</span>
+<span class="nb">echo</span> <span class="nv">$BASE</span>
+<span class="nv">EXTENT</span><span class="o">=</span><span class="k">$(</span>ogrinfo -so obce/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.shp <span class="nv">$BASE</span> <span class="p">|</span> grep Extent <span class="se">\</span>
+<span class="p">|</span> sed <span class="s1">&#39;s/Extent: //g&#39;</span> <span class="p">|</span> sed <span class="s1">&#39;s/(//g&#39;</span> <span class="p">|</span> sed <span class="s1">&#39;s/)//g&#39;</span> <span class="se">\</span>
+<span class="p">|</span> sed <span class="s1">&#39;s/ - /, /g&#39;</span><span class="k">)</span>
+<span class="nv">EXTENT</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span> <span class="nv">$EXTENT</span> <span class="p">|</span> awk -F <span class="s1">&#39;,&#39;</span> <span class="s1">&#39;{print $1 &quot; &quot; $4 &quot; &quot; $3 &quot; &quot; $2}&#39;</span><span class="k">)</span>
+gdal_translate -projwin <span class="nv">$EXTENT</span> -of GTiff <span class="nv">$OBEC</span> output/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.tif
+gdalwarp -dstalpha -s_srs <span class="s1">&#39;EPSG:5514&#39;</span> -t_srs <span class="s1">&#39;EPSG:5514&#39;</span> <span class="se">\</span>
+    -co <span class="nv">COMPRESS</span><span class="o">=</span>JPEG <span class="se">\</span>
+    -co <span class="nv">TILED</span><span class="o">=</span>YES -<span class="se">\</span>
+    of GTiff <span class="se">\</span>
+    -cutline obce/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.shp <span class="se">\</span>
+    output/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.tif output/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.final.tif
+</pre></div>
+
+
+<p>Note that if <code>gdalwarp</code> doesn&#8217;t recognize an <span class="caps">EPSG</span> code (which is the case for my country national grid), you might pass it as a <span class="caps">PROJ</span>.4&nbsp;string.</p>
+<p>According to the point 5 in the above list, the script needs to be run in a&nbsp;loop:</p>
+<div class="highlight"><pre><span></span><span class="k">for</span> f in *_jpeg.tif<span class="p">;</span>
+    <span class="k">do</span> the_script_above.sh <span class="nv">$f</span>
+<span class="p">;</span><span class="k">done</span>
+</pre></div>
+    </section>
+    </div>
+<div class="neighbors">
+    <h3>More reading</h3>
+    <ul>
+        <li>
+            <a href="https://www.zimmi.cz/posts/2015/filtering-points-by-distance-in-postgis/">
+                 Filtering points by distance in&nbsp;PostGIS
+            </a>
+        </li>
+         <li>
+             <a href="https://www.zimmi.cz/posts/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/">
+                 Automated Map Creation With <span class="caps">QGIS</span>, PostGIS, Python, <span class="caps">SVG</span> and&nbsp;ImageMagick
+             </a>
+         </li>
+         <li>
+             <a href="https://www.zimmi.cz/posts/2015/grass-big-buffers-made-easy/">
+                 <span class="caps">GRASS</span>: Big Buffers Made&nbsp;Easy
+             </a>
+         </li>
+         <li>
+             <a href="https://www.zimmi.cz/posts/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/">
+                 Automated Map Creation With <span class="caps">QGIS</span>, PostGIS, Python, <span class="caps">SVG</span> and&nbsp;ImageMagick
+             </a>
+         </li>
+        </li>
+    </ul>
+</div></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns footer">
+                <footer>
+                    <address>
+                    Written by <a href="http://www.zimmi.cz">Michal Zimmermann</a>.
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    </address><!-- /#about -->
+                </footer><!-- /#contentinfo -->
+            </div>
+        </div>
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-43432739-2']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+<script src="https://www.zimmi.cz/posts/theme/js/packed.js?8bee1467"></script>
+<script>
+$(document).foundation();
+</script>
+</body>
+</html>

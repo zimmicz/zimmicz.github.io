@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+        <title>Michal Zimmermann | tag: regex</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?d5d1e141">
+</head>
+
+<body id="index" class="home">
+    <nav class="top-bar card-1" data-topbar role="navigation">
+        <ul class="title-area">
+            <li class="name">
+                <h1><a href="/posts">Home</a></h1>
+            </li>
+     <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+            <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+        </ul>
+        <section class="top-bar-section">
+    <!-- Right Nav Section -->
+            <ul class="right">
+                <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+                <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+                <li><a href="https://www.zimmi.cz/posts/feed.xml">RSS feed</a></li>
+            </ul>
+        </section>
+    </nav>
+        <div class="row">
+          <div class="large-12 columns header">
+            <h1><a href="/posts">Michal Zimmermann</a> <small>Pieces of knowledge from the world of GIS.</small></h1>
+          </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns">
+<h2 class="text-center">Articles tagged with regex tag</h2>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2015/using-postgresql-to-update-outdated-map-links/" rel="bookmark" title="Permalink to Using PostgreSQL To Update Outdated Map Links">Using PostgreSQL To Update Outdated Map&nbsp;Links</a></h1>
+            <small>Written on Feb 16, 2015
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/regex.html">regex</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
+        </small>
+        <section>
+            <p><a href="http://www.edpp.cz/pdb_mapa-povodnoveho-planu-mesta/">We&#8217;ve rolled out</a> completely new map <span class="caps">GUI</span> at <a href="http://edpp.cz">edpp.cz</a> built on top of <a href="http://ol3js.org">OpenLayers 3</a>. It looks great and has lots of functions both for <span class="caps">BFU</span> and power users. The only pitfall that came with moving away from OpenLayers 2 were remarkable differences in zoom levels between the old map and the new&nbsp;one.</p>
+<p>Each of our maps is defined by our admins (center, zoom level, layers) at the map creation. Lots of links calling different views of map are created as well. They take form of <code>http://edpp.cz/some-map?0=0&amp;1=0...zoom=5</code>. That <code>zoom=&lt;Number&gt;</code> started causing troubles immediately after the map switch. No way my workmates would update them one by one as there were ~4,500 of them. Sounds like a task for little bit of regular expressions and some <span class="caps">SQL</span>&nbsp;updates.</p>
+<div class="highlight"><pre><span></span>UPDATE table
+    SET column = regexp_replace(column, &#39;zoom=\d&#39;, &#39;zoom=&#39; || subquery.zoom, &#39;g&#39;)
+    FROM (
+        SELECT regexp_replace(
+            substring(column from &#39;zoom=\d&#39;),
+            &#39;zoom=(\d)&#39;,
+            &#39;\1&#39;,
+            &#39;g&#39;)::integer + 2 AS zoom, guid
+        FROM table) AS subquery
+    WHERE column ~ &#39;zoom=\d&#39;
+        AND table.guid = subquery.guid
+</pre></div>
+
+
+<p>That&#8217;s what I&#8217;ve come up with. It basically extracts the zoom level from the link, adds number two to its value and writes it back to the&nbsp;string.</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2014/switch-latitude-and-longitude-with-regular-expression/" rel="bookmark" title="Permalink to Switch Latitude And Longitude With Regular Expression">Switch Latitude And Longitude With Regular&nbsp;Expression</a></h1>
+            <small>Written on Sep 14, 2014
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/sublime.html">sublime</a>,         <a href="https://www.zimmi.cz/posts/tag/regex.html">regex</a>        | <a href="https://www.zimmi.cz/posts/category/development.html">development</a>
+        </small>
+        <section>
+            <p>It happens that you receive a file with longitude and latitude just in the opposite order that you would like to have. It&#8217;s fairly easy to switch those without loading it into Excel or Calc and doing <code>Ctrl + C</code> and <code>Ctrl + V</code> on&nbsp;columns.</p>
+<p>If you have a file with tabular data that looks like&nbsp;this:</p>
+<div class="highlight"><pre><span></span> 50.52, 60.15
+ 70.96, 80.1
+-55.23, 62.03
+</pre></div>
+
+
+<p>You can use Sublime Text to switch the&nbsp;values:</p>
+<ol>
+<li>Press <code>Ctrl + H</code></li>
+<li>Copy <code>(\-?\d+\.?\d+),?[\t ]*(\-?\d+\.?\d+)$</code> to <em>Find What</em>&nbsp;input</li>
+<li>Copy <code>$2,$1</code> to <em>Replace With</em>&nbsp;input</li>
+</ol>
+<p>Hit <em>Replace All</em> button and you&#8217;re&nbsp;done.</p>
+        </section>
+        </div>
+    </div>
+
+<div class="pagination row">
+    <div class="large-6 columns">
+    </div>
+    <div class="large-6 columns">
+    </div>
+    <!-- <p class="paginator">
+    </p> -->
+</div>            </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns footer">
+                <footer>
+                    <address>
+                    Written by <a href="http://www.zimmi.cz">Michal Zimmermann</a>.
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    </address><!-- /#about -->
+                </footer><!-- /#contentinfo -->
+            </div>
+        </div>
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-43432739-2']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+<script src="https://www.zimmi.cz/posts/theme/js/packed.js?8bee1467"></script>
+<script>
+$(document).foundation();
+</script>
+</body>
+</html>

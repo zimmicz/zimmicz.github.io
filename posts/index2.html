@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+        <title>Michal Zimmermann | Pieces of knowledge from the world of GIS.</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?d5d1e141">
+</head>
+
+<body id="index" class="home">
+    <nav class="top-bar card-1" data-topbar role="navigation">
+        <ul class="title-area">
+            <li class="name">
+                <h1><a href="/posts">Home</a></h1>
+            </li>
+     <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+            <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+        </ul>
+        <section class="top-bar-section">
+    <!-- Right Nav Section -->
+            <ul class="right">
+                <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+                <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+                <li><a href="https://www.zimmi.cz/posts/feed.xml">RSS feed</a></li>
+            </ul>
+        </section>
+    </nav>
+        <div class="row">
+          <div class="large-12 columns header">
+            <h1><a href="/posts">Michal Zimmermann</a> <small>Pieces of knowledge from the world of GIS.</small></h1>
+          </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns">
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2015/liftago-open-dataset-infographics/" rel="bookmark" title="Permalink to Liftago Open Dataset Infographics">Liftago Open Dataset&nbsp;Infographics</a></h1>
+            <small>Written on Dec 21, 2015
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/python.html">python</a>,         <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>,         <a href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>,         <a href="https://www.zimmi.cz/posts/tag/visualization.html">visualization</a>        | <a href="https://www.zimmi.cz/posts/category/data.html">data</a>
+        </small>
+        <section>
+            <p><a href="https://www.liftago.com/cs">Liftago</a> (the Czech analogy of Uber) has recently <a href="http://try.liftago.com/info-wants-to-be-free/">released a sample of its data</a> covering four weeks of driver/pasenger&nbsp;interactions.</p>
+<p>Have a look at my infographics created with PostGIS, Inkscape, Python and&nbsp;pygal.</p>
+<p class="text-center"><a href="https://www.zimmi.cz/posts/assets/liftago-open-dataset-infographics/liftago.pdf"><img title="Liftago infographics" src="https://www.zimmi.cz/posts/assets/liftago-open-dataset-infographics/liftago.png" class="img-responsive centered"></a></p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2015/twitter-rest-api-data-mining-on-openshift-part-ii/" rel="bookmark" title="Permalink to Twitter REST API Data Mining on OpenShift (Part II)">Twitter <span class="caps">REST</span> <span class="caps">API</span> Data Mining on OpenShift (Part <span class="caps">II</span>)</a></h1>
+            <small>Written on Dec 6, 2015
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>,         <a href="https://www.zimmi.cz/posts/tag/openshift.html">openshift</a>,         <a href="https://www.zimmi.cz/posts/tag/twitter.html">twitter</a>        | <a href="https://www.zimmi.cz/posts/category/development.html">development</a>
+        </small>
+        <section>
+            <p>Last time I described <a href="https://www.zimmi.cz/posts/2015/twitter-rest-api-data-mining-on-openshift-part-i/">the setup of my OpenShift Twitter crawler</a> and let it running and downloading data. It&#8217;s been more than two months since I started and I got interesting amount of data. I also made a simple <span class="caps">ETL</span> process to load it into my local PostGIS database, which I&#8217;d like to cover in this&nbsp;post.</p>
+<h2>Extract&nbsp;data</h2>
+<p>Each day is written to the separate sqlite file with a name like <code>tw_day_D_M_YYYY</code>. <code>Bash</code> is used to gzip all the files before downloading them from&nbsp;OpenShift.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+ssh openshift <span class="s">&lt;&lt; EOF</span>
+<span class="s">    cd app-root/data</span>
+<span class="s">    tar czf twitter.tar.gz *.db</span>
+<span class="s">EOF</span>
+
+scp openshift:/var/lib/openshift/55e487587628e1280b0000a9/app-root/data/twitter.tar.gz ./data
+<span class="nb">cd</span> data <span class="o">&amp;&amp;</span>
+tar -xzf twitter.tar.gz <span class="o">&amp;&amp;</span>
+<span class="nb">cd</span> -
+
+<span class="nb">echo</span> <span class="s2">&quot;Extract done&quot;</span>
+</pre></div>
+
+
+<h2>Transform&nbsp;data</h2>
+<p>The transformation part operates on downloaded files and merges them into one big <span class="caps">CSV</span> file. That&#8217;s pretty straightforward. Note that&#8217;s quite simple with sqlite flags, some <code>sed</code> and <code>tail</code> commands.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+rm -rf ./data/csv
+mkdir ./data/csv
+
+<span class="k">for</span> db in ./data/*.db<span class="p">;</span> <span class="k">do</span>
+    <span class="nv">FILENAME</span><span class="o">=</span><span class="k">$(</span>basename <span class="nv">$db</span><span class="k">)</span>
+    <span class="nv">DBNAME</span><span class="o">=</span><span class="si">${</span><span class="nv">FILENAME</span><span class="p">%%.db</span><span class="si">}</span>
+    <span class="nv">CSVNAME</span><span class="o">=</span><span class="nv">$DBNAME</span>.csv
+    <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$DBNAME</span><span class="s2"> to csv...&quot;</span>
+    sqlite3 -header -csv <span class="nv">$db</span> <span class="s2">&quot;select * from </span><span class="nv">$DBNAME</span><span class="s2">;&quot;</span> &gt; ./data/csv/<span class="nv">$CSVNAME</span>
+<span class="k">done</span>
+
+<span class="nb">cd</span> ./data/csv
+touch tweets.csv
+<span class="nb">echo</span> <span class="k">$(</span>sed -n 1p <span class="k">$(</span>ls -d -1 *.csv <span class="p">|</span> head -n 1<span class="k">))</span> &gt; tweets.csv <span class="c1"># get column names</span>
+
+<span class="k">for</span> csv in tw_*.csv<span class="p">;</span> <span class="k">do</span>
+    <span class="nb">echo</span> <span class="nv">$csv</span>
+    tail -n +2 <span class="nv">$csv</span> &gt;&gt; tweets.csv <span class="c1"># get all lines without the first one</span>
+<span class="k">done</span>
+</pre></div>
+
+
+<h2>Load&nbsp;data</h2>
+<p>In the last step, the data is loaded with <span class="caps">SQL</span> <code>\copy</code> command.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+<span class="nb">export</span> <span class="nv">PG_USE_COPY</span><span class="o">=</span>YES
+
+<span class="nv">DATABASE</span><span class="o">=</span>mzi_dizertace
+<span class="nv">SCHEMA</span><span class="o">=</span>dizertace
+<span class="nv">TABLE</span><span class="o">=</span>tweets
+
+psql <span class="nv">$DATABASE</span> <span class="s">&lt;&lt; EOF</span>
+<span class="s">    DROP TABLE IF EXISTS $SCHEMA.$TABLE;</span>
+<span class="s">    CREATE UNLOGGED TABLE $SCHEMA.$TABLE (id text, author text, author_id text, tweet text, created_at text, lon float, lat float, lang text);</span>
+<span class="s">    \copy $SCHEMA.$TABLE FROM &#39;data/csv/tweets.csv&#39; CSV HEADER DELIMITER &#39;,&#39;</span>
+<span class="s">    ALTER TABLE $SCHEMA.$TABLE ADD COLUMN wkb_geometry geometry(POINT, 4326);</span>
+<span class="s">    UPDATE $SCHEMA.$TABLE SET wkb_geometry = ST_SetSRID(ST_MakePoint(lon, lat), 4326);</span>
+<span class="s">    CREATE INDEX ${TABLE}_geom_idx ON $SCHEMA.$TABLE USING gist(wkb_geometry);</span>
+<span class="s">    COMMIT;</span>
+<span class="s">EOF</span>
+</pre></div>
+
+
+<h2>First&nbsp;statistics</h2>
+<p>Some interesting charts and numbers&nbsp;follow.</p>
+<p class="text-center"><img title="Top 100 Twitter users in the Czech Republic" src="https://www.zimmi.cz/posts/assets/twitter-rest-api-data-mining-on-openshift-part-ii/authors.png" class="img-responsive centered"></p>
+
+<p class="text-center"><img title="When people tweet in the Czech Republic" src="https://www.zimmi.cz/posts/assets/twitter-rest-api-data-mining-on-openshift-part-ii/hours.png" class="img-responsive centered"></p>
+
+<p class="text-center"><img title="Languages on Twitter in the Czech Republic" src="https://www.zimmi.cz/posts/assets/twitter-rest-api-data-mining-on-openshift-part-ii/languages.png" class="img-responsive centered"></p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-iii/" rel="bookmark" title="Permalink to PostGIS Case Study: Vozejkmap Open Data (Part III)">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">III</span>)</a></h1>
+            <small>Written on Nov 14, 2015
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>,         <a href="https://www.zimmi.cz/posts/tag/leaflet.html">leaflet</a>,         <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>        | <a href="https://www.zimmi.cz/posts/category/web-maps.html">web maps</a>
+        </small>
+        <section>
+            <p>After a while I got back to my <a href="https://www.zimmi.cz/posts/2014/postgis-case-study-vozejkmap-open-data-part-i/">PostGIS open data</a> <a href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-ii/">case study</a>. Last time I left it with clustering implemented, looking forward to incorporate <a href="http://turfjs.org">Turf.js</a> in the future. <em>And the future is now.</em> <a href="https://github.com/zimmicz/vozejkmap-to-postgis">The code is still available on&nbsp;GitHub.</a></p>
+<h2>Subgroup&nbsp;clustering</h2>
+<p>Vozejkmap data is categorized based on the place type (banks, parking lots, pubs, &hellip;). One of the core features of map showing such data should be the easy way to turn these categories on and&nbsp;off.</p>
+<p>As far as I know, it&#8217;s not trivial to do this with the standard Leaflet library. Extending <code>L.control.layers</code> and implement its <code>addOverlay</code>, <code>removeOverlay</code> methods on your own might be the way to add needed behavior. Fortunately, there&#8217;s an easier option thanks to <a href="https://github.com/ghybs/Leaflet.FeatureGroup.SubGroup">Leaflet.FeatureGroup.SubGroup</a> that can handle such use case and is really straightforward. See the code&nbsp;below.</p>
+<div class="highlight"><pre><span></span><span class="nx">cluster</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">markerClusterGroup</span><span class="p">({</span>
+    <span class="nx">chunkedLoading</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nx">chunkInterval</span><span class="o">:</span> <span class="mi">500</span>
+<span class="p">});</span>
+
+<span class="nx">cluster</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
+
+<span class="p">...</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">category</span> <span class="k">in</span> <span class="nx">categories</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// just use L.featureGroup.subGroup instead of L.layerGroup or L.featureGroup</span>
+    <span class="nx">overlays</span><span class="p">[</span><span class="nx">my</span><span class="p">.</span><span class="nx">Style</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="nx">category</span><span class="p">).</span><span class="nx">type</span><span class="p">]</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">featureGroup</span><span class="p">.</span><span class="nx">subGroup</span><span class="p">(</span><span class="nx">cluster</span><span class="p">,</span> <span class="nx">categories</span><span class="p">[</span><span class="nx">category</span><span class="p">]);</span>
+<span class="p">}</span>
+
+<span class="nx">mapkey</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">control</span><span class="p">.</span><span class="nx">layers</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">overlays</span><span class="p">).</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
+</pre></div>
+
+
+<p>With this piece of code you get a map key with checkboxes for all the categories, yet they&#8217;re still kept in the single cluster on the map.&nbsp;Brilliant!</p>
+<p><img src="https://www.zimmi.cz/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/map.png" title="vozejkmap.cz data map" class="img-responsive centered"></p>
+<h2>Using Turf.js for&nbsp;analysis</h2>
+<p>Turf is one of those libraries I get amazed easily with, spending a week trying to find a use case, finally putting it aside with <em>&#8220;I&#8217;ll get back to it later&#8221;</em>. I usually don&#8217;t. This time it&#8217;s&nbsp;different.</p>
+<p>I use Turf to get the nearest neighbor for any marker on click. My first try ended up with the same marker being the result as it was a member of a feature collection passed to <code>turf.nearest()</code> method. After snooping around the docs I found <code>turf.remove()</code> method that can filter GeoJSON based on key-value&nbsp;pair.</p>
+<p>Another handy function is <code>turf.distance()</code> that gives you distance between two points. The code below adds an information about the nearest point and its distance into the&nbsp;popup.</p>
+<div class="highlight"><pre><span></span><span class="c1">// data is a geojson feature collection</span>
+<span class="nx">json</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">geoJson</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span> <span class="p">{</span>
+    <span class="nx">onEachFeature</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">feature</span><span class="p">,</span> <span class="nx">layer</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">layer</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;click&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kd">var</span> <span class="nx">nearest</span> <span class="o">=</span> <span class="nx">turf</span><span class="p">.</span><span class="nx">nearest</span><span class="p">(</span><span class="nx">layer</span><span class="p">.</span><span class="nx">toGeoJSON</span><span class="p">(),</span> <span class="nx">turf</span><span class="p">.</span><span class="nx">remove</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="nx">feature</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">title</span><span class="p">)),</span>
+                <span class="nx">distance</span> <span class="o">=</span> <span class="nx">turf</span><span class="p">.</span><span class="nx">distance</span><span class="p">(</span><span class="nx">layer</span><span class="p">.</span><span class="nx">toGeoJSON</span><span class="p">(),</span> <span class="nx">nearest</span><span class="p">,</span> <span class="s2">&quot;kilometers&quot;</span><span class="p">).</span><span class="nx">toPrecision</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+                <span class="nx">popup</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">popup</span><span class="p">({</span><span class="nx">offset</span><span class="o">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">35</span><span class="p">]}).</span><span class="nx">setLatLng</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">latlng</span><span class="p">),</span>
+                <span class="nx">content</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">Util</span><span class="p">.</span><span class="nx">template</span><span class="p">(</span>
+                    <span class="s2">&quot;&lt;h1&gt;{title}&lt;/h1&gt;&lt;p&gt;{description}&lt;/p&gt; \</span>
+<span class="s2">                    &lt;p&gt;Nejbližší bod: {nearest} je {distance} km daleko.&lt;/p&gt;&quot;</span><span class="p">,</span> <span class="p">{</span>
+                    <span class="nx">title</span><span class="o">:</span> <span class="nx">feature</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">title</span><span class="p">,</span>
+                    <span class="nx">description</span><span class="o">:</span> <span class="nx">feature</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">description</span><span class="p">,</span>
+                    <span class="nx">nearest</span><span class="o">:</span> <span class="nx">nearest</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">title</span><span class="p">,</span>
+                    <span class="nx">distance</span><span class="o">:</span> <span class="nx">distance</span>
+                <span class="p">});</span>
+
+            <span class="nx">popup</span><span class="p">.</span><span class="nx">setContent</span><span class="p">(</span><span class="nx">content</span><span class="p">);</span>
+            <span class="nx">popup</span><span class="p">.</span><span class="nx">openOn</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
+
+            <span class="p">...</span>
+</pre></div>
+
+
+<p>From what I&#8217;ve tried so far, Turf seems to be incredibly fast and easy to use. I&#8217;ll try to find the nearest point for any of the categories, that could take Turf some&nbsp;time.</p>
+<h2>Update</h2>
+<p>Turf is blazing fast! I&#8217;ve implemented nearest point for each of the categories and it gets done in a blink of an eye. Some screenshots below. Geolocation implemented as&nbsp;well.</p>
+<p><img src="https://www.zimmi.cz/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen1.png" title="vozejkmap.cz data map" class="img-responsive centered"> You can locate the point&nbsp;easily.</p>
+
+<p><img src="https://www.zimmi.cz/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen2.png" title="vozejkmap.cz data map" class="img-responsive centered"> You can hide the&nbsp;infobox.</p>
+
+<p><img src="https://www.zimmi.cz/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen3.png" title="vozejkmap.cz data map" class="img-responsive centered">You can jump to any of the nearest&nbsp;places.</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2015/twitter-rest-api-data-mining-on-openshift-part-i/" rel="bookmark" title="Permalink to Twitter REST API Data Mining on OpenShift (Part I)">Twitter <span class="caps">REST</span> <span class="caps">API</span> Data Mining on OpenShift (Part&nbsp;I)</a></h1>
+            <small>Written on Nov 6, 2015
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>,         <a href="https://www.zimmi.cz/posts/tag/openshift.html">openshift</a>,         <a href="https://www.zimmi.cz/posts/tag/twitter.html">twitter</a>        | <a href="https://www.zimmi.cz/posts/category/development.html">development</a>
+        </small>
+        <section>
+            <p>More than a year ago I wrote about <a href="http://www.zimmi.cz/posts/2014/analyzing-twitter-languages-with-streaming-api/">analyzing Twitter languages with Streaming <span class="caps">API</span></a>. Back then I kept my laptop running for a week to download data. Not a comfortable way, especially if you decide to get more data. One year uptime doesn&#8217;t sound like anything you want to be part of. <a href="https://www.openshift.com/">OpenShift</a> by Red Hat seems to be almost perfect replacement.&nbsp;Almost.</p>
+<h2>OpenShift&nbsp;setup</h2>
+<p>I started with Node.js application running on one small gear. Once running, you can easily <code>git push</code> the code to your OpenShift repo and login via <span class="caps">SSH</span>. I quickly found simple copy-pasting my local solution wasn&#8217;t going to work. and fixed it with some minor tweaks. That&#8217;s where the fun&nbsp;begins&#8230;</p>
+<blockquote>
+<p>I based the downloader on Node.js a year ago. Until now I still don&#8217;t get how that piece of software works. Frankly, I don&#8217;t really care as long as it&nbsp;works.</p>
+</blockquote>
+<h3>Pitfalls</h3>
+<p>If your application doesn&#8217;t generate any traffic, <strong>OpenShift turns it off</strong>. It wakes up once someone visits again. I had no idea about that and spent some time trying to stop that behavior. Obviously, I could have scheduled a cron job on my laptop pinging it every now and then. Luckily, OpenShift can run cron jobs itself. All you need is to embed a cron cartridge into the running application (and install a bunch of ruby dependencies&nbsp;beforehand).</p>
+<div class="highlight"><pre><span></span>rhc cartridge add cron-1.4 -a app-name
+</pre></div>
+
+
+<p>Then create <code>.openshift/cron/{hourly,daily,weekly,monthly}</code> folder in the git repository and put your script running a simple curl command into one of&nbsp;those.</p>
+<div class="highlight"><pre><span></span>curl http://social-zimmi.rhcloud.com &gt; /dev/null
+</pre></div>
+
+
+<p>Another problem was just around the corner. Once in a while, the app stopped writing data to the database without saying a word. What helped was restarting it - the only automatic way to do so being a <code>git push</code> command. Sadly, I haven&#8217;t found a way to restart the app from within itself; it probably can&#8217;t be&nbsp;done.</p>
+<p>When you <code>git push</code>, the gear stops, builds, deploys and restarts the app. By using hot deployment you can minimize the downtime. Just put the <code>hot_deploy</code> file into <code>.openshift/markers</code> folder.</p>
+<div class="highlight"><pre><span></span>git commit --allow-empty -m <span class="s2">&quot;Restart gear&quot;</span> <span class="o">&amp;&amp;</span> git push
+</pre></div>
+
+
+<p>This solved the problem until I realize that <strong>every restart deleted all the data</strong> collected so far. If your data are to stay safe and sound, <strong>save them in <code>process.env.OPENSHIFT_DATA_DIR</code></strong> (which is <code>app-root/data</code>).</p>
+<h3>Anacron to the&nbsp;rescue</h3>
+<p>How do you push an empty commit once a day? With cron of course. Even better, <strong>anacron</strong>.</p>
+<div class="highlight"><pre><span></span>mkdir ~/.anacron
+<span class="nb">cd</span> ~/.anacron
+mkdir cron.daily cron.weekly cron.monthly spool etc
+
+cat <span class="s">&lt;&lt;EOT &gt; ~/.anacron/etc/anacrontab</span>
+
+<span class="s">SHELL=/bin/sh</span>
+<span class="s">PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/$HOME/bin</span>
+<span class="s">HOME=$HOME</span>
+<span class="s">LOGNAME=$USER</span>
+
+<span class="s">1 5  daily-cron nice run-parts --report $HOME/.anacron/cron.daily</span>
+<span class="s">7 10 weekly-cron nice run-parts --report $HOME/.anacron/cron.weekly</span>
+<span class="s">@monthly 15 monthly-cron nice run-parts --report $HOME/.anacron/cron.monthly</span>
+
+<span class="s">EOT</span>
+
+cat <span class="s">&lt;&lt;EOT &gt;&gt; ~/.zprofile # I use zsh shell</span>
+<span class="s">rm -f $HOME/.anacron/anacron.log</span>
+<span class="s">/usr/sbin/anacron -t /home/zimmi/.anacron/etc/anacrontab -S /home/zimmi/.anacron/spool &amp;&gt; /home/zimmi/.anacron/anacron.log</span>
+
+<span class="s">EOT</span>
+</pre></div>
+
+
+<p>Anacron is to laptop what cron is to 24/7 running server. It just runs automatic jobs when the laptop is running. If it&#8217;s not and the job should be run, it runs it once the <span class="caps">OS</span> boots. Brilliant&nbsp;idea.</p>
+<p>It runs the following code for me to keep the app writing data to the&nbsp;database.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+<span class="nv">workdir</span><span class="o">=</span><span class="s1">&#39;/home/zimmi/documents/zimmi/dizertace/social&#39;</span>
+<span class="nv">logfile</span><span class="o">=</span><span class="nv">$workdir</span>/restart-gear.log
+date &gt; <span class="nv">$logfile</span>
+
+<span class="o">{</span> 
+<span class="nv">HOME</span><span class="o">=</span>/home/zimmi
+<span class="nb">cd</span> <span class="nv">$workdir</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
+git merge origin/master <span class="o">&amp;&amp;</span> <span class="se">\</span>
+git commit --allow-empty -m <span class="s2">&quot;Restart gear&quot;</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
+git push <span class="o">&amp;&amp;</span> <span class="se">\</span>
+<span class="nb">echo</span> <span class="s2">&quot;Success&quot;</span> <span class="p">;</span> 
+<span class="o">}</span> &gt;&gt; <span class="nv">$logfile</span> 2&gt;<span class="p">&amp;</span>1
+</pre></div>
+
+
+<p><strong><span class="caps">UPDATE</span>:</strong> Spent a long time debugging the &#8220;Permission denied (publickey).&#8221;-like errors. What seems to help&nbsp;is:</p>
+<ol>
+<li>Use id_rsa instead of any other <span class="caps">SSH</span>&nbsp;key</li>
+<li>Put a new entry into the <code>~/.ssh/config</code> file</li>
+</ol>
+<p>I don&#8217;t know which one did the magic&nbsp;though.</p>
+<p>I&#8217;ve been harvesting Twitter for a month with about 10-15K tweets a day (only interested in the Czech Republic). 
+<sup>1</sup>&frasl;<sub>6</sub> to <sup>1</sup>&frasl;<sub>5</sub> of them is located with latitude and longitude. More on this next&nbsp;time.</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/" rel="bookmark" title="Permalink to Installing PostGIS 2.2 with SFCGAL on Ubuntu-based OS">Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span></a></h1>
+            <small>Written on Oct 29, 2015
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>,         <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>        | <a href="https://www.zimmi.cz/posts/category/development.html">development</a>
+        </small>
+        <section>
+            <p>I&#8217;ve seen a bunch of questions on <span class="caps">GIS</span> StackExchange recently related to <a href="http://sfcgal.org/"><span class="caps">SFCGAL</span></a> extension for <a href="http://postgis.net">PostGIS 2.2</a>. Great news are it can be installed with one simple query <code>CREATE EXTENSION postgis_sfcgal</code>. Not so great news are you have to compile it from source for Ubuntu-based <span class="caps">OS</span> (14.04) as recent versions of required packages are not available in the&nbsp;repositories.</p>
+<p>I tested my solution on elementary <span class="caps">OS</span> 0.3.1 based on Ubuntu 14.04. <strong>And it works!</strong> It installs PostgreSQL 9.4 from repositories together with <span class="caps">GDAL</span> and <span class="caps">GEOS</span> and some other libs PostGIS depends on. PostGIS itself, <span class="caps">CGAL</span>, Boost, <span class="caps">MPFR</span> and <span class="caps">GMP</span> are built from&nbsp;source.</p>
+<p>Here comes the code (commented where&nbsp;needed).</p>
+<div class="highlight"><pre><span></span>sudo -i
+<span class="nb">echo</span> <span class="s2">&quot;deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main&quot;</span> <span class="p">|</span> tee -a /etc/apt/sources.list
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc <span class="p">|</span> sudo apt-key add -
+apt-get update
+apt-get install -y postgresql-9.4 <span class="se">\</span>
+    postgresql-client-9.4 <span class="se">\</span>
+    postgresql-contrib-9.4 <span class="se">\</span>
+    libpq-dev <span class="se">\</span>
+    postgresql-server-dev-9.4 <span class="se">\</span>
+    build-essential <span class="se">\</span>
+    libgeos-c1 <span class="se">\</span>
+    libgdal-dev <span class="se">\</span>
+    libproj-dev <span class="se">\</span>
+    libjson0-dev <span class="se">\</span>
+    libxml2-dev <span class="se">\</span>
+    libxml2-utils <span class="se">\</span>
+    xsltproc <span class="se">\</span>
+    docbook-xsl <span class="se">\</span>
+    docbook-mathml <span class="se">\</span>
+    cmake <span class="se">\</span>
+    gcc <span class="se">\</span>
+    m4 <span class="se">\</span>
+    icu-devtools
+
+<span class="nb">exit</span> <span class="c1"># leave root otherwise postgis will choke</span>
+
+<span class="nb">cd</span> /tmp
+touch download.txt
+cat <span class="s">&lt;&lt;EOT &gt;&gt; download.txt</span>
+<span class="s">https://gmplib.org/download/gmp/gmp-6.0.0a.tar.bz2</span>
+<span class="s">https://github.com/Oslandia/SFCGAL/archive/v1.2.0.tar.gz</span>
+<span class="s">http://www.mpfr.org/mpfr-current/mpfr-3.1.3.tar.gz</span>
+<span class="s">http://downloads.sourceforge.net/project/boost/boost/1.59.0/boost_1_59_0.tar.gz</span>
+<span class="s">https://github.com/CGAL/cgal/archive/releases/CGAL-4.6.3.tar.gz</span>
+<span class="s">http://download.osgeo.org/postgis/source/postgis-2.2.0.tar.gz</span>
+
+<span class="s">EOT</span>
+
+cat download.txt <span class="p">|</span> xargs -n <span class="m">1</span> -P <span class="m">8</span> wget <span class="c1"># make wget a little bit faster</span>
+
+tar xjf gmp-6.0.0a.tar.bz2
+tar xzf mpfr-3.1.3.tar.gz
+tar xzf v1.2.0.tar.gz
+tar xzf boost_1_59_0.tar.gz
+tar xzf CGAL-4.6.3.tar.gz
+tar xzf postgis-2.2.0.tar.gz
+
+<span class="nv">CORES</span><span class="o">=</span><span class="k">$(</span>nproc<span class="k">)</span>
+
+<span class="k">if</span> <span class="o">[[</span> <span class="nv">$CORES</span> &gt; <span class="m">1</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nv">CORES</span><span class="o">=</span><span class="k">$(</span>expr <span class="nv">$CORES</span> - 1<span class="k">)</span> <span class="c1"># be nice to your PC</span>
+<span class="k">fi</span>
+
+<span class="nb">cd</span> gmp-6.0.0
+./configure <span class="o">&amp;&amp;</span> make -j <span class="nv">$CORES</span> <span class="o">&amp;&amp;</span> sudo make -j <span class="nv">$CORES</span> install
+
+<span class="nb">cd</span> ..
+<span class="nb">cd</span> mpfr-3.1.3
+./configure <span class="o">&amp;&amp;</span> make -j <span class="nv">$CORES</span> <span class="o">&amp;&amp;</span> sudo make -j <span class="nv">$CORES</span> install
+
+<span class="nb">cd</span> ..
+<span class="nb">cd</span> boost_1_59_0
+./bootstrap.sh --prefix<span class="o">=</span>/usr/local --with-libraries<span class="o">=</span>all <span class="o">&amp;&amp;</span> sudo ./b2 install <span class="c1"># there might be some warnings along the way, don&#39;t panic</span>
+<span class="nb">echo</span> <span class="s2">&quot;/usr/local/lib&quot;</span> <span class="p">|</span> sudo tee /etc/ld.so.conf.d/boost.conf
+sudo ldconfig
+
+<span class="nb">cd</span> ..
+<span class="nb">cd</span> cgal-releases-CGAL-4.6.3
+cmake . <span class="o">&amp;&amp;</span> make -j <span class="nv">$CORES</span> <span class="o">&amp;&amp;</span> sudo make -j <span class="nv">$CORES</span> install
+
+<span class="nb">cd</span> ..
+<span class="nb">cd</span> SFCGAL-1.2.0/
+cmake . <span class="o">&amp;&amp;</span> make -j <span class="nv">$CORES</span> <span class="o">&amp;&amp;</span> sudo make -j <span class="nv">$CORES</span> install
+
+<span class="nb">cd</span> ..
+<span class="nb">cd</span> postgis-2.2.0
+./configure <span class="se">\</span>
+    --with-geosconfig<span class="o">=</span>/usr/bin/geos-config <span class="se">\</span>
+    --with-xml2config<span class="o">=</span>/usr/bin/xml2-config <span class="se">\</span>
+    --with-projdir<span class="o">=</span>/usr/share/proj <span class="se">\</span>
+    --with-libiconv<span class="o">=</span>/usr/bin <span class="se">\</span>
+    --with-jsondir<span class="o">=</span>/usr/include/json <span class="se">\</span>
+    --with-gdalconfig<span class="o">=</span>/usr/bin/gdal-config <span class="se">\</span>
+    --with-raster <span class="se">\</span>
+    --with-topology <span class="se">\</span>
+    --with-sfcgal<span class="o">=</span>/usr/local/bin/sfcgal-config <span class="o">&amp;&amp;</span> <span class="se">\</span>
+make <span class="o">&amp;&amp;</span> make cheatsheets <span class="o">&amp;&amp;</span> sudo make install <span class="c1"># deliberately one CPU only</span>
+
+sudo -u postgres psql
+sudo -u postgres createdb spatial_template
+sudo -u postgres psql -d spatial_template -c <span class="s2">&quot;CREATE EXTENSION postgis;&quot;</span>
+sudo -u postgres psql -d spatial_template -c <span class="s2">&quot;CREATE EXTENSION postgis_topology;&quot;</span>
+sudo -u postgres psql -d spatial_template -c <span class="s2">&quot;CREATE EXTENSION postgis_sfcgal;&quot;</span>
+sudo -u postgres psql -d spatial_template -c <span class="s2">&quot;SELECT postgis_full_version();&quot;</span>
+</pre></div>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2015/color-relief-shaded-map-using-open-data-with-open-source-software/" rel="bookmark" title="Permalink to Color Relief Shaded Map Using Open Data with Open Source Software">Color Relief Shaded Map Using Open Data with Open Source&nbsp;Software</a></h1>
+            <small>Written on Oct 25, 2015
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>,         <a href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>,         <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>,         <a href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>        | <a href="https://www.zimmi.cz/posts/category/automation.html">automation</a>
+        </small>
+        <section>
+            <p>The Digital Elevation Model over Europe (<span class="caps">EU</span>-<span class="caps">DEM</span>) has been recently released for public usage at <a href="http://land.copernicus.eu/in-situ/eu-dem">Copernicus Land Monitoring Services homepage</a>. Strictly speaking, it is a <strong>digital surface model</strong> coming from weighted average of <span class="caps">SRTM</span> and <span class="caps">ASTER</span> <span class="caps">GDEM</span> with geographic accuracy of 25 m. Data are provided as GeoTIFF files projected in 1 degree by 1 degree tiles (projected to <span class="caps">EPSG</span>:3035), so they correspond to the <span class="caps">SRTM</span> naming&nbsp;convention.</p>
+<p>If you can&#8217;t see the map to choose the data to download, make sure you&#8217;re not using <span class="caps">HTTPS</span> Everywhere or similar browser&nbsp;plugin.</p>
+<p>I chose <strong>Austria</strong> to play with the&nbsp;data.</p>
+<h2>Obtaining the&nbsp;data</h2>
+<p>It&#8217;s so easy I doubt it&#8217;s even worth a word. Get zipped data with <code>wget</code>, extract them to a&nbsp;directory.</p>
+<div class="highlight"><pre><span></span>wget https://cws-download.eea.europa.eu/in-situ/eudem/eu-dem/EUD_CP-DEMS_4500025000-AA.rar -O dem.rar
+unrar dem.rar -d copernicus
+<span class="nb">cd</span> copernicus
+</pre></div>
+
+
+<h2>Hillshade and color&nbsp;relief</h2>
+<p>Use <span class="caps">GDAL</span> to create hillshade with a simple command. No need to use <code>-s</code> flag to convert units, it already comes in meters. Exaggerate heights a bit with <code>-z</code> flag.</p>
+<div class="highlight"><pre><span></span>gdaldem hillshade EUD_CP-DEMS_4500025000-AA.tif hillshade.tif -z 3
+</pre></div>
+
+
+<p>And here comes the&nbsp;Alps.</p>
+<p class="text-center"><img title="Hillshade" src="https://www.zimmi.cz/posts/assets/color-relief-shaded-map-using-open-data-and-open-source-software/hillshade.png" class="center"></p>
+
+<p>To create a color relief you need a ramp of heights with colors. <a href="http://cartographicperspectives.org/index.php/journal/article/viewFile/20/70">&#8220;The Development and Rationale of Cross-blended Hypsometric Tints&#8221;</a> by T. Patterson and B. Jenny is a great read on <strong>hypsometric tints</strong>. They also give advice on what colors to choose in different environments (see the table at the last page of the article). I settled for warm humid color&nbsp;values.</p>
+<table class="center">
+<thead>
+    <tr>
+        <th>Elevation [m]</th>
+        <th>Red</th>
+        <th>Green</th>
+        <th>Blue</th>
+    </tr>
+</thead>
+<tbody>
+<tr style="background: rgb(220, 220, 220)">
+<td>5000</td>
+<td>220</td>
+<td>220</td>
+<td>220</td>
+</tr>
+<tr style="background: rgb(212, 207, 204)">
+<td>4000</td>
+<td>212</td>
+<td>207</td>
+<td>204</td>
+</tr>
+<tr style="background: rgb(212, 193, 179)">
+<td>3000</td>
+<td>212</td>
+<td>193</td>
+<td>179</td>
+</tr>
+<tr style="background: rgb(212, 184, 163)">
+<td>2000</td>
+<td>212</td>
+<td>184</td>
+<td>163</td>
+</tr>
+<tr style="background: rgb(212, 201, 180)">
+<td>1000</td>
+<td>212</td>
+<td>201</td>
+<td>180</td>
+</tr>
+<tr style="background: rgb(196, 192, 166)">
+<td>600</td>
+<td>169</td>
+<td>192</td>
+<td>166</td>
+</tr>
+<tr style="background: rgb(134, 184, 159)">
+<td>200</td>
+<td>134</td>
+<td>184</td>
+<td>159</td>
+</tr>
+<tr style="background: rgb(120, 172, 149)">
+<td>50</td>
+<td>120</td>
+<td>172</td>
+<td>149</td>
+</tr>
+<tr style="background: rgb(114, 164, 141)">
+<td>0</td>
+<td>114</td>
+<td>164</td>
+<td>141</td>
+</tr>
+</tbody>
+</table>
+
+<p>I created a color relief with another <span class="caps">GDAL</span>&nbsp;command.</p>
+<div class="highlight"><pre><span></span>gdaldem color-relief EUD_CP-DEMS_4500025000-AA.tif ramp_humid.txt color_relief.tif
+</pre></div>
+
+
+<p>And here comes hypsometric&nbsp;tints.</p>
+<p class="text-center"><img title="Color relief" src="https://www.zimmi.cz/posts/assets/color-relief-shaded-map-using-open-data-and-open-source-software/color_relief.png" class="center"></p>
+
+<p>Add a bit of compression and some overviews to make it smaller and load&nbsp;faster.</p>
+<div class="highlight"><pre><span></span>gdal_translate -of GTiff -co <span class="nv">TILED</span><span class="o">=</span>YES -co <span class="nv">COMPRESS</span><span class="o">=</span>DEFLATE color_relief.tif color_relief.compress.tif
+gdal_translate -of GTiff -co <span class="nv">TILED</span><span class="o">=</span>YES -co <span class="nv">COMPRESS</span><span class="o">=</span>DEFLATE hillshade.tif hillshade.compress.tif
+rm color_relief.tif
+rm hillshade.tif
+mv color_relief.compress.tif color_relief.tif
+mv hillshade.compress.tif hillshade.tif
+gdaladdo color_relief.tif <span class="m">2</span> <span class="m">4</span> <span class="m">8</span> 16
+gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span class="m">8</span> 16
+</pre></div>
+
+
+<h2>Map&nbsp;composition</h2>
+<p>I chose Austria for its excessive amount of freely available datasets. What I didn&#8217;t take into consideration was my lack of knowledge when it comes to German (#fail). States come from <a href="http://data.gv.at">data.gv.at</a> and was dissolved from smaller administrative units. State capitals were downloaded from <a href="http://naturalearth.com">naturalearth.com</a>.</p>
+<p class="text-center"><a href="https://www.zimmi.cz/posts/assets/color-relief-shaded-map-using-open-data-and-open-source-software/map.pdf" title="Click for PDF version"><img title="Austria" src="https://www.zimmi.cz/posts/assets/color-relief-shaded-map-using-open-data-and-open-source-software/map.png" class="center"></a></p>
+
+<p>I&#8217;d like to add some more thematic layers in the future. And translate the map to&nbsp;English.</p>
+<h2>Few words on <span class="caps">INSPIRE</span>&nbsp;Geoportal</h2>
+<p><a href="http://inspire-geoportal.ec.europa.eu/"><span class="caps">INSPIRE</span> Geoportal</a> should be the first place you go to search for European spatial data (at last <span class="caps">EU</span> thinks so). I used it to find data for this map and it was a very frustrating experience. It was actually more frustrating than using Austrian open data portal in German. Last news are from May 21, 2015, but the whole site looks and feels like deep 90s or early 2000 at&nbsp;least.</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2015/postgresql-in-vs-exists/" rel="bookmark" title="Permalink to PostgreSQL IN vs EXISTS">PostgreSQL <span class="caps">IN</span> vs <span class="caps">EXISTS</span></a></h1>
+            <small>Written on Oct 9, 2015
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>        | <a href="https://www.zimmi.cz/posts/category/development.html">development</a>
+        </small>
+        <section>
+            <p>Until recently, <span class="caps">SQL</span> <code>IN</code> and <code>EXISTS</code> were almost exactly the same to me. There is a significant difference both in execution plans and time of execution though, as I found out after not being able to speed up my workmate&#8217;s&nbsp;query.</p>
+<p>Assume two not-as-small-as-they-might-be&nbsp;tables:</p>
+<div class="highlight"><pre><span></span><span class="k">BEGIN</span><span class="p">;</span>
+
+<span class="k">CREATE</span> <span class="n">UNLOGGED</span> <span class="k">TABLE</span> <span class="n">test</span><span class="p">.</span><span class="n">small</span> <span class="k">AS</span>
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">generate_series</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">500000</span><span class="p">)</span> <span class="n">id</span><span class="p">;</span>
+
+<span class="k">CREATE</span> <span class="n">UNLOGGED</span> <span class="k">TABLE</span> <span class="n">test</span><span class="p">.</span><span class="n">big</span> <span class="k">AS</span>
+<span class="k">SELECT</span> <span class="p">(</span><span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">4000000</span><span class="p">)::</span><span class="nb">integer</span> <span class="n">id</span>
+<span class="k">FROM</span> <span class="n">generate_series</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4000000</span><span class="p">);</span>
+
+<span class="k">COMMIT</span><span class="p">;</span>
+</pre></div>
+
+
+<p>To find out what rows from <code>test.big</code> is missing in <code>test.small</code>, you&#8217;ll use one of these&nbsp;queries:</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">id</span>
+<span class="k">FROM</span> <span class="n">test</span><span class="p">.</span><span class="n">big</span>
+<span class="k">WHERE</span> <span class="n">id</span> <span class="k">NOT</span> <span class="k">IN</span> <span class="p">(</span><span class="k">SELECT</span> <span class="n">id</span> <span class="k">FROM</span> <span class="n">test</span><span class="p">.</span><span class="n">small</span><span class="p">);</span>
+
+                            <span class="n">QUERY</span> <span class="n">PLAN</span>
+<span class="c1">-----------------------------------------------------------------------------------------</span>
+<span class="n">Seq</span> <span class="n">Scan</span> <span class="k">on</span> <span class="n">big</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">8463</span><span class="p">.</span><span class="mi">01</span><span class="p">..</span><span class="mi">42313</span><span class="p">.</span><span class="mi">02</span> <span class="k">rows</span><span class="o">=</span><span class="mi">1000000</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">177</span><span class="p">.</span><span class="mi">061</span><span class="p">..</span><span class="mi">864</span><span class="p">.</span><span class="mi">043</span> <span class="k">rows</span><span class="o">=</span><span class="mi">1500894</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">Filter</span><span class="p">:</span> <span class="p">(</span><span class="k">NOT</span> <span class="p">(</span><span class="n">hashed</span> <span class="n">SubPlan</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="k">Rows</span> <span class="n">Removed</span> <span class="k">by</span> <span class="n">Filter</span><span class="p">:</span> <span class="mi">499107</span>
+    <span class="n">SubPlan</span> <span class="mi">1</span>
+    <span class="o">-&gt;</span>  <span class="n">Seq</span> <span class="n">Scan</span> <span class="k">on</span> <span class="n">small</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">00</span><span class="p">..</span><span class="mi">7213</span><span class="p">.</span><span class="mi">01</span> <span class="k">rows</span><span class="o">=</span><span class="mi">500001</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">045</span><span class="p">..</span><span class="mi">34</span><span class="p">.</span><span class="mi">727</span> <span class="k">rows</span><span class="o">=</span><span class="mi">500001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">Total</span> <span class="n">runtime</span><span class="p">:</span> <span class="mi">904</span><span class="p">.</span><span class="mi">413</span> <span class="n">ms</span>
+<span class="p">(</span><span class="mi">6</span> <span class="k">rows</span><span class="p">)</span>
+
+
+<span class="k">SELECT</span> <span class="n">id</span>
+<span class="k">FROM</span> <span class="n">test</span><span class="p">.</span><span class="n">big</span>
+<span class="k">WHERE</span> <span class="k">NOT</span> <span class="k">EXISTS</span> <span class="p">(</span>
+    <span class="k">SELECT</span> <span class="mi">1</span>
+    <span class="k">FROM</span> <span class="n">test</span><span class="p">.</span><span class="n">small</span>
+    <span class="k">WHERE</span> <span class="n">test</span><span class="p">.</span><span class="n">big</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">test</span><span class="p">.</span><span class="n">small</span><span class="p">.</span><span class="n">id</span>
+<span class="p">);</span>
+                            <span class="n">QUERY</span> <span class="n">PLAN</span>
+<span class="c1">-----------------------------------------------------------------------------------------</span>
+<span class="n">Hash</span> <span class="n">Anti</span> <span class="k">Join</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">15417</span><span class="p">.</span><span class="mi">02</span><span class="p">..</span><span class="mi">82100</span><span class="p">.</span><span class="mi">58</span> <span class="k">rows</span><span class="o">=</span><span class="mi">955189</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">100</span><span class="p">.</span><span class="mi">257</span><span class="p">..</span><span class="mi">1240</span><span class="p">.</span><span class="mi">343</span> <span class="k">rows</span><span class="o">=</span><span class="mi">1500894</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">Hash</span> <span class="n">Cond</span><span class="p">:</span> <span class="p">(</span><span class="n">big</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">small</span><span class="p">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="o">-&gt;</span>  <span class="n">Seq</span> <span class="n">Scan</span> <span class="k">on</span> <span class="n">big</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">00</span><span class="p">..</span><span class="mi">28850</span><span class="p">.</span><span class="mi">01</span> <span class="k">rows</span><span class="o">=</span><span class="mi">2000001</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">016</span><span class="p">..</span><span class="mi">125</span><span class="p">.</span><span class="mi">024</span> <span class="k">rows</span><span class="o">=</span><span class="mi">2000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="o">-&gt;</span>  <span class="n">Hash</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">7213</span><span class="p">.</span><span class="mi">01</span><span class="p">..</span><span class="mi">7213</span><span class="p">.</span><span class="mi">01</span> <span class="k">rows</span><span class="o">=</span><span class="mi">500001</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">100</span><span class="p">.</span><span class="mi">068</span><span class="p">..</span><span class="mi">100</span><span class="p">.</span><span class="mi">068</span> <span class="k">rows</span><span class="o">=</span><span class="mi">500001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">Buckets</span><span class="p">:</span> <span class="mi">65536</span>  <span class="n">Batches</span><span class="p">:</span> <span class="mi">2</span>  <span class="n">Memory</span> <span class="k">Usage</span><span class="p">:</span> <span class="mi">8800</span><span class="n">kB</span>
+        <span class="o">-&gt;</span>  <span class="n">Seq</span> <span class="n">Scan</span> <span class="k">on</span> <span class="n">small</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">00</span><span class="p">..</span><span class="mi">7213</span><span class="p">.</span><span class="mi">01</span> <span class="k">rows</span><span class="o">=</span><span class="mi">500001</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">011</span><span class="p">..</span><span class="mi">35</span><span class="p">.</span><span class="mi">543</span> <span class="k">rows</span><span class="o">=</span><span class="mi">500001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">Total</span> <span class="n">runtime</span><span class="p">:</span> <span class="mi">1280</span><span class="p">.</span><span class="mi">609</span> <span class="n">ms</span>
+</pre></div>
+
+
+<p>That&#8217;s not a significant difference in time execution, is&nbsp;it?</p>
+<p>What if you want to find out what rows from <code>test.small</code> is missing in <code>test.big</code>?</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">id</span>
+<span class="k">FROM</span> <span class="n">test</span><span class="p">.</span><span class="n">small</span>
+<span class="k">WHERE</span> <span class="n">id</span> <span class="k">NOT</span> <span class="k">IN</span> <span class="p">(</span><span class="k">SELECT</span> <span class="n">id</span> <span class="k">FROM</span> <span class="n">test</span><span class="p">.</span><span class="n">big</span><span class="p">);</span>
+
+                                <span class="n">QUERY</span> <span class="n">PLAN</span>
+<span class="c1">---------------------------------------------------------------------------</span>
+<span class="n">Seq</span> <span class="n">Scan</span> <span class="k">on</span> <span class="n">small</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">00</span><span class="p">..</span><span class="mi">12915788669</span><span class="p">.</span><span class="mi">52</span> <span class="k">rows</span><span class="o">=</span><span class="mi">250000</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">Filter</span><span class="p">:</span> <span class="p">(</span><span class="k">NOT</span> <span class="p">(</span><span class="n">SubPlan</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">SubPlan</span> <span class="mi">1</span>
+    <span class="o">-&gt;</span>  <span class="n">Materialize</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">00</span><span class="p">..</span><span class="mi">46663</span><span class="p">.</span><span class="mi">01</span> <span class="k">rows</span><span class="o">=</span><span class="mi">2000001</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+        <span class="o">-&gt;</span>  <span class="n">Seq</span> <span class="n">Scan</span> <span class="k">on</span> <span class="n">big</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">00</span><span class="p">..</span><span class="mi">28850</span><span class="p">.</span><span class="mi">01</span> <span class="k">rows</span><span class="o">=</span><span class="mi">2000001</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="p">(</span><span class="mi">5</span> <span class="k">rows</span><span class="p">)</span>
+
+
+<span class="k">SELECT</span> <span class="n">id</span>
+<span class="k">FROM</span> <span class="n">test</span><span class="p">.</span><span class="n">small</span>
+<span class="k">WHERE</span> <span class="k">NOT</span> <span class="k">EXISTS</span> <span class="p">(</span>
+    <span class="k">SELECT</span> <span class="mi">1</span>
+    <span class="k">FROM</span> <span class="n">test</span><span class="p">.</span><span class="n">big</span>
+    <span class="k">WHERE</span> <span class="n">test</span><span class="p">.</span><span class="n">big</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">test</span><span class="p">.</span><span class="n">small</span><span class="p">.</span><span class="n">id</span>
+<span class="p">);</span>
+
+                               <span class="n">QUERY</span> <span class="n">PLAN</span>
+<span class="c1">-------------------------------------------------------------------------</span>
+<span class="n">Hash</span> <span class="n">Anti</span> <span class="k">Join</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">61663</span><span class="p">.</span><span class="mi">02</span><span class="p">..</span><span class="mi">180597</span><span class="p">.</span><span class="mi">23</span> <span class="k">rows</span><span class="o">=</span><span class="mi">1</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">Hash</span> <span class="n">Cond</span><span class="p">:</span> <span class="p">(</span><span class="n">small</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">big</span><span class="p">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="o">-&gt;</span>  <span class="n">Seq</span> <span class="n">Scan</span> <span class="k">on</span> <span class="n">small</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">00</span><span class="p">..</span><span class="mi">7213</span><span class="p">.</span><span class="mi">01</span> <span class="k">rows</span><span class="o">=</span><span class="mi">500001</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="o">-&gt;</span>  <span class="n">Hash</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">28850</span><span class="p">.</span><span class="mi">01</span><span class="p">..</span><span class="mi">28850</span><span class="p">.</span><span class="mi">01</span> <span class="k">rows</span><span class="o">=</span><span class="mi">2000001</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+        <span class="o">-&gt;</span>  <span class="n">Seq</span> <span class="n">Scan</span> <span class="k">on</span> <span class="n">big</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">00</span><span class="p">..</span><span class="mi">28850</span><span class="p">.</span><span class="mi">01</span> <span class="k">rows</span><span class="o">=</span><span class="mi">2000001</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="p">(</span><span class="mi">5</span> <span class="k">rows</span><span class="p">)</span>
+</pre></div>
+
+
+<p>It took me ~750 ms to get the result with <code>EXISTS</code> expression. I kept <code>IN</code> running whole night with no result. I&#8217;m not really sure why <code>IN</code> is so much slower, it might be caused by checks for <code>NULL</code> values. The speed is also related to the size of the subquery, thus the difference when tables were&nbsp;switched.</p>
+<p><code>LEFT JOIN</code> can be used to achieve the same result, I find its syntax less obvious&nbsp;though.</p>
+<p>No indexes were built this time, I know they don&#8217;t help the <code>IN</code> performance at all from my previous tests. Tested with PostgreSQL&nbsp;9.3.9.</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2015/how-to-use-queue-with-rsync/" rel="bookmark" title="Permalink to How to Use Queue with Rsync">How to Use Queue with&nbsp;Rsync</a></h1>
+            <small>Written on Oct 1, 2015
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>,         <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>        | <a href="https://www.zimmi.cz/posts/category/automation.html">automation</a>
+        </small>
+        <section>
+            <p>Having more than 120K <span class="caps">5MB</span>+ images that should be moved to the server is a great oportunity for some automatic bash processing. It might be good idea to use <a href="http://www.imagemagick.org/script/index.php">ImageMagick</a> <a href="http://www.imagemagick.org/script/convert.php">convert tool</a> to make images smaller in a simple for loop. <a href="http://www.gnu.org/software/parallel/"><span class="caps">GNU</span> Parallel</a> can significantly increase the performance by running one job per <span class="caps">CPU</span>&nbsp;core.</p>
+<div class="highlight"><pre><span></span>parallel --verbose convert <span class="o">{}</span> -quality 40% <span class="o">{}</span> ::: *.jpg
+</pre></div>
+
+
+<p>The <code>parallel</code> modifies several images per second. Uploading these right away seems to be the next step. But how do you tell <code>rsync</code> to check for modified files every now and then? Another for loop mixed with <code>sleep</code> would work, but it just doesn&#8217;t feel&nbsp;right.</p>
+<p>Luckily, there&#8217;s a <a href="http://linux.die.net/man/1/inotifywait"><code>inotifywait</code></a> tool capable of watching changes to files and taking actions based on those&nbsp;changes.</p>
+<div class="highlight"><pre><span></span>inotifywait -e close_write -m --format <span class="s1">&#39;%f&#39;</span> . <span class="p">|</span> <span class="se">\</span>
+<span class="k">while</span> <span class="nb">read</span> file
+<span class="k">do</span>
+    <span class="nb">echo</span> <span class="nv">$file</span>
+    rsync -OWRD0Pq --ignore-existing <span class="nv">$file</span> data@localhost
+<span class="k">done</span>
+</pre></div>
+
+
+<p>By default, <code>inotifywait</code> stops after receiving a single event, while <code>-m</code> flag runs it indefinitely. <code>-e</code> flag defines an event to watch for, in my case that&#8217;s a <code>close_write</code> event. The <code>inotifywait</code> output can be piped to <code>rsync</code> that takes care of syncing local files to remote&nbsp;server.</p>
+<p>The last step, as usual, is&nbsp;profit.</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/" rel="bookmark" title="Permalink to Automated Map Creation With QGIS, PostGIS, Python, SVG and ImageMagick">Automated Map Creation With <span class="caps">QGIS</span>, PostGIS, Python, <span class="caps">SVG</span> and&nbsp;ImageMagick</a></h1>
+            <small>Written on Aug 9, 2015
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>,         <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>,         <a href="https://www.zimmi.cz/posts/tag/python.html">python</a>,         <a href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>,         <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>        | <a href="https://www.zimmi.cz/posts/category/automation.html">automation</a>
+        </small>
+        <section>
+            <p>As mentioned in <a href="https://www.zimmi.cz/posts/2015/qgis-tips-for-collaborative-mapping/"><span class="caps">QGIS</span> Tips For Collaborative Mapping</a> we&#8217;re in the middle of crop evaluation project at <a href="http://www.clevermaps.cz/">CleverMaps</a>.</p>
+<p>With the <span class="caps">QGIS</span> workflow up and running, I&#8217;ve been focused on different <span class="caps">QGIS</span> related task: <strong>automatic map generation</strong> for land blocks that meet certain conditions. The logic behind identifying such land blocks is as&nbsp;follows:</p>
+<ul>
+<li>if the original area and the measured one differ more than 0.5 %&nbsp;or</li>
+<li>number of declared crops differs from number of crops identified&nbsp;or</li>
+<li>at least one parcel in the land block was given a certain error&nbsp;code</li>
+</ul>
+<p>Let&#8217;s assume that with several lines of <span class="caps">SQL</span> code we can store these mentioned above in a table called <code>land_blocks</code> with geometries being the result of calling <code>ST_Union()</code> over parcels for each land&nbsp;block.</p>
+<h2>Map&nbsp;composition</h2>
+<p>Every map should feature following&nbsp;layers:</p>
+<ul>
+<li>land blocks (remember the <code>land_blocks</code> table?) - labeled with <span class="caps">ID</span>, yellowish borders, no&nbsp;fill</li>
+<li>land parcels - that&#8217;s my source layer - labeled with letters, blue borders, no&nbsp;fill</li>
+<li>other&nbsp;layers</li>
+<li><span class="caps">HR</span>, <span class="caps">VHR</span>, <span class="caps">NIR</span> imagery, orthophoto - served via <span class="caps">WMS</span></li>
+</ul>
+<p>Labels should be visible only for the featured land block (both for the land parcels and the land block itself. The whole map scales dynamically, showing small land blocks zoomed in and the large ones zoomed&nbsp;out.</p>
+<p class='text-center'><a id="desired-map" title="Desired map" href="https://www.zimmi.cz/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map.jpg"><img title="Desired map" src="https://www.zimmi.cz/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map.jpg" width=70% class="img-responsive centered"></a></p>
+
+<p>Every map features additional&nbsp;items:</p>
+<ul>
+<li>dynamic list of subsidies farmer asks for - showing both measured and declared&nbsp;area</li>
+<li>dynamic list of land parcels with their areas and error&nbsp;codes</li>
+<li>scalebar</li>
+<li>map&nbsp;key</li>
+<li>logos</li>
+</ul>
+<h2>Atlas&nbsp;creation</h2>
+<p>Now with requirements defined, let&#8217;s create some maps. It&#8217;s incredibly easy to generate a series of maps with <span class="caps">QGIS</span> atlas&nbsp;options.</p>
+<h3>Atlas generation&nbsp;settings</h3>
+<p><strong>Coverage layer</strong> is presumably the only thing you really need - as the name suggests, it covers your area of interest. One map will be created for each feature in this layer, unless you decide to use some <strong>filtering</strong> - which I&nbsp;did.</p>
+<p><strong>Output filenames</strong> can be tweaked to your needs, here&#8217;s what such a function might look like. If there is a slash in the land block <span class="caps">ID</span> (<span class="caps">XXXXXXX</span>/Y), the filename is set to <code>USER-ID_XXXXXXX-00Y_M_00</code>, <code>USER-ID_XXXXXXX-000_M_00</code> otherwise.</p>
+<div class="highlight"><pre><span></span><span class="k">CASE</span> <span class="k">WHEN</span> <span class="n">strpos</span><span class="p">(</span><span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">),</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">THEN</span>
+        <span class="n">ji</span> <span class="o">||</span> <span class="s1">&#39;_&#39;</span> <span class="o">||</span>
+        <span class="n">substr</span><span class="p">(</span>
+            <span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="n">strpos</span><span class="p">(</span><span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">),</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span> <span class="c1">-- slash position</span>
+        <span class="p">)</span> <span class="o">||</span> <span class="s1">&#39;-&#39;</span> <span class="o">||</span>
+        <span class="n">lpad</span><span class="p">(</span>
+            <span class="n">substr</span><span class="p">(</span>
+                <span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">),</span>
+                <span class="n">strpos</span><span class="p">(</span><span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">),</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span>
+                <span class="k">length</span><span class="p">(</span><span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">))</span>
+            <span class="p">),</span>
+        <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">)</span> <span class="o">||</span> <span class="s1">&#39;_M_00&#39;</span>
+    <span class="k">ELSE</span>
+        <span class="n">ji</span> <span class="o">||</span> <span class="s1">&#39;_&#39;</span> <span class="o">||</span> <span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">)</span> <span class="o">||</span> <span class="s1">&#39;-000_M_00&#39;</span>
+<span class="k">END</span>
+</pre></div>
+
+
+<h3>Map scale <span class="amp">&amp;</span> variable&nbsp;substitutions</h3>
+<p>Different land blocks are of different sizes, thus needing different <strong>scales</strong> to fit in the map. Again, <span class="caps">QGIS</span> handles this <em>might-become-a-nightmare-pretty-easily</em> issue with a single click. You can define the scale&nbsp;as:</p>
+<ul>
+<li>margin around feature: percentage of the space displayed&nbsp;around</li>
+<li>predefined scale (best fit): my choice, sometimes it doesn&#8217;t display the entire land block&nbsp;though</li>
+<li>fixed scale: sets the scale the same for all the&nbsp;maps</li>
+</ul>
+<p>With these settings, I get a map similar to the one below. Notice two interesting&nbsp;things:</p>
+<p class='text-center'><a title="QGIS map skeleton" href="https://www.zimmi.cz/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map_skeleton.png"><img title="QGIS map skeleton" src="https://www.zimmi.cz/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map_skeleton.png" width=70% class="img-responsive centered"></a></p>
+
+<ul>
+<li>Scale uses decimal places, which I find <em>a huge failure</em>. Has anyone ever seen a map with such scale? The worst is there is no easy way to hide these, or at least I didn&#8217;t find&nbsp;one.</li>
+<li>You can see a bunch of <code>[something in the brackets]</code> notations. These will be substituted with actual values during the atlas generation. Showing land block <span class="caps">ID</span> with a preceeding label is as easy as <code>[%concat('PB: ', "kod_pb")%]</code> (mind the percentage&nbsp;sign).</li>
+</ul>
+<h3>Styling the map using atlas&nbsp;features</h3>
+<p>Atlas features are a great help for <strong>map customization</strong>. As mentioned earlier, in my case, only one land block label per map should be visible. That can be achieved with a simple label dialog&nbsp;expression:</p>
+<div class="highlight"><pre><span></span><span class="k">CASE</span>
+    <span class="k">WHEN</span> <span class="err">$</span><span class="n">id</span> <span class="o">=</span> <span class="err">$</span><span class="n">atlasfeatureid</span>
+    <span class="k">THEN</span> <span class="ss">&quot;kod_pb&quot;</span>
+<span class="k">END</span>
+</pre></div>
+
+
+<p><span class="caps">QGIS</span> keeps reference to each coverage layer feature <span class="caps">ID</span> during atlas generation, so you can use it for comparison. The best part is you can use IDs with <strong>any layer</strong> you&nbsp;need:</p>
+<div class="highlight"><pre><span></span><span class="k">CASE</span>
+    <span class="k">WHEN</span> <span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">)</span> <span class="o">=</span> <span class="ss">&quot;kod_pb&quot;</span>
+    <span class="k">THEN</span> <span class="ss">&quot;kod_zp&quot;</span>
+<span class="k">END</span>
+</pre></div>
+
+
+<p>With this simple expression, I get labels only for those land parcels that are part of the mapped land block. Even the <strong>layer style</strong> can be controlled with atlas feature. Land parcels inside the land block have blue borders, the rest is yellowish, remember? It&#8217;s a piece of cake with rule-based&nbsp;styling.</p>
+<p class='text-center'><a title="Layer style based on atlas feature" href="https://www.zimmi.cz/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/atlas_feature_style.png"><img title="Layer style based on atlas feature" src="https://www.zimmi.cz/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/atlas_feature_style.png" width=70% class="img-responsive centered"></a></p>
+
+<h3>Atlas&nbsp;generation</h3>
+<p>When you&#8217;re set, atlas can be created with a single button. I used <span class="caps">SVG</span> as an output format to easily manipulate the map content afterwards. The resulting maps look like the one in <a href="#desired-map">the first picture</a> without the text in the red rectangle. A Python script appends this to each map&nbsp;afterwards.</p>
+<p>Roughly speaking, generating 300 maps takes an hour or so, I guess that depends on the map complexity and hardware&nbsp;though.</p>
+<h3>Adding textual&nbsp;content</h3>
+<p><span class="caps">SVG</span> output is just plain old <span class="caps">XML</span> that you can edit by hand or by script. A simple Python script, part of map post-processing, loads <span class="caps">SVG</span> from the database and adds it to the left pane of each&nbsp;map.</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span>
+      <span class="n">ji</span><span class="p">,</span>
+      <span class="n">kod_pb</span><span class="p">,</span>
+      <span class="n">concat</span><span class="p">(</span>
+            <span class="s1">&#39;&lt;g fill=&quot;none&quot; stroke=&quot;#000000&quot; stroke-opacity=&quot;1&quot; stroke-width=&quot;1&quot;</span>
+<span class="s1">                  stroke-linecap=&quot;square&quot; stroke-linejoin=&quot;bevel&quot; transform=&quot;matrix(1.18081,0,0,1.18081,270.0,550.0)&quot;</span>
+<span class="s1">                  font-family=&quot;Droid Sans&quot; font-size=&quot;35&quot; font-style=&quot;normal&quot;&gt;&#39;</span><span class="p">,</span>
+            <span class="n">kultura</span><span class="p">,</span> <span class="n">vymery</span><span class="p">,</span> <span class="n">vymery_hodnoty</span><span class="p">,</span>
+            <span class="n">vcs_titul</span><span class="p">,</span> <span class="n">vcs_brk</span><span class="p">,</span> <span class="n">vcs_brs</span><span class="p">,</span> <span class="n">vcs_chmel</span><span class="p">,</span>
+            <span class="n">vcs_zvv</span><span class="p">,</span> <span class="n">vcs_zv</span><span class="p">,</span> <span class="n">vcs_ovv</span><span class="p">,</span> <span class="n">vcs_ov</span><span class="p">,</span> <span class="n">vcs_cur</span><span class="p">,</span> <span class="n">vcs_bip</span><span class="p">,</span>
+            <span class="n">lfa</span><span class="p">,</span> <span class="n">lfa_h1</span><span class="p">,</span> <span class="n">lfa_h2</span><span class="p">,</span> <span class="n">lfa_h3</span><span class="p">,</span>
+            <span class="n">lfa_h4</span><span class="p">,</span> <span class="n">lfa_h5</span><span class="p">,</span> <span class="n">lfa_oa</span><span class="p">,</span> <span class="n">lfa_ob</span><span class="p">,</span> <span class="n">lfa_s</span><span class="p">,</span>
+            <span class="n">natura</span><span class="p">,</span> <span class="n">aeo_eafrd_text</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_a1</span><span class="p">,</span>
+            <span class="n">dv_aeo_eafrd_a2o</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_a2v</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_b1</span><span class="p">,</span>
+            <span class="n">dv_aeo_eafrd_b2</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_b3</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_b4</span><span class="p">,</span>
+            <span class="n">dv_aeo_eafrd_b5</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_b6</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_b7</span><span class="p">,</span>
+            <span class="n">dv_aeo_eafrd_b8</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_b9</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_c1</span><span class="p">,</span>
+            <span class="n">dv_aeo_eafrd_c3</span><span class="p">,</span> <span class="n">aeko_text</span><span class="p">,</span> <span class="n">dv_aeko_a</span><span class="p">,</span> <span class="n">dv_aeko_b</span><span class="p">,</span> <span class="n">dv_aeko_c</span><span class="p">,</span>
+            <span class="n">dv_aeko_d1</span><span class="p">,</span> <span class="n">dv_aeko_d2</span><span class="p">,</span> <span class="n">dv_aeko_d3</span><span class="p">,</span> <span class="n">dv_aeko_d4</span><span class="p">,</span> <span class="n">dv_aeko_d5</span><span class="p">,</span>
+            <span class="n">dv_aeko_d6</span><span class="p">,</span> <span class="n">dv_aeko_d7</span><span class="p">,</span> <span class="n">dv_aeko_d8</span><span class="p">,</span> <span class="n">dv_aeko_d9</span><span class="p">,</span> <span class="n">dv_aeko_d10</span><span class="p">,</span>
+            <span class="n">dv_aeko_e</span><span class="p">,</span> <span class="n">dv_aeko_f</span><span class="p">,</span> <span class="n">ez</span><span class="p">,</span> <span class="n">dzes_text</span><span class="p">,</span> <span class="n">rep</span><span class="p">,</span> <span class="n">obi</span><span class="p">,</span> <span class="n">seop</span><span class="p">,</span> <span class="n">meop</span><span class="p">,</span> <span class="n">pbz</span><span class="p">,</span> <span class="n">dzes7</span><span class="p">,</span>
+            <span class="s1">&#39;&lt;/g&gt;&#39;</span>
+      <span class="p">)</span> <span class="n">popis</span>
+<span class="k">FROM</span> <span class="p">(...);</span>
+</pre></div>
+
+
+<p>Each column from the previous query is a result of <code>SELECT</code> similar to the one&nbsp;below.</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">concat</span><span class="p">(</span><span class="s1">&#39;&lt;text fill=&quot;#000000&quot; fill-opacity=&quot;1&quot; stroke=&quot;none&quot;&gt;BrK: &#39;</span><span class="p">,</span> <span class="n">dv_brk</span><span class="p">,</span> <span class="s1">&#39; ha / &#39;</span><span class="p">,</span> <span class="ss">&quot;MV_BRK&quot;</span><span class="p">,</span> <span class="s1">&#39; ha;&#39;</span><span class="p">,</span> <span class="n">kod_dpz</span><span class="p">,</span> <span class="s1">&#39;&lt;/text&gt;&#39;</span><span class="p">)</span> <span class="n">vcs_brk</span>
+</pre></div>
+
+
+<p>The <code>transform="matrix(1.18081,0,0,1.18081,270.0,550.0)</code> part puts the text on the right spot. Great finding about <span class="caps">SVG</span> is that it places each <code>&lt;text&gt;</code> element on the new line, so you don&#8217;t need to deal with calculating the position in your&nbsp;script.</p>
+<p>Scale adjustment is done with a dirty lambda&nbsp;function.</p>
+<div class="highlight"><pre><span></span><span class="n">content</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">r&quot;&gt;(\d{1,3}\.\d{3,5})&lt;/text&gt;&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">m</span> <span class="p">:</span><span class="s2">&quot;&gt;    &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)))))</span> <span class="o">+</span> <span class="s2">&quot;&lt;/text&gt;&quot;</span><span class="p">,</span> <span class="n">old_map</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+</pre></div>
+
+
+<h3><span class="caps">SVG</span> to <span class="caps">JPEG</span>&nbsp;conversion</h3>
+<p>We deliver maps as <span class="caps">JPEG</span> files with 150 <span class="caps">DPI</span> on A4 paper format. <a href="http://www.imagemagick.org/script/index.php">ImageMagick</a> converts the formats with a simple shell&nbsp;command:</p>
+<div class="highlight"><pre><span></span>convert -density <span class="m">150</span> -resize 1753x1240 input.svg output.jpg
+</pre></div>
+
+
+<h2>Conclusion</h2>
+<p>I created pretty efficient semi-automated workflow using several open source technologies that saves me a lot of work. Although <span class="caps">QGIS</span> has some minor pet peeves (scale with decimal places, not showing the entire feature, not substituting variables at times), it definitely makes boring map creation quite amusing. The more I work with big data / on big tasks, the more I find Linux a&nbsp;must-have.</p>
+<p>The whole process was done with <span class="caps">QGIS</span> 2.10, PostGIS 2.1, PostgreSQL 9.3, Python 2.7, ImageMagick&nbsp;6.7.</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2015/clip-raster-with-vector-using-gdal/" rel="bookmark" title="Permalink to Clip Raster With Vector Using GDAL">Clip Raster With Vector Using <span class="caps">GDAL</span></a></h1>
+            <small>Written on Jul 21, 2015
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>,         <a href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>        | <a href="https://www.zimmi.cz/posts/category/automation.html">automation</a>
+        </small>
+        <section>
+            <p>Recently I needed to clip several raster files with polygonal layer of municipalities. A solution to this task is pretty straightforward using <a href="http://gdal.org/"><span class="caps">GDAL</span></a> and a bit of Bash and <span class="caps">QGIS</span> thrown&nbsp;in.</p>
+<p>The necessary steps&nbsp;are:</p>
+<ol>
+<li>Put each polygon to a separate file. This can be done easily with <code>Vector - Data Management Tools - Split Vector Layer</code> in <span class="caps">QGIS</span>. The solution below assumes that each shapefile has the same basename as the raster&nbsp;file.</li>
+<li>These polygons are stored in the <code>obce</code> subfolder relative to the folder with&nbsp;rasters.</li>
+<li>An <code>output</code> folder exists that is used for&#8230; output,&nbsp;yes.</li>
+<li>Rasters are saved with output alpha band for nodata (<code>-dstalpha</code> flag).</li>
+<li>The script takes one argument - raster&nbsp;name.</li>
+<li>Profit!</li>
+</ol>
+<div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env bash</span>
+
+<span class="nv">OBEC</span><span class="o">=</span><span class="nv">$1</span>
+<span class="nv">BASE</span><span class="o">=</span><span class="k">$(</span>basename <span class="nv">$OBEC</span> _jpeg.tif<span class="k">)</span>
+<span class="nb">echo</span> <span class="nv">$BASE</span>
+<span class="nv">EXTENT</span><span class="o">=</span><span class="k">$(</span>ogrinfo -so obce/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.shp <span class="nv">$BASE</span> <span class="p">|</span> grep Extent <span class="se">\</span>
+<span class="p">|</span> sed <span class="s1">&#39;s/Extent: //g&#39;</span> <span class="p">|</span> sed <span class="s1">&#39;s/(//g&#39;</span> <span class="p">|</span> sed <span class="s1">&#39;s/)//g&#39;</span> <span class="se">\</span>
+<span class="p">|</span> sed <span class="s1">&#39;s/ - /, /g&#39;</span><span class="k">)</span>
+<span class="nv">EXTENT</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span> <span class="nv">$EXTENT</span> <span class="p">|</span> awk -F <span class="s1">&#39;,&#39;</span> <span class="s1">&#39;{print $1 &quot; &quot; $4 &quot; &quot; $3 &quot; &quot; $2}&#39;</span><span class="k">)</span>
+gdal_translate -projwin <span class="nv">$EXTENT</span> -of GTiff <span class="nv">$OBEC</span> output/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.tif
+gdalwarp -dstalpha -s_srs <span class="s1">&#39;EPSG:5514&#39;</span> -t_srs <span class="s1">&#39;EPSG:5514&#39;</span> <span class="se">\</span>
+    -co <span class="nv">COMPRESS</span><span class="o">=</span>JPEG <span class="se">\</span>
+    -co <span class="nv">TILED</span><span class="o">=</span>YES -<span class="se">\</span>
+    of GTiff <span class="se">\</span>
+    -cutline obce/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.shp <span class="se">\</span>
+    output/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.tif output/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.final.tif
+</pre></div>
+
+
+<p>Note that if <code>gdalwarp</code> doesn&#8217;t recognize an <span class="caps">EPSG</span> code (which is the case for my country national grid), you might pass it as a <span class="caps">PROJ</span>.4&nbsp;string.</p>
+<p>According to the point 5 in the above list, the script needs to be run in a&nbsp;loop:</p>
+<div class="highlight"><pre><span></span><span class="k">for</span> f in *_jpeg.tif<span class="p">;</span>
+    <span class="k">do</span> the_script_above.sh <span class="nv">$f</span>
+<span class="p">;</span><span class="k">done</span>
+</pre></div>
+        </section>
+        </div>
+    </div>
+
+<div class="pagination row">
+    <div class="large-6 columns">
+            <a href="https://www.zimmi.cz/posts/index.html" class="button card card-1">&laquo; Previous page</a>
+    </div>
+    <div class="large-6 columns">
+            <a href="https://www.zimmi.cz/posts/index3.html" class="button card card-1">Next page &raquo;</a>
+    </div>
+    <!-- <p class="paginator">
+            <a href="https://www.zimmi.cz/posts/index.html" class="button card card-1">&laquo; Previous page</a>
+            <a href="https://www.zimmi.cz/posts/index3.html" class="button card card-1">Next page &raquo;</a>
+    </p> -->
+</div>            </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns footer">
+                <footer>
+                    <address>
+                    Written by <a href="http://www.zimmi.cz">Michal Zimmermann</a>.
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    </address><!-- /#about -->
+                </footer><!-- /#contentinfo -->
+            </div>
+        </div>
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-43432739-2']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+<script src="https://www.zimmi.cz/posts/theme/js/packed.js?8bee1467"></script>
+<script>
+$(document).foundation();
+</script>
+</body>
+</html>

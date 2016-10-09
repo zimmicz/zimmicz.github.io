@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+        <title>Michal Zimmermann | category: web maps</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?d5d1e141">
+</head>
+
+<body id="index" class="home">
+    <nav class="top-bar card-1" data-topbar role="navigation">
+        <ul class="title-area">
+            <li class="name">
+                <h1><a href="/posts">Home</a></h1>
+            </li>
+     <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+            <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+        </ul>
+        <section class="top-bar-section">
+    <!-- Right Nav Section -->
+            <ul class="right">
+                <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+                <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+                <li><a href="https://www.zimmi.cz/posts/feed.xml">RSS feed</a></li>
+            </ul>
+        </section>
+    </nav>
+        <div class="row">
+          <div class="large-12 columns header">
+            <h1><a href="/posts">Michal Zimmermann</a> <small>Pieces of knowledge from the world of GIS.</small></h1>
+          </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns">
+<h2 class="text-center">Articles in the web maps category</h2>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-iii/" rel="bookmark" title="Permalink to PostGIS Case Study: Vozejkmap Open Data (Part III)">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">III</span>)</a></h1>
+            <small>Written on Nov 14, 2015
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>,         <a href="https://www.zimmi.cz/posts/tag/leaflet.html">leaflet</a>,         <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>        | <a href="https://www.zimmi.cz/posts/category/web-maps.html">web maps</a>
+        </small>
+        <section>
+            <p>After a while I got back to my <a href="https://www.zimmi.cz/posts/2014/postgis-case-study-vozejkmap-open-data-part-i/">PostGIS open data</a> <a href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-ii/">case study</a>. Last time I left it with clustering implemented, looking forward to incorporate <a href="http://turfjs.org">Turf.js</a> in the future. <em>And the future is now.</em> <a href="https://github.com/zimmicz/vozejkmap-to-postgis">The code is still available on&nbsp;GitHub.</a></p>
+<h2>Subgroup&nbsp;clustering</h2>
+<p>Vozejkmap data is categorized based on the place type (banks, parking lots, pubs, &hellip;). One of the core features of map showing such data should be the easy way to turn these categories on and&nbsp;off.</p>
+<p>As far as I know, it&#8217;s not trivial to do this with the standard Leaflet library. Extending <code>L.control.layers</code> and implement its <code>addOverlay</code>, <code>removeOverlay</code> methods on your own might be the way to add needed behavior. Fortunately, there&#8217;s an easier option thanks to <a href="https://github.com/ghybs/Leaflet.FeatureGroup.SubGroup">Leaflet.FeatureGroup.SubGroup</a> that can handle such use case and is really straightforward. See the code&nbsp;below.</p>
+<div class="highlight"><pre><span></span><span class="nx">cluster</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">markerClusterGroup</span><span class="p">({</span>
+    <span class="nx">chunkedLoading</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nx">chunkInterval</span><span class="o">:</span> <span class="mi">500</span>
+<span class="p">});</span>
+
+<span class="nx">cluster</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
+
+<span class="p">...</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">category</span> <span class="k">in</span> <span class="nx">categories</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// just use L.featureGroup.subGroup instead of L.layerGroup or L.featureGroup</span>
+    <span class="nx">overlays</span><span class="p">[</span><span class="nx">my</span><span class="p">.</span><span class="nx">Style</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="nx">category</span><span class="p">).</span><span class="nx">type</span><span class="p">]</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">featureGroup</span><span class="p">.</span><span class="nx">subGroup</span><span class="p">(</span><span class="nx">cluster</span><span class="p">,</span> <span class="nx">categories</span><span class="p">[</span><span class="nx">category</span><span class="p">]);</span>
+<span class="p">}</span>
+
+<span class="nx">mapkey</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">control</span><span class="p">.</span><span class="nx">layers</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">overlays</span><span class="p">).</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
+</pre></div>
+
+
+<p>With this piece of code you get a map key with checkboxes for all the categories, yet they&#8217;re still kept in the single cluster on the map.&nbsp;Brilliant!</p>
+<p><img src="https://www.zimmi.cz/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/map.png" title="vozejkmap.cz data map" class="img-responsive centered"></p>
+<h2>Using Turf.js for&nbsp;analysis</h2>
+<p>Turf is one of those libraries I get amazed easily with, spending a week trying to find a use case, finally putting it aside with <em>&#8220;I&#8217;ll get back to it later&#8221;</em>. I usually don&#8217;t. This time it&#8217;s&nbsp;different.</p>
+<p>I use Turf to get the nearest neighbor for any marker on click. My first try ended up with the same marker being the result as it was a member of a feature collection passed to <code>turf.nearest()</code> method. After snooping around the docs I found <code>turf.remove()</code> method that can filter GeoJSON based on key-value&nbsp;pair.</p>
+<p>Another handy function is <code>turf.distance()</code> that gives you distance between two points. The code below adds an information about the nearest point and its distance into the&nbsp;popup.</p>
+<div class="highlight"><pre><span></span><span class="c1">// data is a geojson feature collection</span>
+<span class="nx">json</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">geoJson</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span> <span class="p">{</span>
+    <span class="nx">onEachFeature</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">feature</span><span class="p">,</span> <span class="nx">layer</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">layer</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;click&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kd">var</span> <span class="nx">nearest</span> <span class="o">=</span> <span class="nx">turf</span><span class="p">.</span><span class="nx">nearest</span><span class="p">(</span><span class="nx">layer</span><span class="p">.</span><span class="nx">toGeoJSON</span><span class="p">(),</span> <span class="nx">turf</span><span class="p">.</span><span class="nx">remove</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="nx">feature</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">title</span><span class="p">)),</span>
+                <span class="nx">distance</span> <span class="o">=</span> <span class="nx">turf</span><span class="p">.</span><span class="nx">distance</span><span class="p">(</span><span class="nx">layer</span><span class="p">.</span><span class="nx">toGeoJSON</span><span class="p">(),</span> <span class="nx">nearest</span><span class="p">,</span> <span class="s2">&quot;kilometers&quot;</span><span class="p">).</span><span class="nx">toPrecision</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+                <span class="nx">popup</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">popup</span><span class="p">({</span><span class="nx">offset</span><span class="o">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">35</span><span class="p">]}).</span><span class="nx">setLatLng</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">latlng</span><span class="p">),</span>
+                <span class="nx">content</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">Util</span><span class="p">.</span><span class="nx">template</span><span class="p">(</span>
+                    <span class="s2">&quot;&lt;h1&gt;{title}&lt;/h1&gt;&lt;p&gt;{description}&lt;/p&gt; \</span>
+<span class="s2">                    &lt;p&gt;Nejbližší bod: {nearest} je {distance} km daleko.&lt;/p&gt;&quot;</span><span class="p">,</span> <span class="p">{</span>
+                    <span class="nx">title</span><span class="o">:</span> <span class="nx">feature</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">title</span><span class="p">,</span>
+                    <span class="nx">description</span><span class="o">:</span> <span class="nx">feature</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">description</span><span class="p">,</span>
+                    <span class="nx">nearest</span><span class="o">:</span> <span class="nx">nearest</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">title</span><span class="p">,</span>
+                    <span class="nx">distance</span><span class="o">:</span> <span class="nx">distance</span>
+                <span class="p">});</span>
+
+            <span class="nx">popup</span><span class="p">.</span><span class="nx">setContent</span><span class="p">(</span><span class="nx">content</span><span class="p">);</span>
+            <span class="nx">popup</span><span class="p">.</span><span class="nx">openOn</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
+
+            <span class="p">...</span>
+</pre></div>
+
+
+<p>From what I&#8217;ve tried so far, Turf seems to be incredibly fast and easy to use. I&#8217;ll try to find the nearest point for any of the categories, that could take Turf some&nbsp;time.</p>
+<h2>Update</h2>
+<p>Turf is blazing fast! I&#8217;ve implemented nearest point for each of the categories and it gets done in a blink of an eye. Some screenshots below. Geolocation implemented as&nbsp;well.</p>
+<p><img src="https://www.zimmi.cz/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen1.png" title="vozejkmap.cz data map" class="img-responsive centered"> You can locate the point&nbsp;easily.</p>
+
+<p><img src="https://www.zimmi.cz/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen2.png" title="vozejkmap.cz data map" class="img-responsive centered"> You can hide the&nbsp;infobox.</p>
+
+<p><img src="https://www.zimmi.cz/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen3.png" title="vozejkmap.cz data map" class="img-responsive centered">You can jump to any of the nearest&nbsp;places.</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2015/animating-svg-maps-with-smil/" rel="bookmark" title="Permalink to Animating SVG Maps With SMIL">Animating <span class="caps">SVG</span> Maps With <span class="caps">SMIL</span></a></h1>
+            <small>Written on Apr 29, 2015
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>,         <a href="https://www.zimmi.cz/posts/tag/smil.html">smil</a>        | <a href="https://www.zimmi.cz/posts/category/web-maps.html">web maps</a>
+        </small>
+        <section>
+            <p>Using <span class="caps">SVG</span> to build web maps have both pros and cons and to be honest I don&#8217;t know any <em>serious</em> map/<span class="caps">GIS</span> project built on top of <span class="caps">SVG</span>. However, as a part of my job at university, I was forced to use both <span class="caps">SVG</span> and <span class="caps">SMIL</span> to produce animated web map (see the small version below or the big one at <a href="https://zimmicz.github.io/svg-smil-airplanes/map.svg">GitHub</a>) and I&#8217;d like to share my&nbsp;findings.</p>
+<p><object width="400" data="https://zimmicz.github.io/svg-smil-airplanes/map.svg" type="image/svg+xml"></object></p>
+<h2>Data&nbsp;preprocessing</h2>
+<p>I chose <a href="http://www.naturalearthdata.com/">Natural Earth dataset</a> both for basemap and thematic&nbsp;layer:</p>
+<ul>
+<li>countries polygon layer for&nbsp;basemap</li>
+<li>airports point layer for thematic&nbsp;layer</li>
+</ul>
+<p>I decided that animation should go like&nbsp;this:</p>
+<ol>
+<li>Load basemap and Vaclav Havel airport (<span class="caps">PRG</span>).</li>
+<li>Animate destinations one by one. They are revealed in order of their distance from <span class="caps">PRG</span>.</li>
+<li>Animate&nbsp;airways.</li>
+<li>Once airways are animated, animate airplanes along their path from <span class="caps">PRG</span> to their destination in order of their time of&nbsp;departure.</li>
+<li>Profit.</li>
+</ol>
+<p>My goal was to create an animation of all departures from Vaclav Havel airport during one day. These data can be obtained at <a href="http://www.flightstats.com/">FlightStats</a>, I didn&#8217;t find a way make this process automatic though. <a href="http://openflights.org/">OpenFlights</a> might be better source&nbsp;then.</p>
+<h2><span class="caps">SVG</span>&nbsp;creation</h2>
+<p><a href="http://kartograph.org/">Kartograph</a> is a great tool both for <span class="caps">SVG</span> generation and scripting. What a pity it&#8217;s probably a dead project according to the last commit date. After installing Python part of library used to create <span class="caps">SVG</span> files out of vector geometries, it can be run with something like&nbsp;this:</p>
+<div class="highlight"><pre><span></span>kartograph --output map.svg --pretty-print --style style.css config.json
+</pre></div>
+
+
+<p>Pretty self-explanatory, let&#8217;s have a look at config&nbsp;file:</p>
+<div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;layers&quot;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;countries&quot;</span><span class="o">:</span> <span class="p">{</span>
+            <span class="s2">&quot;src&quot;</span><span class="o">:</span> <span class="s2">&quot;ne_50m_admin_0_countries/ne_50m_admin_0_countries.shp&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;attributes&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;airports&quot;</span><span class="o">:</span> <span class="p">{</span>
+            <span class="s2">&quot;src&quot;</span><span class="o">:</span> <span class="s2">&quot;ne_10m_airports/ne_10m_airports_prg.shp&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;attributes&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;abbrev&quot;</span><span class="p">]</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;travels&quot;</span><span class="o">:</span> <span class="p">{</span>
+            <span class="s2">&quot;src&quot;</span><span class="o">:</span> <span class="s2">&quot;ne_10m_airports/travels.shp&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;attributes&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;distance&quot;</span><span class="p">]</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;grid&quot;</span><span class="o">:</span> <span class="p">{</span>
+            <span class="s2">&quot;special&quot;</span><span class="o">:</span> <span class="s2">&quot;graticule&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;latitudes&quot;</span><span class="o">:</span> <span class="mi">10</span><span class="p">,</span>
+            <span class="s2">&quot;longitudes&quot;</span><span class="o">:</span> <span class="mi">10</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;proj&quot;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="s2">&quot;satellite&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;lon0&quot;</span><span class="o">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">&quot;lat0&quot;</span><span class="o">:</span> <span class="mf">48.0</span><span class="p">,</span>
+        <span class="s2">&quot;dist&quot;</span><span class="o">:</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="s2">&quot;up&quot;</span><span class="o">:</span> <span class="mi">15</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;bounds&quot;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;mode&quot;</span><span class="o">:</span> <span class="s2">&quot;bbox&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;data&quot;</span><span class="o">:</span> <span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span>
+        <span class="s2">&quot;padding&quot;</span><span class="o">:</span> <span class="mi">1</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;export&quot;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;round&quot;</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">&quot;width&quot;</span><span class="o">:</span> <span class="mi">1000</span><span class="p">,</span>
+        <span class="s2">&quot;ratio&quot;</span><span class="o">:</span> <span class="mi">1</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>It is possible to adjust map settings in many different ways. The most&nbsp;important/interesting:</p>
+<ul>
+<li>Choose what attributes you want to have exported from source file with <code>attributes</code> key for every layer. They&#8217;ll be available as <code>data-</code> attribute of <span class="caps">SVG</span>&nbsp;elements.</li>
+<li>It comes with Grid generation packed in! Really great. Sea generation works for some projections&nbsp;only.</li>
+<li>Set the projections you want to use with additional&nbsp;settings.</li>
+<li><code>bounds</code> settings should - according to the docs - use layer extent as well, I couldn&#8217;t make it work though. Use <code>[-180, -90, 180, 90]</code> as a workaround to get the whole world. Don&#8217;t forget to set <code>padding</code>, so your map doesn&#8217;t get clipped on&nbsp;edges.</li>
+<li><code>export</code>ing coordinates rounded to one decimal place makes your <span class="caps">SVG</span> a lot&nbsp;smaller.</li>
+</ul>
+<p>You can change <span class="caps">SVG</span> look with simple <span class="caps">CSS</span>, just be sure to use layer names as <span class="caps">CSS</span>&nbsp;ids:</p>
+<div class="highlight"><pre><span></span><span class="nn">#airports</span> <span class="p">{</span>
+    <span class="n">fill</span><span class="o">:</span> <span class="m">#CC0000</span><span class="p">;</span>
+    <span class="n">fill</span><span class="o">-</span><span class="nb">opacity</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
+    <span class="n">stroke</span><span class="o">:</span> <span class="m">#660000</span><span class="p">;</span>
+    <span class="n">stroke</span><span class="o">-</span><span class="nb">opacity</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nn">#countries</span> <span class="p">{</span>
+    <span class="n">fill</span><span class="o">:</span> <span class="m">#e6deb4</span><span class="p">;</span>
+    <span class="n">stroke</span><span class="o">:</span> <span class="m">#a59f81</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nn">#grid</span> <span class="p">{</span>
+    <span class="n">stroke</span><span class="o">:</span> <span class="m">#d0d0d0</span><span class="p">;</span>
+    <span class="n">stroke</span><span class="o">-</span><span class="nb">width</span><span class="o">:</span> <span class="m">.3px</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nn">#travels</span> <span class="p">{</span>
+    <span class="n">stroke</span><span class="o">:</span> <span class="m">#1f78b4</span><span class="p">;</span>
+    <span class="n">stroke</span><span class="o">-</span><span class="nb">opacity</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
+    <span class="n">stroke</span><span class="o">-</span><span class="n">dasharray</span><span class="o">:</span> <span class="m">5</span><span class="o">,</span><span class="m">5</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<h2>Data adjustment <span class="amp">&amp;</span>&nbsp;animation</h2>
+<p><strong><span class="caps">SMIL</span></strong> is a <span class="caps">XML</span> based language for multimedia representation. It comes ready for timing, animation, visual transitions etc. I guess it might be considered easier to read for a web development beginner. Once you start using it, you immediately realize it suffers from the same disease like <span class="caps">XML</span> does: it is so&nbsp;wordy!</p>
+<p>Let&#8217;s get back to my example. To animate airports one by one, let&#8217;s give them unique ids, so they look something&nbsp;like:</p>
+<div class="highlight"><pre><span></span><span class="nt">&lt;circle</span> <span class="na">id=</span><span class="s">&quot;brs&quot;</span> <span class="na">stroke-opacity=</span><span class="s">&quot;0&quot;</span> <span class="na">fill-opacity=</span><span class="s">&quot;0&quot;</span> <span class="na">cx=</span><span class="s">&quot;476.597304864&quot;</span> <span class="na">cy=</span><span class="s">&quot;539.487783171&quot;</span> <span class="na">data-abbrev=</span><span class="s">&quot;BRS&quot;</span> <span class="na">data-name=</span><span class="s">&quot;Bristol Int&#39;l&quot;</span> <span class="na">r=</span><span class="s">&quot;3&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+
+
+<p>That&#8217;s something you do by hand as kartograph doesn&#8217;t give ids to <span class="caps">SVG</span> elements. Once you&#8217;re done with that, you can run <span class="caps">SMIL</span> animation. If you look closer at the final map, you&#8217;ll notice there are three properties animated for each airport: fill opacity, stroke opacity and radius. Each property needs to use separate <span class="caps">SMIL</span> <code>&lt;animate /&gt;</code>, which might look like the one&nbsp;below:</p>
+<div class="highlight"><pre><span></span><span class="nt">&lt;animate</span> <span class="na">attributeName=</span><span class="s">&quot;fill-opacity&quot;</span>
+    <span class="na">id=</span><span class="s">&quot;kos_ani_fo&quot;</span>
+    <span class="na">from=</span><span class="s">&quot;0&quot;</span>
+    <span class="na">to=</span><span class="s">&quot;1&quot;</span>
+    <span class="na">begin=</span><span class="s">&quot;osr_ani.end&quot;</span>
+    <span class="na">dur=</span><span class="s">&quot;0.25s&quot;</span>
+    <span class="na">fill=</span><span class="s">&quot;freeze&quot;</span>
+    <span class="na">xlink:href=</span><span class="s">&quot;#kos&quot;</span>
+<span class="nt">/&gt;</span>
+<span class="nt">&lt;animate</span> <span class="na">attributeName=</span><span class="s">&quot;stroke-opacity&quot;</span>
+    <span class="na">id=</span><span class="s">&quot;kos_ani_so&quot;</span>
+    <span class="na">from=</span><span class="s">&quot;0&quot;</span>
+    <span class="na">to=</span><span class="s">&quot;1&quot;</span>
+    <span class="na">begin=</span><span class="s">&quot;osr_ani.end&quot;</span>
+    <span class="na">dur=</span><span class="s">&quot;0.25s&quot;</span>
+    <span class="na">fill=</span><span class="s">&quot;freeze&quot;</span>
+    <span class="na">xlink:href=</span><span class="s">&quot;#kos&quot;</span>
+<span class="nt">/&gt;</span>
+<span class="nt">&lt;animate</span> <span class="na">attributeName=</span><span class="s">&quot;r&quot;</span>
+    <span class="na">id=</span><span class="s">&quot;kos_ani_r&quot;</span>
+    <span class="na">from=</span><span class="s">&quot;10px&quot;</span>
+    <span class="na">to=</span><span class="s">&quot;3px&quot;</span>
+    <span class="na">begin=</span><span class="s">&quot;osr_ani.end&quot;</span>
+    <span class="na">dur=</span><span class="s">&quot;0.25s&quot;</span>
+    <span class="na">xlink:href=</span><span class="s">&quot;#kos&quot;</span>
+<span class="nt">/&gt;</span>
+</pre></div>
+
+
+<p>I guess you get the idea how long this would take for more airports. Make sure to notice that <span class="caps">SMIL</span> can start animation based on another animation&#8217;s end (<code>osr_ani.end</code>) - that&#8217;s pretty&nbsp;neat.</p>
+<p>Airways animation works almost the same. First, add unique id to each&nbsp;airway:</p>
+<div class="highlight"><pre><span></span><span class="nt">&lt;path</span> <span class="na">d=</span><span class="s">&quot;M550.9,562.9L568.0,495.0 &quot;</span> <span class="na">id=</span><span class="s">&quot;travel-arn&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+
+
+<p>Second, start animation after all the airports are visible on the map. Notice the initial definition of <code>d</code> attribute - it&#8217;s a line with zero&nbsp;length.</p>
+<div class="highlight"><pre><span></span><span class="nt">&lt;animate</span> <span class="na">attributeName=</span><span class="s">&quot;d&quot;</span>
+    <span class="na">id=</span><span class="s">&quot;path_ani&quot;</span>
+    <span class="na">from=</span><span class="s">&quot;M550.9,562.9L550.9,562.9&quot;</span>
+    <span class="na">to=</span><span class="s">&quot;M550.9,562.9L568.0,495.0&quot;</span>
+    <span class="na">begin=</span><span class="s">&quot;icn_ani_r.end&quot;</span>
+    <span class="na">dur=</span><span class="s">&quot;3s&quot;</span>
+    <span class="na">xlink:href=</span><span class="s">&quot;#travel-arn&quot;</span>
+<span class="nt">/&gt;</span>
+</pre></div>
+
+
+<p>Once airways animation has finished, let airplanes fly around the globe with a simple JavaScript&nbsp;function:</p>
+<div class="highlight"><pre><span></span><span class="c">/**</span>
+<span class="c"> * @param  number coef  scale radius by number of flights to the given destination</span>
+<span class="c"> * @param  string flight_id</span>
+<span class="c"> */</span>
+<span class="nt">var</span> <span class="nt">circle</span> <span class="o">=</span> <span class="nt">function</span><span class="o">(</span><span class="nt">coef</span><span class="o">,</span> <span class="nt">flight_id</span><span class="o">,</span> <span class="nt">timeshift</span><span class="o">)</span> <span class="p">{</span>
+    <span class="n">var</span> <span class="n">svgns</span> <span class="o">=</span> <span class="s2">&quot;http://www.w3.org/2000/svg&quot;</span><span class="p">;</span>
+    <span class="n">var</span> <span class="n">svgDocument</span> <span class="o">=</span><span class="n">document</span><span class="p">;</span>
+    <span class="n">var</span> <span class="n">motion</span> <span class="o">=</span> <span class="n">svgDocument</span><span class="o">.</span><span class="n">createElementNS</span><span class="p">(</span><span class="n">svgns</span><span class="o">,</span><span class="s2">&quot;animateMotion&quot;</span><span class="p">);</span>
+    <span class="n">var</span> <span class="n">animation</span> <span class="o">=</span> <span class="n">svgDocument</span><span class="o">.</span><span class="n">createElementNS</span><span class="p">(</span><span class="n">svgns</span><span class="o">,</span><span class="s2">&quot;animate&quot;</span><span class="p">);</span>
+    <span class="n">var</span> <span class="n">shape</span>  <span class="o">=</span> <span class="n">svgDocument</span><span class="o">.</span><span class="n">createElementNS</span><span class="p">(</span><span class="n">svgns</span><span class="o">,</span> <span class="s2">&quot;circle&quot;</span><span class="p">);</span>
+    <span class="n">var</span> <span class="n">time</span> <span class="o">=</span> <span class="m">15</span> <span class="o">+</span> <span class="n">timeshift</span><span class="p">;</span>
+    <span class="n">var</span> <span class="n">dur</span> <span class="o">=</span> <span class="n">document</span><span class="o">.</span><span class="n">getElementById</span><span class="p">(</span><span class="n">flight_id</span><span class="p">)</span><span class="o">.</span><span class="n">getAttributeNS</span><span class="p">(</span><span class="n">null</span><span class="o">,</span> <span class="s2">&quot;data-dist&quot;</span><span class="p">)</span><span class="o">/</span><span class="m">100</span><span class="p">;</span>
+    <span class="n">motion</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;begin&quot;</span><span class="o">,</span> <span class="n">time</span> <span class="o">+</span> <span class="s2">&quot;s&quot;</span><span class="p">);</span>
+    <span class="n">motion</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;dur&quot;</span><span class="o">,</span> <span class="n">dur</span> <span class="o">+</span> <span class="s2">&quot;s&quot;</span><span class="p">);</span>
+    <span class="n">motion</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;path&quot;</span><span class="o">,</span> <span class="n">document</span><span class="o">.</span><span class="n">getElementById</span><span class="p">(</span><span class="n">flight_id</span><span class="p">)</span><span class="o">.</span><span class="n">getAttributeNS</span><span class="p">(</span><span class="n">null</span><span class="o">,</span> <span class="s2">&quot;d&quot;</span><span class="p">));</span>
+    <span class="n">motion</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;xlink:href&quot;</span><span class="o">,</span> <span class="s2">&quot;#&quot;</span> <span class="o">+</span> <span class="n">flight_id</span><span class="p">);</span>
+    <span class="n">motion</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="o">,</span> <span class="n">flight_id</span> <span class="o">+</span> <span class="s2">&quot;_motion&quot;</span><span class="p">);</span>
+
+    <span class="n">animation</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;attributeName&quot;</span><span class="o">,</span> <span class="s2">&quot;opacity&quot;</span><span class="p">);</span>
+    <span class="n">animation</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;from&quot;</span><span class="o">,</span> <span class="s2">&quot;1&quot;</span><span class="p">);</span>
+    <span class="n">animation</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;to&quot;</span><span class="o">,</span> <span class="s2">&quot;0&quot;</span><span class="p">);</span>
+    <span class="n">animation</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;begin&quot;</span><span class="o">,</span> <span class="n">time</span> <span class="o">+</span> <span class="n">dur</span> <span class="o">+</span> <span class="s2">&quot;s&quot;</span><span class="p">);</span>
+    <span class="n">animation</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;dur&quot;</span><span class="o">,</span> <span class="s2">&quot;0.1s&quot;</span><span class="p">);</span>
+    <span class="n">animation</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;fill&quot;</span><span class="o">,</span> <span class="s2">&quot;freeze&quot;</span><span class="p">);</span>
+
+
+    <span class="n">shape</span><span class="o">.</span><span class="n">setAttributeNS</span><span class="p">(</span><span class="n">null</span><span class="o">,</span> <span class="s2">&quot;r&quot;</span><span class="o">,</span>  <span class="m">1</span><span class="o">*</span><span class="n">coef</span><span class="p">);</span>
+    <span class="n">shape</span><span class="o">.</span><span class="n">setAttributeNS</span><span class="p">(</span><span class="n">null</span><span class="o">,</span> <span class="s2">&quot;fill&quot;</span><span class="o">,</span> <span class="s2">&quot;1f78b4&quot;</span><span class="p">);</span>
+    <span class="n">shape</span><span class="o">.</span><span class="n">setAttributeNS</span><span class="p">(</span><span class="n">null</span><span class="o">,</span> <span class="s2">&quot;stroke&quot;</span><span class="o">,</span> <span class="s2">&quot;1f78b4&quot;</span><span class="p">);</span>
+    <span class="n">shape</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="o">,</span> <span class="s2">&quot;airplane-&quot;</span> <span class="o">+</span> <span class="n">flight_id</span><span class="p">);</span>
+    <span class="n">shape</span><span class="o">.</span><span class="n">appendChild</span><span class="p">(</span><span class="n">motion</span><span class="p">);</span>
+    <span class="n">shape</span><span class="o">.</span><span class="n">appendChild</span><span class="p">(</span><span class="n">animation</span><span class="p">);</span>
+
+    <span class="n">document</span><span class="o">.</span><span class="n">getElementById</span><span class="p">(</span><span class="s2">&quot;airplanes&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">appendChild</span><span class="p">(</span><span class="n">shape</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p><span class="caps">SMIL</span> with <span class="caps">SVG</span> seems to be interesting option for web map animation, a bit lengthy though. Syncing animations can easily become pain in the ass (<a href="https://stackoverflow.com/questions/29897355/svg-smil-animatemotion-only-triggers-once/">see StackOverflow thread</a>). Never call your function <code>animate</code> - there is namesake function defined in <a href="https://w3c.github.io/web-animations/">Web Animations <span class="caps">API</span></a> that makes animation crash in Chrome. <code>&lt;animateMotion /&gt;</code> is a great tool to animate elements along&nbsp;path.</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2014/connecting-to-secured-arcgis-server-layer-with-openlayers-3/" rel="bookmark" title="Permalink to Connecting To Secured ArcGIS Server Layer With OpenLayers 3">Connecting To Secured ArcGIS Server Layer With OpenLayers&nbsp;3</a></h1>
+            <small>Written on Sep 12, 2014
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>,         <a href="https://www.zimmi.cz/posts/tag/openlayers.html">openlayers</a>,         <a href="https://www.zimmi.cz/posts/tag/ogc.html">ogc</a>        | <a href="https://www.zimmi.cz/posts/category/web-maps.html">web maps</a>
+        </small>
+        <section>
+            <p>I was made to use ArcGIS Server with <a href="http://openlayers.org">Openlayers 3</a> just recently as one of the projects I&#8217;ve been working on demands such different tools to work&nbsp;together.</p>
+<p><strong>tl;dr: I hate&nbsp;Esri.</strong></p>
+<p>I found myself in need to access secured layers published via <span class="caps">WMS</span> on ArcGIS Server using username and password I was given, so here&#8217;s a little how-to for anyone who would have to do the&nbsp;same.</p>
+<p>Let&#8217;s start with a simple ol.layer.Image and pretend this is the secured layer we&#8217;re looking&nbsp;for:</p>
+<div class="highlight"><pre><span></span>var layer = new ol.layer.Image({
+    extent: extent,
+    source: new ol.source.ImageWMS(/** @type {olx.source.ImageWMSOptions} */ ({
+        url: url,
+        params: {
+            &#39;LAYERS&#39;: &#39;layer&#39;,
+            &#39;CRS&#39;: &#39;EPSG:3857&#39;,
+        }
+    }))
+});
+</pre></div>
+
+
+<p>We need to retrieve the token, so we define a&nbsp;function:</p>
+<div class="highlight"><pre><span></span><span class="nt">function</span> <span class="nt">retrieveToken</span><span class="o">(</span><span class="nt">callback</span><span class="o">)</span> <span class="p">{</span>
+    <span class="n">var</span> <span class="n">req</span> <span class="o">=</span> <span class="n">new</span> <span class="n">XMLHttpRequest</span><span class="p">;</span>
+
+    <span class="n">req</span><span class="o">.</span><span class="n">onload</span> <span class="o">=</span> <span class="n">function</span><span class="p">()</span> <span class="err">{</span>
+        <span class="n">if</span> <span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;200&quot;</span><span class="p">)</span> <span class="err">{</span>
+            <span class="n">var</span> <span class="n">response</span> <span class="o">=</span> <span class="n">JSON</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">responseText</span><span class="p">);</span>
+            <span class="n">if</span> <span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">contents</span><span class="p">)</span> <span class="err">{</span>
+                <span class="n">callback</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">contents</span><span class="p">);</span> <span class="o">//</span> <span class="n">response</span> <span class="n">contents</span> <span class="n">is</span> <span class="n">where</span> <span class="n">the</span> <span class="n">token</span> <span class="n">is</span> <span class="n">stored</span>
+        <span class="p">}</span>
+    <span class="err">}</span><span class="o">;</span>
+    <span class="nt">req</span><span class="nc">.open</span><span class="o">(</span><span class="s2">&quot;get&quot;</span><span class="o">,</span> <span class="s2">&quot;http://server.address/arcgis/tokens/?request=getToken&amp;username=username&amp;password=password&amp;expiration=60&quot;</span><span class="o">,</span> <span class="nt">true</span><span class="o">);</span>
+    <span class="nt">req</span><span class="nc">.send</span><span class="o">()</span>
+<span class="err">}</span>
+</pre></div>
+
+
+<p>I pass a parameter called <code>callback</code> - that&#8217;s a very important step, otherwise you would not be able to retrieve the token when you actually need it (<span class="caps">AJAX</span> stands for asynchronous). Now you just pass the token to the layer params like&nbsp;this:</p>
+<div class="highlight"><pre><span></span>retrieveToken(function(token) {
+    layer.getSource().updateParams({
+        token: token
+    })
+}
+</pre></div>
+
+
+<p>When you open Firebug and inspect Network tab, you should find <code>token</code> <span class="caps">URL</span> parameter passed along with <span class="caps">WMS</span> <code>GetMap</code> request.</p>
+<p>Few&nbsp;sidenotes:</p>
+<ol>
+<li>Although you might be logged in ArcGIS Server via web interface, you might need to pass the <code>token</code>  <span class="caps">URL</span> param when trying to access Capabilities document. Don&#8217;t know why&nbsp;though.</li>
+<li>You should probably take care of calling the <code>retrieveToken()</code> in shorter interval than the token expiration is set to. Otherwise you might end up with invalid&nbsp;token.</li>
+<li>You need to hide the username and password from anonymous users (I guess that&#8217;s only possible with server side implementation of selective JavaScript&nbsp;loading).</li>
+</ol>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2014/wmts-few-things-i-want-to-remember/" rel="bookmark" title="Permalink to WMTS: Few Things I Want To Remember"><span class="caps">WMTS</span>: Few Things I Want To&nbsp;Remember</a></h1>
+            <small>Written on Sep 10, 2014
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/ogc.html">ogc</a>,         <a href="https://www.zimmi.cz/posts/tag/wmts.html">wmts</a>        | <a href="https://www.zimmi.cz/posts/category/web-maps.html">web maps</a>
+        </small>
+        <section>
+            <ul>
+<li>Used to serve prepared rectangular tiles; this means you are limited by web server speed rather than map server&nbsp;speed</li>
+<li>Several ways to retrieve tiles are defined: <span class="caps">KVP</span> and <span class="caps">REST</span> are mandatory, <span class="caps">SOAP</span> is&nbsp;optional</li>
+<li>Does not allow layer combination; additional tile matrix would have to be&nbsp;created</li>
+<li>GetCapabilities, GetTile and GetFeatureInfo requests are&nbsp;defined</li>
+<li><strong>tile</strong></li>
+<li>rectangular representation of&nbsp;space</li>
+<li>defined by tile and row&nbsp;indices</li>
+<li><strong>tile&nbsp;matrix</strong></li>
+<li>set of tiles for a given&nbsp;scale</li>
+<li><em>defined with:</em><ul>
+<li>tile size derived from standardized pixel size (0.28 &times; 0.28&nbsp;mm)</li>
+<li>tile width and tile height&nbsp;(px)</li>
+<li>left upper corner&nbsp;coordinates</li>
+<li>matrix width and height as number of&nbsp;tiles</li>
+</ul>
+</li>
+<li><strong>tile matrix&nbsp;set</strong></li>
+<li>set of tile matrices for different&nbsp;scales</li>
+</ul>
+<h3>Total count of tile&nbsp;matrices</h3>
+<p><em><code>nTileMatrices × nTiledStyles × nTiledFormats (if no dimensions are defined)</code></em></p>
+<h3>Total count of tiles in a tile&nbsp;matrix</h3>
+<p><em><code>matrixWidth × matrixHeight</code></em></p>
+<h3>Other&nbsp;equations</h3>
+<ul>
+<li><code>pixelSpan = scaleDenominator × 0.28 10<sup>3</sup> / metersPerUnit(crs);</code></li>
+<li><code>tileSpanX = tileWidth × pixelSpan;</code></li>
+<li><code>tileSpanY = tileHeight × pixelSpan;</code></li>
+<li><code>tileMatrixMaxX = tileMatrixMinX + tileSpanX × matrixWidth;</code></li>
+<li><code>tileMatrixMinY = tileMatrixMaxY - tileSpanY × matrixHeight;</code></li>
+</ul>
+<p><img src="https://www.zimmi.cz/posts/assets/wmts-few-things-i-want-to-remember/wmts.png" title="WMTS tiling schema" class="img-responsive centered"></p>
+        </section>
+        </div>
+    </div>
+
+<div class="pagination row">
+    <div class="large-6 columns">
+    </div>
+    <div class="large-6 columns">
+    </div>
+    <!-- <p class="paginator">
+    </p> -->
+</div>            </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns footer">
+                <footer>
+                    <address>
+                    Written by <a href="http://www.zimmi.cz">Michal Zimmermann</a>.
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    </address><!-- /#about -->
+                </footer><!-- /#contentinfo -->
+            </div>
+        </div>
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-43432739-2']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+<script src="https://www.zimmi.cz/posts/theme/js/packed.js?8bee1467"></script>
+<script>
+$(document).foundation();
+</script>
+</body>
+</html>

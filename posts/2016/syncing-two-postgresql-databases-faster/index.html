@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+          <title>Michal Zimmermann | Syncing Two PostgreSQL Databases&nbsp;Faster</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+
+
+
+    <meta name="tags" content="postgresql" />
+    <meta name="tags" content="bash" />
+  <meta property="og:image" content="https://pbs.twimg.com/profile_images/770323886290440192/3G5hqp11_400x400.jpg" />
+  <meta property="og:title" content="Syncing Two PostgreSQL Databases Faster" />
+  <meta property="og:description" content="Imagine you run two database machines hosting structurally the same databases on two separate servers and you need to transfer data from one to another. Not very often, let’s say once a month. Your tables aren’t small nor huge, let’s say millions rows ..." />
+  <meta property="og:url" content="https://www.zimmi.cz/posts/2016/syncing-two-postgresql-databases-faster/" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?d5d1e141">
+</head>
+
+<body id="index" class="home">
+    <nav class="top-bar card-1" data-topbar role="navigation">
+        <ul class="title-area">
+            <li class="name">
+                <h1><a href="/posts">Home</a></h1>
+            </li>
+     <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+            <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+        </ul>
+        <section class="top-bar-section">
+    <!-- Right Nav Section -->
+            <ul class="right">
+                <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+                <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+                <li><a href="https://www.zimmi.cz/posts/feed.xml">RSS feed</a></li>
+            </ul>
+        </section>
+    </nav>
+        <div class="row">
+          <div class="large-12 columns header">
+            <h1><a href="/posts">Michal Zimmermann</a> <small>Pieces of knowledge from the world of GIS.</small></h1>
+          </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns">
+<div class="panel card card-1">
+    <div class="post-name">
+        <h1><a href="https://www.zimmi.cz/posts/2016/syncing-two-postgresql-databases-faster/" rel="bookmark" title="Permalink to Syncing Two PostgreSQL Databases Faster">Syncing Two PostgreSQL Databases&nbsp;Faster</a></h1>
+        <small>Written on Jul 17, 2016
+    and marked as
+    <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,     <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>    | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
+    </small>
+    <section>
+        <p>Imagine you run two database machines hosting structurally the same databases on two separate servers and you need to transfer data from one to another. Not very often, let&#8217;s say once a month. Your tables aren&#8217;t small nor huge, let&#8217;s say millions rows in&nbsp;general.</p>
+<p>You&#8217;re going to use <code>pg_dump</code> and pipe it to <code>psql</code>, but the indices on your tables will slow you down a&nbsp;lot.</p>
+<p>That&#8217;s why you&#8217;ll want to drop all indices and constraints (<code>drop_indices_constraints.sql</code>):</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="s1">&#39;ALTER TABLE &#39;</span> <span class="o">||</span>
+    <span class="n">tc</span><span class="p">.</span><span class="n">table_schema</span> <span class="o">||</span>
+    <span class="s1">&#39;.&#39;</span> <span class="o">||</span>
+    <span class="n">tc</span><span class="p">.</span><span class="k">table_name</span> <span class="o">||</span>
+    <span class="s1">&#39; DROP CONSTRAINT &#39;</span> <span class="o">||</span>
+    <span class="n">tc</span><span class="p">.</span><span class="k">constraint_name</span>  <span class="o">||</span>
+    <span class="s1">&#39;;&#39;</span>
+<span class="k">FROM</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">table_constraints</span> <span class="n">tc</span>
+<span class="k">JOIN</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">constraint_column_usage</span> <span class="n">ccu</span> <span class="k">ON</span> <span class="p">(</span><span class="n">tc</span><span class="p">.</span><span class="k">constraint_catalog</span> <span class="o">=</span> <span class="n">ccu</span><span class="p">.</span><span class="k">constraint_catalog</span> <span class="k">AND</span> <span class="n">tc</span><span class="p">.</span><span class="k">constraint_schema</span> <span class="o">=</span> <span class="n">ccu</span><span class="p">.</span><span class="k">constraint_schema</span> <span class="k">AND</span> <span class="n">tc</span><span class="p">.</span><span class="k">constraint_name</span> <span class="o">=</span> <span class="n">ccu</span><span class="p">.</span><span class="k">constraint_name</span><span class="p">)</span>
+<span class="k">WHERE</span> <span class="n">tc</span><span class="p">.</span><span class="n">table_schema</span> <span class="k">IN</span> <span class="p">(</span><span class="k">SELECT</span> <span class="k">unnest</span><span class="p">(</span><span class="n">string_to_array</span><span class="p">(:</span><span class="s1">&#39;schemas&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">)))</span>
+<span class="k">UNION</span> <span class="k">ALL</span>
+<span class="k">SELECT</span>
+    <span class="s1">&#39;DROP INDEX IF EXISTS &#39;</span> <span class="o">||</span> <span class="n">schemaname</span> <span class="o">||</span> <span class="s1">&#39;.&#39;</span> <span class="o">||</span> <span class="n">indexname</span> <span class="o">||</span> <span class="s1">&#39;;&#39;</span>
+<span class="k">FROM</span> <span class="n">pg_indexes</span>
+<span class="k">WHERE</span> <span class="n">schemaname</span> <span class="k">IN</span> <span class="p">(</span><span class="k">SELECT</span> <span class="k">unnest</span><span class="p">(</span><span class="n">string_to_array</span><span class="p">(:</span><span class="s1">&#39;schemas&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">)));</span>
+</pre></div>
+
+
+<p>Then you will transfer the&nbsp;data:</p>
+<div class="highlight"><pre><span></span>pg_dump -a -t <span class="s2">&quot;schema1.*&quot;</span> -t <span class="s2">&quot;schema2.*&quot;</span> -O -d <span class="nb">source</span> -v <span class="p">|</span> psql -h localhost -d target
+</pre></div>
+
+
+<p>And restore the already dropped indices and constraints (<code>create_indices_constraints.sql</code>):</p>
+<div class="highlight"><pre><span></span><span class="k">WITH</span> <span class="k">constraints</span> <span class="k">AS</span> <span class="p">(</span>
+<span class="k">SELECT</span> <span class="s1">&#39;ALTER TABLE &#39;</span> <span class="o">||</span>
+    <span class="n">tc</span><span class="p">.</span><span class="n">table_schema</span> <span class="o">||</span>
+    <span class="s1">&#39;.&#39;</span> <span class="o">||</span>
+    <span class="n">tc</span><span class="p">.</span><span class="k">table_name</span> <span class="o">||</span>
+    <span class="s1">&#39; ADD CONSTRAINT &#39;</span> <span class="o">||</span>
+    <span class="n">tc</span><span class="p">.</span><span class="k">constraint_name</span> <span class="o">||</span>
+    <span class="s1">&#39; &#39;</span> <span class="o">||</span>
+    <span class="n">tc</span><span class="p">.</span><span class="n">constraint_type</span> <span class="o">||</span>
+    <span class="s1">&#39;(&#39;</span> <span class="o">||</span>
+    <span class="n">string_agg</span><span class="p">(</span><span class="n">ccu</span><span class="p">.</span><span class="k">column_name</span><span class="p">::</span><span class="nb">text</span><span class="p">,</span> <span class="s1">&#39;, &#39;</span><span class="p">)</span><span class="o">||</span> <span class="c1">-- column order should be taken into account here</span>
+    <span class="s1">&#39;);&#39;</span> <span class="n">def</span><span class="p">,</span>
+    <span class="n">tc</span><span class="p">.</span><span class="n">table_schema</span><span class="p">,</span>
+    <span class="n">tc</span><span class="p">.</span><span class="k">table_name</span><span class="p">,</span>
+    <span class="n">tc</span><span class="p">.</span><span class="k">constraint_name</span>
+<span class="k">FROM</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">table_constraints</span> <span class="n">tc</span>
+<span class="k">JOIN</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">constraint_column_usage</span> <span class="n">ccu</span> <span class="k">ON</span> <span class="p">(</span><span class="n">tc</span><span class="p">.</span><span class="k">constraint_catalog</span> <span class="o">=</span> <span class="n">ccu</span><span class="p">.</span><span class="k">constraint_catalog</span> <span class="k">AND</span> <span class="n">tc</span><span class="p">.</span><span class="k">constraint_schema</span> <span class="o">=</span> <span class="n">ccu</span><span class="p">.</span><span class="k">constraint_schema</span> <span class="k">AND</span> <span class="n">tc</span><span class="p">.</span><span class="k">constraint_name</span> <span class="o">=</span> <span class="n">ccu</span><span class="p">.</span><span class="k">constraint_name</span><span class="p">)</span>
+<span class="k">WHERE</span> <span class="n">tc</span><span class="p">.</span><span class="n">table_schema</span> <span class="k">IN</span> <span class="p">(</span><span class="k">SELECT</span> <span class="k">unnest</span><span class="p">(</span><span class="n">string_to_array</span><span class="p">(:</span><span class="s1">&#39;schemas&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">)))</span>
+    <span class="k">AND</span> <span class="n">tc</span><span class="p">.</span><span class="n">constraint_type</span> <span class="o">=</span> <span class="s1">&#39;PRIMARY KEY&#39;</span>
+<span class="k">GROUP</span> <span class="k">BY</span>
+    <span class="n">tc</span><span class="p">.</span><span class="n">table_schema</span><span class="p">,</span>
+    <span class="n">tc</span><span class="p">.</span><span class="k">table_name</span><span class="p">,</span>
+    <span class="n">tc</span><span class="p">.</span><span class="k">constraint_name</span><span class="p">,</span>
+    <span class="n">tc</span><span class="p">.</span><span class="n">constraint_type</span>
+<span class="p">)</span>
+<span class="k">SELECT</span> <span class="n">def</span> <span class="k">FROM</span> <span class="k">constraints</span>
+<span class="k">UNION</span> <span class="k">ALL</span>
+<span class="k">SELECT</span> <span class="n">indexdef</span> <span class="o">||</span> <span class="s1">&#39;;&#39;</span>
+<span class="k">FROM</span> <span class="n">pg_indexes</span>
+<span class="k">WHERE</span> <span class="n">schemaname</span> <span class="k">IN</span> <span class="p">(</span><span class="k">SELECT</span> <span class="k">unnest</span><span class="p">(</span><span class="n">string_to_array</span><span class="p">(:</span><span class="s1">&#39;schemas&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">)))</span> 
+<span class="k">AND</span> <span class="k">NOT</span> <span class="k">EXISTS</span> <span class="p">(</span>
+    <span class="k">SELECT</span> <span class="mi">1</span> <span class="k">FROM</span>
+    <span class="k">constraints</span> <span class="k">c</span>
+    <span class="k">WHERE</span> <span class="n">pg_indexes</span><span class="p">.</span><span class="n">schemaname</span> <span class="o">=</span> <span class="k">c</span><span class="p">.</span><span class="n">table_schema</span>
+        <span class="k">AND</span> <span class="n">pg_indexes</span><span class="p">.</span><span class="n">tablename</span> <span class="o">=</span> <span class="k">c</span><span class="p">.</span><span class="k">table_name</span>
+        <span class="k">AND</span> <span class="n">pg_indexes</span><span class="p">.</span><span class="n">indexname</span> <span class="o">=</span> <span class="k">c</span><span class="p">.</span><span class="k">constraint_name</span>
+<span class="p">);</span>
+</pre></div>
+
+
+<h2>Few&nbsp;sidenotes</h2>
+<ol>
+<li>Run the second piece of code first. If you forget, run that code on the source&nbsp;database.</li>
+<li>Notice the <code>:schemas</code>. Variable assignment is one of the <code>psql</code> features I really&nbsp;like.</li>
+<li>Notice <code>DROP INDEX IF EXISTS</code> and the <span class="caps">CTE</span> used in the drop code - that&#8217;s due to the fact that dropping the constraint obviously drops the underlying index as well and you don&#8217;t want to dropping something that doesn&#8217;t exist or creating something that exists&nbsp;already.</li>
+</ol>
+<p>The bash script proposal might look as&nbsp;follows:</p>
+<div class="highlight"><pre><span></span><span class="c1"># store indices and constraint definitions</span>
+psql -qAt -d target -v <span class="nv">schemas</span><span class="o">=</span><span class="s1">&#39;schema1&#39;</span>,<span class="s1">&#39;schema2&#39;</span> -f create_indices_constraints.sql &gt; create.sql
+
+<span class="c1"># drop indices and constraints</span>
+psql -qAt -d target -v <span class="nv">schemas</span><span class="o">=</span><span class="s1">&#39;schema1&#39;</span>,<span class="s1">&#39;schema2&#39;</span> -f drop_indices_constraints.sql <span class="p">|</span> psql -d target
+
+​# load data
+pg_dump -a -t <span class="s2">&quot;schema1.*&quot;</span> -t <span class="s2">&quot;schema2.*&quot;</span> -O -d <span class="nb">source</span> -v <span class="p">|</span> psql -h localhost -d target
+
+<span class="c1">#renew indices and constraints</span>
+psql -qAt -d target -f create.sql
+​
+</pre></div>
+    </section>
+    </div>
+<div class="neighbors">
+    <h3>More reading</h3>
+    <ul>
+        <li>
+            <a href="https://www.zimmi.cz/posts/2016/testing-postgresql-ogr-fdw/">
+                 Testing PostgreSQL <span class="caps">OGR</span> <span class="caps">FDW</span>
+            </a>
+        </li>
+         <li>
+             <a href="https://www.zimmi.cz/posts/2016/dead-simple-random-points-in-polygons-with-postgis/">
+                 Dead Simple Random Points in Polygons with&nbsp;PostGIS
+             </a>
+         </li>
+         <li>
+             <a href="https://www.zimmi.cz/posts/2016/testing-postgresql-ogr-fdw/">
+                 Testing PostgreSQL <span class="caps">OGR</span> <span class="caps">FDW</span>
+             </a>
+         </li>
+         <li>
+             <a href="https://www.zimmi.cz/posts/2016/dead-simple-random-points-in-polygons-with-postgis/">
+                 Dead Simple Random Points in Polygons with&nbsp;PostGIS
+             </a>
+         </li>
+        </li>
+    </ul>
+</div></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns footer">
+                <footer>
+                    <address>
+                    Written by <a href="http://www.zimmi.cz">Michal Zimmermann</a>.
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    </address><!-- /#about -->
+                </footer><!-- /#contentinfo -->
+            </div>
+        </div>
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-43432739-2']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+<script src="https://www.zimmi.cz/posts/theme/js/packed.js?8bee1467"></script>
+<script>
+$(document).foundation();
+</script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+          <title>Michal Zimmermann | <span class="caps">WMTS</span>: Few Things I Want To&nbsp;Remember</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+
+
+
+    <meta name="tags" content="ogc" />
+    <meta name="tags" content="wmts" />
+  <meta property="og:image" content="https://pbs.twimg.com/profile_images/770323886290440192/3G5hqp11_400x400.jpg" />
+  <meta property="og:title" content="WMTS: Few Things I Want To Remember" />
+  <meta property="og:description" content="Used to serve prepared rectangular tiles; this means you are limited by web server speed rather than map server speed Several ways to retrieve tiles are defined: KVP and REST are mandatory, SOAP is optional Does not allow layer combination; additional ..." />
+  <meta property="og:url" content="https://www.zimmi.cz/posts/2014/wmts-few-things-i-want-to-remember/" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?d5d1e141">
+</head>
+
+<body id="index" class="home">
+    <nav class="top-bar card-1" data-topbar role="navigation">
+        <ul class="title-area">
+            <li class="name">
+                <h1><a href="/posts">Home</a></h1>
+            </li>
+     <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+            <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+        </ul>
+        <section class="top-bar-section">
+    <!-- Right Nav Section -->
+            <ul class="right">
+                <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+                <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+                <li><a href="https://www.zimmi.cz/posts/feed.xml">RSS feed</a></li>
+            </ul>
+        </section>
+    </nav>
+        <div class="row">
+          <div class="large-12 columns header">
+            <h1><a href="/posts">Michal Zimmermann</a> <small>Pieces of knowledge from the world of GIS.</small></h1>
+          </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns">
+<div class="panel card card-1">
+    <div class="post-name">
+        <h1><a href="https://www.zimmi.cz/posts/2014/wmts-few-things-i-want-to-remember/" rel="bookmark" title="Permalink to WMTS: Few Things I Want To Remember"><span class="caps">WMTS</span>: Few Things I Want To&nbsp;Remember</a></h1>
+        <small>Written on Sep 10, 2014
+    and marked as
+    <a href="https://www.zimmi.cz/posts/tag/ogc.html">ogc</a>,     <a href="https://www.zimmi.cz/posts/tag/wmts.html">wmts</a>    | <a href="https://www.zimmi.cz/posts/category/web-maps.html">web maps</a>
+    </small>
+    <section>
+        <ul>
+<li>Used to serve prepared rectangular tiles; this means you are limited by web server speed rather than map server&nbsp;speed</li>
+<li>Several ways to retrieve tiles are defined: <span class="caps">KVP</span> and <span class="caps">REST</span> are mandatory, <span class="caps">SOAP</span> is&nbsp;optional</li>
+<li>Does not allow layer combination; additional tile matrix would have to be&nbsp;created</li>
+<li>GetCapabilities, GetTile and GetFeatureInfo requests are&nbsp;defined</li>
+<li><strong>tile</strong></li>
+<li>rectangular representation of&nbsp;space</li>
+<li>defined by tile and row&nbsp;indices</li>
+<li><strong>tile&nbsp;matrix</strong></li>
+<li>set of tiles for a given&nbsp;scale</li>
+<li><em>defined with:</em><ul>
+<li>tile size derived from standardized pixel size (0.28 &times; 0.28&nbsp;mm)</li>
+<li>tile width and tile height&nbsp;(px)</li>
+<li>left upper corner&nbsp;coordinates</li>
+<li>matrix width and height as number of&nbsp;tiles</li>
+</ul>
+</li>
+<li><strong>tile matrix&nbsp;set</strong></li>
+<li>set of tile matrices for different&nbsp;scales</li>
+</ul>
+<h3>Total count of tile&nbsp;matrices</h3>
+<p><em><code>nTileMatrices × nTiledStyles × nTiledFormats (if no dimensions are defined)</code></em></p>
+<h3>Total count of tiles in a tile&nbsp;matrix</h3>
+<p><em><code>matrixWidth × matrixHeight</code></em></p>
+<h3>Other&nbsp;equations</h3>
+<ul>
+<li><code>pixelSpan = scaleDenominator × 0.28 10<sup>3</sup> / metersPerUnit(crs);</code></li>
+<li><code>tileSpanX = tileWidth × pixelSpan;</code></li>
+<li><code>tileSpanY = tileHeight × pixelSpan;</code></li>
+<li><code>tileMatrixMaxX = tileMatrixMinX + tileSpanX × matrixWidth;</code></li>
+<li><code>tileMatrixMinY = tileMatrixMaxY - tileSpanY × matrixHeight;</code></li>
+</ul>
+<p><img src="https://www.zimmi.cz/posts/assets/wmts-few-things-i-want-to-remember/wmts.png" title="WMTS tiling schema" class="img-responsive centered"></p>
+    </section>
+    </div>
+<div class="neighbors">
+    <h3>More reading</h3>
+    <ul>
+        <li>
+            <a href="https://www.zimmi.cz/posts/2014/degrees-to-decimal-with-javascript/">
+                 Degrees To Decimal With&nbsp;Javascript
+            </a>
+        </li>
+         <li>
+             <a href="https://www.zimmi.cz/posts/2014/blogging-on-docker-piecrust-to-the-rescue/">
+                 Blogging On Docker: Piecrust To The&nbsp;Rescue
+             </a>
+         </li>
+         <li>
+             <a href="https://www.zimmi.cz/posts/2014/connecting-to-secured-arcgis-server-layer-with-openlayers-3/">
+                 Connecting To Secured ArcGIS Server Layer With OpenLayers&nbsp;3
+             </a>
+         </li>
+        </li>
+    </ul>
+</div></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns footer">
+                <footer>
+                    <address>
+                    Written by <a href="http://www.zimmi.cz">Michal Zimmermann</a>.
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    </address><!-- /#about -->
+                </footer><!-- /#contentinfo -->
+            </div>
+        </div>
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-43432739-2']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+<script src="https://www.zimmi.cz/posts/theme/js/packed.js?8bee1467"></script>
+<script>
+$(document).foundation();
+</script>
+</body>
+</html>
