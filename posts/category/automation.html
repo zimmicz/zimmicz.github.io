@@ -38,6 +38,46 @@
 
     <div class="panel card card-1">
         <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2016/ogrinfo-output-formatting/" rel="bookmark" title="Permalink to Ogrinfo Output Formatting">Ogrinfo Output&nbsp;Formatting</a></h1>
+            <small>Written on Oct 21, 2016
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>        | <a href="https://www.zimmi.cz/posts/category/automation.html">automation</a>
+        </small>
+        <section>
+            <p>Today my workmate asked if there was a way to see an attribute table other than importing spatial data into a PostGIS database. I told him about <span class="caps">QGIS</span> and while talking about other <span class="caps">GIS</span> stuff, I started thinking about <em>pipes</em> and how awesome it would be to actually format the output of the <code>ogrinfo</code> command.</p>
+<p>Here it is. It is just a much longer way to do <code>ogr2ogr -f "CSV" dest source</code>, but sometimes you just have to experiment a&nbsp;bit.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="nv">FILE</span><span class="o">=</span><span class="nv">$1</span>
+
+<span class="k">function</span> columns <span class="o">{</span>
+    ogrinfo <span class="nv">$FILE</span> -al -so <span class="p">|</span> <span class="se">\</span>
+    sed <span class="s1">&#39;/Column/,$!d&#39;</span> <span class="p">|</span> <span class="se">\</span>
+    sed <span class="s1">&#39;/Geometry Column/d&#39;</span> <span class="p">|</span> <span class="se">\</span>
+    sed -e <span class="s1">&#39;s/Column =/\:/g&#39;</span> <span class="p">|</span> <span class="se">\</span>
+    awk -F: <span class="s1">&#39;{print $1}&#39;</span> <span class="p">|</span> <span class="se">\</span>
+    awk -v <span class="nv">RS</span><span class="o">=</span> -v <span class="nv">OFS</span><span class="o">=</span><span class="s2">&quot;|&quot;</span> <span class="s1">&#39;{$1 = $1} 1&#39;</span>
+<span class="o">}</span>
+
+<span class="k">function</span> data <span class="o">{</span>
+   ogrinfo <span class="nv">$FILE</span> -al <span class="p">|</span> <span class="se">\</span>
+   sed <span class="s1">&#39;/OGRFeature/,$!d&#39;</span> <span class="p">|</span> <span class="se">\</span>
+   sed <span class="s1">&#39;/POLYGON\|LINESTRING\|POINT/ d&#39;</span> <span class="p">|</span> <span class="se">\</span>
+   sed -e <span class="s1">&#39;s/OGRFeature\(.*\)\://g&#39;</span> <span class="p">|</span> <span class="se">\</span>
+   sed -e <span class="s1">&#39;s/.*\s*\(.*\)\s*=\s*//g&#39;</span> <span class="p">|</span> <span class="se">\</span>
+   awk -v <span class="nv">RS</span><span class="o">=</span> -v <span class="nv">OFS</span><span class="o">=</span><span class="s2">&quot;|&quot;</span> <span class="s1">&#39;{$1 = $1} 1&#39;</span>
+<span class="o">}</span>
+
+<span class="o">{</span> columns<span class="p">;</span> data<span class="p">;</span> <span class="o">}</span>
+</pre></div>
+
+
+<p>The result can be piped to other <code>bash</code> functions, such as <code>less</code> or <code>more</code>. I call it <code>ogrinfotable</code>.</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
             <h1><a href="https://www.zimmi.cz/posts/2016/how-to-convert-dgn-to-tiff-with-gdal/" rel="bookmark" title="Permalink to How to convert DGN to Tiff with GDAL">How to convert <span class="caps">DGN</span> to Tiff with <span class="caps">GDAL</span></a></h1>
             <small>Written on Feb 21, 2016
         and marked as

@@ -1,5 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0"><channel><title>Michal Zimmermann</title><link>https://www.zimmi.cz/posts/</link><description>Pieces of knowledge from the world of GIS.</description><lastBuildDate>Thu, 01 Sep 2016 22:00:00 +0200</lastBuildDate><item><title>PostGIS Custom Function to Create Wind Rose</title><link>https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-wind-rose/</link><description>&lt;p&gt;I&amp;#8217;ve come across the &lt;a href="http://gis.stackexchange.com/questions/208797/draw-wind-rose-with-qgis-from-postgis/"&gt;beautiful &lt;span class="caps"&gt;GIS&lt;/span&gt; StackExchange question&lt;/a&gt; recently, asking how to draw a &lt;a href="https://en.wikipedia.org/wiki/Wind_rose"&gt;wind rose&lt;/a&gt; within&amp;nbsp;PostGIS.&lt;/p&gt;
+<rss version="2.0"><channel><title>Michal Zimmermann</title><link>https://www.zimmi.cz/posts/</link><description>Pieces of knowledge from the world of GIS.</description><lastBuildDate>Fri, 21 Oct 2016 23:00:00 +0200</lastBuildDate><item><title>Ogrinfo Output Formatting</title><link>https://www.zimmi.cz/posts/2016/ogrinfo-output-formatting/</link><description>&lt;p&gt;Today my workmate asked if there was a way to see an attribute table other than importing spatial data into a PostGIS database. I told him about &lt;span class="caps"&gt;QGIS&lt;/span&gt; and while talking about other &lt;span class="caps"&gt;GIS&lt;/span&gt; stuff, I started thinking about &lt;em&gt;pipes&lt;/em&gt; and how awesome it would be to actually format the output of the &lt;code&gt;ogrinfo&lt;/code&gt; command.&lt;/p&gt;
+&lt;p&gt;Here it is. It is just a much longer way to do &lt;code&gt;ogr2ogr -f "CSV" dest source&lt;/code&gt;, but sometimes you just have to experiment a&amp;nbsp;bit.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class="nv"&gt;FILE&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$1&lt;/span&gt;
+
+&lt;span class="k"&gt;function&lt;/span&gt; columns &lt;span class="o"&gt;{&lt;/span&gt;
+    ogrinfo &lt;span class="nv"&gt;$FILE&lt;/span&gt; -al -so &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+    sed &lt;span class="s1"&gt;&amp;#39;/Column/,$!d&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+    sed &lt;span class="s1"&gt;&amp;#39;/Geometry Column/d&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+    sed -e &lt;span class="s1"&gt;&amp;#39;s/Column =/\:/g&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+    awk -F: &lt;span class="s1"&gt;&amp;#39;{print $1}&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+    awk -v &lt;span class="nv"&gt;RS&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt; -v &lt;span class="nv"&gt;OFS&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;|&amp;quot;&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;{$1 = $1} 1&amp;#39;&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+
+&lt;span class="k"&gt;function&lt;/span&gt; data &lt;span class="o"&gt;{&lt;/span&gt;
+   ogrinfo &lt;span class="nv"&gt;$FILE&lt;/span&gt; -al &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+   sed &lt;span class="s1"&gt;&amp;#39;/OGRFeature/,$!d&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+   sed &lt;span class="s1"&gt;&amp;#39;/POLYGON\|LINESTRING\|POINT/ d&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+   sed -e &lt;span class="s1"&gt;&amp;#39;s/OGRFeature\(.*\)\://g&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+   sed -e &lt;span class="s1"&gt;&amp;#39;s/.*\s*\(.*\)\s*=\s*//g&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+   awk -v &lt;span class="nv"&gt;RS&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt; -v &lt;span class="nv"&gt;OFS&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;|&amp;quot;&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;{$1 = $1} 1&amp;#39;&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+
+&lt;span class="o"&gt;{&lt;/span&gt; columns&lt;span class="p"&gt;;&lt;/span&gt; data&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The result can be piped to other &lt;code&gt;bash&lt;/code&gt; functions, such as &lt;code&gt;less&lt;/code&gt; or &lt;code&gt;more&lt;/code&gt;. I call it &lt;code&gt;ogrinfotable&lt;/code&gt;.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Michal Zimmermann</dc:creator><pubDate>Fri, 21 Oct 2016 23:00:00 +0200</pubDate><guid isPermaLink="false">tag:www.zimmi.cz,2016-10-21:posts/2016/ogrinfo-output-formatting/</guid><category>gdal</category></item><item><title>PostGIS Custom Function to Create Wind Rose</title><link>https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-wind-rose/</link><description>&lt;p&gt;I&amp;#8217;ve come across the &lt;a href="http://gis.stackexchange.com/questions/208797/draw-wind-rose-with-qgis-from-postgis/"&gt;beautiful &lt;span class="caps"&gt;GIS&lt;/span&gt; StackExchange question&lt;/a&gt; recently, asking how to draw a &lt;a href="https://en.wikipedia.org/wiki/Wind_rose"&gt;wind rose&lt;/a&gt; within&amp;nbsp;PostGIS.&lt;/p&gt;
 &lt;div class="text-center"&gt;
 &lt;img src="http://i.stack.imgur.com/0xAMU.png"&gt;
 &lt;/div&gt;

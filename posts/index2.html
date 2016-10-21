@@ -37,6 +37,86 @@
 
     <div class="panel card card-1">
         <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2016/looking-for-the-next-row-with-postgresql/" rel="bookmark" title="Permalink to Looking for the Next Row with PostgreSQL">Looking for the Next Row with&nbsp;PostgreSQL</a></h1>
+            <small>Written on Jan 23, 2016
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
+        </small>
+        <section>
+            <h2>Using <span class="caps">JOIN</span>&nbsp;clause</h2>
+<p>All my <span class="caps">GIS</span> life I&#8217;ve been using a simple <code>JOIN</code> clause to find a row with an <code>id = previous_id + 1</code>. In other words, imagine a simple table with no&nbsp;indices:</p>
+<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">test</span> <span class="p">(</span><span class="n">id</span> <span class="nb">integer</span><span class="p">);</span>
+<span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">test</span> <span class="k">SELECT</span> <span class="n">i</span> <span class="k">FROM</span> <span class="n">generate_series</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">10000000</span><span class="p">)</span> <span class="n">i</span><span class="p">;</span>
+</pre></div>
+
+
+<p>Let&#8217;s retrieve next row for each row in that&nbsp;table:</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">a</span><span class="p">.</span><span class="n">id</span><span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">id</span>
+<span class="k">FROM</span> <span class="n">test</span> <span class="n">a</span>
+<span class="k">LEFT</span> <span class="k">JOIN</span> <span class="n">test</span> <span class="n">b</span> <span class="k">ON</span> <span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">id</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">=</span> <span class="n">b</span><span class="p">.</span><span class="n">id</span><span class="p">);</span> <span class="c1">-- note the LEFT JOIN is needed to get the last row as well</span>
+</pre></div>
+
+
+<p>Execution plan looks like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="n">Hash</span> <span class="k">Join</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">311087</span><span class="p">.</span><span class="mi">17</span><span class="p">..</span><span class="mi">953199</span><span class="p">.</span><span class="mi">41</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10088363</span> <span class="n">width</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">25440</span><span class="p">.</span><span class="mi">770</span><span class="p">..</span><span class="mi">79591</span><span class="p">.</span><span class="mi">869</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000000</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+   <span class="n">Hash</span> <span class="n">Cond</span><span class="p">:</span> <span class="p">((</span><span class="n">a</span><span class="p">.</span><span class="n">id</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">b</span><span class="p">.</span><span class="n">id</span><span class="p">)</span>
+   <span class="o">-&gt;</span>  <span class="n">Seq</span> <span class="n">Scan</span> <span class="k">on</span> <span class="n">test</span> <span class="n">a</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">00</span><span class="p">..</span><span class="mi">145574</span><span class="p">.</span><span class="mi">63</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10088363</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">588</span><span class="p">..</span><span class="mi">10801</span><span class="p">.</span><span class="mi">584</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+   <span class="o">-&gt;</span>  <span class="n">Hash</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">145574</span><span class="p">.</span><span class="mi">63</span><span class="p">..</span><span class="mi">145574</span><span class="p">.</span><span class="mi">63</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10088363</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">25415</span><span class="p">.</span><span class="mi">282</span><span class="p">..</span><span class="mi">25415</span><span class="p">.</span><span class="mi">282</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+         <span class="n">Buckets</span><span class="p">:</span> <span class="mi">16384</span>  <span class="n">Batches</span><span class="p">:</span> <span class="mi">128</span>  <span class="n">Memory</span> <span class="k">Usage</span><span class="p">:</span> <span class="mi">2778</span><span class="n">kB</span>
+         <span class="o">-&gt;</span>  <span class="n">Seq</span> <span class="n">Scan</span> <span class="k">on</span> <span class="n">test</span> <span class="n">b</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">00</span><span class="p">..</span><span class="mi">145574</span><span class="p">.</span><span class="mi">63</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10088363</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">422</span><span class="p">..</span><span class="mi">11356</span><span class="p">.</span><span class="mi">108</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+ <span class="n">Planning</span> <span class="n">time</span><span class="p">:</span> <span class="mi">0</span><span class="p">.</span><span class="mi">155</span> <span class="n">ms</span>
+ <span class="n">Execution</span> <span class="n">time</span><span class="p">:</span> <span class="mi">90134</span><span class="p">.</span><span class="mi">248</span> <span class="n">ms</span>
+</pre></div>
+
+
+<p>If we add an index with <code>CREATE INDEX ON test (id)</code>, the plan&nbsp;changes:</p>
+<div class="highlight"><pre><span></span><span class="n">Merge</span> <span class="k">Join</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">87</span><span class="p">..</span><span class="mi">669369</span><span class="p">.</span><span class="mi">85</span> <span class="k">rows</span><span class="o">=</span><span class="mi">9999844</span> <span class="n">width</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">035</span><span class="p">..</span><span class="mi">56219</span><span class="p">.</span><span class="mi">294</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+   <span class="n">Merge</span> <span class="n">Cond</span><span class="p">:</span> <span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">b</span><span class="p">.</span><span class="n">id</span><span class="p">)</span>
+   <span class="o">-&gt;</span>  <span class="k">Index</span> <span class="k">Only</span> <span class="n">Scan</span> <span class="k">using</span> <span class="n">test_id_idx</span> <span class="k">on</span> <span class="n">test</span> <span class="n">a</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">43</span><span class="p">..</span><span class="mi">259686</span><span class="p">.</span><span class="mi">10</span> <span class="k">rows</span><span class="o">=</span><span class="mi">9999844</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">015</span><span class="p">..</span><span class="mi">11101</span><span class="p">.</span><span class="mi">937</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+         <span class="n">Heap</span> <span class="n">Fetches</span><span class="p">:</span> <span class="mi">0</span>
+   <span class="o">-&gt;</span>  <span class="k">Index</span> <span class="k">Only</span> <span class="n">Scan</span> <span class="k">using</span> <span class="n">test_id_idx</span> <span class="k">on</span> <span class="n">test</span> <span class="n">b</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">43</span><span class="p">..</span><span class="mi">259686</span><span class="p">.</span><span class="mi">10</span> <span class="k">rows</span><span class="o">=</span><span class="mi">9999844</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">012</span><span class="p">..</span><span class="mi">11827</span><span class="p">.</span><span class="mi">895</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+         <span class="n">Heap</span> <span class="n">Fetches</span><span class="p">:</span> <span class="mi">0</span>
+ <span class="n">Planning</span> <span class="n">time</span><span class="p">:</span> <span class="mi">0</span><span class="p">.</span><span class="mi">244</span> <span class="n">ms</span>
+ <span class="n">Execution</span> <span class="n">time</span><span class="p">:</span> <span class="mi">65973</span><span class="p">.</span><span class="mi">421</span> <span class="n">ms</span>
+</pre></div>
+
+
+<p>Not&nbsp;bad.</p>
+<h2>Using window&nbsp;function</h2>
+<p><a href="http://www.postgresql.org/docs/9.4/static/functions-window.html">Window functions</a> are real fun. They&#8217;re great if you&#8217;re doing counts, sums or ranks by groups. And, to my surprise, they&#8217;re great in finding next rows as&nbsp;well.</p>
+<p>With the same <code>test</code> table, we retrieve next row for each row with the following&nbsp;query:</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">id</span><span class="p">,</span> <span class="n">lead</span><span class="p">(</span><span class="n">id</span><span class="p">)</span> <span class="n">OVER</span> <span class="p">(</span><span class="k">ORDER</span> <span class="k">BY</span> <span class="n">id</span><span class="p">)</span>
+<span class="k">FROM</span> <span class="n">test</span><span class="p">.</span><span class="n">test</span><span class="p">;</span>
+</pre></div>
+
+
+<p>How does that score without an index? Better than the <code>JOIN</code> clause.</p>
+<div class="highlight"><pre><span></span><span class="n">WindowAgg</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">1581246</span><span class="p">.</span><span class="mi">90</span><span class="p">..</span><span class="mi">1756294</span><span class="p">.</span><span class="mi">50</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10002720</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">28785</span><span class="p">.</span><span class="mi">388</span><span class="p">..</span><span class="mi">63819</span><span class="p">.</span><span class="mi">071</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+   <span class="o">-&gt;</span>  <span class="n">Sort</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">1581246</span><span class="p">.</span><span class="mi">90</span><span class="p">..</span><span class="mi">1606253</span><span class="p">.</span><span class="mi">70</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10002720</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">28785</span><span class="p">.</span><span class="mi">354</span><span class="p">..</span><span class="mi">40117</span><span class="p">.</span><span class="mi">899</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+         <span class="n">Sort</span> <span class="k">Key</span><span class="p">:</span> <span class="n">id</span>
+         <span class="n">Sort</span> <span class="k">Method</span><span class="p">:</span> <span class="k">external</span> <span class="n">merge</span>  <span class="n">Disk</span><span class="p">:</span> <span class="mi">136848</span><span class="n">kB</span>
+         <span class="o">-&gt;</span>  <span class="n">Seq</span> <span class="n">Scan</span> <span class="k">on</span> <span class="n">test</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">00</span><span class="p">..</span><span class="mi">144718</span><span class="p">.</span><span class="mi">20</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10002720</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">020</span><span class="p">..</span><span class="mi">10797</span><span class="p">.</span><span class="mi">961</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+ <span class="n">Planning</span> <span class="n">time</span><span class="p">:</span> <span class="mi">0</span><span class="p">.</span><span class="mi">242</span> <span class="n">ms</span>
+ <span class="n">Execution</span> <span class="n">time</span><span class="p">:</span> <span class="mi">73391</span><span class="p">.</span><span class="mi">024</span> <span class="n">ms</span>
+</pre></div>
+
+
+<p>And it works even better if indexed. It&#8217;s actually ~1,5&times; faster than the <code>JOIN</code> way.</p>
+<div class="highlight"><pre><span></span><span class="n">WindowAgg</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">43</span><span class="p">..</span><span class="mi">409770</span><span class="p">.</span><span class="mi">03</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10002720</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">087</span><span class="p">..</span><span class="mi">35647</span><span class="p">.</span><span class="mi">815</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+   <span class="o">-&gt;</span>  <span class="k">Index</span> <span class="k">Only</span> <span class="n">Scan</span> <span class="k">using</span> <span class="n">test_id_idx</span> <span class="k">on</span> <span class="n">test</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">43</span><span class="p">..</span><span class="mi">259729</span><span class="p">.</span><span class="mi">23</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10002720</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">059</span><span class="p">..</span><span class="mi">11310</span><span class="p">.</span><span class="mi">879</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+         <span class="n">Heap</span> <span class="n">Fetches</span><span class="p">:</span> <span class="mi">0</span>
+ <span class="n">Planning</span> <span class="n">time</span><span class="p">:</span> <span class="mi">0</span><span class="p">.</span><span class="mi">247</span> <span class="n">ms</span>
+ <span class="n">Execution</span> <span class="n">time</span><span class="p">:</span> <span class="mi">45388</span><span class="p">.</span><span class="mi">202</span> <span class="n">ms</span>
+</pre></div>
+
+
+<p>It reads well and the purpose of such a query is pretty&nbsp;obvious.</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
             <h1><a href="https://www.zimmi.cz/posts/2015/liftago-open-dataset-infographics/" rel="bookmark" title="Permalink to Liftago Open Dataset Infographics">Liftago Open Dataset&nbsp;Infographics</a></h1>
             <small>Written on Dec 21, 2015
         and marked as
@@ -810,53 +890,6 @@ gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span c
 <h2>Conclusion</h2>
 <p>I created pretty efficient semi-automated workflow using several open source technologies that saves me a lot of work. Although <span class="caps">QGIS</span> has some minor pet peeves (scale with decimal places, not showing the entire feature, not substituting variables at times), it definitely makes boring map creation quite amusing. The more I work with big data / on big tasks, the more I find Linux a&nbsp;must-have.</p>
 <p>The whole process was done with <span class="caps">QGIS</span> 2.10, PostGIS 2.1, PostgreSQL 9.3, Python 2.7, ImageMagick&nbsp;6.7.</p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2015/clip-raster-with-vector-using-gdal/" rel="bookmark" title="Permalink to Clip Raster With Vector Using GDAL">Clip Raster With Vector Using <span class="caps">GDAL</span></a></h1>
-            <small>Written on Jul 21, 2015
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>,         <a href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>        | <a href="https://www.zimmi.cz/posts/category/automation.html">automation</a>
-        </small>
-        <section>
-            <p>Recently I needed to clip several raster files with polygonal layer of municipalities. A solution to this task is pretty straightforward using <a href="http://gdal.org/"><span class="caps">GDAL</span></a> and a bit of Bash and <span class="caps">QGIS</span> thrown&nbsp;in.</p>
-<p>The necessary steps&nbsp;are:</p>
-<ol>
-<li>Put each polygon to a separate file. This can be done easily with <code>Vector - Data Management Tools - Split Vector Layer</code> in <span class="caps">QGIS</span>. The solution below assumes that each shapefile has the same basename as the raster&nbsp;file.</li>
-<li>These polygons are stored in the <code>obce</code> subfolder relative to the folder with&nbsp;rasters.</li>
-<li>An <code>output</code> folder exists that is used for&#8230; output,&nbsp;yes.</li>
-<li>Rasters are saved with output alpha band for nodata (<code>-dstalpha</code> flag).</li>
-<li>The script takes one argument - raster&nbsp;name.</li>
-<li>Profit!</li>
-</ol>
-<div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env bash</span>
-
-<span class="nv">OBEC</span><span class="o">=</span><span class="nv">$1</span>
-<span class="nv">BASE</span><span class="o">=</span><span class="k">$(</span>basename <span class="nv">$OBEC</span> _jpeg.tif<span class="k">)</span>
-<span class="nb">echo</span> <span class="nv">$BASE</span>
-<span class="nv">EXTENT</span><span class="o">=</span><span class="k">$(</span>ogrinfo -so obce/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.shp <span class="nv">$BASE</span> <span class="p">|</span> grep Extent <span class="se">\</span>
-<span class="p">|</span> sed <span class="s1">&#39;s/Extent: //g&#39;</span> <span class="p">|</span> sed <span class="s1">&#39;s/(//g&#39;</span> <span class="p">|</span> sed <span class="s1">&#39;s/)//g&#39;</span> <span class="se">\</span>
-<span class="p">|</span> sed <span class="s1">&#39;s/ - /, /g&#39;</span><span class="k">)</span>
-<span class="nv">EXTENT</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span> <span class="nv">$EXTENT</span> <span class="p">|</span> awk -F <span class="s1">&#39;,&#39;</span> <span class="s1">&#39;{print $1 &quot; &quot; $4 &quot; &quot; $3 &quot; &quot; $2}&#39;</span><span class="k">)</span>
-gdal_translate -projwin <span class="nv">$EXTENT</span> -of GTiff <span class="nv">$OBEC</span> output/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.tif
-gdalwarp -dstalpha -s_srs <span class="s1">&#39;EPSG:5514&#39;</span> -t_srs <span class="s1">&#39;EPSG:5514&#39;</span> <span class="se">\</span>
-    -co <span class="nv">COMPRESS</span><span class="o">=</span>JPEG <span class="se">\</span>
-    -co <span class="nv">TILED</span><span class="o">=</span>YES -<span class="se">\</span>
-    of GTiff <span class="se">\</span>
-    -cutline obce/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.shp <span class="se">\</span>
-    output/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.tif output/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.final.tif
-</pre></div>
-
-
-<p>Note that if <code>gdalwarp</code> doesn&#8217;t recognize an <span class="caps">EPSG</span> code (which is the case for my country national grid), you might pass it as a <span class="caps">PROJ</span>.4&nbsp;string.</p>
-<p>According to the point 5 in the above list, the script needs to be run in a&nbsp;loop:</p>
-<div class="highlight"><pre><span></span><span class="k">for</span> f in *_jpeg.tif<span class="p">;</span>
-    <span class="k">do</span> the_script_above.sh <span class="nv">$f</span>
-<span class="p">;</span><span class="k">done</span>
-</pre></div>
         </section>
         </div>
     </div>
