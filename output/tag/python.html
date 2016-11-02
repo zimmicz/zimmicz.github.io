@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+        <title>Michal Zimmermann | tag: python</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="/theme/webassets-external/fee07050f67182ee94565df0306e2583_foundation.min.css">
+        <link rel="stylesheet" href="/theme/webassets-external/c8d3bd219f818a16149faa6dc85ada3b_pygment.css">
+        <link rel="stylesheet" href="/theme/webassets-external/f19e9253fe1e12d62d57b9087abc5f7a_screen.css">
+</head>
+
+<body id="index" class="home">
+    <nav class="top-bar card-1" data-topbar role="navigation">
+        <ul class="title-area">
+            <li class="name">
+                <h1><a href="/posts">Home</a></h1>
+            </li>
+     <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+            <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+        </ul>
+        <section class="top-bar-section">
+    <!-- Right Nav Section -->
+            <ul class="right">
+                <li><a href="/categories">Categories</a></li>
+                <li><a href="/tags">Tags</a></li>
+                <li><a href="/feed.xml">RSS feed</a></li>
+            </ul>
+        </section>
+    </nav>
+        <div class="row">
+          <div class="large-12 columns header">
+            <h1><a href="/posts">Michal Zimmermann</a> <small>Pieces of knowledge from the world of GIS.</small></h1>
+          </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns">
+<h2 class="text-center">Articles tagged with python tag</h2>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="/posts/2015/liftago-open-dataset-infographics/" rel="bookmark" title="Permalink to Liftago Open Dataset Infographics">Liftago Open Dataset&nbsp;Infographics</a></h1>
+            <small>Written on Dec 21, 2015
+        and marked as
+        <a href="/tag/python.html">python</a>,         <a href="/tag/postgis.html">postgis</a>,         <a href="/tag/svg.html">svg</a>,         <a href="/tag/visualization.html">visualization</a>        | <a href="/category/data.html">data</a>
+        </small>
+        <section>
+            <p><a href="https://www.liftago.com/cs">Liftago</a> (the Czech analogy of Uber) has recently <a href="http://try.liftago.com/info-wants-to-be-free/">released a sample of its data</a> covering four weeks of driver/pasenger&nbsp;interactions.</p>
+<p>Have a look at my infographics created with PostGIS, Inkscape, Python and&nbsp;pygal.</p>
+<p class="text-center"><a href="/assets/liftago-open-dataset-infographics/liftago.pdf"><img title="Liftago infographics" src="/assets/liftago-open-dataset-infographics/liftago.png" class="img-responsive centered"></a></p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="/posts/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/" rel="bookmark" title="Permalink to Automated Map Creation With QGIS, PostGIS, Python, SVG and ImageMagick">Automated Map Creation With <span class="caps">QGIS</span>, PostGIS, Python, <span class="caps">SVG</span> and&nbsp;ImageMagick</a></h1>
+            <small>Written on Aug 9, 2015
+        and marked as
+        <a href="/tag/qgis.html">qgis</a>,         <a href="/tag/postgis.html">postgis</a>,         <a href="/tag/python.html">python</a>,         <a href="/tag/svg.html">svg</a>,         <a href="/tag/linux.html">linux</a>        | <a href="/category/automation.html">automation</a>
+        </small>
+        <section>
+            <p>As mentioned in <a href="/posts/2015/qgis-tips-for-collaborative-mapping/"><span class="caps">QGIS</span> Tips For Collaborative Mapping</a> we&#8217;re in the middle of crop evaluation project at <a href="http://www.clevermaps.cz/">CleverMaps</a>.</p>
+<p>With the <span class="caps">QGIS</span> workflow up and running, I&#8217;ve been focused on different <span class="caps">QGIS</span> related task: <strong>automatic map generation</strong> for land blocks that meet certain conditions. The logic behind identifying such land blocks is as&nbsp;follows:</p>
+<ul>
+<li>if the original area and the measured one differ more than 0.5 %&nbsp;or</li>
+<li>number of declared crops differs from number of crops identified&nbsp;or</li>
+<li>at least one parcel in the land block was given a certain error&nbsp;code</li>
+</ul>
+<p>Let&#8217;s assume that with several lines of <span class="caps">SQL</span> code we can store these mentioned above in a table called <code>land_blocks</code> with geometries being the result of calling <code>ST_Union()</code> over parcels for each land&nbsp;block.</p>
+<h2>Map&nbsp;composition</h2>
+<p>Every map should feature following&nbsp;layers:</p>
+<ul>
+<li>land blocks (remember the <code>land_blocks</code> table?) - labeled with <span class="caps">ID</span>, yellowish borders, no&nbsp;fill</li>
+<li>land parcels - that&#8217;s my source layer - labeled with letters, blue borders, no&nbsp;fill</li>
+<li>other&nbsp;layers</li>
+<li><span class="caps">HR</span>, <span class="caps">VHR</span>, <span class="caps">NIR</span> imagery, orthophoto - served via <span class="caps">WMS</span></li>
+</ul>
+<p>Labels should be visible only for the featured land block (both for the land parcels and the land block itself. The whole map scales dynamically, showing small land blocks zoomed in and the large ones zoomed&nbsp;out.</p>
+<p class='text-center'><a id="desired-map" title="Desired map" href="/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map.jpg"><img title="Desired map" src="/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map.jpg" width=70% class="img-responsive centered"></a></p>
+
+<p>Every map features additional&nbsp;items:</p>
+<ul>
+<li>dynamic list of subsidies farmer asks for - showing both measured and declared&nbsp;area</li>
+<li>dynamic list of land parcels with their areas and error&nbsp;codes</li>
+<li>scalebar</li>
+<li>map&nbsp;key</li>
+<li>logos</li>
+</ul>
+<h2>Atlas&nbsp;creation</h2>
+<p>Now with requirements defined, let&#8217;s create some maps. It&#8217;s incredibly easy to generate a series of maps with <span class="caps">QGIS</span> atlas&nbsp;options.</p>
+<h3>Atlas generation&nbsp;settings</h3>
+<p><strong>Coverage layer</strong> is presumably the only thing you really need - as the name suggests, it covers your area of interest. One map will be created for each feature in this layer, unless you decide to use some <strong>filtering</strong> - which I&nbsp;did.</p>
+<p><strong>Output filenames</strong> can be tweaked to your needs, here&#8217;s what such a function might look like. If there is a slash in the land block <span class="caps">ID</span> (<span class="caps">XXXXXXX</span>/Y), the filename is set to <code>USER-ID_XXXXXXX-00Y_M_00</code>, <code>USER-ID_XXXXXXX-000_M_00</code> otherwise.</p>
+<div class="highlight"><pre><span></span><span class="k">CASE</span> <span class="k">WHEN</span> <span class="n">strpos</span><span class="p">(</span><span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">),</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">THEN</span>
+        <span class="n">ji</span> <span class="o">||</span> <span class="s1">&#39;_&#39;</span> <span class="o">||</span>
+        <span class="n">substr</span><span class="p">(</span>
+            <span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="n">strpos</span><span class="p">(</span><span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">),</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span> <span class="c1">-- slash position</span>
+        <span class="p">)</span> <span class="o">||</span> <span class="s1">&#39;-&#39;</span> <span class="o">||</span>
+        <span class="n">lpad</span><span class="p">(</span>
+            <span class="n">substr</span><span class="p">(</span>
+                <span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">),</span>
+                <span class="n">strpos</span><span class="p">(</span><span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">),</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span>
+                <span class="k">length</span><span class="p">(</span><span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">))</span>
+            <span class="p">),</span>
+        <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">)</span> <span class="o">||</span> <span class="s1">&#39;_M_00&#39;</span>
+    <span class="k">ELSE</span>
+        <span class="n">ji</span> <span class="o">||</span> <span class="s1">&#39;_&#39;</span> <span class="o">||</span> <span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">)</span> <span class="o">||</span> <span class="s1">&#39;-000_M_00&#39;</span>
+<span class="k">END</span>
+</pre></div>
+
+
+<h3>Map scale <span class="amp">&amp;</span> variable&nbsp;substitutions</h3>
+<p>Different land blocks are of different sizes, thus needing different <strong>scales</strong> to fit in the map. Again, <span class="caps">QGIS</span> handles this <em>might-become-a-nightmare-pretty-easily</em> issue with a single click. You can define the scale&nbsp;as:</p>
+<ul>
+<li>margin around feature: percentage of the space displayed&nbsp;around</li>
+<li>predefined scale (best fit): my choice, sometimes it doesn&#8217;t display the entire land block&nbsp;though</li>
+<li>fixed scale: sets the scale the same for all the&nbsp;maps</li>
+</ul>
+<p>With these settings, I get a map similar to the one below. Notice two interesting&nbsp;things:</p>
+<p class='text-center'><a title="QGIS map skeleton" href="/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map_skeleton.png"><img title="QGIS map skeleton" src="/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map_skeleton.png" width=70% class="img-responsive centered"></a></p>
+
+<ul>
+<li>Scale uses decimal places, which I find <em>a huge failure</em>. Has anyone ever seen a map with such scale? The worst is there is no easy way to hide these, or at least I didn&#8217;t find&nbsp;one.</li>
+<li>You can see a bunch of <code>[something in the brackets]</code> notations. These will be substituted with actual values during the atlas generation. Showing land block <span class="caps">ID</span> with a preceeding label is as easy as <code>[%concat('PB: ', "kod_pb")%]</code> (mind the percentage&nbsp;sign).</li>
+</ul>
+<h3>Styling the map using atlas&nbsp;features</h3>
+<p>Atlas features are a great help for <strong>map customization</strong>. As mentioned earlier, in my case, only one land block label per map should be visible. That can be achieved with a simple label dialog&nbsp;expression:</p>
+<div class="highlight"><pre><span></span><span class="k">CASE</span>
+    <span class="k">WHEN</span> <span class="err">$</span><span class="n">id</span> <span class="o">=</span> <span class="err">$</span><span class="n">atlasfeatureid</span>
+    <span class="k">THEN</span> <span class="ss">&quot;kod_pb&quot;</span>
+<span class="k">END</span>
+</pre></div>
+
+
+<p><span class="caps">QGIS</span> keeps reference to each coverage layer feature <span class="caps">ID</span> during atlas generation, so you can use it for comparison. The best part is you can use IDs with <strong>any layer</strong> you&nbsp;need:</p>
+<div class="highlight"><pre><span></span><span class="k">CASE</span>
+    <span class="k">WHEN</span> <span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">)</span> <span class="o">=</span> <span class="ss">&quot;kod_pb&quot;</span>
+    <span class="k">THEN</span> <span class="ss">&quot;kod_zp&quot;</span>
+<span class="k">END</span>
+</pre></div>
+
+
+<p>With this simple expression, I get labels only for those land parcels that are part of the mapped land block. Even the <strong>layer style</strong> can be controlled with atlas feature. Land parcels inside the land block have blue borders, the rest is yellowish, remember? It&#8217;s a piece of cake with rule-based&nbsp;styling.</p>
+<p class='text-center'><a title="Layer style based on atlas feature" href="/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/atlas_feature_style.png"><img title="Layer style based on atlas feature" src="/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/atlas_feature_style.png" width=70% class="img-responsive centered"></a></p>
+
+<h3>Atlas&nbsp;generation</h3>
+<p>When you&#8217;re set, atlas can be created with a single button. I used <span class="caps">SVG</span> as an output format to easily manipulate the map content afterwards. The resulting maps look like the one in <a href="#desired-map">the first picture</a> without the text in the red rectangle. A Python script appends this to each map&nbsp;afterwards.</p>
+<p>Roughly speaking, generating 300 maps takes an hour or so, I guess that depends on the map complexity and hardware&nbsp;though.</p>
+<h3>Adding textual&nbsp;content</h3>
+<p><span class="caps">SVG</span> output is just plain old <span class="caps">XML</span> that you can edit by hand or by script. A simple Python script, part of map post-processing, loads <span class="caps">SVG</span> from the database and adds it to the left pane of each&nbsp;map.</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span>
+      <span class="n">ji</span><span class="p">,</span>
+      <span class="n">kod_pb</span><span class="p">,</span>
+      <span class="n">concat</span><span class="p">(</span>
+            <span class="s1">&#39;&lt;g fill=&quot;none&quot; stroke=&quot;#000000&quot; stroke-opacity=&quot;1&quot; stroke-width=&quot;1&quot;</span>
+<span class="s1">                  stroke-linecap=&quot;square&quot; stroke-linejoin=&quot;bevel&quot; transform=&quot;matrix(1.18081,0,0,1.18081,270.0,550.0)&quot;</span>
+<span class="s1">                  font-family=&quot;Droid Sans&quot; font-size=&quot;35&quot; font-style=&quot;normal&quot;&gt;&#39;</span><span class="p">,</span>
+            <span class="n">kultura</span><span class="p">,</span> <span class="n">vymery</span><span class="p">,</span> <span class="n">vymery_hodnoty</span><span class="p">,</span>
+            <span class="n">vcs_titul</span><span class="p">,</span> <span class="n">vcs_brk</span><span class="p">,</span> <span class="n">vcs_brs</span><span class="p">,</span> <span class="n">vcs_chmel</span><span class="p">,</span>
+            <span class="n">vcs_zvv</span><span class="p">,</span> <span class="n">vcs_zv</span><span class="p">,</span> <span class="n">vcs_ovv</span><span class="p">,</span> <span class="n">vcs_ov</span><span class="p">,</span> <span class="n">vcs_cur</span><span class="p">,</span> <span class="n">vcs_bip</span><span class="p">,</span>
+            <span class="n">lfa</span><span class="p">,</span> <span class="n">lfa_h1</span><span class="p">,</span> <span class="n">lfa_h2</span><span class="p">,</span> <span class="n">lfa_h3</span><span class="p">,</span>
+            <span class="n">lfa_h4</span><span class="p">,</span> <span class="n">lfa_h5</span><span class="p">,</span> <span class="n">lfa_oa</span><span class="p">,</span> <span class="n">lfa_ob</span><span class="p">,</span> <span class="n">lfa_s</span><span class="p">,</span>
+            <span class="n">natura</span><span class="p">,</span> <span class="n">aeo_eafrd_text</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_a1</span><span class="p">,</span>
+            <span class="n">dv_aeo_eafrd_a2o</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_a2v</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_b1</span><span class="p">,</span>
+            <span class="n">dv_aeo_eafrd_b2</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_b3</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_b4</span><span class="p">,</span>
+            <span class="n">dv_aeo_eafrd_b5</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_b6</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_b7</span><span class="p">,</span>
+            <span class="n">dv_aeo_eafrd_b8</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_b9</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_c1</span><span class="p">,</span>
+            <span class="n">dv_aeo_eafrd_c3</span><span class="p">,</span> <span class="n">aeko_text</span><span class="p">,</span> <span class="n">dv_aeko_a</span><span class="p">,</span> <span class="n">dv_aeko_b</span><span class="p">,</span> <span class="n">dv_aeko_c</span><span class="p">,</span>
+            <span class="n">dv_aeko_d1</span><span class="p">,</span> <span class="n">dv_aeko_d2</span><span class="p">,</span> <span class="n">dv_aeko_d3</span><span class="p">,</span> <span class="n">dv_aeko_d4</span><span class="p">,</span> <span class="n">dv_aeko_d5</span><span class="p">,</span>
+            <span class="n">dv_aeko_d6</span><span class="p">,</span> <span class="n">dv_aeko_d7</span><span class="p">,</span> <span class="n">dv_aeko_d8</span><span class="p">,</span> <span class="n">dv_aeko_d9</span><span class="p">,</span> <span class="n">dv_aeko_d10</span><span class="p">,</span>
+            <span class="n">dv_aeko_e</span><span class="p">,</span> <span class="n">dv_aeko_f</span><span class="p">,</span> <span class="n">ez</span><span class="p">,</span> <span class="n">dzes_text</span><span class="p">,</span> <span class="n">rep</span><span class="p">,</span> <span class="n">obi</span><span class="p">,</span> <span class="n">seop</span><span class="p">,</span> <span class="n">meop</span><span class="p">,</span> <span class="n">pbz</span><span class="p">,</span> <span class="n">dzes7</span><span class="p">,</span>
+            <span class="s1">&#39;&lt;/g&gt;&#39;</span>
+      <span class="p">)</span> <span class="n">popis</span>
+<span class="k">FROM</span> <span class="p">(...);</span>
+</pre></div>
+
+
+<p>Each column from the previous query is a result of <code>SELECT</code> similar to the one&nbsp;below.</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">concat</span><span class="p">(</span><span class="s1">&#39;&lt;text fill=&quot;#000000&quot; fill-opacity=&quot;1&quot; stroke=&quot;none&quot;&gt;BrK: &#39;</span><span class="p">,</span> <span class="n">dv_brk</span><span class="p">,</span> <span class="s1">&#39; ha / &#39;</span><span class="p">,</span> <span class="ss">&quot;MV_BRK&quot;</span><span class="p">,</span> <span class="s1">&#39; ha;&#39;</span><span class="p">,</span> <span class="n">kod_dpz</span><span class="p">,</span> <span class="s1">&#39;&lt;/text&gt;&#39;</span><span class="p">)</span> <span class="n">vcs_brk</span>
+</pre></div>
+
+
+<p>The <code>transform="matrix(1.18081,0,0,1.18081,270.0,550.0)</code> part puts the text on the right spot. Great finding about <span class="caps">SVG</span> is that it places each <code>&lt;text&gt;</code> element on the new line, so you don&#8217;t need to deal with calculating the position in your&nbsp;script.</p>
+<p>Scale adjustment is done with a dirty lambda&nbsp;function.</p>
+<div class="highlight"><pre><span></span><span class="n">content</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">r&quot;&gt;(\d{1,3}\.\d{3,5})&lt;/text&gt;&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">m</span> <span class="p">:</span><span class="s2">&quot;&gt;    &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)))))</span> <span class="o">+</span> <span class="s2">&quot;&lt;/text&gt;&quot;</span><span class="p">,</span> <span class="n">old_map</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+</pre></div>
+
+
+<h3><span class="caps">SVG</span> to <span class="caps">JPEG</span>&nbsp;conversion</h3>
+<p>We deliver maps as <span class="caps">JPEG</span> files with 150 <span class="caps">DPI</span> on A4 paper format. <a href="http://www.imagemagick.org/script/index.php">ImageMagick</a> converts the formats with a simple shell&nbsp;command:</p>
+<div class="highlight"><pre><span></span>convert -density <span class="m">150</span> -resize 1753x1240 input.svg output.jpg
+</pre></div>
+
+
+<h2>Conclusion</h2>
+<p>I created pretty efficient semi-automated workflow using several open source technologies that saves me a lot of work. Although <span class="caps">QGIS</span> has some minor pet peeves (scale with decimal places, not showing the entire feature, not substituting variables at times), it definitely makes boring map creation quite amusing. The more I work with big data / on big tasks, the more I find Linux a&nbsp;must-have.</p>
+<p>The whole process was done with <span class="caps">QGIS</span> 2.10, PostGIS 2.1, PostgreSQL 9.3, Python 2.7, ImageMagick&nbsp;6.7.</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="/posts/2015/wms-download-for-future-offline-use/" rel="bookmark" title="Permalink to WMS Download For Future Offline Use"><span class="caps">WMS</span> Download For Future Offline&nbsp;Use</a></h1>
+            <small>Written on Mar 15, 2015
+        and marked as
+        <a href="/tag/ogc.html">ogc</a>,         <a href="/tag/python.html">python</a>,         <a href="/tag/wms.html">wms</a>        | <a href="/category/automation.html">automation</a>
+        </small>
+        <section>
+            <p>Using <span class="caps">WMS</span> in real time might easily become pain in the ass due to low connection speed or slow server response. Downloading images beforehand seems to be a reasonable choice both to avoid any slowdowns and to improve user experience when working with <span class="caps">WMS</span>&nbsp;layers.</p>
+<p><a href="https://geopython.github.io/OWSLib/">OWSLib</a> is a great tool to help you get images from <span class="caps">WMS</span> server. Code and some comments&nbsp;follow.</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">owslib.wms</span> <span class="kn">import</span> <span class="n">WebMapService</span>
+
+<span class="n">BOTTOM_LEFT</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">679363</span><span class="p">,</span><span class="o">-</span><span class="mi">1120688</span><span class="p">)</span>
+<span class="n">TOP_RIGHT</span>   <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">565171</span><span class="p">,</span><span class="o">-</span><span class="mi">1042703</span><span class="p">)</span>
+<span class="n">SRS_WIDTH</span>   <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="o">-</span><span class="mi">639084</span> <span class="o">-</span> <span class="o">-</span><span class="mi">638825</span><span class="p">)</span> <span class="c1"># tile width in units of crs =&gt; 259 m</span>
+<span class="n">SRS_HEIGHT</span>  <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="o">-</span><span class="mi">1070426</span> <span class="o">-</span> <span class="o">-</span><span class="mi">1070273</span><span class="p">)</span> <span class="c1"># tile height in units of crs =&gt; 153 m</span>
+<span class="n">PX_WIDTH</span>    <span class="o">=</span> <span class="mi">977</span>
+<span class="n">PX_HEIGHT</span>   <span class="o">=</span> <span class="mi">578</span>
+
+<span class="n">FORMAT</span>      <span class="o">=</span> <span class="s1">&#39;image/png&#39;</span>
+<span class="n">LAYERS</span>      <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;KN&#39;</span><span class="p">,</span> <span class="s1">&#39;RST_PK&#39;</span><span class="p">]</span>
+<span class="n">SIZE</span>        <span class="o">=</span> <span class="p">(</span><span class="n">PX_WIDTH</span><span class="p">,</span> <span class="n">PX_HEIGHT</span><span class="p">)</span>
+<span class="n">SRS</span>         <span class="o">=</span> <span class="s1">&#39;EPSG:5514&#39;</span>
+<span class="n">STYLES</span>      <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">]</span>
+<span class="n">TRANSPARENT</span> <span class="o">=</span> <span class="bp">True</span>
+
+<span class="n">DIRECTORY</span> <span class="o">=</span> <span class="s1">&#39;tiles/&#39;</span>
+<span class="n">SLEEP</span>     <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">20</span><span class="p">)</span> <span class="c1"># seconds</span>
+
+<span class="n">dx</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="n">BOTTOM_LEFT</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">TOP_RIGHT</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="c1"># area width in units of crs</span>
+<span class="n">dy</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="n">BOTTOM_LEFT</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">TOP_RIGHT</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="c1"># area height in units of crs</span>
+
+<span class="n">cols</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">dx</span> <span class="o">/</span> <span class="n">SRS_WIDTH</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="n">rows</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">dy</span> <span class="o">/</span> <span class="n">SRS_HEIGHT</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
+
+<span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;world_file.pngw&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">wld_template</span><span class="p">:</span>
+    <span class="n">tmpl</span> <span class="o">=</span> <span class="n">wld_template</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+<span class="n">wms</span> <span class="o">=</span> <span class="n">WebMapService</span><span class="p">(</span><span class="s1">&#39;http://services.cuzk.cz/wms/wms.asp&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.1.1&#39;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">rows</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">DIRECTORY</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">DIRECTORY</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">cols</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">DIRECTORY</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;/kn_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span><span class="p">):</span>
+            <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">continue</span>
+
+        <span class="n">bbox</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">i</span> <span class="o">*</span> <span class="n">SRS_WIDTH</span> <span class="o">+</span> <span class="n">BOTTOM_LEFT</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">j</span> <span class="o">*</span> <span class="n">SRS_HEIGHT</span> <span class="o">+</span> <span class="n">BOTTOM_LEFT</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">SRS_WIDTH</span> <span class="o">+</span> <span class="n">BOTTOM_LEFT</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">SRS_HEIGHT</span> <span class="o">+</span> <span class="n">BOTTOM_LEFT</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="n">img</span> <span class="o">=</span> <span class="n">wms</span><span class="o">.</span><span class="n">getmap</span><span class="p">(</span>
+            <span class="n">layers</span><span class="o">=</span><span class="n">LAYERS</span><span class="p">,</span>
+            <span class="n">styles</span><span class="o">=</span><span class="n">STYLES</span><span class="p">,</span>
+            <span class="n">srs</span><span class="o">=</span><span class="n">SRS</span><span class="p">,</span>
+            <span class="n">bbox</span><span class="o">=</span><span class="n">bbox</span><span class="p">,</span>
+            <span class="n">size</span><span class="o">=</span><span class="n">SIZE</span><span class="p">,</span>
+            <span class="n">format</span><span class="o">=</span><span class="n">FORMAT</span><span class="p">,</span>
+            <span class="n">transparent</span><span class="o">=</span><span class="n">TRANSPARENT</span>
+        <span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">DIRECTORY</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;/kn_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">png</span><span class="p">:</span>
+            <span class="n">png</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">DIRECTORY</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/kn_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.pngw&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">wld_file</span><span class="p">:</span>
+            <span class="n">wld_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">tmpl</span><span class="p">)</span>
+            <span class="n">wld_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="n">SRS_WIDTH</span> <span class="o">+</span> <span class="n">BOTTOM_LEFT</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="n">wld_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">((</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">SRS_HEIGHT</span> <span class="o">+</span> <span class="n">BOTTOM_LEFT</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+        <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">print</span> <span class="nb">str</span><span class="p">(</span><span class="n">counter</span><span class="p">),</span> <span class="s1">&#39; out of &#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">rows</span> <span class="o">*</span> <span class="n">cols</span><span class="p">)</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">SLEEP</span><span class="p">)</span>
+</pre></div>
+
+
+<p>First, always make sure <strong>you are not violating terms of use</strong> defined by service provider. If you are not, here are the necessary&nbsp;steps:</p>
+<ol>
+<li>Define your area of interest with bottom left and top right&nbsp;coordinates.</li>
+<li>Calculate width of single image both in pixels and units of <span class="caps">CRS</span> to get the rightsized image. Note that there may be image size restrictions defined by provider (2048 &times; 2048 px is usually the biggest you can&nbsp;get).</li>
+<li>Define template <a href="https://en.wikipedia.org/wiki/World_file">world file</a> for referencing images. OWSLib doesn&#8217;t provide world files to saved images, these have to be created by you. I recommend to use a template file for creating real world&nbsp;files.</li>
+<li>Be nice! Don&#8217;t overload the service. I use <code>time.sleep()</code> for&nbsp;this.</li>
+<li>Profit.</li>
+</ol>
+<p>The trouble with <span class="caps">WMS</span> is that you can&#8217;t set an arbitrary scale you want to obtain images in (e.g. 1:1 000). It&#8217;s fairly easy to get all values needed to imitate this behavior&nbsp;though.</p>
+<p>Using <a href="http://qgis.org"><span class="caps">QGIS</span></a> you&nbsp;can:</p>
+<ol>
+<li>Get bounding box of area you&#8217;re interested&nbsp;in.</li>
+<li>Save current view as an image (together with the world file!) and use it as a specimen for your own world&nbsp;files.</li>
+<li>Derive image width (<span class="caps">CRS</span>, pixels) from the saved image, thus getting the same zoom level you were using in <span class="caps">QGIS</span>.</li>
+</ol>
+<p>Code given is not bulletproof, it will fail on any network error. However, if you restart it after such a crash, it checks for existing files and starts with the first missing, so you don&#8217;t have to download all the tiles&nbsp;again.</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="/posts/2014/migrating-geoserver-and-checking-for-missing-data/" rel="bookmark" title="Permalink to Migrating Geoserver And Checking For Missing Data">Migrating Geoserver And Checking For Missing&nbsp;Data</a></h1>
+            <small>Written on Oct 29, 2014
+        and marked as
+        <a href="/tag/geoserver.html">geoserver</a>,         <a href="/tag/python.html">python</a>        | <a href="/category/development.html">development</a>
+        </small>
+        <section>
+            <p>I&#8217;ve upgraded a handful of Geoserver installations and it has never been flawless. If you&#8217;re lucky you end up with just <em>some</em> layers missing, if you&#8217;re not, you&#8217;ll miss a bunch of them (together with layergroups, some stores, workspaces might screw up&nbsp;etc.).</p>
+<p>But how do you check for missing data before switching to the newer version? Thanks to the <a href="http://docs.geoserver.org/stable/en/user/rest/api/index.html"><span class="caps">REST</span> <span class="caps">API</span> implemented within Geoserver</a>, it&#8217;s rather&nbsp;easy.</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="kn">from</span> <span class="nn">requests.auth</span> <span class="kn">import</span> <span class="n">HTTPBasicAuth</span>
+
+<span class="n">req</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;http://example.com/geoserver/rest/layers&#39;</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="n">HTTPBasicAuth</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">))</span>
+
+<span class="n">html</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+<span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">link</span> <span class="ow">in</span> <span class="n">html</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">):</span>
+    <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">href</span> <span class="o">=</span> <span class="n">link</span><span class="o">.</span><span class="n">get_text</span><span class="p">()</span>
+    <span class="k">print</span> <span class="n">i</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;list.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">href</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>We needed to migrate ~ 17,000 layers last week, and yes, we could have just shut the door and spend couple of nights checking one after another, if we were the dumbest <span class="caps">GIS</span> company&nbsp;ever.</p>
+<p>As I wanted to make it a bit easier I wrote the simple Python script (see above) that just authenticates against Geoserver and downloads the list of layers. I actually had to do that twice - both old and new instance. A <a href="https://www.diffchecker.com/">simple file comparison</a> followed and I got a list of missing layers in less than two&nbsp;minutes.</p>
+<p>If you do the same to workspaces, stores and layergroups, your chances of not losing some data after the switch are pretty&nbsp;high.</p>
+<p>I guess it&#8217;s reasonable to check your maps by hand as well, but this gives you the picture of the current state of your data real&nbsp;quick.</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="/posts/2014/going-3d-with-space-time-cube/" rel="bookmark" title="Permalink to Going 3D With Space Time Cube">Going 3D With Space Time&nbsp;Cube</a></h1>
+            <small>Written on Sep 2, 2014
+        and marked as
+        <a href="/tag/python.html">python</a>,         <a href="/tag/twitter.html">twitter</a>        | <a href="/category/development.html">development</a>
+        </small>
+        <section>
+            <p>Seeing <a href="http://anitagraser.com/2012/08/05/space-time-cubes-exploring-twitter-streams-3/">Anita&#8217;s space-time cube</a> back in 2013 was a moment of <em>woooow</em> for me. I&#8217;ve been interested in unusual ways of displaying data ever since I started studying <span class="caps">GIS</span> and this one was just great. <em>How the hell did she make it?!</em>, I thought back&nbsp;then.</p>
+
+<p>And I asked her, we had a little e-mail conversation and that was it. I got busy and had to postpone my attemps to create that viz until I dove into my diploma thesis. So&hellip;here you&nbsp;go.</p>
+
+<h3>Recipe</h3>
+
+<p>What you need&nbsp;is:</p>
+
+<ul>
+<li><strong><a href="https://github.com/jdf/processing.py">processing.py</a></strong> which is a Python port of <a href="http://processing.org/">processing</a>&nbsp;environment.</li>
+<li>A <strong>basemap</strong> that fits the extent you are about to show in the viz. I recommend <span class="caps">QGIS</span> for obtaining an&nbsp;image.</li>
+<li>A <strong><span class="caps">JSON</span> file</strong> with tweets you got via <a href="/2014/analyzing-twitter-languages-with-streaming-api/">Twitter <span class="caps">REST</span> <span class="caps">API</span></a> (yes, the viz was made to display&nbsp;tweets).</li>
+<li>A <strong>python script</strong> I&nbsp;wrote.</li>
+</ul>
+
+<h3>How to make it&nbsp;delicious</h3>
+
+<p>First things first, you need to add a <code>timestamp</code> property to tweets you want to show (with the following Python code). <code>created_at</code> param is a datetime string like <code>Sat Jun 22 21:30:42 +0000 2013</code> of every tweet in a loop. As a result you get a number of seconds since&nbsp;1.1.1970. </p>
+
+<pre><code>def string_to_timestamp(created_at):
+    """Return the timestamp from created_at object."""
+    locale.setlocale(locale.LC_TIME, 'en_US.utf8')
+    created_at = created_at.split(' ')
+    created_at[1] = str(strptime(created_at[1], '%b').tm_mon)
+    timestamp = strptime(' '.join(created_at[i] for i in [1,2,3,5]), '%m %d %H:%M:%S %Y') # returns Month Day Time Year
+    return mktime(timestamp)
+</code></pre>
+
+<p>As you probably guess, the <code>timestamp</code> property is the one we&#8217;re gonna display on the vertical axis. <strong>You definitely want the tweets to be sorted chronologically in your <span class="caps">JSON</span>&nbsp;file!</strong></p>
+
+<pre><code>#!/usr/bin/python
+# -*- coding: utf-8 -*-
+#avconv -i frame-%04d.png -r 25 -b 65536k  video.mp4
+
+from peasy import PeasyCam
+import json
+
+basemap = None
+tweets = []
+angle = 0
+
+def setup():
+    global basemap
+    global tweets
+
+    size(1010, 605, P3D)
+
+    data = loadJSONArray('./tweets.json')
+    count = data.size()
+
+    last = data.getJSONObject(data.size()-1).getFloat('timestamp')
+    first = data.getJSONObject(0).getFloat('timestamp')
+
+    for i in range(0, count):
+        lon = data.getJSONObject(i).getJSONObject('coordinates').getJSONArray('coordinates').getFloat(0)
+        lat = data.getJSONObject(i).getJSONObject('coordinates').getJSONArray('coordinates').getFloat(1)
+        time = data.getJSONObject(i).getFloat('timestamp')
+
+        x = map(lon, -19.68624620368202116, 58.92453879754536672, 0, width)
+        y = map(time, first, last, 0, 500)
+        z = map(lat, 16.59971950210866964, 63.68835804244784526, 0, height)
+
+        tweets.append({'x': x, 'y': y, 'z': z})
+
+    basemap = loadImage('basemap.png')
+
+    cam = PeasyCam(this,53,100,-25,700)
+    cam.setMinimumDistance(1)
+    cam.setMaximumDistance(1500)
+
+def draw():
+    global basemap
+    global tweets
+    global angle
+
+    background(0)
+
+    # Uncomment to rotate the cube
+    """if angle &lt; 360:
+        rotateY(radians(angle))
+        angle += 1
+    else:
+        angle = 360 - angle"""
+
+    # box definition
+    stroke(150,150,150)
+    strokeWeight(.5)
+    noFill()
+    box(1010,500,605)
+
+
+    # basemap definition
+    translate(-505,250,-302.5)
+    rotateX(HALF_PI)
+    image(basemap,0,0)
+
+    for i in range(0, len(tweets)):
+        strokeWeight(.5)
+        stroke(255,255,255)
+        line(tweets[i].get('x'), height-tweets[i].get('z'), tweets[i].get('y'), tweets[i].get('x'), height-tweets[i].get('z'), 0)
+
+        strokeWeight(5)
+        stroke(255,0,0)
+        point(tweets[i].get('x'), height-tweets[i].get('z'), tweets[i].get('y'))
+
+        strokeWeight(2)
+        stroke(255,255,255)
+        point(tweets[i].get('x'), height-tweets[i].get('z'), 0)
+        lrp = map(i, 0, len(tweets), 0, 1)
+        frm = color(255,0,0)
+        to = color(0,0,255)
+        if i &lt; len(tweets)-1:
+            strokeWeight(1)
+            stroke(lerpColor(frm,to,lrp))
+            line(tweets[i].get('x'), height-tweets[i].get('z'), tweets[i].get('y'), tweets[i+1].get('x'), height-tweets[i+1].get('z'), tweets[i+1].get('y'))
+
+    # Uncomment to capture the screens
+    """if frameCount &gt; 360:
+        noLoop()
+    else:
+        saveFrame('screens/frame-####.png')"""
+</code></pre>
+
+<p>You should be most interested in these&nbsp;lines:</p>
+
+<pre><code>x = map(lon, -19.68624620368202116, 58.92453879754536672, 0, width)
+y = map(time, first, last, 0, 500)
+z = map(lat, 16.59971950210866964, 63.68835804244784526, 0, height)
+</code></pre>
+
+<p><img src="http://www.processing.org/tutorials/p3d/imgs/coordinatesystem.png" title="Processing coordinate system" class="img-rounded pull-left">They define how coordinates inside the cube should be computed. As you see, <code>x</code> is the result of mapping longitudinal extent of our area to the width of cube, the same happens to <code>z</code> and latitude, and to <code>y</code> (but here we map time, not&nbsp;coordinates).</p>
+
+<p>The bounding box used in those computations is the bounding box of the basemap. Interesting thing about Processing and its 3D environment is how it defines the beginning of the coordinate system. As you can see on the left, it might be slighty different from what you could expect. That&#8217;s what you need to be careful&nbsp;about.</p>
+
+<h3>How does it&nbsp;look</h3>
+
+<iframe width="420" height="315" src="//www.youtube.com/embed/4jl6-qOiSAE?rel=0" frameborder="0" allowfullscreen></iframe>
+        </section>
+        </div>
+    </div>
+
+<div class="pagination row">
+    <div class="large-6 columns">
+    </div>
+    <div class="large-6 columns">
+    </div>
+    <!-- <p class="paginator">
+    </p> -->
+</div>            </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns footer">
+                <footer>
+                    <address>
+                    Written by <a href="http://www.zimmi.cz">Michal Zimmermann</a>.
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    </address><!-- /#about -->
+                </footer><!-- /#contentinfo -->
+            </div>
+        </div>
+<script src="/theme/webassets-external/91ae19a44b6fd6f56de2d3a3a1e2f680_jquery.js"></script>
+<script src="/theme/webassets-external/1f857912fbcb91b33a7fbeafdecefa84_foundation.min.js"></script>
+<script>
+$(document).foundation();
+</script>
+</body>
+</html>

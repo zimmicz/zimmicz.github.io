@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+          <title>Michal Zimmermann | Geoserver Printing With&nbsp;Mapfish</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+
+
+
+    <meta name="tags" content="geoserver" />
+  <meta property="og:image" content="https://pbs.twimg.com/profile_images/770323886290440192/3G5hqp11_400x400.jpg" />
+  <meta property="og:title" content="Geoserver Printing With Mapfish" />
+  <meta property="og:description" content="Printing a web map requires a lot more than doing Ctrl + P. MapFish seems to be the best option to use with Geoserver, and it comes ready as an extension. If you installed the module properly, you should be seeing general info at ..." />
+  <meta property="og:url" content="/posts/2014/geoserver-printing-with-mapfish/" />
+        <link rel="stylesheet" href="/theme/webassets-external/fee07050f67182ee94565df0306e2583_foundation.min.css">
+        <link rel="stylesheet" href="/theme/webassets-external/c8d3bd219f818a16149faa6dc85ada3b_pygment.css">
+        <link rel="stylesheet" href="/theme/webassets-external/f19e9253fe1e12d62d57b9087abc5f7a_screen.css">
+</head>
+
+<body id="index" class="home">
+    <nav class="top-bar card-1" data-topbar role="navigation">
+        <ul class="title-area">
+            <li class="name">
+                <h1><a href="/posts">Home</a></h1>
+            </li>
+     <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+            <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+        </ul>
+        <section class="top-bar-section">
+    <!-- Right Nav Section -->
+            <ul class="right">
+                <li><a href="/categories">Categories</a></li>
+                <li><a href="/tags">Tags</a></li>
+                <li><a href="/feed.xml">RSS feed</a></li>
+            </ul>
+        </section>
+    </nav>
+        <div class="row">
+          <div class="large-12 columns header">
+            <h1><a href="/posts">Michal Zimmermann</a> <small>Pieces of knowledge from the world of GIS.</small></h1>
+          </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns">
+<div class="panel card card-1">
+    <div class="post-name">
+        <h1><a href="/posts/2014/geoserver-printing-with-mapfish/" rel="bookmark" title="Permalink to Geoserver Printing With Mapfish">Geoserver Printing With&nbsp;Mapfish</a></h1>
+        <small>Written on Sep 2, 2014
+    and marked as
+    <a href="/tag/geoserver.html">geoserver</a>    | <a href="/category/development.html">development</a>
+    </small>
+    <section>
+        <p>Printing a web map requires a lot more than doing <code>Ctrl + P</code>. <a href="http://mapfish.org/">MapFish</a> seems to be the best option to use with Geoserver, and it comes <a href="http://docs.geoserver.org/stable/en/user/community/printing/">ready as an extension</a>. If you installed the module properly, you should be seeing general info at <a href="http://localhost:8080/geoserver/pdf/info.json">http://localhost:8080/geoserver/pdf/info.json</a>. You&#8217;ll find a <code>config.yaml</code> in <code>data_dir/printing</code>.</p>
+
+<p>MapFish lets you access three different&nbsp;points:</p>
+
+<ol>
+<li><code>info.json</code> that returns current config as defined in config.yaml&nbsp;file</li>
+<li><code>print.pdf</code> that actually prints the map as defined in the <code>spec</code> <span class="caps">GET</span>&nbsp;argument</li>
+<li><code>create.json</code> that returns a <span class="caps">JSON</span> object with an <span class="caps">URL</span> of the printed&nbsp;map</li>
+</ol>
+
+<p>Remember, if you&#8217;re displaying a lot of layers in the map and all of them should be printed, you need to pass it as a <span class="caps">POST</span> argument when calling <code>print.pdf</code> or <code>create.json</code>, otherwise you&#8217;ll be getting an error complaining about the <span class="caps">GET</span> request&nbsp;length.</p>
+
+<p>The <code>config.yaml</code> file is where you define settings for the print module. You definitely want to define <code>dpis</code> (we&#8217;re using 90, 200 and 300 <span class="caps">DPI</span>), <code>scales</code> (they probably need to be hardcoded, I didn&#8217;t succeed trying any arbitrary scale) and <code>layouts</code> (we&#8217;re using A4 to A0 both portrait and&nbsp;landscape).</p>
+
+<p>However, defining the page size might get tricky as MapFish does not use standardized sizes defined in cm, in or any other unit. I&#8217;ve experimenting and doing some maths and here&#8217;s what I came up with for portrait&nbsp;layouts.</p>
+
+<table class="table-centered">
+    <tr>
+        <th>A0</th>
+        <th>A1</th>
+        <th>A2</th>
+        <th>A3</th>
+        <th>A4</th>
+    </tr>
+    <tr>
+        <td>2382&times;3361</td>
+        <td>1683&times;2380</td>
+        <td>1190&times;1680</td>
+        <td>840&times;1180</td>
+        <td>595&times;832</td>
+    </tr>
+</table>
+
+<p><em>The bigger paper you use, the smaller <span class="caps">DPI</span> is available</em>, that&#8217;s what I found out messing around with MapFish settings. This means that we&#8217;re using 200 <span class="caps">DPI</span> top for A2 layout and 90 <span class="caps">DPI</span> for A1 and A0 layout,&nbsp;respectively.</p>
+
+<p>JQuery takes care of sending <span class="caps">POST</span> request and fetching the response. <a href="http://www.edpp.cz/poli_mapa-povodnoveho-planu-mesta/">See it in action</a> (Choose <em>Nástroje</em> and <em>Tisknout</em> for&nbsp;printing).</p>
+    </section>
+    </div>
+<div class="neighbors">
+    <h3>More reading</h3>
+    <ul>
+        <li>
+            <a href="/posts/2014/analyzing-twitter-languages-with-streaming-api/">
+                 Analyzing Twitter Languages With Streaming <span class="caps">API</span>
+            </a>
+        </li>
+         <li>
+             <a href="/posts/2014/degrees-to-decimal-with-javascript/">
+                 Degrees To Decimal With&nbsp;Javascript
+             </a>
+         </li>
+         <li>
+             <a href="/posts/2014/analyzing-twitter-languages-with-streaming-api/">
+                 Analyzing Twitter Languages With Streaming <span class="caps">API</span>
+             </a>
+         </li>
+         <li>
+             <a href="/posts/2014/degrees-to-decimal-with-javascript/">
+                 Degrees To Decimal With&nbsp;Javascript
+             </a>
+         </li>
+        </li>
+    </ul>
+</div></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns footer">
+                <footer>
+                    <address>
+                    Written by <a href="http://www.zimmi.cz">Michal Zimmermann</a>.
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    </address><!-- /#about -->
+                </footer><!-- /#contentinfo -->
+            </div>
+        </div>
+<script src="/theme/webassets-external/91ae19a44b6fd6f56de2d3a3a1e2f680_jquery.js"></script>
+<script src="/theme/webassets-external/1f857912fbcb91b33a7fbeafdecefa84_foundation.min.js"></script>
+<script>
+$(document).foundation();
+</script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+          <title>Michal Zimmermann | Dead Simple Random Points in Polygons with&nbsp;PostGIS</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+
+
+
+    <meta name="tags" content="postgis" />
+    <meta name="tags" content="postgresql" />
+    <meta name="tags" content="sql" />
+  <meta property="og:image" content="https://pbs.twimg.com/profile_images/770323886290440192/3G5hqp11_400x400.jpg" />
+  <meta property="og:title" content="Dead Simple Random Points in Polygons with PostGIS" />
+  <meta property="og:description" content="Since PostgreSQL 9.3 there has been a handy little keyword called LATERAL, which - combined with JOIN - might rock your GIS world in a second. To keep it simple, a LATERAL JOIN enables a subquery in the FROM part of a query to reference columns from ..." />
+  <meta property="og:url" content="/posts/2016/dead-simple-random-points-in-polygons-with-postgis/" />
+        <link rel="stylesheet" href="/theme/webassets-external/fee07050f67182ee94565df0306e2583_foundation.min.css">
+        <link rel="stylesheet" href="/theme/webassets-external/c8d3bd219f818a16149faa6dc85ada3b_pygment.css">
+        <link rel="stylesheet" href="/theme/webassets-external/f19e9253fe1e12d62d57b9087abc5f7a_screen.css">
+</head>
+
+<body id="index" class="home">
+    <nav class="top-bar card-1" data-topbar role="navigation">
+        <ul class="title-area">
+            <li class="name">
+                <h1><a href="/posts">Home</a></h1>
+            </li>
+     <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+            <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+        </ul>
+        <section class="top-bar-section">
+    <!-- Right Nav Section -->
+            <ul class="right">
+                <li><a href="/categories">Categories</a></li>
+                <li><a href="/tags">Tags</a></li>
+                <li><a href="/feed.xml">RSS feed</a></li>
+            </ul>
+        </section>
+    </nav>
+        <div class="row">
+          <div class="large-12 columns header">
+            <h1><a href="/posts">Michal Zimmermann</a> <small>Pieces of knowledge from the world of GIS.</small></h1>
+          </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns">
+<div class="panel card card-1">
+    <div class="post-name">
+        <h1><a href="/posts/2016/dead-simple-random-points-in-polygons-with-postgis/" rel="bookmark" title="Permalink to Dead Simple Random Points in Polygons with PostGIS">Dead Simple Random Points in Polygons with&nbsp;PostGIS</a></h1>
+        <small>Written on Aug 3, 2016
+    and marked as
+    <a href="/tag/postgis.html">postgis</a>,     <a href="/tag/postgresql.html">postgresql</a>,     <a href="/tag/sql.html">sql</a>    | <a href="/category/sql.html">SQL</a>
+    </small>
+    <section>
+        <p>Since PostgreSQL 9.3 there has been a handy little keyword called <code>LATERAL</code>, which - combined with <code>JOIN</code> - might rock your <span class="caps">GIS</span> world in a second. To keep it simple, a <code>LATERAL JOIN</code> enables a subquery in the <code>FROM</code> part of a query to reference columns from preceding expressions in the <code>FROM</code> list. What the&nbsp;heck?</p>
+<p>Imagine that not so unusual request to <strong>generate random points in polygons</strong> (something I needed to do today). Do it automatically without your favorite piece of desktop <span class="caps">GIS</span>&nbsp;software.</p>
+<p>It is pretty easy using <code>LATERAL JOIN</code>:</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span>
+    <span class="n">a</span><span class="p">.</span><span class="n">id</span><span class="p">,</span>
+    <span class="n">b</span><span class="p">.</span><span class="o">*</span>
+<span class="k">FROM</span> <span class="p">(</span>
+    <span class="k">VALUES</span><span class="p">(</span>
+        <span class="mi">1</span><span class="p">,</span>
+        <span class="n">ST_SetSRID</span><span class="p">(</span>
+            <span class="n">ST_GeomFromText</span><span class="p">(</span>
+                <span class="s1">&#39;POLYGON((0 0, -1 0, -1 -1, 0 -1, 0 0))&#39;</span>
+            <span class="p">),</span>
+        <span class="mi">4326</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">UNION</span> <span class="k">ALL</span>
+    <span class="k">VALUES</span><span class="p">(</span>
+        <span class="mi">2</span><span class="p">,</span>
+        <span class="n">ST_SetSRID</span><span class="p">(</span>
+            <span class="n">ST_GeomFromText</span><span class="p">(</span>
+                <span class="s1">&#39;POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))&#39;</span>
+            <span class="p">),</span>
+        <span class="mi">4326</span><span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">)</span> <span class="n">a</span><span class="p">(</span><span class="n">id</span><span class="p">,</span> <span class="n">geom</span><span class="p">)</span>
+<span class="k">CROSS</span> <span class="k">JOIN</span> <span class="k">LATERAL</span> <span class="p">(</span>
+    <span class="k">SELECT</span> <span class="n">ST_SetSRID</span><span class="p">(</span><span class="n">ST_MakePoint</span><span class="p">(</span><span class="n">tmp</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">tmp</span><span class="p">.</span><span class="n">y</span><span class="p">),</span> <span class="mi">4326</span><span class="p">)</span> <span class="n">geom</span>
+    <span class="k">FROM</span> <span class="p">(</span>
+        <span class="k">SELECT</span>
+            <span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">ST_XMax</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="o">-</span> <span class="n">ST_XMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span> <span class="o">+</span> <span class="n">ST_XMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">x</span><span class="p">,</span>
+            <span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">ST_YMax</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="o">-</span> <span class="n">ST_YMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span> <span class="o">+</span> <span class="n">ST_YMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">y</span>
+        <span class="k">FROM</span> <span class="n">generate_series</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">)</span>
+    <span class="p">)</span> <span class="n">tmp</span>
+<span class="p">)</span> <span class="n">b</span><span class="p">;</span>
+</pre></div>
+
+
+<p>What actually happened over there? If you want to put points inside polygons, you need&#8230; polygons. We will do just fine with two of them created inside this&nbsp;query:</p>
+<div class="highlight"><pre><span></span><span class="k">VALUES</span><span class="p">(</span>
+    <span class="mi">1</span><span class="p">,</span>
+    <span class="n">ST_SetSRID</span><span class="p">(</span>
+        <span class="n">ST_GeomFromText</span><span class="p">(</span>
+            <span class="s1">&#39;POLYGON((0 0, -1 0, -1 -1, 0 -1, 0 0))&#39;</span>
+        <span class="p">),</span>
+    <span class="mi">4326</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="k">UNION</span> <span class="k">ALL</span>
+<span class="k">VALUES</span><span class="p">(</span>
+    <span class="mi">2</span><span class="p">,</span>
+    <span class="n">ST_SetSRID</span><span class="p">(</span>
+        <span class="n">ST_GeomFromText</span><span class="p">(</span>
+            <span class="s1">&#39;POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))&#39;</span>
+        <span class="p">),</span>
+    <span class="mi">4326</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+
+
+<p>All the magic happens inside the <code>LATERAL JOIN</code> part of the&nbsp;query:</p>
+<div class="highlight"><pre><span></span><span class="k">CROSS</span> <span class="k">JOIN</span> <span class="k">LATERAL</span> <span class="p">(</span>
+    <span class="k">SELECT</span> <span class="n">ST_SetSRID</span><span class="p">(</span><span class="n">ST_MakePoint</span><span class="p">(</span><span class="n">tmp</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">tmp</span><span class="p">.</span><span class="n">y</span><span class="p">),</span> <span class="mi">4326</span><span class="p">)</span> <span class="n">geom</span>
+    <span class="k">FROM</span> <span class="p">(</span>
+        <span class="k">SELECT</span>
+            <span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">ST_XMax</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="o">-</span> <span class="n">ST_XMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span> <span class="o">+</span> <span class="n">ST_XMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">x</span><span class="p">,</span>
+            <span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">ST_YMax</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="o">-</span> <span class="n">ST_YMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span> <span class="o">+</span> <span class="n">ST_YMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">y</span>
+        <span class="k">FROM</span> <span class="n">generate_series</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">)</span>
+    <span class="p">)</span> <span class="n">tmp</span>
+<span class="p">)</span> <span class="n">b</span><span class="p">;</span>
+</pre></div>
+
+
+<p>The inner <code>SELECT</code> calculates random points based on the extent of the polygon. Note it directly calls <code>a.geom</code>, a value that comes from the previous <code>SELECT</code>! The <code>LATERAL JOIN</code> part is thus run for every row of the previous <code>SELECT</code> statement inside <code>FROM</code> part of the query. This means it will return 201 points for each of the two polygons (run the query inside <span class="caps">QGIS</span> to see the&nbsp;result).</p>
+<p>Note all the points fall inside the polygons by accident, because they are <strong>square</strong>. Otherwise a <code>ST_Contains</code> or <code>ST_Within</code> should be used inside the outermost <code>WHERE</code> query to filter outliers. This part could use some&nbsp;tweaking.</p>
+    </section>
+    </div>
+<div class="neighbors">
+    <h3>More reading</h3>
+    <ul>
+        <li>
+            <a href="/posts/2016/syncing-two-postgresql-databases-faster/">
+                 Syncing Two PostgreSQL Databases&nbsp;Faster
+            </a>
+        </li>
+         <li>
+             <a href="/posts/2016/finding-polygons-lying-across-other-polygons-with-postgis/">
+                 Finding Polygons Lying across Other Polygons with&nbsp;PostGIS
+             </a>
+         </li>
+         <li>
+             <a href="/posts/2016/syncing-two-postgresql-databases-faster/">
+                 Syncing Two PostgreSQL Databases&nbsp;Faster
+             </a>
+         </li>
+         <li>
+             <a href="/posts/2016/finding-polygons-lying-across-other-polygons-with-postgis/">
+                 Finding Polygons Lying across Other Polygons with&nbsp;PostGIS
+             </a>
+         </li>
+        </li>
+    </ul>
+</div></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns footer">
+                <footer>
+                    <address>
+                    Written by <a href="http://www.zimmi.cz">Michal Zimmermann</a>.
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    </address><!-- /#about -->
+                </footer><!-- /#contentinfo -->
+            </div>
+        </div>
+<script src="/theme/webassets-external/91ae19a44b6fd6f56de2d3a3a1e2f680_jquery.js"></script>
+<script src="/theme/webassets-external/1f857912fbcb91b33a7fbeafdecefa84_foundation.min.js"></script>
+<script>
+$(document).foundation();
+</script>
+</body>
+</html>

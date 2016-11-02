@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+          <title>Michal Zimmermann | PostGIS: Finding Biggest Land Users&nbsp;Nearby</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+
+
+
+    <meta name="tags" content="postgresql" />
+    <meta name="tags" content="postgis" />
+  <meta property="og:image" content="https://pbs.twimg.com/profile_images/770323886290440192/3G5hqp11_400x400.jpg" />
+  <meta property="og:title" content="PostGIS: Finding Biggest Land Users Nearby" />
+  <meta property="og:description" content="At CleverMaps we heavily rely on the cadastre of real estate, which is probably the biggest data source in my country. Using their excellent knowledge of this data set, my teammates often supply me with all kinds of weird challenges. Give me the ..." />
+  <meta property="og:url" content="/posts/2015/postgis-finding-biggest-land-users-nearby/" />
+        <link rel="stylesheet" href="/theme/webassets-external/fee07050f67182ee94565df0306e2583_foundation.min.css">
+        <link rel="stylesheet" href="/theme/webassets-external/c8d3bd219f818a16149faa6dc85ada3b_pygment.css">
+        <link rel="stylesheet" href="/theme/webassets-external/f19e9253fe1e12d62d57b9087abc5f7a_screen.css">
+</head>
+
+<body id="index" class="home">
+    <nav class="top-bar card-1" data-topbar role="navigation">
+        <ul class="title-area">
+            <li class="name">
+                <h1><a href="/posts">Home</a></h1>
+            </li>
+     <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+            <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+        </ul>
+        <section class="top-bar-section">
+    <!-- Right Nav Section -->
+            <ul class="right">
+                <li><a href="/categories">Categories</a></li>
+                <li><a href="/tags">Tags</a></li>
+                <li><a href="/feed.xml">RSS feed</a></li>
+            </ul>
+        </section>
+    </nav>
+        <div class="row">
+          <div class="large-12 columns header">
+            <h1><a href="/posts">Michal Zimmermann</a> <small>Pieces of knowledge from the world of GIS.</small></h1>
+          </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns">
+<div class="panel card card-1">
+    <div class="post-name">
+        <h1><a href="/posts/2015/postgis-finding-biggest-land-users-nearby/" rel="bookmark" title="Permalink to PostGIS: Finding Biggest Land Users Nearby">PostGIS: Finding Biggest Land Users&nbsp;Nearby</a></h1>
+        <small>Written on Apr 3, 2015
+    and marked as
+    <a href="/tag/postgresql.html">postgresql</a>,     <a href="/tag/postgis.html">postgis</a>    | <a href="/category/sql.html">SQL</a>
+    </small>
+    <section>
+        <p>At <a href="http://clevermaps.cz">CleverMaps</a> we heavily rely on the cadastre of real estate, which is probably the biggest data source in my country. Using their excellent knowledge of this data set, my teammates often supply me with all kinds of weird&nbsp;challenges.</p>
+<h2>Give me the biggest land users&nbsp;nearby</h2>
+<p><em>Find the biggest land users in surrounding cadastral communities for each cadastral community (~ 13K)</em> being the latest task, here&#8217;s the query I tackled it&nbsp;with:</p>
+<div class="highlight"><pre><span></span>WITH users_ AS (
+    SELECT
+        cad_code,
+        id,
+        zipcode,
+        city,
+        concat_ws(&#39; &#39;,street, concat_ws(&#39;/&#39;, house_number, street_number)) as street,
+        name,
+        &#39;Users with more than 10 ha&#39;::text note,
+        SUM(acreage) area
+        FROM land_blocks -- being a table with info about all the agricultural land blocks
+        JOIN users u ON id_uz = id
+        GROUP BY cad_code, u.id
+        HAVING SUM(acreage) &gt; 10
+),
+ints AS (
+    SELECT
+        ku.cad_code as community,
+        ku2.cad_code as surrounding,
+        ku2.cad_name
+    FROM cadastral_community ku
+    JOIN cadastral_community ku2
+        ON ST_Intersects(ku.geom, ku2.geom)
+    WHERE ku.cad_code &lt;&gt; ku2.cad_code
+)
+SELECT
+    DISTINCT ON (surrounding, cad_name, u.zipcode, u.city, u.street, u.name)
+    surrounding,
+    cad_name,
+    u.zipcode,
+    u.city,
+    u.street,
+    u.name,
+    u.note,
+    u.area
+FROM
+    users_ u
+JOIN ints
+    ON cad_code = community;
+</pre></div>
+
+
+<p>Few things to&nbsp;note:</p>
+<ul>
+<li><code>concat_ws()</code> is a great function for joining values that might be <code>NULL</code>. If such a value is found, it is skipped and the function continues with the next one (if any). Thus, you&#8217;ll never get a string ending with a trailing slash (<code>Street name 55/</code>).</li>
+<li>With <code>users_</code> <span class="caps">CTE</span> I get a list of owners having more than 10 hectares of land for each cadastral community. This gives me the inverse result of what I want (if I know the biggest owners in the cadastral community, I know these are the ones that should be listed for surrounding c.&nbsp;communities).</li>
+<li>This <em>putting-it-all-together</em> step is done with <code>ints</code> <span class="caps">CTE</span> that outputs the list of surrounding c. communities for each of&nbsp;them.</li>
+<li><code>DISTINCT ON</code> cleans up the list so the same owners don&#8217;t appear more than once for any given c.&nbsp;community.</li>
+</ul>
+<p>Writing this makes me realize the list should be probably sorted by area so only the occurence with the biggest value is kept for each c. community. Simple <code>ORDER BY</code> should deal with this just fine. Or even more sophisticated, using <code>GROUP BY</code> to output the total acreage in all surrounding c.&nbsp;communities.</p>
+    </section>
+    </div>
+<div class="neighbors">
+    <h3>More reading</h3>
+    <ul>
+        <li>
+            <a href="/posts/2015/postgis-count-line-self-intersections/">
+                 PostGIS: Count Line&nbsp;Self-Intersections
+            </a>
+        </li>
+         <li>
+             <a href="/posts/2015/grass-big-buffers-made-easy/">
+                 <span class="caps">GRASS</span>: Big Buffers Made&nbsp;Easy
+             </a>
+         </li>
+         <li>
+             <a href="/posts/2015/postgis-count-line-self-intersections/">
+                 PostGIS: Count Line&nbsp;Self-Intersections
+             </a>
+         </li>
+         <li>
+             <a href="/posts/2015/filtering-points-by-distance-in-postgis/">
+                 Filtering points by distance in&nbsp;PostGIS
+             </a>
+         </li>
+        </li>
+    </ul>
+</div></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns footer">
+                <footer>
+                    <address>
+                    Written by <a href="http://www.zimmi.cz">Michal Zimmermann</a>.
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    </address><!-- /#about -->
+                </footer><!-- /#contentinfo -->
+            </div>
+        </div>
+<script src="/theme/webassets-external/91ae19a44b6fd6f56de2d3a3a1e2f680_jquery.js"></script>
+<script src="/theme/webassets-external/1f857912fbcb91b33a7fbeafdecefa84_foundation.min.js"></script>
+<script>
+$(document).foundation();
+</script>
+</body>
+</html>

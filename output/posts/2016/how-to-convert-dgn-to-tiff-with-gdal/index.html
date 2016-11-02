@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+          <title>Michal Zimmermann | How to convert <span class="caps">DGN</span> to Tiff with <span class="caps">GDAL</span></title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+
+
+
+    <meta name="tags" content="gdal" />
+  <meta property="og:image" content="https://pbs.twimg.com/profile_images/770323886290440192/3G5hqp11_400x400.jpg" />
+  <meta property="og:title" content="How to convert DGN to Tiff with GDAL" />
+  <meta property="og:description" content="We have to deal with DGN drawings quite often at CleverMaps - heavily used for infrastructure projects (highways, roads, pipelines), they are a pure nightmare to the GIS person inside me. Right now, I’m only capable of converting it into a raster file ..." />
+  <meta property="og:url" content="/posts/2016/how-to-convert-dgn-to-tiff-with-gdal/" />
+        <link rel="stylesheet" href="/theme/webassets-external/fee07050f67182ee94565df0306e2583_foundation.min.css">
+        <link rel="stylesheet" href="/theme/webassets-external/c8d3bd219f818a16149faa6dc85ada3b_pygment.css">
+        <link rel="stylesheet" href="/theme/webassets-external/f19e9253fe1e12d62d57b9087abc5f7a_screen.css">
+</head>
+
+<body id="index" class="home">
+    <nav class="top-bar card-1" data-topbar role="navigation">
+        <ul class="title-area">
+            <li class="name">
+                <h1><a href="/posts">Home</a></h1>
+            </li>
+     <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+            <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+        </ul>
+        <section class="top-bar-section">
+    <!-- Right Nav Section -->
+            <ul class="right">
+                <li><a href="/categories">Categories</a></li>
+                <li><a href="/tags">Tags</a></li>
+                <li><a href="/feed.xml">RSS feed</a></li>
+            </ul>
+        </section>
+    </nav>
+        <div class="row">
+          <div class="large-12 columns header">
+            <h1><a href="/posts">Michal Zimmermann</a> <small>Pieces of knowledge from the world of GIS.</small></h1>
+          </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns">
+<div class="panel card card-1">
+    <div class="post-name">
+        <h1><a href="/posts/2016/how-to-convert-dgn-to-tiff-with-gdal/" rel="bookmark" title="Permalink to How to convert DGN to Tiff with GDAL">How to convert <span class="caps">DGN</span> to Tiff with <span class="caps">GDAL</span></a></h1>
+        <small>Written on Feb 21, 2016
+    and marked as
+    <a href="/tag/gdal.html">gdal</a>    | <a href="/category/automation.html">automation</a>
+    </small>
+    <section>
+        <p>We have to deal with <span class="caps">DGN</span> drawings quite often at <a href="http://www.clevermaps.cz">CleverMaps</a> - heavily used for infrastructure projects (highways, roads, pipelines), they are a pure nightmare to the <span class="caps">GIS</span> person inside me. Right now, I&#8217;m only capable of converting it into a raster file and serve it with Geoserver. The transformation from <span class="caps">DGN</span> to <span class="caps">PDF</span> to <span class="caps">PNG</span> to Tiff is not something that makes me utterly happy&nbsp;though.</p>
+<p>All you need to do the same is <a href="/tag/gdal.html"><span class="caps">GDAL</span></a>, ImageMagick, some <span class="caps">PDF</span> documents created out of <span class="caps">DGN</span> files - something MicroStation can help you with - and their upper left and lower right corner&nbsp;coordinates.</p>
+<div class="highlight"><pre><span></span><span class="c1"># I recommend putting some limits on ImageMagick - it tends to eat up all the resources and quit</span>
+<span class="nb">export</span> <span class="nv">MAGICK_MEMORY_LIMIT</span><span class="o">=</span>1512
+<span class="nb">export</span> <span class="nv">MAGICK_MAP_LIMIT</span><span class="o">=</span>512
+<span class="nb">export</span> <span class="nv">MAGICK_AREA_LIMIT</span><span class="o">=</span>1024
+<span class="nb">export</span> <span class="nv">MAGICK_FILES_LIMIT</span><span class="o">=</span>512
+<span class="nb">export</span> <span class="nv">MAGICK_TMPDIR</span><span class="o">=</span>/partition/large/enough
+
+<span class="c1"># I expect two files on the input: the first is PDF file with drawing, the second is a simple text file with four coordinates on a single line in the following order: upper left x, upper left y, lower right x, lower right y</span>
+<span class="nv">INPUT</span><span class="o">=</span><span class="si">${</span><span class="nv">1</span><span class="p">:?</span><span class="s2">&quot;PDF file path&quot;</span><span class="si">}</span>
+<span class="nv">COORDS</span><span class="o">=</span><span class="si">${</span><span class="nv">2</span><span class="p">:?</span><span class="s2">&quot;Bounding box file path&quot;</span><span class="si">}</span>
+<span class="nv">OUTPUTDIRNAME</span><span class="o">=</span><span class="k">$(</span>dirname <span class="nv">$INPUT</span><span class="k">)</span>
+<span class="nv">OUTPUTFILENAME</span><span class="o">=</span><span class="k">$(</span>basename <span class="nv">$INPUT</span> <span class="p">|</span> cut -d. -f1<span class="k">)</span>.png
+<span class="nv">OUTPUTPATH</span><span class="o">=</span><span class="nv">$OUTPUTDIRNAME</span>/<span class="nv">$OUTPUTFILENAME</span>
+
+<span class="c1"># create PNG image - I actually don&#39;t remember why it didn&#39;t work directly to Tiff</span>
+gdal_translate <span class="se">\</span>
+    -co <span class="nv">WORLDFILE</span><span class="o">=</span>YES <span class="se">\</span>
+    -co <span class="nv">ZLEVEL</span><span class="o">=</span><span class="m">5</span> <span class="se">\</span>
+    -of PNG <span class="se">\</span>
+    --config GDAL_CACHEMAX <span class="m">500</span> <span class="se">\</span>
+    --config GDAL_PDF_DPI <span class="m">300</span> <span class="se">\</span>
+    -a_srs EPSG:5514 <span class="se">\ </span><span class="c1"># Czech local CRS</span>
+    -a_ullr <span class="k">$(</span><span class="nb">echo</span> <span class="k">$(</span>cat <span class="nv">$COORDS</span><span class="k">))</span> <span class="se">\ </span><span class="c1"># read the file with coordinates</span>
+    <span class="nv">$INPUT</span> <span class="se">\</span>
+    <span class="nv">$OUTPUTPATH</span>
+
+<span class="c1"># convert to Tiff image</span>
+convert <span class="se">\</span>
+    -define tiff:tile-geometry<span class="o">=</span>256x256 <span class="se">\</span>
+    -transparent white <span class="se">\ </span><span class="c1"># drawings come with white background</span>
+    <span class="nv">$OUTPUTPATH</span> <span class="se">\</span>
+    <span class="si">${</span><span class="nv">OUTPUTPATH</span><span class="p">/.png</span><span class="si">}</span>_alpha.tif
+
+<span class="c1"># build overwies to speed things up</span>
+gdaladdo <span class="si">${</span><span class="nv">OUTPUTPATH</span><span class="p">/.png</span><span class="si">}</span>_alpha.tif <span class="m">2</span> <span class="m">4</span> <span class="m">8</span> <span class="m">16</span> 32
+</pre></div>
+
+
+<p>And you&#8217;re done. The <code>.wld</code> file will be present for each resulting file. I rename it manually to match the name of a GeoTiff - that should be probably done automatically as&nbsp;well.</p>
+    </section>
+    </div>
+<div class="neighbors">
+    <h3>More reading</h3>
+    <ul>
+        <li>
+            <a href="/posts/2016/looking-for-the-next-row-with-postgresql/">
+                 Looking for the Next Row with&nbsp;PostgreSQL
+            </a>
+        </li>
+         <li>
+             <a href="/posts/2016/do-you-really-need-gulp-or-grunt-or-bower-or-what/">
+                 Do You Really Need Gulp? Or Grunt? Or Bower? Or&nbsp;What?
+             </a>
+         </li>
+         <li>
+             <a href="/posts/2015/color-relief-shaded-map-using-open-data-with-open-source-software/">
+                 Color Relief Shaded Map Using Open Data with Open Source&nbsp;Software
+             </a>
+         </li>
+         <li>
+             <a href="/posts/2016/ogrinfo-output-formatting/">
+                 Ogrinfo Output&nbsp;Formatting
+             </a>
+         </li>
+        </li>
+    </ul>
+</div></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns footer">
+                <footer>
+                    <address>
+                    Written by <a href="http://www.zimmi.cz">Michal Zimmermann</a>.
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    </address><!-- /#about -->
+                </footer><!-- /#contentinfo -->
+            </div>
+        </div>
+<script src="/theme/webassets-external/91ae19a44b6fd6f56de2d3a3a1e2f680_jquery.js"></script>
+<script src="/theme/webassets-external/1f857912fbcb91b33a7fbeafdecefa84_foundation.min.js"></script>
+<script>
+$(document).foundation();
+</script>
+</body>
+</html>

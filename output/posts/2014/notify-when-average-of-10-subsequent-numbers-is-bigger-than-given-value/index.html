@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+          <title>Michal Zimmermann | Notify When Average of 10 Subsequent Numbers Is Bigger Than Given&nbsp;Value</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+
+
+
+    <meta name="tags" content="php" />
+  <meta property="og:image" content="https://pbs.twimg.com/profile_images/770323886290440192/3G5hqp11_400x400.jpg" />
+  <meta property="og:title" content="Notify When Average of 10 Subsequent Numbers Is Bigger Than Given Value" />
+  <meta property="og:description" content="I found an interesting question at StackOverflow asking for help finding solution to what I have already mentioned in the title, with PHP. I gave it a try before reading answers and came up with the following code: $avg = // value we are looking for ..." />
+  <meta property="og:url" content="/posts/2014/notify-when-average-of-10-subsequent-numbers-is-bigger-than-given-value/" />
+        <link rel="stylesheet" href="/theme/webassets-external/fee07050f67182ee94565df0306e2583_foundation.min.css">
+        <link rel="stylesheet" href="/theme/webassets-external/c8d3bd219f818a16149faa6dc85ada3b_pygment.css">
+        <link rel="stylesheet" href="/theme/webassets-external/f19e9253fe1e12d62d57b9087abc5f7a_screen.css">
+</head>
+
+<body id="index" class="home">
+    <nav class="top-bar card-1" data-topbar role="navigation">
+        <ul class="title-area">
+            <li class="name">
+                <h1><a href="/posts">Home</a></h1>
+            </li>
+     <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+            <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+        </ul>
+        <section class="top-bar-section">
+    <!-- Right Nav Section -->
+            <ul class="right">
+                <li><a href="/categories">Categories</a></li>
+                <li><a href="/tags">Tags</a></li>
+                <li><a href="/feed.xml">RSS feed</a></li>
+            </ul>
+        </section>
+    </nav>
+        <div class="row">
+          <div class="large-12 columns header">
+            <h1><a href="/posts">Michal Zimmermann</a> <small>Pieces of knowledge from the world of GIS.</small></h1>
+          </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns">
+<div class="panel card card-1">
+    <div class="post-name">
+        <h1><a href="/posts/2014/notify-when-average-of-10-subsequent-numbers-is-bigger-than-given-value/" rel="bookmark" title="Permalink to Notify When Average of 10 Subsequent Numbers Is Bigger Than Given Value">Notify When Average of 10 Subsequent Numbers Is Bigger Than Given&nbsp;Value</a></h1>
+        <small>Written on Sep 21, 2014
+    and marked as
+    <a href="/tag/php.html">php</a>    | <a href="/category/development.html">development</a>
+    </small>
+    <section>
+        <p>I found an <a href="http://stackoverflow.com/questions/25952380/php-find-a-maximum-average-for-10-subsequent-numbers-in-a-list-of-50-random-numb">interesting question</a> at StackOverflow asking for help finding solution to what I have already mentioned in the title, with <span class="caps">PHP</span>. I gave it a try before reading answers and came up with the following&nbsp;code:</p>
+<div class="highlight"><pre><span></span><span class="p">$</span><span class="nv">avg</span><span class="x">  = // value we are looking for</span>
+<span class="p">$</span><span class="nv">size</span><span class="x"> = count(</span><span class="p">$</span><span class="nv">numbers</span><span class="x">);</span>
+
+<span class="x">for (</span><span class="p">$</span><span class="nv">i</span><span class="x"> = 0; </span><span class="p">$</span><span class="nv">i</span><span class="x"> &lt; </span><span class="p">$</span><span class="nv">size</span><span class="x">; </span><span class="p">$</span><span class="nv">i</span><span class="x"> += 1) </span><span class="err">{</span><span class="x"></span>
+<span class="x">    if (</span><span class="p">$</span><span class="nv">i</span><span class="x"> + 9 &lt; 51) </span><span class="err">{</span><span class="x"></span>
+<span class="x">        </span><span class="p">$</span><span class="nv">val</span><span class="x"> += </span><span class="p">$</span><span class="nv">numbers</span><span class="x">[</span><span class="p">$</span><span class="nv">i</span><span class="x">];</span>
+<span class="x">        for (</span><span class="p">$</span><span class="nv">j</span><span class="x"> = </span><span class="p">$</span><span class="nv">i</span><span class="x"> + 1; </span><span class="p">$</span><span class="nv">j</span><span class="x"> &lt; 10 + </span><span class="p">$</span><span class="nv">i</span><span class="x">; </span><span class="p">$</span><span class="nv">j</span><span class="x"> += 1) </span><span class="err">{</span><span class="x"></span>
+<span class="x">            </span><span class="p">$</span><span class="nv">val</span><span class="x"> += </span><span class="p">$</span><span class="nv">numbers</span><span class="x">[</span><span class="p">$</span><span class="nv">j</span><span class="x">];</span>
+<span class="x">        }</span>
+<span class="x">        if (</span><span class="p">$</span><span class="nv">val</span><span class="x"> / 10 &gt;= </span><span class="p">$</span><span class="nv">avg</span><span class="x">) </span><span class="err">{</span><span class="x"> // hit</span>
+<span class="x">            // do something</span>
+<span class="x">        }</span>
+<span class="x">        </span><span class="p">$</span><span class="nv">val</span><span class="x"> = 0;</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+</pre></div>
+
+
+<p>That was the first that I could think of. And it worked. The answer given by Dave Chen was much more elegant than my solution (although I think it does something a bit different, but that&#8217;s not the point&nbsp;here):</p>
+<div class="highlight"><pre><span></span><span class="p">$</span><span class="nv">number</span><span class="x"> = 10; //numbers in a set</span>
+<span class="p">$</span><span class="nv">max</span><span class="x"> = 0;</span>
+<span class="p">$</span><span class="nv">index</span><span class="x"> = 0;</span>
+
+<span class="p">$</span><span class="nv">size</span><span class="x"> = sizeof(</span><span class="p">$</span><span class="nv">numbers</span><span class="x">) - </span><span class="p">$</span><span class="nv">number</span><span class="x">;</span>
+<span class="x">for (</span><span class="p">$</span><span class="nv">i</span><span class="x"> = 0; </span><span class="p">$</span><span class="nv">i</span><span class="x"> &lt; </span><span class="p">$</span><span class="nv">size</span><span class="x">; </span><span class="p">$</span><span class="nv">i</span><span class="x">++) </span><span class="err">{</span><span class="x"></span>
+<span class="x">    </span><span class="p">$</span><span class="nv">tmp</span><span class="x"> = array_sum(array_slice(</span><span class="p">$</span><span class="nv">numbers</span><span class="x">, </span><span class="p">$</span><span class="nv">i</span><span class="x">, </span><span class="p">$</span><span class="nv">number</span><span class="x">)) / </span><span class="p">$</span><span class="nv">number</span><span class="x">;</span>
+<span class="x">    if (</span><span class="p">$</span><span class="nv">tmp</span><span class="x"> &gt; </span><span class="p">$</span><span class="nv">max</span><span class="x">) </span><span class="err">{</span><span class="x"></span>
+<span class="x">        </span><span class="p">$</span><span class="nv">max</span><span class="x"> = </span><span class="p">$</span><span class="nv">tmp</span><span class="x">;</span>
+<span class="x">        </span><span class="p">$</span><span class="nv">index</span><span class="x"> = </span><span class="p">$</span><span class="nv">i</span><span class="x">;</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+</pre></div>
+
+
+<p>I made a simple benchmark with <a href="http://php.net/manual/en/function.microtime.php"><code>microtime()</code></a> and found out that my solution (ran 100k times) took about ~12.3 seconds while Dave&#8217;s took only ~7.4 seconds to finish. That makes his code almost twice faster than&nbsp;mine.</p>
+<p><strong>Lesson learned: do not stop&nbsp;learning!</strong></p>
+    </section>
+    </div>
+<div class="neighbors">
+    <h3>More reading</h3>
+    <ul>
+        <li>
+            <a href="/posts/2014/postgresql-remote-access/">
+                 PostgreSQL Remote&nbsp;Access
+            </a>
+        </li>
+         <li>
+             <a href="/posts/2014/ogr2ogr-unix-x-windows/">
+                 ogr2ogr <span class="caps">UNIX</span> x&nbsp;Windows
+             </a>
+         </li>
+         <li>
+             <a href="/posts/2014/postgresql-remote-access/">
+                 PostgreSQL Remote&nbsp;Access
+             </a>
+         </li>
+         <li>
+             <a href="/posts/2014/ogr2ogr-unix-x-windows/">
+                 ogr2ogr <span class="caps">UNIX</span> x&nbsp;Windows
+             </a>
+         </li>
+        </li>
+    </ul>
+</div></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns footer">
+                <footer>
+                    <address>
+                    Written by <a href="http://www.zimmi.cz">Michal Zimmermann</a>.
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    </address><!-- /#about -->
+                </footer><!-- /#contentinfo -->
+            </div>
+        </div>
+<script src="/theme/webassets-external/91ae19a44b6fd6f56de2d3a3a1e2f680_jquery.js"></script>
+<script src="/theme/webassets-external/1f857912fbcb91b33a7fbeafdecefa84_foundation.min.js"></script>
+<script>
+$(document).foundation();
+</script>
+</body>
+</html>

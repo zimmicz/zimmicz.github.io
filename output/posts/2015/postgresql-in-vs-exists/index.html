@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+          <title>Michal Zimmermann | PostgreSQL <span class="caps">IN</span> vs <span class="caps">EXISTS</span></title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+
+
+
+    <meta name="tags" content="sql" />
+  <meta property="og:image" content="https://pbs.twimg.com/profile_images/770323886290440192/3G5hqp11_400x400.jpg" />
+  <meta property="og:title" content="PostgreSQL IN vs EXISTS" />
+  <meta property="og:description" content="Until recently, SQL IN and EXISTS were almost exactly the same to me. There is a significant difference both in execution plans and time of execution though, as I found out after not being able to speed up my workmate’s query. Assume two ..." />
+  <meta property="og:url" content="/posts/2015/postgresql-in-vs-exists/" />
+        <link rel="stylesheet" href="/theme/webassets-external/fee07050f67182ee94565df0306e2583_foundation.min.css">
+        <link rel="stylesheet" href="/theme/webassets-external/c8d3bd219f818a16149faa6dc85ada3b_pygment.css">
+        <link rel="stylesheet" href="/theme/webassets-external/f19e9253fe1e12d62d57b9087abc5f7a_screen.css">
+</head>
+
+<body id="index" class="home">
+    <nav class="top-bar card-1" data-topbar role="navigation">
+        <ul class="title-area">
+            <li class="name">
+                <h1><a href="/posts">Home</a></h1>
+            </li>
+     <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+            <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+        </ul>
+        <section class="top-bar-section">
+    <!-- Right Nav Section -->
+            <ul class="right">
+                <li><a href="/categories">Categories</a></li>
+                <li><a href="/tags">Tags</a></li>
+                <li><a href="/feed.xml">RSS feed</a></li>
+            </ul>
+        </section>
+    </nav>
+        <div class="row">
+          <div class="large-12 columns header">
+            <h1><a href="/posts">Michal Zimmermann</a> <small>Pieces of knowledge from the world of GIS.</small></h1>
+          </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns">
+<div class="panel card card-1">
+    <div class="post-name">
+        <h1><a href="/posts/2015/postgresql-in-vs-exists/" rel="bookmark" title="Permalink to PostgreSQL IN vs EXISTS">PostgreSQL <span class="caps">IN</span> vs <span class="caps">EXISTS</span></a></h1>
+        <small>Written on Oct 9, 2015
+    and marked as
+    <a href="/tag/sql.html">sql</a>    | <a href="/category/development.html">development</a>
+    </small>
+    <section>
+        <p>Until recently, <span class="caps">SQL</span> <code>IN</code> and <code>EXISTS</code> were almost exactly the same to me. There is a significant difference both in execution plans and time of execution though, as I found out after not being able to speed up my workmate&#8217;s&nbsp;query.</p>
+<p>Assume two not-as-small-as-they-might-be&nbsp;tables:</p>
+<div class="highlight"><pre><span></span><span class="k">BEGIN</span><span class="p">;</span>
+
+<span class="k">CREATE</span> <span class="n">UNLOGGED</span> <span class="k">TABLE</span> <span class="n">test</span><span class="p">.</span><span class="n">small</span> <span class="k">AS</span>
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">generate_series</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">500000</span><span class="p">)</span> <span class="n">id</span><span class="p">;</span>
+
+<span class="k">CREATE</span> <span class="n">UNLOGGED</span> <span class="k">TABLE</span> <span class="n">test</span><span class="p">.</span><span class="n">big</span> <span class="k">AS</span>
+<span class="k">SELECT</span> <span class="p">(</span><span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">4000000</span><span class="p">)::</span><span class="nb">integer</span> <span class="n">id</span>
+<span class="k">FROM</span> <span class="n">generate_series</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4000000</span><span class="p">);</span>
+
+<span class="k">COMMIT</span><span class="p">;</span>
+</pre></div>
+
+
+<p>To find out what rows from <code>test.big</code> is missing in <code>test.small</code>, you&#8217;ll use one of these&nbsp;queries:</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">id</span>
+<span class="k">FROM</span> <span class="n">test</span><span class="p">.</span><span class="n">big</span>
+<span class="k">WHERE</span> <span class="n">id</span> <span class="k">NOT</span> <span class="k">IN</span> <span class="p">(</span><span class="k">SELECT</span> <span class="n">id</span> <span class="k">FROM</span> <span class="n">test</span><span class="p">.</span><span class="n">small</span><span class="p">);</span>
+
+                            <span class="n">QUERY</span> <span class="n">PLAN</span>
+<span class="c1">-----------------------------------------------------------------------------------------</span>
+<span class="n">Seq</span> <span class="n">Scan</span> <span class="k">on</span> <span class="n">big</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">8463</span><span class="p">.</span><span class="mi">01</span><span class="p">..</span><span class="mi">42313</span><span class="p">.</span><span class="mi">02</span> <span class="k">rows</span><span class="o">=</span><span class="mi">1000000</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">177</span><span class="p">.</span><span class="mi">061</span><span class="p">..</span><span class="mi">864</span><span class="p">.</span><span class="mi">043</span> <span class="k">rows</span><span class="o">=</span><span class="mi">1500894</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">Filter</span><span class="p">:</span> <span class="p">(</span><span class="k">NOT</span> <span class="p">(</span><span class="n">hashed</span> <span class="n">SubPlan</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="k">Rows</span> <span class="n">Removed</span> <span class="k">by</span> <span class="n">Filter</span><span class="p">:</span> <span class="mi">499107</span>
+    <span class="n">SubPlan</span> <span class="mi">1</span>
+    <span class="o">-&gt;</span>  <span class="n">Seq</span> <span class="n">Scan</span> <span class="k">on</span> <span class="n">small</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">00</span><span class="p">..</span><span class="mi">7213</span><span class="p">.</span><span class="mi">01</span> <span class="k">rows</span><span class="o">=</span><span class="mi">500001</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">045</span><span class="p">..</span><span class="mi">34</span><span class="p">.</span><span class="mi">727</span> <span class="k">rows</span><span class="o">=</span><span class="mi">500001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">Total</span> <span class="n">runtime</span><span class="p">:</span> <span class="mi">904</span><span class="p">.</span><span class="mi">413</span> <span class="n">ms</span>
+<span class="p">(</span><span class="mi">6</span> <span class="k">rows</span><span class="p">)</span>
+
+
+<span class="k">SELECT</span> <span class="n">id</span>
+<span class="k">FROM</span> <span class="n">test</span><span class="p">.</span><span class="n">big</span>
+<span class="k">WHERE</span> <span class="k">NOT</span> <span class="k">EXISTS</span> <span class="p">(</span>
+    <span class="k">SELECT</span> <span class="mi">1</span>
+    <span class="k">FROM</span> <span class="n">test</span><span class="p">.</span><span class="n">small</span>
+    <span class="k">WHERE</span> <span class="n">test</span><span class="p">.</span><span class="n">big</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">test</span><span class="p">.</span><span class="n">small</span><span class="p">.</span><span class="n">id</span>
+<span class="p">);</span>
+                            <span class="n">QUERY</span> <span class="n">PLAN</span>
+<span class="c1">-----------------------------------------------------------------------------------------</span>
+<span class="n">Hash</span> <span class="n">Anti</span> <span class="k">Join</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">15417</span><span class="p">.</span><span class="mi">02</span><span class="p">..</span><span class="mi">82100</span><span class="p">.</span><span class="mi">58</span> <span class="k">rows</span><span class="o">=</span><span class="mi">955189</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">100</span><span class="p">.</span><span class="mi">257</span><span class="p">..</span><span class="mi">1240</span><span class="p">.</span><span class="mi">343</span> <span class="k">rows</span><span class="o">=</span><span class="mi">1500894</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">Hash</span> <span class="n">Cond</span><span class="p">:</span> <span class="p">(</span><span class="n">big</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">small</span><span class="p">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="o">-&gt;</span>  <span class="n">Seq</span> <span class="n">Scan</span> <span class="k">on</span> <span class="n">big</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">00</span><span class="p">..</span><span class="mi">28850</span><span class="p">.</span><span class="mi">01</span> <span class="k">rows</span><span class="o">=</span><span class="mi">2000001</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">016</span><span class="p">..</span><span class="mi">125</span><span class="p">.</span><span class="mi">024</span> <span class="k">rows</span><span class="o">=</span><span class="mi">2000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="o">-&gt;</span>  <span class="n">Hash</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">7213</span><span class="p">.</span><span class="mi">01</span><span class="p">..</span><span class="mi">7213</span><span class="p">.</span><span class="mi">01</span> <span class="k">rows</span><span class="o">=</span><span class="mi">500001</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">100</span><span class="p">.</span><span class="mi">068</span><span class="p">..</span><span class="mi">100</span><span class="p">.</span><span class="mi">068</span> <span class="k">rows</span><span class="o">=</span><span class="mi">500001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">Buckets</span><span class="p">:</span> <span class="mi">65536</span>  <span class="n">Batches</span><span class="p">:</span> <span class="mi">2</span>  <span class="n">Memory</span> <span class="k">Usage</span><span class="p">:</span> <span class="mi">8800</span><span class="n">kB</span>
+        <span class="o">-&gt;</span>  <span class="n">Seq</span> <span class="n">Scan</span> <span class="k">on</span> <span class="n">small</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">00</span><span class="p">..</span><span class="mi">7213</span><span class="p">.</span><span class="mi">01</span> <span class="k">rows</span><span class="o">=</span><span class="mi">500001</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">011</span><span class="p">..</span><span class="mi">35</span><span class="p">.</span><span class="mi">543</span> <span class="k">rows</span><span class="o">=</span><span class="mi">500001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">Total</span> <span class="n">runtime</span><span class="p">:</span> <span class="mi">1280</span><span class="p">.</span><span class="mi">609</span> <span class="n">ms</span>
+</pre></div>
+
+
+<p>That&#8217;s not a significant difference in time execution, is&nbsp;it?</p>
+<p>What if you want to find out what rows from <code>test.small</code> is missing in <code>test.big</code>?</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">id</span>
+<span class="k">FROM</span> <span class="n">test</span><span class="p">.</span><span class="n">small</span>
+<span class="k">WHERE</span> <span class="n">id</span> <span class="k">NOT</span> <span class="k">IN</span> <span class="p">(</span><span class="k">SELECT</span> <span class="n">id</span> <span class="k">FROM</span> <span class="n">test</span><span class="p">.</span><span class="n">big</span><span class="p">);</span>
+
+                                <span class="n">QUERY</span> <span class="n">PLAN</span>
+<span class="c1">---------------------------------------------------------------------------</span>
+<span class="n">Seq</span> <span class="n">Scan</span> <span class="k">on</span> <span class="n">small</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">00</span><span class="p">..</span><span class="mi">12915788669</span><span class="p">.</span><span class="mi">52</span> <span class="k">rows</span><span class="o">=</span><span class="mi">250000</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">Filter</span><span class="p">:</span> <span class="p">(</span><span class="k">NOT</span> <span class="p">(</span><span class="n">SubPlan</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">SubPlan</span> <span class="mi">1</span>
+    <span class="o">-&gt;</span>  <span class="n">Materialize</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">00</span><span class="p">..</span><span class="mi">46663</span><span class="p">.</span><span class="mi">01</span> <span class="k">rows</span><span class="o">=</span><span class="mi">2000001</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+        <span class="o">-&gt;</span>  <span class="n">Seq</span> <span class="n">Scan</span> <span class="k">on</span> <span class="n">big</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">00</span><span class="p">..</span><span class="mi">28850</span><span class="p">.</span><span class="mi">01</span> <span class="k">rows</span><span class="o">=</span><span class="mi">2000001</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="p">(</span><span class="mi">5</span> <span class="k">rows</span><span class="p">)</span>
+
+
+<span class="k">SELECT</span> <span class="n">id</span>
+<span class="k">FROM</span> <span class="n">test</span><span class="p">.</span><span class="n">small</span>
+<span class="k">WHERE</span> <span class="k">NOT</span> <span class="k">EXISTS</span> <span class="p">(</span>
+    <span class="k">SELECT</span> <span class="mi">1</span>
+    <span class="k">FROM</span> <span class="n">test</span><span class="p">.</span><span class="n">big</span>
+    <span class="k">WHERE</span> <span class="n">test</span><span class="p">.</span><span class="n">big</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">test</span><span class="p">.</span><span class="n">small</span><span class="p">.</span><span class="n">id</span>
+<span class="p">);</span>
+
+                               <span class="n">QUERY</span> <span class="n">PLAN</span>
+<span class="c1">-------------------------------------------------------------------------</span>
+<span class="n">Hash</span> <span class="n">Anti</span> <span class="k">Join</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">61663</span><span class="p">.</span><span class="mi">02</span><span class="p">..</span><span class="mi">180597</span><span class="p">.</span><span class="mi">23</span> <span class="k">rows</span><span class="o">=</span><span class="mi">1</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">Hash</span> <span class="n">Cond</span><span class="p">:</span> <span class="p">(</span><span class="n">small</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">big</span><span class="p">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="o">-&gt;</span>  <span class="n">Seq</span> <span class="n">Scan</span> <span class="k">on</span> <span class="n">small</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">00</span><span class="p">..</span><span class="mi">7213</span><span class="p">.</span><span class="mi">01</span> <span class="k">rows</span><span class="o">=</span><span class="mi">500001</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="o">-&gt;</span>  <span class="n">Hash</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">28850</span><span class="p">.</span><span class="mi">01</span><span class="p">..</span><span class="mi">28850</span><span class="p">.</span><span class="mi">01</span> <span class="k">rows</span><span class="o">=</span><span class="mi">2000001</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+        <span class="o">-&gt;</span>  <span class="n">Seq</span> <span class="n">Scan</span> <span class="k">on</span> <span class="n">big</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">00</span><span class="p">..</span><span class="mi">28850</span><span class="p">.</span><span class="mi">01</span> <span class="k">rows</span><span class="o">=</span><span class="mi">2000001</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="p">(</span><span class="mi">5</span> <span class="k">rows</span><span class="p">)</span>
+</pre></div>
+
+
+<p>It took me ~750 ms to get the result with <code>EXISTS</code> expression. I kept <code>IN</code> running whole night with no result. I&#8217;m not really sure why <code>IN</code> is so much slower, it might be caused by checks for <code>NULL</code> values. The speed is also related to the size of the subquery, thus the difference when tables were&nbsp;switched.</p>
+<p><code>LEFT JOIN</code> can be used to achieve the same result, I find its syntax less obvious&nbsp;though.</p>
+<p>No indexes were built this time, I know they don&#8217;t help the <code>IN</code> performance at all from my previous tests. Tested with PostgreSQL&nbsp;9.3.9.</p>
+    </section>
+    </div>
+<div class="neighbors">
+    <h3>More reading</h3>
+    <ul>
+        <li>
+            <a href="/posts/2015/how-to-use-queue-with-rsync/">
+                 How to Use Queue with&nbsp;Rsync
+            </a>
+        </li>
+         <li>
+             <a href="/posts/2015/color-relief-shaded-map-using-open-data-with-open-source-software/">
+                 Color Relief Shaded Map Using Open Data with Open Source&nbsp;Software
+             </a>
+         </li>
+         <li>
+             <a href="/posts/2015/ssh-grass-processing-status-check/">
+                 <span class="caps">SSH</span> <span class="caps">GRASS</span> Processing Status&nbsp;Check
+             </a>
+         </li>
+         <li>
+             <a href="/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/">
+                 Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span>
+             </a>
+         </li>
+        </li>
+    </ul>
+</div></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns footer">
+                <footer>
+                    <address>
+                    Written by <a href="http://www.zimmi.cz">Michal Zimmermann</a>.
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    </address><!-- /#about -->
+                </footer><!-- /#contentinfo -->
+            </div>
+        </div>
+<script src="/theme/webassets-external/91ae19a44b6fd6f56de2d3a3a1e2f680_jquery.js"></script>
+<script src="/theme/webassets-external/1f857912fbcb91b33a7fbeafdecefa84_foundation.min.js"></script>
+<script>
+$(document).foundation();
+</script>
+</body>
+</html>

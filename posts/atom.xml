@@ -1,5 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Michal Zimmermann</title><link href="https://www.zimmi.cz/posts/" rel="alternate"></link><link href="https://www.zimmi.cz/posts/atom.xml" rel="self"></link><id>https://www.zimmi.cz/posts/</id><updated>2016-10-28T16:00:00+02:00</updated><entry><title>Degrees To Decimal With Javascript Reworked</title><link href="https://www.zimmi.cz/posts/2016/degrees-to-decimal-with-javascript-reworked/" rel="alternate"></link><published>2016-10-28T16:00:00+02:00</published><updated>2016-10-28T16:00:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2016-10-28:posts/2016/degrees-to-decimal-with-javascript-reworked/</id><summary type="html">&lt;p&gt;Two years ago I was pretty happy with &lt;a href="https://www.zimmi.cz/posts/2014/degrees-to-decimal-with-javascript/"&gt;this little piece of code to transform degrees to the decimal value&lt;/a&gt;. Yesterday, I found a neater way to do the&amp;nbsp;same:&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Michal Zimmermann</title><link href="https://www.zimmi.cz/posts/" rel="alternate"></link><link href="https://www.zimmi.cz/posts/atom.xml" rel="self"></link><id>https://www.zimmi.cz/posts/</id><updated>2016-11-02T18:30:00+01:00</updated><entry><title>Introducing Blind Maps Project</title><link href="https://www.zimmi.cz/posts/2016/introducing-blind-maps-project/" rel="alternate"></link><published>2016-11-02T18:30:00+01:00</published><updated>2016-11-02T18:30:00+01:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2016-11-02:posts/2016/introducing-blind-maps-project/</id><summary type="html">&lt;p&gt;I&amp;#8217;d like to introduce you to my little pet project, which might just as well be awarded &lt;em&gt;the first pet project I&amp;#8217;ve ever completed&lt;/em&gt;, called &lt;a href="https://www.zimmi.cz/blind-maps"&gt;Blind maps&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s a very simple, yet useful web application built on top of the great &lt;a href="../../tag/leaflet.html"&gt;Leaflet&lt;/a&gt; library meant to help you get to know our world a bit better. As the name suggests, the app shows you, well&amp;hellip; a blind map, and you try to fill as many features as you&amp;nbsp;can.&lt;/p&gt;
+&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/introducing-blind-maps-project/map.png" /&gt;&lt;/div&gt;
+
+&lt;p&gt;The app is ready and can be&amp;nbsp;used:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;online at &lt;a href="https://www.zimmi.cz/blind-maps/"&gt;Blind maps&lt;/a&gt; with the map of your choice (if&amp;nbsp;available)&lt;/li&gt;
+&lt;li&gt;offline, downloaded to your computer and filled with whatever data you&amp;nbsp;want&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;What I find great about this project is the ease of adding new dataset. For starters, I filled it with data coming from &lt;a href="naturalearthdata.com"&gt;Natural Earth&lt;/a&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;span class="caps"&gt;CONUS&lt;/span&gt;&amp;nbsp;states&lt;/li&gt;
+&lt;li&gt;European&amp;nbsp;states&lt;/li&gt;
+&lt;li&gt;World&amp;nbsp;capitals&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;If you wish, feel free to send me a pull request with GeoJSON data, I&amp;#8217;ll be happy to have more datasets available! The process is described at the &lt;a href="https://www.zimmi.cz/blind-maps"&gt;project homepage&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;As you notice at the project homepage, there are two versions of the game&amp;nbsp;available:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;one lets you find map features by their&amp;nbsp;names&lt;/li&gt;
+&lt;li&gt;the other one lets you type name highlighted feature (much&amp;nbsp;tougher)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Have&amp;nbsp;fun!&lt;/p&gt;</summary><category term="javascript"></category><category term="leaflet"></category></entry><entry><title>Degrees To Decimal With Javascript Reworked</title><link href="https://www.zimmi.cz/posts/2016/degrees-to-decimal-with-javascript-reworked/" rel="alternate"></link><published>2016-10-28T16:00:00+02:00</published><updated>2016-10-28T16:00:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2016-10-28:posts/2016/degrees-to-decimal-with-javascript-reworked/</id><summary type="html">&lt;p&gt;Two years ago I was pretty happy with &lt;a href="https://www.zimmi.cz/posts/2014/degrees-to-decimal-with-javascript/"&gt;this little piece of code to transform degrees to the decimal value&lt;/a&gt;. Yesterday, I found a neater way to do the&amp;nbsp;same:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kd"&gt;let&lt;/span&gt; &lt;span class="nx"&gt;deg&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;50&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;30&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
 
 &lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="nx"&gt;degToDec&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;prev&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;cur&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;curIndex&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+        <title>Michal Zimmermann | tag: ogc</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="/theme/webassets-external/fee07050f67182ee94565df0306e2583_foundation.min.css">
+        <link rel="stylesheet" href="/theme/webassets-external/c8d3bd219f818a16149faa6dc85ada3b_pygment.css">
+        <link rel="stylesheet" href="/theme/webassets-external/f19e9253fe1e12d62d57b9087abc5f7a_screen.css">
+</head>
+
+<body id="index" class="home">
+    <nav class="top-bar card-1" data-topbar role="navigation">
+        <ul class="title-area">
+            <li class="name">
+                <h1><a href="/posts">Home</a></h1>
+            </li>
+     <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+            <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+        </ul>
+        <section class="top-bar-section">
+    <!-- Right Nav Section -->
+            <ul class="right">
+                <li><a href="/categories">Categories</a></li>
+                <li><a href="/tags">Tags</a></li>
+                <li><a href="/feed.xml">RSS feed</a></li>
+            </ul>
+        </section>
+    </nav>
+        <div class="row">
+          <div class="large-12 columns header">
+            <h1><a href="/posts">Michal Zimmermann</a> <small>Pieces of knowledge from the world of GIS.</small></h1>
+          </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns">
+<h2 class="text-center">Articles tagged with ogc tag</h2>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="/posts/2015/wms-download-for-future-offline-use/" rel="bookmark" title="Permalink to WMS Download For Future Offline Use"><span class="caps">WMS</span> Download For Future Offline&nbsp;Use</a></h1>
+            <small>Written on Mar 15, 2015
+        and marked as
+        <a href="/tag/ogc.html">ogc</a>,         <a href="/tag/python.html">python</a>,         <a href="/tag/wms.html">wms</a>        | <a href="/category/automation.html">automation</a>
+        </small>
+        <section>
+            <p>Using <span class="caps">WMS</span> in real time might easily become pain in the ass due to low connection speed or slow server response. Downloading images beforehand seems to be a reasonable choice both to avoid any slowdowns and to improve user experience when working with <span class="caps">WMS</span>&nbsp;layers.</p>
+<p><a href="https://geopython.github.io/OWSLib/">OWSLib</a> is a great tool to help you get images from <span class="caps">WMS</span> server. Code and some comments&nbsp;follow.</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">owslib.wms</span> <span class="kn">import</span> <span class="n">WebMapService</span>
+
+<span class="n">BOTTOM_LEFT</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">679363</span><span class="p">,</span><span class="o">-</span><span class="mi">1120688</span><span class="p">)</span>
+<span class="n">TOP_RIGHT</span>   <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">565171</span><span class="p">,</span><span class="o">-</span><span class="mi">1042703</span><span class="p">)</span>
+<span class="n">SRS_WIDTH</span>   <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="o">-</span><span class="mi">639084</span> <span class="o">-</span> <span class="o">-</span><span class="mi">638825</span><span class="p">)</span> <span class="c1"># tile width in units of crs =&gt; 259 m</span>
+<span class="n">SRS_HEIGHT</span>  <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="o">-</span><span class="mi">1070426</span> <span class="o">-</span> <span class="o">-</span><span class="mi">1070273</span><span class="p">)</span> <span class="c1"># tile height in units of crs =&gt; 153 m</span>
+<span class="n">PX_WIDTH</span>    <span class="o">=</span> <span class="mi">977</span>
+<span class="n">PX_HEIGHT</span>   <span class="o">=</span> <span class="mi">578</span>
+
+<span class="n">FORMAT</span>      <span class="o">=</span> <span class="s1">&#39;image/png&#39;</span>
+<span class="n">LAYERS</span>      <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;KN&#39;</span><span class="p">,</span> <span class="s1">&#39;RST_PK&#39;</span><span class="p">]</span>
+<span class="n">SIZE</span>        <span class="o">=</span> <span class="p">(</span><span class="n">PX_WIDTH</span><span class="p">,</span> <span class="n">PX_HEIGHT</span><span class="p">)</span>
+<span class="n">SRS</span>         <span class="o">=</span> <span class="s1">&#39;EPSG:5514&#39;</span>
+<span class="n">STYLES</span>      <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">]</span>
+<span class="n">TRANSPARENT</span> <span class="o">=</span> <span class="bp">True</span>
+
+<span class="n">DIRECTORY</span> <span class="o">=</span> <span class="s1">&#39;tiles/&#39;</span>
+<span class="n">SLEEP</span>     <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">20</span><span class="p">)</span> <span class="c1"># seconds</span>
+
+<span class="n">dx</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="n">BOTTOM_LEFT</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">TOP_RIGHT</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="c1"># area width in units of crs</span>
+<span class="n">dy</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="n">BOTTOM_LEFT</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">TOP_RIGHT</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="c1"># area height in units of crs</span>
+
+<span class="n">cols</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">dx</span> <span class="o">/</span> <span class="n">SRS_WIDTH</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="n">rows</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">dy</span> <span class="o">/</span> <span class="n">SRS_HEIGHT</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
+
+<span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;world_file.pngw&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">wld_template</span><span class="p">:</span>
+    <span class="n">tmpl</span> <span class="o">=</span> <span class="n">wld_template</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+<span class="n">wms</span> <span class="o">=</span> <span class="n">WebMapService</span><span class="p">(</span><span class="s1">&#39;http://services.cuzk.cz/wms/wms.asp&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.1.1&#39;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">rows</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">DIRECTORY</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">DIRECTORY</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">cols</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">DIRECTORY</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;/kn_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span><span class="p">):</span>
+            <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">continue</span>
+
+        <span class="n">bbox</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">i</span> <span class="o">*</span> <span class="n">SRS_WIDTH</span> <span class="o">+</span> <span class="n">BOTTOM_LEFT</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">j</span> <span class="o">*</span> <span class="n">SRS_HEIGHT</span> <span class="o">+</span> <span class="n">BOTTOM_LEFT</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">SRS_WIDTH</span> <span class="o">+</span> <span class="n">BOTTOM_LEFT</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">SRS_HEIGHT</span> <span class="o">+</span> <span class="n">BOTTOM_LEFT</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="n">img</span> <span class="o">=</span> <span class="n">wms</span><span class="o">.</span><span class="n">getmap</span><span class="p">(</span>
+            <span class="n">layers</span><span class="o">=</span><span class="n">LAYERS</span><span class="p">,</span>
+            <span class="n">styles</span><span class="o">=</span><span class="n">STYLES</span><span class="p">,</span>
+            <span class="n">srs</span><span class="o">=</span><span class="n">SRS</span><span class="p">,</span>
+            <span class="n">bbox</span><span class="o">=</span><span class="n">bbox</span><span class="p">,</span>
+            <span class="n">size</span><span class="o">=</span><span class="n">SIZE</span><span class="p">,</span>
+            <span class="n">format</span><span class="o">=</span><span class="n">FORMAT</span><span class="p">,</span>
+            <span class="n">transparent</span><span class="o">=</span><span class="n">TRANSPARENT</span>
+        <span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">DIRECTORY</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;/kn_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">png</span><span class="p">:</span>
+            <span class="n">png</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">DIRECTORY</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/kn_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.pngw&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">wld_file</span><span class="p">:</span>
+            <span class="n">wld_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">tmpl</span><span class="p">)</span>
+            <span class="n">wld_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="n">SRS_WIDTH</span> <span class="o">+</span> <span class="n">BOTTOM_LEFT</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="n">wld_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">((</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">SRS_HEIGHT</span> <span class="o">+</span> <span class="n">BOTTOM_LEFT</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+        <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">print</span> <span class="nb">str</span><span class="p">(</span><span class="n">counter</span><span class="p">),</span> <span class="s1">&#39; out of &#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">rows</span> <span class="o">*</span> <span class="n">cols</span><span class="p">)</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">SLEEP</span><span class="p">)</span>
+</pre></div>
+
+
+<p>First, always make sure <strong>you are not violating terms of use</strong> defined by service provider. If you are not, here are the necessary&nbsp;steps:</p>
+<ol>
+<li>Define your area of interest with bottom left and top right&nbsp;coordinates.</li>
+<li>Calculate width of single image both in pixels and units of <span class="caps">CRS</span> to get the rightsized image. Note that there may be image size restrictions defined by provider (2048 &times; 2048 px is usually the biggest you can&nbsp;get).</li>
+<li>Define template <a href="https://en.wikipedia.org/wiki/World_file">world file</a> for referencing images. OWSLib doesn&#8217;t provide world files to saved images, these have to be created by you. I recommend to use a template file for creating real world&nbsp;files.</li>
+<li>Be nice! Don&#8217;t overload the service. I use <code>time.sleep()</code> for&nbsp;this.</li>
+<li>Profit.</li>
+</ol>
+<p>The trouble with <span class="caps">WMS</span> is that you can&#8217;t set an arbitrary scale you want to obtain images in (e.g. 1:1 000). It&#8217;s fairly easy to get all values needed to imitate this behavior&nbsp;though.</p>
+<p>Using <a href="http://qgis.org"><span class="caps">QGIS</span></a> you&nbsp;can:</p>
+<ol>
+<li>Get bounding box of area you&#8217;re interested&nbsp;in.</li>
+<li>Save current view as an image (together with the world file!) and use it as a specimen for your own world&nbsp;files.</li>
+<li>Derive image width (<span class="caps">CRS</span>, pixels) from the saved image, thus getting the same zoom level you were using in <span class="caps">QGIS</span>.</li>
+</ol>
+<p>Code given is not bulletproof, it will fail on any network error. However, if you restart it after such a crash, it checks for existing files and starts with the first missing, so you don&#8217;t have to download all the tiles&nbsp;again.</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="/posts/2014/connecting-to-secured-arcgis-server-layer-with-openlayers-3/" rel="bookmark" title="Permalink to Connecting To Secured ArcGIS Server Layer With OpenLayers 3">Connecting To Secured ArcGIS Server Layer With OpenLayers&nbsp;3</a></h1>
+            <small>Written on Sep 12, 2014
+        and marked as
+        <a href="/tag/javascript.html">javascript</a>,         <a href="/tag/openlayers.html">openlayers</a>,         <a href="/tag/ogc.html">ogc</a>        | <a href="/category/web-maps.html">web maps</a>
+        </small>
+        <section>
+            <p>I was made to use ArcGIS Server with <a href="http://openlayers.org">Openlayers 3</a> just recently as one of the projects I&#8217;ve been working on demands such different tools to work&nbsp;together.</p>
+<p><strong>tl;dr: I hate&nbsp;Esri.</strong></p>
+<p>I found myself in need to access secured layers published via <span class="caps">WMS</span> on ArcGIS Server using username and password I was given, so here&#8217;s a little how-to for anyone who would have to do the&nbsp;same.</p>
+<p>Let&#8217;s start with a simple ol.layer.Image and pretend this is the secured layer we&#8217;re looking&nbsp;for:</p>
+<div class="highlight"><pre><span></span>var layer = new ol.layer.Image({
+    extent: extent,
+    source: new ol.source.ImageWMS(/** @type {olx.source.ImageWMSOptions} */ ({
+        url: url,
+        params: {
+            &#39;LAYERS&#39;: &#39;layer&#39;,
+            &#39;CRS&#39;: &#39;EPSG:3857&#39;,
+        }
+    }))
+});
+</pre></div>
+
+
+<p>We need to retrieve the token, so we define a&nbsp;function:</p>
+<div class="highlight"><pre><span></span><span class="nt">function</span> <span class="nt">retrieveToken</span><span class="o">(</span><span class="nt">callback</span><span class="o">)</span> <span class="p">{</span>
+    <span class="n">var</span> <span class="n">req</span> <span class="o">=</span> <span class="n">new</span> <span class="n">XMLHttpRequest</span><span class="p">;</span>
+
+    <span class="n">req</span><span class="o">.</span><span class="n">onload</span> <span class="o">=</span> <span class="n">function</span><span class="p">()</span> <span class="err">{</span>
+        <span class="n">if</span> <span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;200&quot;</span><span class="p">)</span> <span class="err">{</span>
+            <span class="n">var</span> <span class="n">response</span> <span class="o">=</span> <span class="n">JSON</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">responseText</span><span class="p">);</span>
+            <span class="n">if</span> <span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">contents</span><span class="p">)</span> <span class="err">{</span>
+                <span class="n">callback</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">contents</span><span class="p">);</span> <span class="o">//</span> <span class="n">response</span> <span class="n">contents</span> <span class="n">is</span> <span class="n">where</span> <span class="n">the</span> <span class="n">token</span> <span class="n">is</span> <span class="n">stored</span>
+        <span class="p">}</span>
+    <span class="err">}</span><span class="o">;</span>
+    <span class="nt">req</span><span class="nc">.open</span><span class="o">(</span><span class="s2">&quot;get&quot;</span><span class="o">,</span> <span class="s2">&quot;http://server.address/arcgis/tokens/?request=getToken&amp;username=username&amp;password=password&amp;expiration=60&quot;</span><span class="o">,</span> <span class="nt">true</span><span class="o">);</span>
+    <span class="nt">req</span><span class="nc">.send</span><span class="o">()</span>
+<span class="err">}</span>
+</pre></div>
+
+
+<p>I pass a parameter called <code>callback</code> - that&#8217;s a very important step, otherwise you would not be able to retrieve the token when you actually need it (<span class="caps">AJAX</span> stands for asynchronous). Now you just pass the token to the layer params like&nbsp;this:</p>
+<div class="highlight"><pre><span></span>retrieveToken(function(token) {
+    layer.getSource().updateParams({
+        token: token
+    })
+}
+</pre></div>
+
+
+<p>When you open Firebug and inspect Network tab, you should find <code>token</code> <span class="caps">URL</span> parameter passed along with <span class="caps">WMS</span> <code>GetMap</code> request.</p>
+<p>Few&nbsp;sidenotes:</p>
+<ol>
+<li>Although you might be logged in ArcGIS Server via web interface, you might need to pass the <code>token</code>  <span class="caps">URL</span> param when trying to access Capabilities document. Don&#8217;t know why&nbsp;though.</li>
+<li>You should probably take care of calling the <code>retrieveToken()</code> in shorter interval than the token expiration is set to. Otherwise you might end up with invalid&nbsp;token.</li>
+<li>You need to hide the username and password from anonymous users (I guess that&#8217;s only possible with server side implementation of selective JavaScript&nbsp;loading).</li>
+</ol>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="/posts/2014/wmts-few-things-i-want-to-remember/" rel="bookmark" title="Permalink to WMTS: Few Things I Want To Remember"><span class="caps">WMTS</span>: Few Things I Want To&nbsp;Remember</a></h1>
+            <small>Written on Sep 10, 2014
+        and marked as
+        <a href="/tag/ogc.html">ogc</a>,         <a href="/tag/wmts.html">wmts</a>        | <a href="/category/web-maps.html">web maps</a>
+        </small>
+        <section>
+            <ul>
+<li>Used to serve prepared rectangular tiles; this means you are limited by web server speed rather than map server&nbsp;speed</li>
+<li>Several ways to retrieve tiles are defined: <span class="caps">KVP</span> and <span class="caps">REST</span> are mandatory, <span class="caps">SOAP</span> is&nbsp;optional</li>
+<li>Does not allow layer combination; additional tile matrix would have to be&nbsp;created</li>
+<li>GetCapabilities, GetTile and GetFeatureInfo requests are&nbsp;defined</li>
+<li><strong>tile</strong></li>
+<li>rectangular representation of&nbsp;space</li>
+<li>defined by tile and row&nbsp;indices</li>
+<li><strong>tile&nbsp;matrix</strong></li>
+<li>set of tiles for a given&nbsp;scale</li>
+<li><em>defined with:</em><ul>
+<li>tile size derived from standardized pixel size (0.28 &times; 0.28&nbsp;mm)</li>
+<li>tile width and tile height&nbsp;(px)</li>
+<li>left upper corner&nbsp;coordinates</li>
+<li>matrix width and height as number of&nbsp;tiles</li>
+</ul>
+</li>
+<li><strong>tile matrix&nbsp;set</strong></li>
+<li>set of tile matrices for different&nbsp;scales</li>
+</ul>
+<h3>Total count of tile&nbsp;matrices</h3>
+<p><em><code>nTileMatrices × nTiledStyles × nTiledFormats (if no dimensions are defined)</code></em></p>
+<h3>Total count of tiles in a tile&nbsp;matrix</h3>
+<p><em><code>matrixWidth × matrixHeight</code></em></p>
+<h3>Other&nbsp;equations</h3>
+<ul>
+<li><code>pixelSpan = scaleDenominator × 0.28 10<sup>3</sup> / metersPerUnit(crs);</code></li>
+<li><code>tileSpanX = tileWidth × pixelSpan;</code></li>
+<li><code>tileSpanY = tileHeight × pixelSpan;</code></li>
+<li><code>tileMatrixMaxX = tileMatrixMinX + tileSpanX × matrixWidth;</code></li>
+<li><code>tileMatrixMinY = tileMatrixMaxY - tileSpanY × matrixHeight;</code></li>
+</ul>
+<p><img src="/assets/wmts-few-things-i-want-to-remember/wmts.png" title="WMTS tiling schema" class="img-responsive centered"></p>
+        </section>
+        </div>
+    </div>
+
+<div class="pagination row">
+    <div class="large-6 columns">
+    </div>
+    <div class="large-6 columns">
+    </div>
+    <!-- <p class="paginator">
+    </p> -->
+</div>            </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns footer">
+                <footer>
+                    <address>
+                    Written by <a href="http://www.zimmi.cz">Michal Zimmermann</a>.
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    </address><!-- /#about -->
+                </footer><!-- /#contentinfo -->
+            </div>
+        </div>
+<script src="/theme/webassets-external/91ae19a44b6fd6f56de2d3a3a1e2f680_jquery.js"></script>
+<script src="/theme/webassets-external/1f857912fbcb91b33a7fbeafdecefa84_foundation.min.js"></script>
+<script>
+$(document).foundation();
+</script>
+</body>
+</html>

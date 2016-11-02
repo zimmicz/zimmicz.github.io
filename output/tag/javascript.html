@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+        <title>Michal Zimmermann | tag: javascript</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="/theme/webassets-external/fee07050f67182ee94565df0306e2583_foundation.min.css">
+        <link rel="stylesheet" href="/theme/webassets-external/c8d3bd219f818a16149faa6dc85ada3b_pygment.css">
+        <link rel="stylesheet" href="/theme/webassets-external/f19e9253fe1e12d62d57b9087abc5f7a_screen.css">
+</head>
+
+<body id="index" class="home">
+    <nav class="top-bar card-1" data-topbar role="navigation">
+        <ul class="title-area">
+            <li class="name">
+                <h1><a href="/posts">Home</a></h1>
+            </li>
+     <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+            <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+        </ul>
+        <section class="top-bar-section">
+    <!-- Right Nav Section -->
+            <ul class="right">
+                <li><a href="/categories">Categories</a></li>
+                <li><a href="/tags">Tags</a></li>
+                <li><a href="/feed.xml">RSS feed</a></li>
+            </ul>
+        </section>
+    </nav>
+        <div class="row">
+          <div class="large-12 columns header">
+            <h1><a href="/posts">Michal Zimmermann</a> <small>Pieces of knowledge from the world of GIS.</small></h1>
+          </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns">
+<h2 class="text-center">Articles tagged with javascript tag</h2>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="/posts/2016/introducing-blind-maps-project/" rel="bookmark" title="Permalink to Introducing Blind Maps Project">Introducing Blind Maps&nbsp;Project</a></h1>
+            <small>Written on Nov 2, 2016
+        and marked as
+        <a href="/tag/javascript.html">javascript</a>,         <a href="/tag/leaflet.html">leaflet</a>        | <a href="/category/web-maps.html">web maps</a>
+        </small>
+        <section>
+            <p>I&#8217;d like to introduce you to my little pet project, which might just as well be awarded <em>the first pet project I&#8217;ve ever completed</em>, called <a href="https://www.zimmi.cz/blind-maps">Blind maps</a>.</p>
+<p>It&#8217;s a very simple, yet useful web application built on top of the great <a href="../../tag/leaflet.html">Leaflet</a> library meant to help you get to know our world a bit better. As the name suggests, the app shows you, well&hellip; a blind map, and you try to fill as many features as you&nbsp;can.</p>
+<div class="text-center"><img src="/assets/introducing-blind-maps-project/map.png" /></div>
+
+<p>The app is ready and can be&nbsp;used:</p>
+<ul>
+<li>online at <a href="https://www.zimmi.cz/blind-maps/">Blind maps</a> with the map of your choice (if&nbsp;available)</li>
+<li>offline, downloaded to your computer and filled with whatever data you&nbsp;want</li>
+</ul>
+<p>What I find great about this project is the ease of adding new dataset. For starters, I filled it with data coming from <a href="naturalearthdata.com">Natural Earth</a>:</p>
+<ul>
+<li><span class="caps">CONUS</span>&nbsp;states</li>
+<li>European&nbsp;states</li>
+<li>World&nbsp;capitals</li>
+</ul>
+<p>If you wish, feel free to send me a pull request with GeoJSON data, I&#8217;ll be happy to have more datasets available! The process is described at the <a href="https://www.zimmi.cz/blind-maps">project homepage</a>.</p>
+<p>As you notice at the project homepage, there are two versions of the game&nbsp;available:</p>
+<ul>
+<li>one lets you find map features by their&nbsp;names</li>
+<li>the other one lets you type name highlighted feature (much&nbsp;tougher)</li>
+</ul>
+<p>Have&nbsp;fun!</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="/posts/2016/degrees-to-decimal-with-javascript-reworked/" rel="bookmark" title="Permalink to Degrees To Decimal With Javascript Reworked">Degrees To Decimal With Javascript&nbsp;Reworked</a></h1>
+            <small>Written on Oct 28, 2016
+        and marked as
+        <a href="/tag/javascript.html">javascript</a>        | <a href="/category/development.html">development</a>
+        </small>
+        <section>
+            <p>Two years ago I was pretty happy with <a href="https://www.zimmi.cz/posts/2014/degrees-to-decimal-with-javascript/">this little piece of code to transform degrees to the decimal value</a>. Yesterday, I found a neater way to do the&nbsp;same:</p>
+<div class="highlight"><pre><span></span><span class="kd">let</span> <span class="nx">deg</span> <span class="o">=</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">0</span><span class="p">];</span>
+
+<span class="kd">function</span> <span class="nx">degToDec</span><span class="p">(</span><span class="nx">prev</span><span class="p">,</span> <span class="nx">cur</span><span class="p">,</span> <span class="nx">curIndex</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">prev</span> <span class="o">+</span> <span class="nx">cur</span> <span class="o">/</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="nx">curIndex</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">deg</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">degToDec</span><span class="p">);</span>
+</pre></div>
+
+
+<p>Once you have an input array, that&#8217;s pretty much it. Love&nbsp;JavaScript.</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="/posts/2016/do-you-really-need-gulp-or-grunt-or-bower-or-what/" rel="bookmark" title="Permalink to Do You Really Need Gulp? Or Grunt? Or Bower? Or What?">Do You Really Need Gulp? Or Grunt? Or Bower? Or&nbsp;What?</a></h1>
+            <small>Written on Mar 20, 2016
+        and marked as
+        <a href="/tag/javascript.html">javascript</a>        | <a href="/category/development.html">development</a>
+        </small>
+        <section>
+            <p><strong>Disclaimer:</strong> I&#8217;m an enthuastic developer, but I do not code for a living. I&#8217;m just the ordinary guy who keeps editing a wrong file wondering why <em>the heck</em> the changes are not being&nbsp;applied.</p>
+<p><strong><span class="caps">TL</span>;<span class="caps">DR</span>:</strong> I do think <code>npm</code> might be the&nbsp;answer.</p>
+<h2>Wonderful world of JavaScript&nbsp;DevOps</h2>
+<p>When I first started using JavaScript on the server side with <code>node.js</code>, I felt overwhelmed by numerous options to automate tasks. There was <code>npm</code> taking care of backend dependencies. Then I would build a&nbsp;frontend and found out about <code>bower</code> for handling frontend dependencies. Then it would be great to have some kind of minification/obfuscation/uglification/you-name-it task. And the <code>build</code> task. And the <code>build:prod</code> task. And how about <code>eslint</code> task? And then I would end up spending hours doing nothing, just reading blogs about the tools being used by others who do code for a&nbsp;living.</p>
+<p><strong>Intermezzo:</strong> I think my coding is slow. Definitely slower than yours. I&#8217;m getting better&nbsp;though.</p>
+<h2>Using the&nbsp;force</h2>
+<p>Looking back I find it a bit stressful - how <em>the heck</em> do I choose the right tools? Where&#8217;s Yoda to help me out? Anyway, next to adopt after <code>npm</code> was <code>bower</code>. And I liked it, even though some packages were missing - but who cares as long as there is no better way, right? Except there is&hellip; I&nbsp;guess.</p>
+<p>Automation was next in the line to tackle. So I chose <code>gulp</code> without a bit of hesitation. It was a&nbsp;hype, a bigger than <code>grunt</code> back then. I even heard of <code>yeoman</code>, but until now I still don&#8217;t know what it actually does. And I&#8217;m happy with&nbsp;that.</p>
+<p>A short summary so&nbsp;far:</p>
+<ul>
+<li><code>npm</code> for backend&nbsp;dependencies</li>
+<li><code>bower</code> for frontend&nbsp;dependencies</li>
+<li><code>gulp</code> for running&nbsp;tasks</li>
+</ul>
+<p>So far, so&nbsp;good.</p>
+<h2>Is Bower going to&nbsp;die?</h2>
+<p>Then I stumbled upon this tweet and started panicking. Or rather started to feel cheated. <em>It took me time to set all this up and now it&#8217;s useless? Or&nbsp;what?</em></p>
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Bower development is stopped. Move to npm, if you haven&#39;t already. <a href="https://t.co/RQRcE7DT5V">https://t.co/RQRcE7DT5V</a></p>&mdash; Nacho Coloma (@nachocoloma) <a href="https://twitter.com/nachocoloma/status/663622545162280960">November 9, 2015</a></blockquote>
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<p>Seeing it now, I&#8217;m glad I read this. And I really don&#8217;t know what happened to Bower, if anything at&nbsp;all.</p>
+<h2>Keeping it&nbsp;simple</h2>
+<p>So Bower&#8217;s dying, what are you going to do about that? You&#8217;ll use <code>npm</code> instead! And you&#8217;ll have a&nbsp;single source of truth called <code>package.json</code>. You&#8217;l resolve all the dependencies with a single <code>npm install</code> command and feel like a king. We&#8217;re down to two now - <code>npm</code> and <code>gulp</code>.</p>
+<h2>Gulp, Gulp&nbsp;everywhere!</h2>
+<p>When you get rid of Bower, next feeling you have is your <code>gulpfile.js</code> just got off the leash. It got really big and grew to ~160 lines of code and became a nightmare to&nbsp;manage.</p>
+<p>So you split it into <a href="https://github.com/zimmicz/bookmap/commit/98a3ce451856e2beaac8fa2be9eb3b7e2878b0a7">task files</a> and a <a href="https://github.com/zimmicz/bookmap/commit/07eaf7d355a47ff9d08e5b7138791a67669534d6">config file</a>. What a relief. But you still realize a <strong>half</strong> of your <code>package.json</code> dependencies starts with <code>gulp-</code>. And you hate&nbsp;it.</p>
+<h2>Webpack for the&nbsp;win</h2>
+<p>For me, a non-developer, setting the <a href="https://webpack.github.io/">webpack</a> wasn&#8217;t easy. I didn&#8217;t find docs very helpful either. Reading the website for the first time, I didn&#8217;t even understand what it should be used for. I&nbsp;got it working eventually. And I got rid of <code>gulp</code>, <code>gulp-connect</code>, <code>gulp-less</code>, <code>gulp-nodemon</code>, <code>gulp-rename</code>, <code>gulp-replace</code>, <code>gulp-task-listing</code> and <code>gutil</code>. And the whole <code>gulpfile.js</code>. That was a big win for&nbsp;me.</p>
+<h2>But how do you run&nbsp;tasks?</h2>
+<p>Well&hellip;</p>
+<div class="highlight"><pre><span></span>npm run start-dev <span class="c1"># which in turn calls the code below</span>
+npm run start-webpack <span class="p">&amp;</span> <span class="nv">NODE_ENV</span><span class="o">=</span>development nodemon server.js <span class="c1"># where start-webpack does the following</span>
+node_modules/webpack-dev-server/bin/webpack-dev-server.js --quiet --inline --hot --watch
+</pre></div>
+
+
+<p>That&#8217;s it. If I need to build code, I run <code>npm run build</code>, which calls some other tasks from <code>scripts</code> section in the <code>package.json</code>.</p>
+<p>That&#8217;s pretty much it. I don&#8217;t think it&#8217;s a silver bullet, but I feel like I finally found peace of mind for my future JavaScript development. At least for a month or so before some other guy comes to&nbsp;town.</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="/posts/2015/twitter-rest-api-data-mining-on-openshift-part-ii/" rel="bookmark" title="Permalink to Twitter REST API Data Mining on OpenShift (Part II)">Twitter <span class="caps">REST</span> <span class="caps">API</span> Data Mining on OpenShift (Part <span class="caps">II</span>)</a></h1>
+            <small>Written on Dec 6, 2015
+        and marked as
+        <a href="/tag/javascript.html">javascript</a>,         <a href="/tag/openshift.html">openshift</a>,         <a href="/tag/twitter.html">twitter</a>        | <a href="/category/development.html">development</a>
+        </small>
+        <section>
+            <p>Last time I described <a href="/posts/2015/twitter-rest-api-data-mining-on-openshift-part-i/">the setup of my OpenShift Twitter crawler</a> and let it running and downloading data. It&#8217;s been more than two months since I started and I got interesting amount of data. I also made a simple <span class="caps">ETL</span> process to load it into my local PostGIS database, which I&#8217;d like to cover in this&nbsp;post.</p>
+<h2>Extract&nbsp;data</h2>
+<p>Each day is written to the separate sqlite file with a name like <code>tw_day_D_M_YYYY</code>. <code>Bash</code> is used to gzip all the files before downloading them from&nbsp;OpenShift.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+ssh openshift <span class="s">&lt;&lt; EOF</span>
+<span class="s">    cd app-root/data</span>
+<span class="s">    tar czf twitter.tar.gz *.db</span>
+<span class="s">EOF</span>
+
+scp openshift:/var/lib/openshift/55e487587628e1280b0000a9/app-root/data/twitter.tar.gz ./data
+<span class="nb">cd</span> data <span class="o">&amp;&amp;</span>
+tar -xzf twitter.tar.gz <span class="o">&amp;&amp;</span>
+<span class="nb">cd</span> -
+
+<span class="nb">echo</span> <span class="s2">&quot;Extract done&quot;</span>
+</pre></div>
+
+
+<h2>Transform&nbsp;data</h2>
+<p>The transformation part operates on downloaded files and merges them into one big <span class="caps">CSV</span> file. That&#8217;s pretty straightforward. Note that&#8217;s quite simple with sqlite flags, some <code>sed</code> and <code>tail</code> commands.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+rm -rf ./data/csv
+mkdir ./data/csv
+
+<span class="k">for</span> db in ./data/*.db<span class="p">;</span> <span class="k">do</span>
+    <span class="nv">FILENAME</span><span class="o">=</span><span class="k">$(</span>basename <span class="nv">$db</span><span class="k">)</span>
+    <span class="nv">DBNAME</span><span class="o">=</span><span class="si">${</span><span class="nv">FILENAME</span><span class="p">%%.db</span><span class="si">}</span>
+    <span class="nv">CSVNAME</span><span class="o">=</span><span class="nv">$DBNAME</span>.csv
+    <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$DBNAME</span><span class="s2"> to csv...&quot;</span>
+    sqlite3 -header -csv <span class="nv">$db</span> <span class="s2">&quot;select * from </span><span class="nv">$DBNAME</span><span class="s2">;&quot;</span> &gt; ./data/csv/<span class="nv">$CSVNAME</span>
+<span class="k">done</span>
+
+<span class="nb">cd</span> ./data/csv
+touch tweets.csv
+<span class="nb">echo</span> <span class="k">$(</span>sed -n 1p <span class="k">$(</span>ls -d -1 *.csv <span class="p">|</span> head -n 1<span class="k">))</span> &gt; tweets.csv <span class="c1"># get column names</span>
+
+<span class="k">for</span> csv in tw_*.csv<span class="p">;</span> <span class="k">do</span>
+    <span class="nb">echo</span> <span class="nv">$csv</span>
+    tail -n +2 <span class="nv">$csv</span> &gt;&gt; tweets.csv <span class="c1"># get all lines without the first one</span>
+<span class="k">done</span>
+</pre></div>
+
+
+<h2>Load&nbsp;data</h2>
+<p>In the last step, the data is loaded with <span class="caps">SQL</span> <code>\copy</code> command.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+<span class="nb">export</span> <span class="nv">PG_USE_COPY</span><span class="o">=</span>YES
+
+<span class="nv">DATABASE</span><span class="o">=</span>mzi_dizertace
+<span class="nv">SCHEMA</span><span class="o">=</span>dizertace
+<span class="nv">TABLE</span><span class="o">=</span>tweets
+
+psql <span class="nv">$DATABASE</span> <span class="s">&lt;&lt; EOF</span>
+<span class="s">    DROP TABLE IF EXISTS $SCHEMA.$TABLE;</span>
+<span class="s">    CREATE UNLOGGED TABLE $SCHEMA.$TABLE (id text, author text, author_id text, tweet text, created_at text, lon float, lat float, lang text);</span>
+<span class="s">    \copy $SCHEMA.$TABLE FROM &#39;data/csv/tweets.csv&#39; CSV HEADER DELIMITER &#39;,&#39;</span>
+<span class="s">    ALTER TABLE $SCHEMA.$TABLE ADD COLUMN wkb_geometry geometry(POINT, 4326);</span>
+<span class="s">    UPDATE $SCHEMA.$TABLE SET wkb_geometry = ST_SetSRID(ST_MakePoint(lon, lat), 4326);</span>
+<span class="s">    CREATE INDEX ${TABLE}_geom_idx ON $SCHEMA.$TABLE USING gist(wkb_geometry);</span>
+<span class="s">    COMMIT;</span>
+<span class="s">EOF</span>
+</pre></div>
+
+
+<h2>First&nbsp;statistics</h2>
+<p>Some interesting charts and numbers&nbsp;follow.</p>
+<p class="text-center"><img title="Top 100 Twitter users in the Czech Republic" src="/assets/twitter-rest-api-data-mining-on-openshift-part-ii/authors.png" class="img-responsive centered"></p>
+
+<p class="text-center"><img title="When people tweet in the Czech Republic" src="/assets/twitter-rest-api-data-mining-on-openshift-part-ii/hours.png" class="img-responsive centered"></p>
+
+<p class="text-center"><img title="Languages on Twitter in the Czech Republic" src="/assets/twitter-rest-api-data-mining-on-openshift-part-ii/languages.png" class="img-responsive centered"></p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="/posts/2015/postgis-case-study-vozejkmap-open-data-part-iii/" rel="bookmark" title="Permalink to PostGIS Case Study: Vozejkmap Open Data (Part III)">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">III</span>)</a></h1>
+            <small>Written on Nov 14, 2015
+        and marked as
+        <a href="/tag/postgresql.html">postgresql</a>,         <a href="/tag/postgis.html">postgis</a>,         <a href="/tag/leaflet.html">leaflet</a>,         <a href="/tag/javascript.html">javascript</a>        | <a href="/category/web-maps.html">web maps</a>
+        </small>
+        <section>
+            <p>After a while I got back to my <a href="/posts/2014/postgis-case-study-vozejkmap-open-data-part-i/">PostGIS open data</a> <a href="/posts/2015/postgis-case-study-vozejkmap-open-data-part-ii/">case study</a>. Last time I left it with clustering implemented, looking forward to incorporate <a href="http://turfjs.org">Turf.js</a> in the future. <em>And the future is now.</em> <a href="https://github.com/zimmicz/vozejkmap-to-postgis">The code is still available on&nbsp;GitHub.</a></p>
+<h2>Subgroup&nbsp;clustering</h2>
+<p>Vozejkmap data is categorized based on the place type (banks, parking lots, pubs, &hellip;). One of the core features of map showing such data should be the easy way to turn these categories on and&nbsp;off.</p>
+<p>As far as I know, it&#8217;s not trivial to do this with the standard Leaflet library. Extending <code>L.control.layers</code> and implement its <code>addOverlay</code>, <code>removeOverlay</code> methods on your own might be the way to add needed behavior. Fortunately, there&#8217;s an easier option thanks to <a href="https://github.com/ghybs/Leaflet.FeatureGroup.SubGroup">Leaflet.FeatureGroup.SubGroup</a> that can handle such use case and is really straightforward. See the code&nbsp;below.</p>
+<div class="highlight"><pre><span></span><span class="nx">cluster</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">markerClusterGroup</span><span class="p">({</span>
+    <span class="nx">chunkedLoading</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nx">chunkInterval</span><span class="o">:</span> <span class="mi">500</span>
+<span class="p">});</span>
+
+<span class="nx">cluster</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
+
+<span class="p">...</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">category</span> <span class="k">in</span> <span class="nx">categories</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// just use L.featureGroup.subGroup instead of L.layerGroup or L.featureGroup</span>
+    <span class="nx">overlays</span><span class="p">[</span><span class="nx">my</span><span class="p">.</span><span class="nx">Style</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="nx">category</span><span class="p">).</span><span class="nx">type</span><span class="p">]</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">featureGroup</span><span class="p">.</span><span class="nx">subGroup</span><span class="p">(</span><span class="nx">cluster</span><span class="p">,</span> <span class="nx">categories</span><span class="p">[</span><span class="nx">category</span><span class="p">]);</span>
+<span class="p">}</span>
+
+<span class="nx">mapkey</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">control</span><span class="p">.</span><span class="nx">layers</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">overlays</span><span class="p">).</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
+</pre></div>
+
+
+<p>With this piece of code you get a map key with checkboxes for all the categories, yet they&#8217;re still kept in the single cluster on the map.&nbsp;Brilliant!</p>
+<p><img src="/assets/postgis-case-study-vozejkmap-open-data-part-iii/map.png" title="vozejkmap.cz data map" class="img-responsive centered"></p>
+<h2>Using Turf.js for&nbsp;analysis</h2>
+<p>Turf is one of those libraries I get amazed easily with, spending a week trying to find a use case, finally putting it aside with <em>&#8220;I&#8217;ll get back to it later&#8221;</em>. I usually don&#8217;t. This time it&#8217;s&nbsp;different.</p>
+<p>I use Turf to get the nearest neighbor for any marker on click. My first try ended up with the same marker being the result as it was a member of a feature collection passed to <code>turf.nearest()</code> method. After snooping around the docs I found <code>turf.remove()</code> method that can filter GeoJSON based on key-value&nbsp;pair.</p>
+<p>Another handy function is <code>turf.distance()</code> that gives you distance between two points. The code below adds an information about the nearest point and its distance into the&nbsp;popup.</p>
+<div class="highlight"><pre><span></span><span class="c1">// data is a geojson feature collection</span>
+<span class="nx">json</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">geoJson</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span> <span class="p">{</span>
+    <span class="nx">onEachFeature</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">feature</span><span class="p">,</span> <span class="nx">layer</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">layer</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;click&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kd">var</span> <span class="nx">nearest</span> <span class="o">=</span> <span class="nx">turf</span><span class="p">.</span><span class="nx">nearest</span><span class="p">(</span><span class="nx">layer</span><span class="p">.</span><span class="nx">toGeoJSON</span><span class="p">(),</span> <span class="nx">turf</span><span class="p">.</span><span class="nx">remove</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="nx">feature</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">title</span><span class="p">)),</span>
+                <span class="nx">distance</span> <span class="o">=</span> <span class="nx">turf</span><span class="p">.</span><span class="nx">distance</span><span class="p">(</span><span class="nx">layer</span><span class="p">.</span><span class="nx">toGeoJSON</span><span class="p">(),</span> <span class="nx">nearest</span><span class="p">,</span> <span class="s2">&quot;kilometers&quot;</span><span class="p">).</span><span class="nx">toPrecision</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+                <span class="nx">popup</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">popup</span><span class="p">({</span><span class="nx">offset</span><span class="o">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">35</span><span class="p">]}).</span><span class="nx">setLatLng</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">latlng</span><span class="p">),</span>
+                <span class="nx">content</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">Util</span><span class="p">.</span><span class="nx">template</span><span class="p">(</span>
+                    <span class="s2">&quot;&lt;h1&gt;{title}&lt;/h1&gt;&lt;p&gt;{description}&lt;/p&gt; \</span>
+<span class="s2">                    &lt;p&gt;Nejbližší bod: {nearest} je {distance} km daleko.&lt;/p&gt;&quot;</span><span class="p">,</span> <span class="p">{</span>
+                    <span class="nx">title</span><span class="o">:</span> <span class="nx">feature</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">title</span><span class="p">,</span>
+                    <span class="nx">description</span><span class="o">:</span> <span class="nx">feature</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">description</span><span class="p">,</span>
+                    <span class="nx">nearest</span><span class="o">:</span> <span class="nx">nearest</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">title</span><span class="p">,</span>
+                    <span class="nx">distance</span><span class="o">:</span> <span class="nx">distance</span>
+                <span class="p">});</span>
+
+            <span class="nx">popup</span><span class="p">.</span><span class="nx">setContent</span><span class="p">(</span><span class="nx">content</span><span class="p">);</span>
+            <span class="nx">popup</span><span class="p">.</span><span class="nx">openOn</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
+
+            <span class="p">...</span>
+</pre></div>
+
+
+<p>From what I&#8217;ve tried so far, Turf seems to be incredibly fast and easy to use. I&#8217;ll try to find the nearest point for any of the categories, that could take Turf some&nbsp;time.</p>
+<h2>Update</h2>
+<p>Turf is blazing fast! I&#8217;ve implemented nearest point for each of the categories and it gets done in a blink of an eye. Some screenshots below. Geolocation implemented as&nbsp;well.</p>
+<p><img src="/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen1.png" title="vozejkmap.cz data map" class="img-responsive centered"> You can locate the point&nbsp;easily.</p>
+
+<p><img src="/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen2.png" title="vozejkmap.cz data map" class="img-responsive centered"> You can hide the&nbsp;infobox.</p>
+
+<p><img src="/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen3.png" title="vozejkmap.cz data map" class="img-responsive centered">You can jump to any of the nearest&nbsp;places.</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="/posts/2015/twitter-rest-api-data-mining-on-openshift-part-i/" rel="bookmark" title="Permalink to Twitter REST API Data Mining on OpenShift (Part I)">Twitter <span class="caps">REST</span> <span class="caps">API</span> Data Mining on OpenShift (Part&nbsp;I)</a></h1>
+            <small>Written on Nov 6, 2015
+        and marked as
+        <a href="/tag/javascript.html">javascript</a>,         <a href="/tag/openshift.html">openshift</a>,         <a href="/tag/twitter.html">twitter</a>        | <a href="/category/development.html">development</a>
+        </small>
+        <section>
+            <p>More than a year ago I wrote about <a href="http://www.zimmi.cz/posts/2014/analyzing-twitter-languages-with-streaming-api/">analyzing Twitter languages with Streaming <span class="caps">API</span></a>. Back then I kept my laptop running for a week to download data. Not a comfortable way, especially if you decide to get more data. One year uptime doesn&#8217;t sound like anything you want to be part of. <a href="https://www.openshift.com/">OpenShift</a> by Red Hat seems to be almost perfect replacement.&nbsp;Almost.</p>
+<h2>OpenShift&nbsp;setup</h2>
+<p>I started with Node.js application running on one small gear. Once running, you can easily <code>git push</code> the code to your OpenShift repo and login via <span class="caps">SSH</span>. I quickly found simple copy-pasting my local solution wasn&#8217;t going to work. and fixed it with some minor tweaks. That&#8217;s where the fun&nbsp;begins&#8230;</p>
+<blockquote>
+<p>I based the downloader on Node.js a year ago. Until now I still don&#8217;t get how that piece of software works. Frankly, I don&#8217;t really care as long as it&nbsp;works.</p>
+</blockquote>
+<h3>Pitfalls</h3>
+<p>If your application doesn&#8217;t generate any traffic, <strong>OpenShift turns it off</strong>. It wakes up once someone visits again. I had no idea about that and spent some time trying to stop that behavior. Obviously, I could have scheduled a cron job on my laptop pinging it every now and then. Luckily, OpenShift can run cron jobs itself. All you need is to embed a cron cartridge into the running application (and install a bunch of ruby dependencies&nbsp;beforehand).</p>
+<div class="highlight"><pre><span></span>rhc cartridge add cron-1.4 -a app-name
+</pre></div>
+
+
+<p>Then create <code>.openshift/cron/{hourly,daily,weekly,monthly}</code> folder in the git repository and put your script running a simple curl command into one of&nbsp;those.</p>
+<div class="highlight"><pre><span></span>curl http://social-zimmi.rhcloud.com &gt; /dev/null
+</pre></div>
+
+
+<p>Another problem was just around the corner. Once in a while, the app stopped writing data to the database without saying a word. What helped was restarting it - the only automatic way to do so being a <code>git push</code> command. Sadly, I haven&#8217;t found a way to restart the app from within itself; it probably can&#8217;t be&nbsp;done.</p>
+<p>When you <code>git push</code>, the gear stops, builds, deploys and restarts the app. By using hot deployment you can minimize the downtime. Just put the <code>hot_deploy</code> file into <code>.openshift/markers</code> folder.</p>
+<div class="highlight"><pre><span></span>git commit --allow-empty -m <span class="s2">&quot;Restart gear&quot;</span> <span class="o">&amp;&amp;</span> git push
+</pre></div>
+
+
+<p>This solved the problem until I realize that <strong>every restart deleted all the data</strong> collected so far. If your data are to stay safe and sound, <strong>save them in <code>process.env.OPENSHIFT_DATA_DIR</code></strong> (which is <code>app-root/data</code>).</p>
+<h3>Anacron to the&nbsp;rescue</h3>
+<p>How do you push an empty commit once a day? With cron of course. Even better, <strong>anacron</strong>.</p>
+<div class="highlight"><pre><span></span>mkdir ~/.anacron
+<span class="nb">cd</span> ~/.anacron
+mkdir cron.daily cron.weekly cron.monthly spool etc
+
+cat <span class="s">&lt;&lt;EOT &gt; ~/.anacron/etc/anacrontab</span>
+
+<span class="s">SHELL=/bin/sh</span>
+<span class="s">PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/$HOME/bin</span>
+<span class="s">HOME=$HOME</span>
+<span class="s">LOGNAME=$USER</span>
+
+<span class="s">1 5  daily-cron nice run-parts --report $HOME/.anacron/cron.daily</span>
+<span class="s">7 10 weekly-cron nice run-parts --report $HOME/.anacron/cron.weekly</span>
+<span class="s">@monthly 15 monthly-cron nice run-parts --report $HOME/.anacron/cron.monthly</span>
+
+<span class="s">EOT</span>
+
+cat <span class="s">&lt;&lt;EOT &gt;&gt; ~/.zprofile # I use zsh shell</span>
+<span class="s">rm -f $HOME/.anacron/anacron.log</span>
+<span class="s">/usr/sbin/anacron -t /home/zimmi/.anacron/etc/anacrontab -S /home/zimmi/.anacron/spool &amp;&gt; /home/zimmi/.anacron/anacron.log</span>
+
+<span class="s">EOT</span>
+</pre></div>
+
+
+<p>Anacron is to laptop what cron is to 24/7 running server. It just runs automatic jobs when the laptop is running. If it&#8217;s not and the job should be run, it runs it once the <span class="caps">OS</span> boots. Brilliant&nbsp;idea.</p>
+<p>It runs the following code for me to keep the app writing data to the&nbsp;database.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+<span class="nv">workdir</span><span class="o">=</span><span class="s1">&#39;/home/zimmi/documents/zimmi/dizertace/social&#39;</span>
+<span class="nv">logfile</span><span class="o">=</span><span class="nv">$workdir</span>/restart-gear.log
+date &gt; <span class="nv">$logfile</span>
+
+<span class="o">{</span> 
+<span class="nv">HOME</span><span class="o">=</span>/home/zimmi
+<span class="nb">cd</span> <span class="nv">$workdir</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
+git merge origin/master <span class="o">&amp;&amp;</span> <span class="se">\</span>
+git commit --allow-empty -m <span class="s2">&quot;Restart gear&quot;</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
+git push <span class="o">&amp;&amp;</span> <span class="se">\</span>
+<span class="nb">echo</span> <span class="s2">&quot;Success&quot;</span> <span class="p">;</span> 
+<span class="o">}</span> &gt;&gt; <span class="nv">$logfile</span> 2&gt;<span class="p">&amp;</span>1
+</pre></div>
+
+
+<p><strong><span class="caps">UPDATE</span>:</strong> Spent a long time debugging the &#8220;Permission denied (publickey).&#8221;-like errors. What seems to help&nbsp;is:</p>
+<ol>
+<li>Use id_rsa instead of any other <span class="caps">SSH</span>&nbsp;key</li>
+<li>Put a new entry into the <code>~/.ssh/config</code> file</li>
+</ol>
+<p>I don&#8217;t know which one did the magic&nbsp;though.</p>
+<p>I&#8217;ve been harvesting Twitter for a month with about 10-15K tweets a day (only interested in the Czech Republic). 
+<sup>1</sup>&frasl;<sub>6</sub> to <sup>1</sup>&frasl;<sub>5</sub> of them is located with latitude and longitude. More on this next&nbsp;time.</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="/posts/2015/leaflet-with-custom-crs-epsg5514/" rel="bookmark" title="Permalink to Leaflet With Custom CRS (EPSG:5514)">Leaflet With Custom <span class="caps">CRS</span> (<span class="caps">EPSG</span>:5514)</a></h1>
+            <small>Written on Jan 15, 2015
+        and marked as
+        <a href="/tag/javascript.html">javascript</a>,         <a href="/tag/leaflet.html">leaflet</a>        | <a href="/category/development.html">development</a>
+        </small>
+        <section>
+            <p>If you ever find yourself in need to use custom projection with Leaflet, feel free to start with this example of <a href="https://github.com/zimmicz/leaflet-custom-crs-jtsk">Czech national coordinate system</a>. All you need is <a href="http://leafletjs.com">Leaflet</a>, <a href="http://proj4js.org/">proj4.js</a> and <a href="https://github.com/kartena/Proj4Leaflet">proj4 for Leaflet plugin</a>. I&#8217;m still not sure how <code>origin</code> coordinates work&nbsp;though.</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="/posts/2014/connecting-to-secured-arcgis-server-layer-with-openlayers-3/" rel="bookmark" title="Permalink to Connecting To Secured ArcGIS Server Layer With OpenLayers 3">Connecting To Secured ArcGIS Server Layer With OpenLayers&nbsp;3</a></h1>
+            <small>Written on Sep 12, 2014
+        and marked as
+        <a href="/tag/javascript.html">javascript</a>,         <a href="/tag/openlayers.html">openlayers</a>,         <a href="/tag/ogc.html">ogc</a>        | <a href="/category/web-maps.html">web maps</a>
+        </small>
+        <section>
+            <p>I was made to use ArcGIS Server with <a href="http://openlayers.org">Openlayers 3</a> just recently as one of the projects I&#8217;ve been working on demands such different tools to work&nbsp;together.</p>
+<p><strong>tl;dr: I hate&nbsp;Esri.</strong></p>
+<p>I found myself in need to access secured layers published via <span class="caps">WMS</span> on ArcGIS Server using username and password I was given, so here&#8217;s a little how-to for anyone who would have to do the&nbsp;same.</p>
+<p>Let&#8217;s start with a simple ol.layer.Image and pretend this is the secured layer we&#8217;re looking&nbsp;for:</p>
+<div class="highlight"><pre><span></span>var layer = new ol.layer.Image({
+    extent: extent,
+    source: new ol.source.ImageWMS(/** @type {olx.source.ImageWMSOptions} */ ({
+        url: url,
+        params: {
+            &#39;LAYERS&#39;: &#39;layer&#39;,
+            &#39;CRS&#39;: &#39;EPSG:3857&#39;,
+        }
+    }))
+});
+</pre></div>
+
+
+<p>We need to retrieve the token, so we define a&nbsp;function:</p>
+<div class="highlight"><pre><span></span><span class="nt">function</span> <span class="nt">retrieveToken</span><span class="o">(</span><span class="nt">callback</span><span class="o">)</span> <span class="p">{</span>
+    <span class="n">var</span> <span class="n">req</span> <span class="o">=</span> <span class="n">new</span> <span class="n">XMLHttpRequest</span><span class="p">;</span>
+
+    <span class="n">req</span><span class="o">.</span><span class="n">onload</span> <span class="o">=</span> <span class="n">function</span><span class="p">()</span> <span class="err">{</span>
+        <span class="n">if</span> <span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;200&quot;</span><span class="p">)</span> <span class="err">{</span>
+            <span class="n">var</span> <span class="n">response</span> <span class="o">=</span> <span class="n">JSON</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">responseText</span><span class="p">);</span>
+            <span class="n">if</span> <span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">contents</span><span class="p">)</span> <span class="err">{</span>
+                <span class="n">callback</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">contents</span><span class="p">);</span> <span class="o">//</span> <span class="n">response</span> <span class="n">contents</span> <span class="n">is</span> <span class="n">where</span> <span class="n">the</span> <span class="n">token</span> <span class="n">is</span> <span class="n">stored</span>
+        <span class="p">}</span>
+    <span class="err">}</span><span class="o">;</span>
+    <span class="nt">req</span><span class="nc">.open</span><span class="o">(</span><span class="s2">&quot;get&quot;</span><span class="o">,</span> <span class="s2">&quot;http://server.address/arcgis/tokens/?request=getToken&amp;username=username&amp;password=password&amp;expiration=60&quot;</span><span class="o">,</span> <span class="nt">true</span><span class="o">);</span>
+    <span class="nt">req</span><span class="nc">.send</span><span class="o">()</span>
+<span class="err">}</span>
+</pre></div>
+
+
+<p>I pass a parameter called <code>callback</code> - that&#8217;s a very important step, otherwise you would not be able to retrieve the token when you actually need it (<span class="caps">AJAX</span> stands for asynchronous). Now you just pass the token to the layer params like&nbsp;this:</p>
+<div class="highlight"><pre><span></span>retrieveToken(function(token) {
+    layer.getSource().updateParams({
+        token: token
+    })
+}
+</pre></div>
+
+
+<p>When you open Firebug and inspect Network tab, you should find <code>token</code> <span class="caps">URL</span> parameter passed along with <span class="caps">WMS</span> <code>GetMap</code> request.</p>
+<p>Few&nbsp;sidenotes:</p>
+<ol>
+<li>Although you might be logged in ArcGIS Server via web interface, you might need to pass the <code>token</code>  <span class="caps">URL</span> param when trying to access Capabilities document. Don&#8217;t know why&nbsp;though.</li>
+<li>You should probably take care of calling the <code>retrieveToken()</code> in shorter interval than the token expiration is set to. Otherwise you might end up with invalid&nbsp;token.</li>
+<li>You need to hide the username and password from anonymous users (I guess that&#8217;s only possible with server side implementation of selective JavaScript&nbsp;loading).</li>
+</ol>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="/posts/2014/degrees-to-decimal-with-javascript/" rel="bookmark" title="Permalink to Degrees To Decimal With Javascript">Degrees To Decimal With&nbsp;Javascript</a></h1>
+            <small>Written on Sep 9, 2014
+        and marked as
+        <a href="/tag/javascript.html">javascript</a>        | <a href="/category/development.html">development</a>
+        </small>
+        <section>
+            <p>I have found a nice way to get decimal value from degrees of longitude and latitude&nbsp;recently:</p>
+<div class="highlight"><pre><span></span><span class="kd">function</span> <span class="nx">format</span><span class="p">(</span><span class="nx">coords</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">decimal</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="nx">output</span>  <span class="o">=</span> <span class="p">[],</span>
+        <span class="nx">coords</span>  <span class="o">=</span> <span class="nx">coords</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;  &#39;</span><span class="p">);</span> <span class="c1">// it might be &lt;br&gt; as well</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">coords</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">c</span> <span class="o">=</span> <span class="nx">coords</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">);</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">j</span> <span class="o">&lt;</span> <span class="nx">c</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">j</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">decimal</span> <span class="o">+=</span> <span class="nx">c</span><span class="p">[</span><span class="nx">j</span><span class="p">]</span> <span class="o">/</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="nx">j</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="nx">output</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nb">parseFloat</span><span class="p">(</span><span class="nx">decimal</span><span class="p">).</span><span class="nx">toFixed</span><span class="p">(</span><span class="mi">5</span><span class="p">));</span>
+        <span class="nx">decimal</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nx">prompt</span><span class="p">(</span><span class="s1">&#39;Souřadnice bodu&#39;</span><span class="p">,</span> <span class="nx">output</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="p">));</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>When you call <code>format("DD° MM' SS'  DD° MM' SS'");</code> you&#8217;ll get decimal value in return (or <code>prompt</code> to be accurate). What I like the most about this solution is the usage of Math.pow(). I think it is a neat way to transform the values as you need to divide parts of latitude or longitude by 60<sup>0</sup>, 60<sup>1</sup> and 60<sup>2</sup> respectively.</p>
+<p>There is definitely a googol of different solutions to this task, I just liked the simplicity of this&nbsp;one.</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="/posts/2014/analyzing-twitter-languages-with-streaming-api/" rel="bookmark" title="Permalink to Analyzing Twitter Languages With Streaming API">Analyzing Twitter Languages With Streaming <span class="caps">API</span></a></h1>
+            <small>Written on Sep 2, 2014
+        and marked as
+        <a href="/tag/javascript.html">javascript</a>,         <a href="/tag/leaflet.html">leaflet</a>,         <a href="/tag/twitter.html">twitter</a>        | <a href="/category/development.html">development</a>
+        </small>
+        <section>
+            <p>I am writing a diploma thesis focused on extracting spatial data from social networks. I have been working mainly with Twitter <span class="caps">API</span> and results I have got so far look really promising. This post was written as a reaction to many retweets I got when I shared one of my visualizations. It aims to make it clear how to connect to Twitter Streaming <span class="caps">API</span> using <a href="http://nodejs.org/">node.js</a>, <a href="http://leafletjs.com/">Leaflet</a> and <a href="http://sqlite.org/">SQLite</a> and retrieve tweets to analyze them&nbsp;later.</p>
+
+<p>If you have any further questions after reading this paper, feel free to contact me via <a href="https://twitter.com/zimmicz">Twitter</a> or <a href="mailto:zimmicz@gmail.com">e-mail</a>. I must say right here <strong>that the code will be shared as well as the map</strong>, but there are still some bugs/features I would like to&nbsp;remove/add.</p>
+
+<p><small>On a side note: I have been studying cartography and <span class="caps">GIS</span> for the last five years at Masaryk University in Brno, Czech Republic. I am mostly interested in ways computers can make data handling easier. I&nbsp;like to code in Python.</small></p>
+
+<h3>Using Twitter Streaming <span class="caps">API</span></h3>
+
+<p>As you probably know, Twitter offers three different&nbsp;APIs:</p>
+
+<ul>
+<li><span class="caps">REST</span> <span class="caps">API</span> which is obviously RESTful. You can access almost every piece of information on Twitter with this one: tweets, users, places, retweets,&nbsp;followers&#8230;</li>
+<li>Search <span class="caps">API</span> used for getting search results. You can customize these by sending parameters with your&nbsp;requests.</li>
+<li><strong>Streaming <span class="caps">API</span></strong> which I am going to tell you about. It is really different, as (again, obviously) it keeps streaming tweets from the time you connect to the server. This means, once the connection is made, it has to stay open as long as you want tweets coming to you. The important thing here is that you get real time tweets delivered to you via this <abbr title="Twitter only delivers a sample of tweets, not the whole traffic.">stream</abbr>, which implies you cannot use this <span class="caps">API</span> to get tweets already&nbsp;tweeted.</li>
+</ul>
+
+<p><strong>To sum it up: You get a small sample of tweets in a real time as long as the connection to the server stays&nbsp;open.</strong></p>
+
+<h3>What you&nbsp;need</h3>
+
+<p>To use any of the Twitter APIs, you need to authenticate you (or your app) against Twitter via OAuth protocol. To be able to do so, you need a Twitter account, because only then you can <a href="https://dev.twitter.com/">create apps</a>, obtain access tokens and get authenticated for <span class="caps">API</span>&nbsp;use.</p>
+
+<p>And then, obviously, you need something to connect to server with. I chose <strong>node.js</strong> because it seemed as a good tool to keep connection alive. I have also been interested in this technology for the couple of months but never really had a task to use it&nbsp;for.</p>
+
+<p>The good thing about node.js is that it comes with lots of handy libraries. You get <strong>socket.io</strong> for streaming, <strong>ntwitter</strong> for using Twitter <span class="caps">API</span> and <strong>sqlite3</strong> for working with SQLite&nbsp;databases.</p>
+
+<p>You need something to store the data in also. As mentioned, I picked SQLite for this task. It is lightweight, does not need server nor configuration to run, just what I was looking for. Seems we are set to go,&nbsp;right?</p>
+
+<h3>Filtering the&nbsp;data</h3>
+
+<p>I guess none of you is interested in obtaining random tweets from around the world, neither was I. I live in the Czech republic and that is the area I want to get tweets from.&nbsp;How?</p>
+
+<p>It is fairly simple, you tell Twitter with the <code>locations</code> parameter of <a href="https://dev.twitter.com/docs/api/1.1/post/statuses/filter"><code>statuses/filter</code></a> resource. This parameter specifies a set of bounding boxes to&nbsp;track.</p>
+
+<p><strong>To sum it up: you connect to the server and tell it you just want to get tweets from the area you specified with the <code>locations</code> parameter. The server understands and keeps you&nbsp;posted.</strong></p>
+
+<h4>Is it that&nbsp;simple?</h4>
+
+<p>No. Twitter decides whether to post you the tweet or not according to what the value of coordinates field is. It goes like&nbsp;this:</p>
+
+<ol>
+<li>If the <code>coordinates</code> field is not empty, it gets tested against the bounding box. If it matches, it is sent to the&nbsp;stream.</li>
+<li>If the <code>coordinates</code> field is empty, but the <code>place</code> field is not, it is the <code>place</code> field that gets checked. If if it by any extent intersects the bounding box, it is sent to the&nbsp;stream.</li>
+<li>If both of the fields are empty, nothing is&nbsp;sent.</li>
+</ol>
+
+<p>I decided to throw away the tweets with the empty <code>coordinates</code> field, because the accuracy of the value specified in the place field can be generally considered very low and insufficient for my purposes. You still need to account for position inaccuracies of users&#8217; devices though, however that is not something that we can deal with. <em>Let us just assume that geotagged tweets are&nbsp;accurate.</em></p>
+
+<div class="text-center"><img src="/assets/analyzing-twitter-languages-with-streaming-api/cr.png" width="50%" height="50%" title="Geotagged tweets" class="img-rounded"><p><strong>Figure:</strong> Twitter seems not to be very accurate when matching tweets against bounding&nbsp;box.</p></div>
+
+<p>Although, as you can see in the picture, they are not. Or they are, but Twitter is not good at telling so. Besides that, none of the countries in the world is shaped like a rectangle and we would need to clip the data anyway. That is where SQLite comes in, because I have been saving incoming tweets right into the&nbsp;database.</p>
+
+<p>If you use any <span class="caps">GUI</span> manager (sqlitebrowser for Linux is just fine), you can easily export your data to the <span class="caps">CSV</span> file, load it into <span class="caps">QGIS</span>, clip it with Natural Earth countries shapefile and save them to the GeoJSON file. It is just a matter of few JavaScript lines of code to put GeoJSON on a Leaflet&nbsp;map.</p>
+
+<h3>Displaying the&nbsp;data</h3>
+
+<p>Once a GeoJSON file is ready, it can be used for making an appealing viz to get a sense of what may be called &#8220;nationalities spatial patterns&#8221;. The <code>lang</code> field (stored in the database, remember?) of every tweet is used to colour the marker accordingly. Its value represents a two-letter language code as specified in <span class="caps">ISO</span> 639-1&nbsp;document.</p>
+
+<p>However, as those codes are guessed by Twitter&#8217;s language algorithms, they are prone to error. There are actually three scenarios we might be&nbsp;facing:</p>
+
+<ol>
+<li>User tweets in the same language as used in the Twitter&nbsp;account.</li>
+<li>User tweets in his/her mother language, but has set different Twitter account&nbsp;language.</li>
+<li>User does not tweet in his/her mother language, but has it set as a Twitter account&nbsp;language.</li>
+</ol>
+
+<p>We basically have to deal with 2) and 3), because 1) means we can be pretty sure what nationality the user is. Sadly though, I have not found an easy way to tell which one of these two we came across, thus which language settings should be prioritized. I made an arbitrary decision to prioritize the language the tweet was written in, based on assumption that <strong>the most of the users tweet in their mother language</strong>. No matter what you do, the data is still going to be biased by automatically generated tweets, especially ones sent by Foursquare saying &#8220;I&#8217;m at @WhateverBarItIs (http://someurl.co)&#8221;. It works fine for the strange languages like Russian and Arabic&nbsp;though.</p>
+
+<p>From Jan 2 to Jan 4 this year 5,090 tweets were collected. Leaflet is becoming a little sluggish without clustering turned on displaying all of them. Plans are to let the collection run until Jan 7 and then put all the tweets on the map. I guess that might be around 10,000 geotagged tweets by that&nbsp;time.</p>
+
+<p>I am definitely willing to share the <abbr title="Do not expect much, it was my first time with node.js">code</abbr> and the final viz. Meanwhile, you can have a look at the screenshot on picture [*]. I have already implemented nationality switch (legend items are clickable) and I would like to add a day/night switch to see whether there are any differences between the peoples&#8217;&nbsp;behaviour. </p>
+
+<div class="text-center"><img width="60%" height="60%" src="/assets/analyzing-twitter-languages-with-streaming-api/screenshot.png" title="Final geoviz using Leaflet" class="img-rounded"><p><strong>Figure:</strong> Final map screenshot. A legend is used to turn nationalities on and off. You are looking at Prague by the&nbsp;way.</p></div>
+
+<p>Obviously the most tweets were sent from the most populated places, e.g. Prague, Brno,&nbsp;Ostrava. </p>
+        </section>
+        </div>
+    </div>
+
+<div class="pagination row">
+    <div class="large-6 columns">
+    </div>
+    <div class="large-6 columns">
+            <a href="/tag/javascript2.html" class="button card card-1">Next page &raquo;</a>
+    </div>
+    <!-- <p class="paginator">
+            <a href="/tag/javascript2.html" class="button card card-1">Next page &raquo;</a>
+    </p> -->
+</div>            </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns footer">
+                <footer>
+                    <address>
+                    Written by <a href="http://www.zimmi.cz">Michal Zimmermann</a>.
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    </address><!-- /#about -->
+                </footer><!-- /#contentinfo -->
+            </div>
+        </div>
+<script src="/theme/webassets-external/91ae19a44b6fd6f56de2d3a3a1e2f680_jquery.js"></script>
+<script src="/theme/webassets-external/1f857912fbcb91b33a7fbeafdecefa84_foundation.min.js"></script>
+<script>
+$(document).foundation();
+</script>
+</body>
+</html>

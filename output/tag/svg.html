@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+        <title>Michal Zimmermann | tag: svg</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="/theme/webassets-external/fee07050f67182ee94565df0306e2583_foundation.min.css">
+        <link rel="stylesheet" href="/theme/webassets-external/c8d3bd219f818a16149faa6dc85ada3b_pygment.css">
+        <link rel="stylesheet" href="/theme/webassets-external/f19e9253fe1e12d62d57b9087abc5f7a_screen.css">
+</head>
+
+<body id="index" class="home">
+    <nav class="top-bar card-1" data-topbar role="navigation">
+        <ul class="title-area">
+            <li class="name">
+                <h1><a href="/posts">Home</a></h1>
+            </li>
+     <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+            <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+        </ul>
+        <section class="top-bar-section">
+    <!-- Right Nav Section -->
+            <ul class="right">
+                <li><a href="/categories">Categories</a></li>
+                <li><a href="/tags">Tags</a></li>
+                <li><a href="/feed.xml">RSS feed</a></li>
+            </ul>
+        </section>
+    </nav>
+        <div class="row">
+          <div class="large-12 columns header">
+            <h1><a href="/posts">Michal Zimmermann</a> <small>Pieces of knowledge from the world of GIS.</small></h1>
+          </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns">
+<h2 class="text-center">Articles tagged with svg tag</h2>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="/posts/2015/liftago-open-dataset-infographics/" rel="bookmark" title="Permalink to Liftago Open Dataset Infographics">Liftago Open Dataset&nbsp;Infographics</a></h1>
+            <small>Written on Dec 21, 2015
+        and marked as
+        <a href="/tag/python.html">python</a>,         <a href="/tag/postgis.html">postgis</a>,         <a href="/tag/svg.html">svg</a>,         <a href="/tag/visualization.html">visualization</a>        | <a href="/category/data.html">data</a>
+        </small>
+        <section>
+            <p><a href="https://www.liftago.com/cs">Liftago</a> (the Czech analogy of Uber) has recently <a href="http://try.liftago.com/info-wants-to-be-free/">released a sample of its data</a> covering four weeks of driver/pasenger&nbsp;interactions.</p>
+<p>Have a look at my infographics created with PostGIS, Inkscape, Python and&nbsp;pygal.</p>
+<p class="text-center"><a href="/assets/liftago-open-dataset-infographics/liftago.pdf"><img title="Liftago infographics" src="/assets/liftago-open-dataset-infographics/liftago.png" class="img-responsive centered"></a></p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="/posts/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/" rel="bookmark" title="Permalink to Automated Map Creation With QGIS, PostGIS, Python, SVG and ImageMagick">Automated Map Creation With <span class="caps">QGIS</span>, PostGIS, Python, <span class="caps">SVG</span> and&nbsp;ImageMagick</a></h1>
+            <small>Written on Aug 9, 2015
+        and marked as
+        <a href="/tag/qgis.html">qgis</a>,         <a href="/tag/postgis.html">postgis</a>,         <a href="/tag/python.html">python</a>,         <a href="/tag/svg.html">svg</a>,         <a href="/tag/linux.html">linux</a>        | <a href="/category/automation.html">automation</a>
+        </small>
+        <section>
+            <p>As mentioned in <a href="/posts/2015/qgis-tips-for-collaborative-mapping/"><span class="caps">QGIS</span> Tips For Collaborative Mapping</a> we&#8217;re in the middle of crop evaluation project at <a href="http://www.clevermaps.cz/">CleverMaps</a>.</p>
+<p>With the <span class="caps">QGIS</span> workflow up and running, I&#8217;ve been focused on different <span class="caps">QGIS</span> related task: <strong>automatic map generation</strong> for land blocks that meet certain conditions. The logic behind identifying such land blocks is as&nbsp;follows:</p>
+<ul>
+<li>if the original area and the measured one differ more than 0.5 %&nbsp;or</li>
+<li>number of declared crops differs from number of crops identified&nbsp;or</li>
+<li>at least one parcel in the land block was given a certain error&nbsp;code</li>
+</ul>
+<p>Let&#8217;s assume that with several lines of <span class="caps">SQL</span> code we can store these mentioned above in a table called <code>land_blocks</code> with geometries being the result of calling <code>ST_Union()</code> over parcels for each land&nbsp;block.</p>
+<h2>Map&nbsp;composition</h2>
+<p>Every map should feature following&nbsp;layers:</p>
+<ul>
+<li>land blocks (remember the <code>land_blocks</code> table?) - labeled with <span class="caps">ID</span>, yellowish borders, no&nbsp;fill</li>
+<li>land parcels - that&#8217;s my source layer - labeled with letters, blue borders, no&nbsp;fill</li>
+<li>other&nbsp;layers</li>
+<li><span class="caps">HR</span>, <span class="caps">VHR</span>, <span class="caps">NIR</span> imagery, orthophoto - served via <span class="caps">WMS</span></li>
+</ul>
+<p>Labels should be visible only for the featured land block (both for the land parcels and the land block itself. The whole map scales dynamically, showing small land blocks zoomed in and the large ones zoomed&nbsp;out.</p>
+<p class='text-center'><a id="desired-map" title="Desired map" href="/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map.jpg"><img title="Desired map" src="/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map.jpg" width=70% class="img-responsive centered"></a></p>
+
+<p>Every map features additional&nbsp;items:</p>
+<ul>
+<li>dynamic list of subsidies farmer asks for - showing both measured and declared&nbsp;area</li>
+<li>dynamic list of land parcels with their areas and error&nbsp;codes</li>
+<li>scalebar</li>
+<li>map&nbsp;key</li>
+<li>logos</li>
+</ul>
+<h2>Atlas&nbsp;creation</h2>
+<p>Now with requirements defined, let&#8217;s create some maps. It&#8217;s incredibly easy to generate a series of maps with <span class="caps">QGIS</span> atlas&nbsp;options.</p>
+<h3>Atlas generation&nbsp;settings</h3>
+<p><strong>Coverage layer</strong> is presumably the only thing you really need - as the name suggests, it covers your area of interest. One map will be created for each feature in this layer, unless you decide to use some <strong>filtering</strong> - which I&nbsp;did.</p>
+<p><strong>Output filenames</strong> can be tweaked to your needs, here&#8217;s what such a function might look like. If there is a slash in the land block <span class="caps">ID</span> (<span class="caps">XXXXXXX</span>/Y), the filename is set to <code>USER-ID_XXXXXXX-00Y_M_00</code>, <code>USER-ID_XXXXXXX-000_M_00</code> otherwise.</p>
+<div class="highlight"><pre><span></span><span class="k">CASE</span> <span class="k">WHEN</span> <span class="n">strpos</span><span class="p">(</span><span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">),</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">THEN</span>
+        <span class="n">ji</span> <span class="o">||</span> <span class="s1">&#39;_&#39;</span> <span class="o">||</span>
+        <span class="n">substr</span><span class="p">(</span>
+            <span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="n">strpos</span><span class="p">(</span><span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">),</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span> <span class="c1">-- slash position</span>
+        <span class="p">)</span> <span class="o">||</span> <span class="s1">&#39;-&#39;</span> <span class="o">||</span>
+        <span class="n">lpad</span><span class="p">(</span>
+            <span class="n">substr</span><span class="p">(</span>
+                <span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">),</span>
+                <span class="n">strpos</span><span class="p">(</span><span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">),</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span>
+                <span class="k">length</span><span class="p">(</span><span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">))</span>
+            <span class="p">),</span>
+        <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">)</span> <span class="o">||</span> <span class="s1">&#39;_M_00&#39;</span>
+    <span class="k">ELSE</span>
+        <span class="n">ji</span> <span class="o">||</span> <span class="s1">&#39;_&#39;</span> <span class="o">||</span> <span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">)</span> <span class="o">||</span> <span class="s1">&#39;-000_M_00&#39;</span>
+<span class="k">END</span>
+</pre></div>
+
+
+<h3>Map scale <span class="amp">&amp;</span> variable&nbsp;substitutions</h3>
+<p>Different land blocks are of different sizes, thus needing different <strong>scales</strong> to fit in the map. Again, <span class="caps">QGIS</span> handles this <em>might-become-a-nightmare-pretty-easily</em> issue with a single click. You can define the scale&nbsp;as:</p>
+<ul>
+<li>margin around feature: percentage of the space displayed&nbsp;around</li>
+<li>predefined scale (best fit): my choice, sometimes it doesn&#8217;t display the entire land block&nbsp;though</li>
+<li>fixed scale: sets the scale the same for all the&nbsp;maps</li>
+</ul>
+<p>With these settings, I get a map similar to the one below. Notice two interesting&nbsp;things:</p>
+<p class='text-center'><a title="QGIS map skeleton" href="/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map_skeleton.png"><img title="QGIS map skeleton" src="/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map_skeleton.png" width=70% class="img-responsive centered"></a></p>
+
+<ul>
+<li>Scale uses decimal places, which I find <em>a huge failure</em>. Has anyone ever seen a map with such scale? The worst is there is no easy way to hide these, or at least I didn&#8217;t find&nbsp;one.</li>
+<li>You can see a bunch of <code>[something in the brackets]</code> notations. These will be substituted with actual values during the atlas generation. Showing land block <span class="caps">ID</span> with a preceeding label is as easy as <code>[%concat('PB: ', "kod_pb")%]</code> (mind the percentage&nbsp;sign).</li>
+</ul>
+<h3>Styling the map using atlas&nbsp;features</h3>
+<p>Atlas features are a great help for <strong>map customization</strong>. As mentioned earlier, in my case, only one land block label per map should be visible. That can be achieved with a simple label dialog&nbsp;expression:</p>
+<div class="highlight"><pre><span></span><span class="k">CASE</span>
+    <span class="k">WHEN</span> <span class="err">$</span><span class="n">id</span> <span class="o">=</span> <span class="err">$</span><span class="n">atlasfeatureid</span>
+    <span class="k">THEN</span> <span class="ss">&quot;kod_pb&quot;</span>
+<span class="k">END</span>
+</pre></div>
+
+
+<p><span class="caps">QGIS</span> keeps reference to each coverage layer feature <span class="caps">ID</span> during atlas generation, so you can use it for comparison. The best part is you can use IDs with <strong>any layer</strong> you&nbsp;need:</p>
+<div class="highlight"><pre><span></span><span class="k">CASE</span>
+    <span class="k">WHEN</span> <span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">)</span> <span class="o">=</span> <span class="ss">&quot;kod_pb&quot;</span>
+    <span class="k">THEN</span> <span class="ss">&quot;kod_zp&quot;</span>
+<span class="k">END</span>
+</pre></div>
+
+
+<p>With this simple expression, I get labels only for those land parcels that are part of the mapped land block. Even the <strong>layer style</strong> can be controlled with atlas feature. Land parcels inside the land block have blue borders, the rest is yellowish, remember? It&#8217;s a piece of cake with rule-based&nbsp;styling.</p>
+<p class='text-center'><a title="Layer style based on atlas feature" href="/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/atlas_feature_style.png"><img title="Layer style based on atlas feature" src="/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/atlas_feature_style.png" width=70% class="img-responsive centered"></a></p>
+
+<h3>Atlas&nbsp;generation</h3>
+<p>When you&#8217;re set, atlas can be created with a single button. I used <span class="caps">SVG</span> as an output format to easily manipulate the map content afterwards. The resulting maps look like the one in <a href="#desired-map">the first picture</a> without the text in the red rectangle. A Python script appends this to each map&nbsp;afterwards.</p>
+<p>Roughly speaking, generating 300 maps takes an hour or so, I guess that depends on the map complexity and hardware&nbsp;though.</p>
+<h3>Adding textual&nbsp;content</h3>
+<p><span class="caps">SVG</span> output is just plain old <span class="caps">XML</span> that you can edit by hand or by script. A simple Python script, part of map post-processing, loads <span class="caps">SVG</span> from the database and adds it to the left pane of each&nbsp;map.</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span>
+      <span class="n">ji</span><span class="p">,</span>
+      <span class="n">kod_pb</span><span class="p">,</span>
+      <span class="n">concat</span><span class="p">(</span>
+            <span class="s1">&#39;&lt;g fill=&quot;none&quot; stroke=&quot;#000000&quot; stroke-opacity=&quot;1&quot; stroke-width=&quot;1&quot;</span>
+<span class="s1">                  stroke-linecap=&quot;square&quot; stroke-linejoin=&quot;bevel&quot; transform=&quot;matrix(1.18081,0,0,1.18081,270.0,550.0)&quot;</span>
+<span class="s1">                  font-family=&quot;Droid Sans&quot; font-size=&quot;35&quot; font-style=&quot;normal&quot;&gt;&#39;</span><span class="p">,</span>
+            <span class="n">kultura</span><span class="p">,</span> <span class="n">vymery</span><span class="p">,</span> <span class="n">vymery_hodnoty</span><span class="p">,</span>
+            <span class="n">vcs_titul</span><span class="p">,</span> <span class="n">vcs_brk</span><span class="p">,</span> <span class="n">vcs_brs</span><span class="p">,</span> <span class="n">vcs_chmel</span><span class="p">,</span>
+            <span class="n">vcs_zvv</span><span class="p">,</span> <span class="n">vcs_zv</span><span class="p">,</span> <span class="n">vcs_ovv</span><span class="p">,</span> <span class="n">vcs_ov</span><span class="p">,</span> <span class="n">vcs_cur</span><span class="p">,</span> <span class="n">vcs_bip</span><span class="p">,</span>
+            <span class="n">lfa</span><span class="p">,</span> <span class="n">lfa_h1</span><span class="p">,</span> <span class="n">lfa_h2</span><span class="p">,</span> <span class="n">lfa_h3</span><span class="p">,</span>
+            <span class="n">lfa_h4</span><span class="p">,</span> <span class="n">lfa_h5</span><span class="p">,</span> <span class="n">lfa_oa</span><span class="p">,</span> <span class="n">lfa_ob</span><span class="p">,</span> <span class="n">lfa_s</span><span class="p">,</span>
+            <span class="n">natura</span><span class="p">,</span> <span class="n">aeo_eafrd_text</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_a1</span><span class="p">,</span>
+            <span class="n">dv_aeo_eafrd_a2o</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_a2v</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_b1</span><span class="p">,</span>
+            <span class="n">dv_aeo_eafrd_b2</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_b3</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_b4</span><span class="p">,</span>
+            <span class="n">dv_aeo_eafrd_b5</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_b6</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_b7</span><span class="p">,</span>
+            <span class="n">dv_aeo_eafrd_b8</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_b9</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_c1</span><span class="p">,</span>
+            <span class="n">dv_aeo_eafrd_c3</span><span class="p">,</span> <span class="n">aeko_text</span><span class="p">,</span> <span class="n">dv_aeko_a</span><span class="p">,</span> <span class="n">dv_aeko_b</span><span class="p">,</span> <span class="n">dv_aeko_c</span><span class="p">,</span>
+            <span class="n">dv_aeko_d1</span><span class="p">,</span> <span class="n">dv_aeko_d2</span><span class="p">,</span> <span class="n">dv_aeko_d3</span><span class="p">,</span> <span class="n">dv_aeko_d4</span><span class="p">,</span> <span class="n">dv_aeko_d5</span><span class="p">,</span>
+            <span class="n">dv_aeko_d6</span><span class="p">,</span> <span class="n">dv_aeko_d7</span><span class="p">,</span> <span class="n">dv_aeko_d8</span><span class="p">,</span> <span class="n">dv_aeko_d9</span><span class="p">,</span> <span class="n">dv_aeko_d10</span><span class="p">,</span>
+            <span class="n">dv_aeko_e</span><span class="p">,</span> <span class="n">dv_aeko_f</span><span class="p">,</span> <span class="n">ez</span><span class="p">,</span> <span class="n">dzes_text</span><span class="p">,</span> <span class="n">rep</span><span class="p">,</span> <span class="n">obi</span><span class="p">,</span> <span class="n">seop</span><span class="p">,</span> <span class="n">meop</span><span class="p">,</span> <span class="n">pbz</span><span class="p">,</span> <span class="n">dzes7</span><span class="p">,</span>
+            <span class="s1">&#39;&lt;/g&gt;&#39;</span>
+      <span class="p">)</span> <span class="n">popis</span>
+<span class="k">FROM</span> <span class="p">(...);</span>
+</pre></div>
+
+
+<p>Each column from the previous query is a result of <code>SELECT</code> similar to the one&nbsp;below.</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">concat</span><span class="p">(</span><span class="s1">&#39;&lt;text fill=&quot;#000000&quot; fill-opacity=&quot;1&quot; stroke=&quot;none&quot;&gt;BrK: &#39;</span><span class="p">,</span> <span class="n">dv_brk</span><span class="p">,</span> <span class="s1">&#39; ha / &#39;</span><span class="p">,</span> <span class="ss">&quot;MV_BRK&quot;</span><span class="p">,</span> <span class="s1">&#39; ha;&#39;</span><span class="p">,</span> <span class="n">kod_dpz</span><span class="p">,</span> <span class="s1">&#39;&lt;/text&gt;&#39;</span><span class="p">)</span> <span class="n">vcs_brk</span>
+</pre></div>
+
+
+<p>The <code>transform="matrix(1.18081,0,0,1.18081,270.0,550.0)</code> part puts the text on the right spot. Great finding about <span class="caps">SVG</span> is that it places each <code>&lt;text&gt;</code> element on the new line, so you don&#8217;t need to deal with calculating the position in your&nbsp;script.</p>
+<p>Scale adjustment is done with a dirty lambda&nbsp;function.</p>
+<div class="highlight"><pre><span></span><span class="n">content</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">r&quot;&gt;(\d{1,3}\.\d{3,5})&lt;/text&gt;&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">m</span> <span class="p">:</span><span class="s2">&quot;&gt;    &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)))))</span> <span class="o">+</span> <span class="s2">&quot;&lt;/text&gt;&quot;</span><span class="p">,</span> <span class="n">old_map</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+</pre></div>
+
+
+<h3><span class="caps">SVG</span> to <span class="caps">JPEG</span>&nbsp;conversion</h3>
+<p>We deliver maps as <span class="caps">JPEG</span> files with 150 <span class="caps">DPI</span> on A4 paper format. <a href="http://www.imagemagick.org/script/index.php">ImageMagick</a> converts the formats with a simple shell&nbsp;command:</p>
+<div class="highlight"><pre><span></span>convert -density <span class="m">150</span> -resize 1753x1240 input.svg output.jpg
+</pre></div>
+
+
+<h2>Conclusion</h2>
+<p>I created pretty efficient semi-automated workflow using several open source technologies that saves me a lot of work. Although <span class="caps">QGIS</span> has some minor pet peeves (scale with decimal places, not showing the entire feature, not substituting variables at times), it definitely makes boring map creation quite amusing. The more I work with big data / on big tasks, the more I find Linux a&nbsp;must-have.</p>
+<p>The whole process was done with <span class="caps">QGIS</span> 2.10, PostGIS 2.1, PostgreSQL 9.3, Python 2.7, ImageMagick&nbsp;6.7.</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="/posts/2015/animating-svg-maps-with-smil/" rel="bookmark" title="Permalink to Animating SVG Maps With SMIL">Animating <span class="caps">SVG</span> Maps With <span class="caps">SMIL</span></a></h1>
+            <small>Written on Apr 29, 2015
+        and marked as
+        <a href="/tag/svg.html">svg</a>,         <a href="/tag/smil.html">smil</a>        | <a href="/category/web-maps.html">web maps</a>
+        </small>
+        <section>
+            <p>Using <span class="caps">SVG</span> to build web maps have both pros and cons and to be honest I don&#8217;t know any <em>serious</em> map/<span class="caps">GIS</span> project built on top of <span class="caps">SVG</span>. However, as a part of my job at university, I was forced to use both <span class="caps">SVG</span> and <span class="caps">SMIL</span> to produce animated web map (see the small version below or the big one at <a href="https://zimmicz.github.io/svg-smil-airplanes/map.svg">GitHub</a>) and I&#8217;d like to share my&nbsp;findings.</p>
+<p><object width="400" data="https://zimmicz.github.io/svg-smil-airplanes/map.svg" type="image/svg+xml"></object></p>
+<h2>Data&nbsp;preprocessing</h2>
+<p>I chose <a href="http://www.naturalearthdata.com/">Natural Earth dataset</a> both for basemap and thematic&nbsp;layer:</p>
+<ul>
+<li>countries polygon layer for&nbsp;basemap</li>
+<li>airports point layer for thematic&nbsp;layer</li>
+</ul>
+<p>I decided that animation should go like&nbsp;this:</p>
+<ol>
+<li>Load basemap and Vaclav Havel airport (<span class="caps">PRG</span>).</li>
+<li>Animate destinations one by one. They are revealed in order of their distance from <span class="caps">PRG</span>.</li>
+<li>Animate&nbsp;airways.</li>
+<li>Once airways are animated, animate airplanes along their path from <span class="caps">PRG</span> to their destination in order of their time of&nbsp;departure.</li>
+<li>Profit.</li>
+</ol>
+<p>My goal was to create an animation of all departures from Vaclav Havel airport during one day. These data can be obtained at <a href="http://www.flightstats.com/">FlightStats</a>, I didn&#8217;t find a way make this process automatic though. <a href="http://openflights.org/">OpenFlights</a> might be better source&nbsp;then.</p>
+<h2><span class="caps">SVG</span>&nbsp;creation</h2>
+<p><a href="http://kartograph.org/">Kartograph</a> is a great tool both for <span class="caps">SVG</span> generation and scripting. What a pity it&#8217;s probably a dead project according to the last commit date. After installing Python part of library used to create <span class="caps">SVG</span> files out of vector geometries, it can be run with something like&nbsp;this:</p>
+<div class="highlight"><pre><span></span>kartograph --output map.svg --pretty-print --style style.css config.json
+</pre></div>
+
+
+<p>Pretty self-explanatory, let&#8217;s have a look at config&nbsp;file:</p>
+<div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;layers&quot;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;countries&quot;</span><span class="o">:</span> <span class="p">{</span>
+            <span class="s2">&quot;src&quot;</span><span class="o">:</span> <span class="s2">&quot;ne_50m_admin_0_countries/ne_50m_admin_0_countries.shp&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;attributes&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;airports&quot;</span><span class="o">:</span> <span class="p">{</span>
+            <span class="s2">&quot;src&quot;</span><span class="o">:</span> <span class="s2">&quot;ne_10m_airports/ne_10m_airports_prg.shp&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;attributes&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;abbrev&quot;</span><span class="p">]</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;travels&quot;</span><span class="o">:</span> <span class="p">{</span>
+            <span class="s2">&quot;src&quot;</span><span class="o">:</span> <span class="s2">&quot;ne_10m_airports/travels.shp&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;attributes&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;distance&quot;</span><span class="p">]</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;grid&quot;</span><span class="o">:</span> <span class="p">{</span>
+            <span class="s2">&quot;special&quot;</span><span class="o">:</span> <span class="s2">&quot;graticule&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;latitudes&quot;</span><span class="o">:</span> <span class="mi">10</span><span class="p">,</span>
+            <span class="s2">&quot;longitudes&quot;</span><span class="o">:</span> <span class="mi">10</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;proj&quot;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="s2">&quot;satellite&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;lon0&quot;</span><span class="o">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">&quot;lat0&quot;</span><span class="o">:</span> <span class="mf">48.0</span><span class="p">,</span>
+        <span class="s2">&quot;dist&quot;</span><span class="o">:</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="s2">&quot;up&quot;</span><span class="o">:</span> <span class="mi">15</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;bounds&quot;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;mode&quot;</span><span class="o">:</span> <span class="s2">&quot;bbox&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;data&quot;</span><span class="o">:</span> <span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span>
+        <span class="s2">&quot;padding&quot;</span><span class="o">:</span> <span class="mi">1</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;export&quot;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;round&quot;</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">&quot;width&quot;</span><span class="o">:</span> <span class="mi">1000</span><span class="p">,</span>
+        <span class="s2">&quot;ratio&quot;</span><span class="o">:</span> <span class="mi">1</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>It is possible to adjust map settings in many different ways. The most&nbsp;important/interesting:</p>
+<ul>
+<li>Choose what attributes you want to have exported from source file with <code>attributes</code> key for every layer. They&#8217;ll be available as <code>data-</code> attribute of <span class="caps">SVG</span>&nbsp;elements.</li>
+<li>It comes with Grid generation packed in! Really great. Sea generation works for some projections&nbsp;only.</li>
+<li>Set the projections you want to use with additional&nbsp;settings.</li>
+<li><code>bounds</code> settings should - according to the docs - use layer extent as well, I couldn&#8217;t make it work though. Use <code>[-180, -90, 180, 90]</code> as a workaround to get the whole world. Don&#8217;t forget to set <code>padding</code>, so your map doesn&#8217;t get clipped on&nbsp;edges.</li>
+<li><code>export</code>ing coordinates rounded to one decimal place makes your <span class="caps">SVG</span> a lot&nbsp;smaller.</li>
+</ul>
+<p>You can change <span class="caps">SVG</span> look with simple <span class="caps">CSS</span>, just be sure to use layer names as <span class="caps">CSS</span>&nbsp;ids:</p>
+<div class="highlight"><pre><span></span><span class="nn">#airports</span> <span class="p">{</span>
+    <span class="n">fill</span><span class="o">:</span> <span class="m">#CC0000</span><span class="p">;</span>
+    <span class="n">fill</span><span class="o">-</span><span class="nb">opacity</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
+    <span class="n">stroke</span><span class="o">:</span> <span class="m">#660000</span><span class="p">;</span>
+    <span class="n">stroke</span><span class="o">-</span><span class="nb">opacity</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nn">#countries</span> <span class="p">{</span>
+    <span class="n">fill</span><span class="o">:</span> <span class="m">#e6deb4</span><span class="p">;</span>
+    <span class="n">stroke</span><span class="o">:</span> <span class="m">#a59f81</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nn">#grid</span> <span class="p">{</span>
+    <span class="n">stroke</span><span class="o">:</span> <span class="m">#d0d0d0</span><span class="p">;</span>
+    <span class="n">stroke</span><span class="o">-</span><span class="nb">width</span><span class="o">:</span> <span class="m">.3px</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nn">#travels</span> <span class="p">{</span>
+    <span class="n">stroke</span><span class="o">:</span> <span class="m">#1f78b4</span><span class="p">;</span>
+    <span class="n">stroke</span><span class="o">-</span><span class="nb">opacity</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
+    <span class="n">stroke</span><span class="o">-</span><span class="n">dasharray</span><span class="o">:</span> <span class="m">5</span><span class="o">,</span><span class="m">5</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<h2>Data adjustment <span class="amp">&amp;</span>&nbsp;animation</h2>
+<p><strong><span class="caps">SMIL</span></strong> is a <span class="caps">XML</span> based language for multimedia representation. It comes ready for timing, animation, visual transitions etc. I guess it might be considered easier to read for a web development beginner. Once you start using it, you immediately realize it suffers from the same disease like <span class="caps">XML</span> does: it is so&nbsp;wordy!</p>
+<p>Let&#8217;s get back to my example. To animate airports one by one, let&#8217;s give them unique ids, so they look something&nbsp;like:</p>
+<div class="highlight"><pre><span></span><span class="nt">&lt;circle</span> <span class="na">id=</span><span class="s">&quot;brs&quot;</span> <span class="na">stroke-opacity=</span><span class="s">&quot;0&quot;</span> <span class="na">fill-opacity=</span><span class="s">&quot;0&quot;</span> <span class="na">cx=</span><span class="s">&quot;476.597304864&quot;</span> <span class="na">cy=</span><span class="s">&quot;539.487783171&quot;</span> <span class="na">data-abbrev=</span><span class="s">&quot;BRS&quot;</span> <span class="na">data-name=</span><span class="s">&quot;Bristol Int&#39;l&quot;</span> <span class="na">r=</span><span class="s">&quot;3&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+
+
+<p>That&#8217;s something you do by hand as kartograph doesn&#8217;t give ids to <span class="caps">SVG</span> elements. Once you&#8217;re done with that, you can run <span class="caps">SMIL</span> animation. If you look closer at the final map, you&#8217;ll notice there are three properties animated for each airport: fill opacity, stroke opacity and radius. Each property needs to use separate <span class="caps">SMIL</span> <code>&lt;animate /&gt;</code>, which might look like the one&nbsp;below:</p>
+<div class="highlight"><pre><span></span><span class="nt">&lt;animate</span> <span class="na">attributeName=</span><span class="s">&quot;fill-opacity&quot;</span>
+    <span class="na">id=</span><span class="s">&quot;kos_ani_fo&quot;</span>
+    <span class="na">from=</span><span class="s">&quot;0&quot;</span>
+    <span class="na">to=</span><span class="s">&quot;1&quot;</span>
+    <span class="na">begin=</span><span class="s">&quot;osr_ani.end&quot;</span>
+    <span class="na">dur=</span><span class="s">&quot;0.25s&quot;</span>
+    <span class="na">fill=</span><span class="s">&quot;freeze&quot;</span>
+    <span class="na">xlink:href=</span><span class="s">&quot;#kos&quot;</span>
+<span class="nt">/&gt;</span>
+<span class="nt">&lt;animate</span> <span class="na">attributeName=</span><span class="s">&quot;stroke-opacity&quot;</span>
+    <span class="na">id=</span><span class="s">&quot;kos_ani_so&quot;</span>
+    <span class="na">from=</span><span class="s">&quot;0&quot;</span>
+    <span class="na">to=</span><span class="s">&quot;1&quot;</span>
+    <span class="na">begin=</span><span class="s">&quot;osr_ani.end&quot;</span>
+    <span class="na">dur=</span><span class="s">&quot;0.25s&quot;</span>
+    <span class="na">fill=</span><span class="s">&quot;freeze&quot;</span>
+    <span class="na">xlink:href=</span><span class="s">&quot;#kos&quot;</span>
+<span class="nt">/&gt;</span>
+<span class="nt">&lt;animate</span> <span class="na">attributeName=</span><span class="s">&quot;r&quot;</span>
+    <span class="na">id=</span><span class="s">&quot;kos_ani_r&quot;</span>
+    <span class="na">from=</span><span class="s">&quot;10px&quot;</span>
+    <span class="na">to=</span><span class="s">&quot;3px&quot;</span>
+    <span class="na">begin=</span><span class="s">&quot;osr_ani.end&quot;</span>
+    <span class="na">dur=</span><span class="s">&quot;0.25s&quot;</span>
+    <span class="na">xlink:href=</span><span class="s">&quot;#kos&quot;</span>
+<span class="nt">/&gt;</span>
+</pre></div>
+
+
+<p>I guess you get the idea how long this would take for more airports. Make sure to notice that <span class="caps">SMIL</span> can start animation based on another animation&#8217;s end (<code>osr_ani.end</code>) - that&#8217;s pretty&nbsp;neat.</p>
+<p>Airways animation works almost the same. First, add unique id to each&nbsp;airway:</p>
+<div class="highlight"><pre><span></span><span class="nt">&lt;path</span> <span class="na">d=</span><span class="s">&quot;M550.9,562.9L568.0,495.0 &quot;</span> <span class="na">id=</span><span class="s">&quot;travel-arn&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+
+
+<p>Second, start animation after all the airports are visible on the map. Notice the initial definition of <code>d</code> attribute - it&#8217;s a line with zero&nbsp;length.</p>
+<div class="highlight"><pre><span></span><span class="nt">&lt;animate</span> <span class="na">attributeName=</span><span class="s">&quot;d&quot;</span>
+    <span class="na">id=</span><span class="s">&quot;path_ani&quot;</span>
+    <span class="na">from=</span><span class="s">&quot;M550.9,562.9L550.9,562.9&quot;</span>
+    <span class="na">to=</span><span class="s">&quot;M550.9,562.9L568.0,495.0&quot;</span>
+    <span class="na">begin=</span><span class="s">&quot;icn_ani_r.end&quot;</span>
+    <span class="na">dur=</span><span class="s">&quot;3s&quot;</span>
+    <span class="na">xlink:href=</span><span class="s">&quot;#travel-arn&quot;</span>
+<span class="nt">/&gt;</span>
+</pre></div>
+
+
+<p>Once airways animation has finished, let airplanes fly around the globe with a simple JavaScript&nbsp;function:</p>
+<div class="highlight"><pre><span></span><span class="c">/**</span>
+<span class="c"> * @param  number coef  scale radius by number of flights to the given destination</span>
+<span class="c"> * @param  string flight_id</span>
+<span class="c"> */</span>
+<span class="nt">var</span> <span class="nt">circle</span> <span class="o">=</span> <span class="nt">function</span><span class="o">(</span><span class="nt">coef</span><span class="o">,</span> <span class="nt">flight_id</span><span class="o">,</span> <span class="nt">timeshift</span><span class="o">)</span> <span class="p">{</span>
+    <span class="n">var</span> <span class="n">svgns</span> <span class="o">=</span> <span class="s2">&quot;http://www.w3.org/2000/svg&quot;</span><span class="p">;</span>
+    <span class="n">var</span> <span class="n">svgDocument</span> <span class="o">=</span><span class="n">document</span><span class="p">;</span>
+    <span class="n">var</span> <span class="n">motion</span> <span class="o">=</span> <span class="n">svgDocument</span><span class="o">.</span><span class="n">createElementNS</span><span class="p">(</span><span class="n">svgns</span><span class="o">,</span><span class="s2">&quot;animateMotion&quot;</span><span class="p">);</span>
+    <span class="n">var</span> <span class="n">animation</span> <span class="o">=</span> <span class="n">svgDocument</span><span class="o">.</span><span class="n">createElementNS</span><span class="p">(</span><span class="n">svgns</span><span class="o">,</span><span class="s2">&quot;animate&quot;</span><span class="p">);</span>
+    <span class="n">var</span> <span class="n">shape</span>  <span class="o">=</span> <span class="n">svgDocument</span><span class="o">.</span><span class="n">createElementNS</span><span class="p">(</span><span class="n">svgns</span><span class="o">,</span> <span class="s2">&quot;circle&quot;</span><span class="p">);</span>
+    <span class="n">var</span> <span class="n">time</span> <span class="o">=</span> <span class="m">15</span> <span class="o">+</span> <span class="n">timeshift</span><span class="p">;</span>
+    <span class="n">var</span> <span class="n">dur</span> <span class="o">=</span> <span class="n">document</span><span class="o">.</span><span class="n">getElementById</span><span class="p">(</span><span class="n">flight_id</span><span class="p">)</span><span class="o">.</span><span class="n">getAttributeNS</span><span class="p">(</span><span class="n">null</span><span class="o">,</span> <span class="s2">&quot;data-dist&quot;</span><span class="p">)</span><span class="o">/</span><span class="m">100</span><span class="p">;</span>
+    <span class="n">motion</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;begin&quot;</span><span class="o">,</span> <span class="n">time</span> <span class="o">+</span> <span class="s2">&quot;s&quot;</span><span class="p">);</span>
+    <span class="n">motion</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;dur&quot;</span><span class="o">,</span> <span class="n">dur</span> <span class="o">+</span> <span class="s2">&quot;s&quot;</span><span class="p">);</span>
+    <span class="n">motion</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;path&quot;</span><span class="o">,</span> <span class="n">document</span><span class="o">.</span><span class="n">getElementById</span><span class="p">(</span><span class="n">flight_id</span><span class="p">)</span><span class="o">.</span><span class="n">getAttributeNS</span><span class="p">(</span><span class="n">null</span><span class="o">,</span> <span class="s2">&quot;d&quot;</span><span class="p">));</span>
+    <span class="n">motion</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;xlink:href&quot;</span><span class="o">,</span> <span class="s2">&quot;#&quot;</span> <span class="o">+</span> <span class="n">flight_id</span><span class="p">);</span>
+    <span class="n">motion</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="o">,</span> <span class="n">flight_id</span> <span class="o">+</span> <span class="s2">&quot;_motion&quot;</span><span class="p">);</span>
+
+    <span class="n">animation</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;attributeName&quot;</span><span class="o">,</span> <span class="s2">&quot;opacity&quot;</span><span class="p">);</span>
+    <span class="n">animation</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;from&quot;</span><span class="o">,</span> <span class="s2">&quot;1&quot;</span><span class="p">);</span>
+    <span class="n">animation</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;to&quot;</span><span class="o">,</span> <span class="s2">&quot;0&quot;</span><span class="p">);</span>
+    <span class="n">animation</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;begin&quot;</span><span class="o">,</span> <span class="n">time</span> <span class="o">+</span> <span class="n">dur</span> <span class="o">+</span> <span class="s2">&quot;s&quot;</span><span class="p">);</span>
+    <span class="n">animation</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;dur&quot;</span><span class="o">,</span> <span class="s2">&quot;0.1s&quot;</span><span class="p">);</span>
+    <span class="n">animation</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;fill&quot;</span><span class="o">,</span> <span class="s2">&quot;freeze&quot;</span><span class="p">);</span>
+
+
+    <span class="n">shape</span><span class="o">.</span><span class="n">setAttributeNS</span><span class="p">(</span><span class="n">null</span><span class="o">,</span> <span class="s2">&quot;r&quot;</span><span class="o">,</span>  <span class="m">1</span><span class="o">*</span><span class="n">coef</span><span class="p">);</span>
+    <span class="n">shape</span><span class="o">.</span><span class="n">setAttributeNS</span><span class="p">(</span><span class="n">null</span><span class="o">,</span> <span class="s2">&quot;fill&quot;</span><span class="o">,</span> <span class="s2">&quot;1f78b4&quot;</span><span class="p">);</span>
+    <span class="n">shape</span><span class="o">.</span><span class="n">setAttributeNS</span><span class="p">(</span><span class="n">null</span><span class="o">,</span> <span class="s2">&quot;stroke&quot;</span><span class="o">,</span> <span class="s2">&quot;1f78b4&quot;</span><span class="p">);</span>
+    <span class="n">shape</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="o">,</span> <span class="s2">&quot;airplane-&quot;</span> <span class="o">+</span> <span class="n">flight_id</span><span class="p">);</span>
+    <span class="n">shape</span><span class="o">.</span><span class="n">appendChild</span><span class="p">(</span><span class="n">motion</span><span class="p">);</span>
+    <span class="n">shape</span><span class="o">.</span><span class="n">appendChild</span><span class="p">(</span><span class="n">animation</span><span class="p">);</span>
+
+    <span class="n">document</span><span class="o">.</span><span class="n">getElementById</span><span class="p">(</span><span class="s2">&quot;airplanes&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">appendChild</span><span class="p">(</span><span class="n">shape</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p><span class="caps">SMIL</span> with <span class="caps">SVG</span> seems to be interesting option for web map animation, a bit lengthy though. Syncing animations can easily become pain in the ass (<a href="https://stackoverflow.com/questions/29897355/svg-smil-animatemotion-only-triggers-once/">see StackOverflow thread</a>). Never call your function <code>animate</code> - there is namesake function defined in <a href="https://w3c.github.io/web-animations/">Web Animations <span class="caps">API</span></a> that makes animation crash in Chrome. <code>&lt;animateMotion /&gt;</code> is a great tool to animate elements along&nbsp;path.</p>
+        </section>
+        </div>
+    </div>
+
+<div class="pagination row">
+    <div class="large-6 columns">
+    </div>
+    <div class="large-6 columns">
+    </div>
+    <!-- <p class="paginator">
+    </p> -->
+</div>            </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns footer">
+                <footer>
+                    <address>
+                    Written by <a href="http://www.zimmi.cz">Michal Zimmermann</a>.
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    </address><!-- /#about -->
+                </footer><!-- /#contentinfo -->
+            </div>
+        </div>
+<script src="/theme/webassets-external/91ae19a44b6fd6f56de2d3a3a1e2f680_jquery.js"></script>
+<script src="/theme/webassets-external/1f857912fbcb91b33a7fbeafdecefa84_foundation.min.js"></script>
+<script>
+$(document).foundation();
+</script>
+</body>
+</html>
