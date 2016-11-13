@@ -1,5 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Michal Zimmermann</title><link href="https://www.zimmi.cz/posts/" rel="alternate"></link><link href="https://www.zimmi.cz/posts/atom.xml" rel="self"></link><id>https://www.zimmi.cz/posts/</id><updated>2016-11-02T18:30:00+01:00</updated><entry><title>Introducing Blind Maps Project</title><link href="https://www.zimmi.cz/posts/2016/introducing-blind-maps-project/" rel="alternate"></link><published>2016-11-02T18:30:00+01:00</published><updated>2016-11-02T18:30:00+01:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2016-11-02:posts/2016/introducing-blind-maps-project/</id><summary type="html">&lt;p&gt;I&amp;#8217;d like to introduce you to my little pet project, which might just as well be awarded &lt;em&gt;the first pet project I&amp;#8217;ve ever completed&lt;/em&gt;, called &lt;a href="https://www.zimmi.cz/blind-maps"&gt;Blind maps&lt;/a&gt;.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Michal Zimmermann</title><link href="https://www.zimmi.cz/posts/" rel="alternate"></link><link href="https://www.zimmi.cz/posts/atom.xml" rel="self"></link><id>https://www.zimmi.cz/posts/</id><updated>2016-11-13T18:30:00+01:00</updated><entry><title>Plotting Czech Cadastre Land Use with d3: Data Extraction (part I)</title><link href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i/" rel="alternate"></link><published>2016-11-13T18:30:00+01:00</published><updated>2016-11-13T18:30:00+01:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2016-11-13:posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i/</id><summary type="html">&lt;p&gt;This post is the first part of the upcoming series summarizing the process of visualizing landuse data with bash, PostgreSQL and&amp;nbsp;d3.js.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://cuzk.cz/en"&gt;Czech Office for Surveying, Mapping and Cadastre&lt;/a&gt; has recently published lot of data via &lt;a href="http://atom.cuzk.cz"&gt;Atom feed&lt;/a&gt;. There&amp;#8217;s pretty small and a bit boring dataset included, featuring quarterly updated landuse-related values for all 13,091 cadastral&amp;nbsp;areas:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;absolute number of land lots within given category (arable land, forests,&amp;nbsp;etc.)&lt;/li&gt;
+&lt;li&gt;absolute area of land lots within given&amp;nbsp;category&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Data are published as &lt;span class="caps"&gt;CSV&lt;/span&gt; files linked from the Atom feed. Sadly, they come windows-1250 encoded, using Windows line endings, with trailing semicolons and header rows using&amp;nbsp;diacritics.&lt;/p&gt;
+&lt;h2&gt;&lt;span class="caps"&gt;ETL&lt;/span&gt;&amp;nbsp;process&lt;/h2&gt;
+&lt;p&gt;Before the d3 viz can be crafted, it&amp;#8217;s necessary&amp;nbsp;to:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;extract &lt;span class="caps"&gt;CSV&lt;/span&gt; data from the URLs provided via the Atom&amp;nbsp;feed&lt;/li&gt;
+&lt;li&gt;transform those data into a relational database, do some&amp;nbsp;math&lt;/li&gt;
+&lt;li&gt;load data into a d3.js&amp;nbsp;viz&lt;/li&gt;
+&lt;li&gt;profit (as&amp;nbsp;usual)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3&gt;Extract&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class="c1"&gt;# extract.sh -f YYYYMMDD&lt;/span&gt;
+
+&lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; &lt;span class="nv"&gt;$#&lt;/span&gt; -gt &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;
+&lt;span class="k"&gt;do&lt;/span&gt;
+&lt;span class="nv"&gt;key&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$1&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+
+&lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="nv"&gt;$key&lt;/span&gt; in
+    -f&lt;span class="p"&gt;|&lt;/span&gt;--file&lt;span class="o"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;FILE&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$2&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+    &lt;span class="nb"&gt;shift&lt;/span&gt; &lt;span class="c1"&gt;# past argument&lt;/span&gt;
+    &lt;span class="p"&gt;;;&lt;/span&gt;
+    *&lt;span class="o"&gt;)&lt;/span&gt;
+        &lt;span class="c1"&gt;# unknown option&lt;/span&gt;
+    &lt;span class="p"&gt;;;&lt;/span&gt;
+&lt;span class="k"&gt;esac&lt;/span&gt;
+&lt;span class="nb"&gt;shift&lt;/span&gt; &lt;span class="c1"&gt;# past argument or value&lt;/span&gt;
+&lt;span class="k"&gt;done&lt;/span&gt;
+
+&lt;span class="nv"&gt;URL&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;http://services.cuzk.cz/sestavy/UHDP/UHDP-
+&lt;span class="nv"&gt;CSVFILE&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$FILE&lt;/span&gt;.csv
+&lt;span class="nv"&gt;CSVUTF8FILE&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;CSVFILE&lt;/span&gt;&lt;span class="p"&gt;%.*&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;.utf.csv
+URL+&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$CSVFILE&lt;/span&gt;
+
+&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;downloading &lt;/span&gt;&lt;span class="nv"&gt;$URL&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+wget -q &lt;span class="nv"&gt;$URL&lt;/span&gt; -O &lt;span class="nv"&gt;$CSVFILE&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; &lt;span class="nv"&gt;$?&lt;/span&gt; !&lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;then&lt;/span&gt;
+    rm -f &lt;span class="nv"&gt;$CSVFILE&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;download failed&amp;quot;&lt;/span&gt;
+    &lt;span class="nb"&gt;exit&lt;/span&gt;
+&lt;span class="k"&gt;fi&lt;/span&gt;
+
+&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;converting to utf-8&amp;quot;&lt;/span&gt;
+iconv -f WINDOWS-1250 -t UTF-8 &lt;span class="nv"&gt;$CSVFILE&lt;/span&gt; -o &lt;span class="nv"&gt;$CSVUTF8FILE&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;modifying &lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;FILE&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+sed -i &lt;span class="s1"&gt;&amp;#39;s/^M$//&amp;#39;&lt;/span&gt; &lt;span class="nv"&gt;$CSVUTF8FILE&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+sed -i &lt;span class="s1"&gt;&amp;#39;s/\r$//&amp;#39;&lt;/span&gt; &lt;span class="nv"&gt;$CSVUTF8FILE&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+sed -i &lt;span class="s1"&gt;&amp;#39;s/;*$//g&amp;#39;&lt;/span&gt; &lt;span class="nv"&gt;$CSVUTF8FILE&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+sed -i &lt;span class="s1"&gt;&amp;#39;1d&amp;#39;&lt;/span&gt; &lt;span class="nv"&gt;$CSVUTF8FILE&lt;/span&gt;
+
+&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;importing to database&amp;quot;&lt;/span&gt;
+sed -e &lt;span class="s2"&gt;&amp;quot;s/\${DATE}/&lt;/span&gt;&lt;span class="nv"&gt;$FILE&lt;/span&gt;&lt;span class="s2"&gt;/g&amp;quot;&lt;/span&gt; extract.sql &lt;span class="p"&gt;|&lt;/span&gt; psql -qAt --no-psqlrc
+
+rm &lt;span class="nv"&gt;$CSVFILE&lt;/span&gt; &lt;span class="nv"&gt;$CSVUTF8FILE&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This script downloads &lt;span class="caps"&gt;CSV&lt;/span&gt; file, deals with all the pitfalls mentioned above and, when done, &lt;code&gt;copy&lt;/code&gt; command within &lt;code&gt;extract.sql&lt;/code&gt; loads the data into a &lt;code&gt;data_YYYYMMDD&lt;/code&gt; table. Putting all the files into the one table would have saved me a lot of transformation &lt;span class="caps"&gt;SQL&lt;/span&gt;, yet it didn&amp;#8217;t feel quite right&amp;nbsp;though.&lt;/p&gt;
+&lt;h2&gt;Transform&lt;/h2&gt;
+&lt;p&gt;Will be covered in the next&amp;nbsp;post.&lt;/p&gt;
+&lt;h2&gt;Load&lt;/h2&gt;
+&lt;p&gt;Will be covered in the post after the next post. Stay&amp;nbsp;tuned!&lt;/p&gt;</summary><category term="javascript"></category><category term="d3"></category><category term="postgresql"></category><category term="svg"></category></entry><entry><title>Introducing Blind Maps Project</title><link href="https://www.zimmi.cz/posts/2016/introducing-blind-maps-project/" rel="alternate"></link><published>2016-11-02T18:30:00+01:00</published><updated>2016-11-02T18:30:00+01:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2016-11-02:posts/2016/introducing-blind-maps-project/</id><summary type="html">&lt;p&gt;I&amp;#8217;d like to introduce you to my little pet project, which might just as well be awarded &lt;em&gt;the first pet project I&amp;#8217;ve ever completed&lt;/em&gt;, called &lt;a href="https://www.zimmi.cz/blind-maps"&gt;Blind maps&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;It&amp;#8217;s a very simple, yet useful web application built on top of the great &lt;a href="../../tag/leaflet.html"&gt;Leaflet&lt;/a&gt; library meant to help you get to know our world a bit better. As the name suggests, the app shows you, well&amp;hellip; a blind map, and you try to fill as many features as you&amp;nbsp;can.&lt;/p&gt;
 &lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/introducing-blind-maps-project/map.png" /&gt;&lt;/div&gt;
 
