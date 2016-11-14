@@ -38,13 +38,178 @@
 
     <div class="panel card card-1">
         <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii/" rel="bookmark" title="Permalink to Plotting Czech Cadastre Land Use with d3: Data Transformation (part II)">Plotting Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></h1>
+            <small>Written on Nov 14, 2016
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>,         <a href="https://www.zimmi.cz/posts/tag/d3.html">d3</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>        | <a href="https://www.zimmi.cz/posts/category/data.html">data</a>
+        </small>
+        <section>
+            <p>This post is the second part of the series summarizing the process of visualizing landuse data with bash, PostgreSQL and d3.js. Read other&nbsp;parts:</p>
+<ol>
+<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i/">Plotting Czech Cadastre Land Use with d3: Data Extraction (part&nbsp;I)</a></li>
+<li>you&#8217;re reading it&nbsp;now</li>
+</ol>
+<h2><span class="caps">ETL</span>&nbsp;process</h2>
+<p>Before the d3 viz can be crafted, it&#8217;s necessary&nbsp;to:</p>
+<ol>
+<li>extract <span class="caps">CSV</span> data from the URLs provided via the Atom&nbsp;feed</li>
+<li>transform those data into a relational database, do some&nbsp;math</li>
+<li>load data into a d3.js&nbsp;viz</li>
+<li>profit (as&nbsp;usual)</li>
+</ol>
+<h3>Extract</h3>
+<p>See <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i/">Plotting Czech Cadastre Land Use with d3: Data Extraction (part I)</a>.</p>
+<h3>Transform</h3>
+<p>Last time, I extracted the data from multiple <span class="caps">CSV</span> files to separate PostgreSQL tables named by <code>data_YYYYMMDD</code> pattern. My current goal is to transform it into the one big <code>data</code> table, where each row represents one cadastral area. Here&#8217;s what I&#8217;m trying to&nbsp;achieve:</p>
+<div class="highlight"><pre><span></span>-<span class="o">[</span> RECORD <span class="m">1</span> <span class="o">]</span>----------+----------------------------------
+ku_kod                 <span class="p">|</span> 600881
+ku_nazev               <span class="p">|</span> Bantice
+celkova_vymera         <span class="p">|</span> <span class="o">{</span>3763255,3763255,3763256,3763256<span class="o">}</span>
+celkovy_pocet_parcel   <span class="p">|</span> <span class="o">{</span>670,668,664,667<span class="o">}</span>
+chmelnice_pp           <span class="p">|</span> <span class="o">{</span>0,0,0,0<span class="o">}</span>
+chmelnice_pp_r         <span class="p">|</span> <span class="o">{</span>0.00,0.00,0.00,0.00<span class="o">}</span>
+chmelnice_v            <span class="p">|</span> <span class="o">{</span>0,0,0,0<span class="o">}</span>
+chmelnice_v_avg        <span class="p">|</span> <span class="o">{</span>0,0,0,0<span class="o">}</span>
+chmelnice_v_r          <span class="p">|</span> <span class="o">{</span>0.00,0.00,0.00,0.00<span class="o">}</span>
+lesni_pozemek_pp       <span class="p">|</span> <span class="o">{</span>25,25,25,25<span class="o">}</span>
+lesni_pozemek_pp_r     <span class="p">|</span> <span class="o">{</span>3.73,3.74,3.77,3.75<span class="o">}</span>
+lesni_pozemek_v        <span class="p">|</span> <span class="o">{</span>83879,83879,83879,83879<span class="o">}</span>
+lesni_pozemek_v_avg    <span class="p">|</span> <span class="o">{</span>3355,3355,3355,3355<span class="o">}</span>
+lesni_pozemek_v_r      <span class="p">|</span> <span class="o">{</span>2.23,2.23,2.23,2.23<span class="o">}</span>
+orna_puda_pp           <span class="p">|</span> <span class="o">{</span>88,88,89,89<span class="o">}</span>
+orna_puda_pp_r         <span class="p">|</span> <span class="o">{</span>13.13,13.17,13.40,13.34<span class="o">}</span>
+orna_puda_v            <span class="p">|</span> <span class="o">{</span>3066230,3066230,3066230,3066230<span class="o">}</span>
+orna_puda_v_avg        <span class="p">|</span> <span class="o">{</span>34844,34844,34452,34452<span class="o">}</span>
+orna_puda_v_r          <span class="p">|</span> <span class="o">{</span>81.48,81.48,81.48,81.48<span class="o">}</span>
+ostatni_plocha_pp      <span class="p">|</span> <span class="o">{</span>201,199,199,201<span class="o">}</span>
+ostatni_plocha_pp_r    <span class="p">|</span> <span class="o">{</span>30.00,29.79,29.97,30.13<span class="o">}</span>
+ostatni_plocha_v       <span class="p">|</span> <span class="o">{</span>283468,283468,283468,284562<span class="o">}</span>
+ostatni_plocha_v_avg   <span class="p">|</span> <span class="o">{</span>1410,1424,1424,1416<span class="o">}</span>
+ostatni_plocha_v_r     <span class="p">|</span> <span class="o">{</span>7.53,7.53,7.53,7.56<span class="o">}</span>
+ovocny_sad_pp          <span class="p">|</span> <span class="o">{</span>0,0,0,0<span class="o">}</span>
+ovocny_sad_pp_r        <span class="p">|</span> <span class="o">{</span>0.00,0.00,0.00,0.00<span class="o">}</span>
+ovocny_sad_v           <span class="p">|</span> <span class="o">{</span>0,0,0,0<span class="o">}</span>
+ovocny_sad_v_avg       <span class="p">|</span> <span class="o">{</span>0,0,0,0<span class="o">}</span>
+ovocny_sad_v_r         <span class="p">|</span> <span class="o">{</span>0.00,0.00,0.00,0.00<span class="o">}</span>
+ttp_pp                 <span class="p">|</span> <span class="o">{</span>44,44,44,45<span class="o">}</span>
+ttp_pp_r               <span class="p">|</span> <span class="o">{</span>6.57,6.59,6.63,6.75<span class="o">}</span>
+ttp_v                  <span class="p">|</span> <span class="o">{</span>49002,49002,49002,47908<span class="o">}</span>
+ttp_v_avg              <span class="p">|</span> <span class="o">{</span>1114,1114,1114,1065<span class="o">}</span>
+ttp_v_r                <span class="p">|</span> <span class="o">{</span>1.30,1.30,1.30,1.27<span class="o">}</span>
+vinice_pp              <span class="p">|</span> <span class="o">{</span>1,1,1,1<span class="o">}</span>
+vinice_pp_r            <span class="p">|</span> <span class="o">{</span>0.15,0.15,0.15,0.15<span class="o">}</span>
+vinice_v               <span class="p">|</span> <span class="o">{</span>106178,106178,106178,106178<span class="o">}</span>
+vinice_v_avg           <span class="p">|</span> <span class="o">{</span>106178,106178,106178,106178<span class="o">}</span>
+vinice_v_r             <span class="p">|</span> <span class="o">{</span>2.82,2.82,2.82,2.82<span class="o">}</span>
+vodni_plocha_pp        <span class="p">|</span> <span class="o">{</span>23,23,23,23<span class="o">}</span>
+vodni_plocha_pp_r      <span class="p">|</span> <span class="o">{</span>3.43,3.44,3.46,3.45<span class="o">}</span>
+vodni_plocha_v         <span class="p">|</span> <span class="o">{</span>27877,27877,27877,27877<span class="o">}</span>
+vodni_plocha_v_avg     <span class="p">|</span> <span class="o">{</span>1212,1212,1212,1212<span class="o">}</span>
+vodni_plocha_v_r       <span class="p">|</span> <span class="o">{</span>0.74,0.74,0.74,0.74<span class="o">}</span>
+zahrada_pp             <span class="p">|</span> <span class="o">{</span>115,115,115,115<span class="o">}</span>
+zahrada_pp_r           <span class="p">|</span> <span class="o">{</span>17.16,17.22,17.32,17.24<span class="o">}</span>
+zahrada_v              <span class="p">|</span> <span class="o">{</span>77381,77381,77353,77353<span class="o">}</span>
+zahrada_v_avg          <span class="p">|</span> <span class="o">{</span>673,673,673,673<span class="o">}</span>
+zahrada_v_r            <span class="p">|</span> <span class="o">{</span>2.06,2.06,2.06,2.06<span class="o">}</span>
+zastavena_plocha_pp    <span class="p">|</span> <span class="o">{</span>173,173,168,168<span class="o">}</span>
+zastavena_plocha_pp_r  <span class="p">|</span> <span class="o">{</span>25.82,25.90,25.30,25.19<span class="o">}</span>
+zastavena_plocha_v     <span class="p">|</span> <span class="o">{</span>69240,69240,69269,69269<span class="o">}</span>
+zastavena_plocha_v_avg <span class="p">|</span> <span class="o">{</span>400,400,412,412<span class="o">}</span>
+zastavena_plocha_v_r   <span class="p">|</span> <span class="o">{</span>1.84,1.84,1.84,1.84<span class="o">}</span>
+</pre></div>
+
+
+<p>Several stats were calculated for each land use category (vinice &rarr; vineyard, ovocny_sad &rarr; orchard,&nbsp;&#8230;):</p>
+<ul>
+<li><code>v_r</code> suffix stands for land use area&nbsp;ratio</li>
+<li><code>pp_r</code> suffix stands for land use parcel count&nbsp;ratio</li>
+<li><code>v_avg</code> stands for average parcel&nbsp;area</li>
+</ul>
+<p>All statistical columns are kept as PostgreSQL <code>ARRAY</code>s, ordered by dates (very handy for the future d3.js viz by the&nbsp;way).</p>
+<blockquote>
+<p>Note that since the <code>FULL OUTER JOIN</code> is needed in the next step, SQLite can&#8217;t be used. Pity&nbsp;though.</p>
+</blockquote>
+<p>The whole transformation bash script is the&nbsp;plain:</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+psql -qAt --no-psqlrc -f transform.sql <span class="p">|</span> psql -qAt --no-psqlrc
+</pre></div>
+
+
+<p>The <code>transform.sql</code> file is used to build the dynamic <span class="caps">SQL</span> query, which - once built - is piped to another <code>psql</code> command. I admit, pipes are super&nbsp;awesome.</p>
+<div class="highlight"><pre><span></span><span class="k">WITH</span> <span class="n">tables</span> <span class="k">AS</span> <span class="p">(</span>
+<span class="c1">-- FULL OUTER JOIN all the data_YYYYMMDD tables</span>
+<span class="k">SELECT</span>
+    <span class="k">table_name</span><span class="p">,</span>
+    <span class="n">table_schema</span><span class="p">,</span>
+    <span class="s1">&#39;d&#39;</span> <span class="o">||</span> <span class="n">id</span> <span class="n">tbl</span><span class="p">,</span>
+    <span class="k">CASE</span> <span class="k">WHEN</span> <span class="n">id</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">THEN</span> <span class="n">table_schema</span> <span class="o">||</span> <span class="s1">&#39;.&#39;</span> <span class="o">||</span> <span class="k">table_name</span> <span class="o">||</span> <span class="s1">&#39; d&#39;</span> <span class="o">||</span> <span class="n">id</span>
+        <span class="k">ELSE</span> <span class="s1">&#39;FULL OUTER JOIN &#39;</span> <span class="o">||</span> <span class="n">table_schema</span> <span class="o">||</span> <span class="s1">&#39;.&#39;</span> <span class="o">||</span> <span class="k">table_name</span> <span class="o">||</span> <span class="s1">&#39; d&#39;</span> <span class="o">||</span> <span class="n">id</span> <span class="o">||</span> <span class="s1">&#39; ON (d1.ku_kod = d&#39;</span> <span class="o">||</span> <span class="n">id</span> <span class="o">||</span> <span class="s1">&#39;.ku_kod)&#39;</span>
+    <span class="k">END</span> <span class="n">tbl_join</span>
+<span class="k">FROM</span> <span class="p">(</span>
+    <span class="k">SELECT</span>
+        <span class="k">table_name</span><span class="p">,</span>
+        <span class="n">table_schema</span><span class="p">,</span>
+        <span class="n">row_number</span><span class="p">()</span> <span class="n">OVER</span> <span class="p">(</span><span class="k">ORDER</span> <span class="k">BY</span> <span class="k">table_name</span><span class="p">)</span> <span class="n">id</span>
+    <span class="k">FROM</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">tables</span>
+    <span class="k">WHERE</span> <span class="k">table_name</span> <span class="k">LIKE</span> <span class="s1">&#39;data_%&#39;</span>
+        <span class="k">AND</span> <span class="n">table_type</span> <span class="o">=</span> <span class="s1">&#39;BASE TABLE&#39;</span>
+        <span class="k">AND</span> <span class="n">table_schema</span> <span class="o">=</span> <span class="s1">&#39;public&#39;</span>
+<span class="p">)</span> <span class="n">a</span>
+<span class="p">)</span>
+<span class="c1">-- create data table with the correct values order for each statistical column</span>
+<span class="c1">-- note that the whole process would crash if d1.ku_kod would be NULL -&gt; @todo fix me</span>
+<span class="k">SELECT</span> <span class="s1">&#39;DROP TABLE IF EXISTS data;</span>
+<span class="s1">    CREATE TABLE data AS</span>
+<span class="s1">    SELECT d1.ku_kod, d1.ku_nazev,&#39;</span>
+<span class="k">UNION</span> <span class="k">ALL</span>
+<span class="k">SELECT</span>
+    <span class="n">array_to_string</span><span class="p">(</span><span class="n">array_agg</span><span class="p">(</span><span class="n">r</span><span class="p">),</span> <span class="s1">&#39;, &#39;</span><span class="p">)</span> <span class="n">r</span>
+<span class="k">FROM</span> <span class="p">(</span>
+    <span class="k">SELECT</span>
+    <span class="s1">&#39;ARRAY[&#39;</span> <span class="o">||</span> <span class="n">array_to_string</span><span class="p">(</span><span class="n">array_agg</span><span class="p">(</span><span class="n">tables</span><span class="p">.</span><span class="n">tbl</span> <span class="o">||</span> <span class="s1">&#39;.&#39;</span> <span class="o">||</span> <span class="n">columns</span><span class="p">.</span><span class="k">column_name</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">tables</span><span class="p">.</span><span class="k">table_name</span><span class="p">),</span> <span class="s1">&#39;, &#39;</span><span class="p">)</span> <span class="o">||</span> <span class="s1">&#39;]&#39;</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span> <span class="n">columns</span><span class="p">.</span><span class="k">column_name</span> <span class="n">r</span>
+    <span class="k">FROM</span> <span class="n">tables</span>
+    <span class="k">JOIN</span> <span class="p">(</span>
+    <span class="k">SELECT</span>
+        <span class="n">table_schema</span><span class="p">,</span>
+        <span class="k">table_name</span><span class="p">,</span>
+        <span class="k">column_name</span>
+    <span class="k">FROM</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">columns</span>
+    <span class="k">WHERE</span> <span class="k">column_name</span> <span class="k">NOT</span> <span class="k">LIKE</span> <span class="s1">&#39;ku_%&#39;</span>
+    <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">ordinal_position</span>
+    <span class="p">)</span> <span class="n">columns</span>
+    <span class="k">ON</span> <span class="p">(</span><span class="n">tables</span><span class="p">.</span><span class="k">table_name</span> <span class="o">=</span> <span class="n">columns</span><span class="p">.</span><span class="k">table_name</span> <span class="k">AND</span> <span class="n">columns</span><span class="p">.</span><span class="n">table_schema</span> <span class="o">=</span> <span class="n">tables</span><span class="p">.</span><span class="n">table_schema</span><span class="p">)</span>
+    <span class="k">GROUP</span> <span class="k">BY</span> <span class="n">columns</span><span class="p">.</span><span class="k">column_name</span>
+<span class="p">)</span> <span class="n">a</span>
+<span class="k">UNION</span> <span class="k">ALL</span>
+<span class="k">SELECT</span> <span class="s1">&#39;FROM&#39;</span>
+<span class="k">UNION</span> <span class="k">ALL</span>
+<span class="k">SELECT</span> <span class="n">tbl_join</span> <span class="k">FROM</span> <span class="n">tables</span><span class="p">;</span>
+</pre></div>
+
+
+<p><code>psql -qAt --no-psqlrc -f transform.sql</code> builds the actual query from the query above, <code>| psql -qAt --no-psqlrc</code> sends it to the database again. This part was really fun to&nbsp;implement!</p>
+<p>I&#8217;m still considering to store diff values instead of absolute values in those <code>ARRAY</code>s - that would save some serious&nbsp;bandwidth!</p>
+<h2>Load</h2>
+<p>Will be covered in the next&nbsp;post.</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
             <h1><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i/" rel="bookmark" title="Permalink to Plotting Czech Cadastre Land Use with d3: Data Extraction (part I)">Plotting Czech Cadastre Land Use with d3: Data Extraction (part&nbsp;I)</a></h1>
             <small>Written on Nov 13, 2016
         and marked as
         <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>,         <a href="https://www.zimmi.cz/posts/tag/d3.html">d3</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>        | <a href="https://www.zimmi.cz/posts/category/data.html">data</a>
         </small>
         <section>
-            <p>This post is the first part of the upcoming series summarizing the process of visualizing landuse data with bash, PostgreSQL and&nbsp;d3.js.</p>
+            <p>This post is the first part of the upcoming series summarizing the process of visualizing landuse data with bash, PostgreSQL and d3.js. Read other&nbsp;parts:</p>
+<ol>
+<li>you&#8217;re reading it&nbsp;now</li>
+<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii/">Plotting Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></li>
+</ol>
 <p><a href="http://cuzk.cz/en">Czech Office for Surveying, Mapping and Cadastre</a> has recently published lot of data via <a href="http://atom.cuzk.cz">Atom feed</a>. There&#8217;s pretty small and a bit boring dataset included, featuring quarterly updated landuse-related values for all 13,091 cadastral&nbsp;areas:</p>
 <ul>
 <li>absolute number of land lots within given category (arable land, forests,&nbsp;etc.)</li>
@@ -110,7 +275,7 @@ rm <span class="nv">$CSVFILE</span> <span class="nv">$CSVUTF8FILE</span>
 
 <p>This script downloads <span class="caps">CSV</span> file, deals with all the pitfalls mentioned above and, when done, <code>copy</code> command within <code>extract.sql</code> loads the data into a <code>data_YYYYMMDD</code> table. Putting all the files into the one table would have saved me a lot of transformation <span class="caps">SQL</span>, yet it didn&#8217;t feel quite right&nbsp;though.</p>
 <h2>Transform</h2>
-<p>Will be covered in the next&nbsp;post.</p>
+<p>See <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii/">Plotting Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a>.</p>
 <h2>Load</h2>
 <p>Will be covered in the post after the next post. Stay&nbsp;tuned!</p>
         </section>
@@ -544,42 +709,6 @@ git push <span class="o">&amp;&amp;</span> <span class="se">\</span>
 <li>You should probably take care of calling the <code>retrieveToken()</code> in shorter interval than the token expiration is set to. Otherwise you might end up with invalid&nbsp;token.</li>
 <li>You need to hide the username and password from anonymous users (I guess that&#8217;s only possible with server side implementation of selective JavaScript&nbsp;loading).</li>
 </ol>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2014/degrees-to-decimal-with-javascript/" rel="bookmark" title="Permalink to Degrees To Decimal With Javascript">Degrees To Decimal With&nbsp;Javascript</a></h1>
-            <small>Written on Sep 9, 2014
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>        | <a href="https://www.zimmi.cz/posts/category/development.html">development</a>
-        </small>
-        <section>
-            <p>I have found a nice way to get decimal value from degrees of longitude and latitude&nbsp;recently:</p>
-<div class="highlight"><pre><span></span><span class="kd">function</span> <span class="nx">format</span><span class="p">(</span><span class="nx">coords</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">decimal</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="nx">output</span>  <span class="o">=</span> <span class="p">[],</span>
-        <span class="nx">coords</span>  <span class="o">=</span> <span class="nx">coords</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;  &#39;</span><span class="p">);</span> <span class="c1">// it might be &lt;br&gt; as well</span>
-
-    <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">coords</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kd">var</span> <span class="nx">c</span> <span class="o">=</span> <span class="nx">coords</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">);</span>
-
-        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">j</span> <span class="o">&lt;</span> <span class="nx">c</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">j</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-            <span class="nx">decimal</span> <span class="o">+=</span> <span class="nx">c</span><span class="p">[</span><span class="nx">j</span><span class="p">]</span> <span class="o">/</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="nx">j</span><span class="p">);</span>
-        <span class="p">}</span>
-
-        <span class="nx">output</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nb">parseFloat</span><span class="p">(</span><span class="nx">decimal</span><span class="p">).</span><span class="nx">toFixed</span><span class="p">(</span><span class="mi">5</span><span class="p">));</span>
-        <span class="nx">decimal</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="nx">prompt</span><span class="p">(</span><span class="s1">&#39;Souřadnice bodu&#39;</span><span class="p">,</span> <span class="nx">output</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="p">));</span>
-<span class="p">}</span>
-</pre></div>
-
-
-<p>When you call <code>format("DD° MM' SS'  DD° MM' SS'");</code> you&#8217;ll get decimal value in return (or <code>prompt</code> to be accurate). What I like the most about this solution is the usage of Math.pow(). I think it is a neat way to transform the values as you need to divide parts of latitude or longitude by 60<sup>0</sup>, 60<sup>1</sup> and 60<sup>2</sup> respectively.</p>
-<p>There is definitely a googol of different solutions to this task, I just liked the simplicity of this&nbsp;one.</p>
         </section>
         </div>
     </div>

@@ -15,7 +15,7 @@
     <meta name="tags" content="svg" />
   <meta property="og:image" content="https://pbs.twimg.com/profile_images/770323886290440192/3G5hqp11_400x400.jpg" />
   <meta property="og:title" content="Plotting Czech Cadastre Land Use with d3: Data Extraction (part I)" />
-  <meta property="og:description" content="This post is the first part of the upcoming series summarizing the process of visualizing landuse data with bash, PostgreSQL and d3.js. Czech Office for Surveying, Mapping and Cadastre has recently published lot of data via Atom feed. There’s pretty ..." />
+  <meta property="og:description" content="This post is the first part of the upcoming series summarizing the process of visualizing landuse data with bash, PostgreSQL and d3.js. Read other parts: you’re reading it now Plotting Czech Cadastre Land Use with d3: Data Transformation (part II) ..." />
   <meta property="og:url" content="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i/" />
         <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?d5d1e141">
 </head>
@@ -53,7 +53,11 @@
     <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>,     <a href="https://www.zimmi.cz/posts/tag/d3.html">d3</a>,     <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,     <a href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>    | <a href="https://www.zimmi.cz/posts/category/data.html">data</a>
     </small>
     <section>
-        <p>This post is the first part of the upcoming series summarizing the process of visualizing landuse data with bash, PostgreSQL and&nbsp;d3.js.</p>
+        <p>This post is the first part of the upcoming series summarizing the process of visualizing landuse data with bash, PostgreSQL and d3.js. Read other&nbsp;parts:</p>
+<ol>
+<li>you&#8217;re reading it&nbsp;now</li>
+<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii/">Plotting Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></li>
+</ol>
 <p><a href="http://cuzk.cz/en">Czech Office for Surveying, Mapping and Cadastre</a> has recently published lot of data via <a href="http://atom.cuzk.cz">Atom feed</a>. There&#8217;s pretty small and a bit boring dataset included, featuring quarterly updated landuse-related values for all 13,091 cadastral&nbsp;areas:</p>
 <ul>
 <li>absolute number of land lots within given category (arable land, forests,&nbsp;etc.)</li>
@@ -119,7 +123,7 @@ rm <span class="nv">$CSVFILE</span> <span class="nv">$CSVUTF8FILE</span>
 
 <p>This script downloads <span class="caps">CSV</span> file, deals with all the pitfalls mentioned above and, when done, <code>copy</code> command within <code>extract.sql</code> loads the data into a <code>data_YYYYMMDD</code> table. Putting all the files into the one table would have saved me a lot of transformation <span class="caps">SQL</span>, yet it didn&#8217;t feel quite right&nbsp;though.</p>
 <h2>Transform</h2>
-<p>Will be covered in the next&nbsp;post.</p>
+<p>See <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii/">Plotting Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a>.</p>
 <h2>Load</h2>
 <p>Will be covered in the post after the next post. Stay&nbsp;tuned!</p>
     </section>
@@ -133,8 +137,18 @@ rm <span class="nv">$CSVFILE</span> <span class="nv">$CSVUTF8FILE</span>
             </a>
         </li>
          <li>
+             <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii/">
+                 Plotting Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)
+             </a>
+         </li>
+         <li>
              <a href="https://www.zimmi.cz/posts/2015/liftago-open-dataset-infographics/">
                  Liftago Open Dataset&nbsp;Infographics
+             </a>
+         </li>
+         <li>
+             <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii/">
+                 Plotting Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)
              </a>
          </li>
         </li>
