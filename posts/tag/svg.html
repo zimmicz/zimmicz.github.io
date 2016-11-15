@@ -38,15 +38,16 @@
 
     <div class="panel card card-1">
         <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii/" rel="bookmark" title="Permalink to Plotting Czech Cadastre Land Use with d3: Data Transformation (part II)">Plotting Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></h1>
-            <small>Written on Nov 14, 2016
+            <h1><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/" rel="bookmark" title="Permalink to Plotting the Czech Cadastre Land Use with d3: Data Load (part III)">Plotting the Czech Cadastre Land Use with d3: Data Load (part <span class="caps">III</span>)</a></h1>
+            <small>Written on Nov 15, 2016
         and marked as
-        <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>,         <a href="https://www.zimmi.cz/posts/tag/d3.html">d3</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>        | <a href="https://www.zimmi.cz/posts/category/data.html">data</a>
+        <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/d3.html">d3</a>,         <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>,         <a href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>        | <a href="https://www.zimmi.cz/posts/category/data.html">data</a>
         </small>
         <section>
             <p>This post is the second part of the series summarizing the process of visualizing landuse data with bash, PostgreSQL and d3.js. Read other&nbsp;parts:</p>
 <ol>
-<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i/">Plotting Czech Cadastre Land Use with d3: Data Extraction (part&nbsp;I)</a></li>
+<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part&nbsp;I)</a></li>
+<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></li>
 <li>you&#8217;re reading it&nbsp;now</li>
 </ol>
 <h2><span class="caps">ETL</span>&nbsp;process</h2>
@@ -58,7 +59,58 @@
 <li>profit (as&nbsp;usual)</li>
 </ol>
 <h3>Extract</h3>
-<p>See <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i/">Plotting Czech Cadastre Land Use with d3: Data Extraction (part I)</a>.</p>
+<p>See <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)</a>.</p>
+<h3>Transform</h3>
+<p>See <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a>.</p>
+<h2>Load</h2>
+<p>Thanks to the way I transformed the data, the whole load is done with&nbsp;simple</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+touch ./data/data.js
+<span class="nb">echo</span> <span class="s2">&quot;let data =&quot;</span> &gt; ./data/data.js
+
+<span class="o">(</span>
+cat <span class="s">&lt;&lt; EOF | psql -qAt --no-psqlrc</span>
+<span class="s">    SELECT</span>
+<span class="s">    array_to_json(array_agg(row_to_json(r)))</span>
+<span class="s">    FROM (</span>
+<span class="s">    SELECT *</span>
+<span class="s">    FROM data</span>
+<span class="s">    ) r</span>
+<span class="s">EOF</span>
+<span class="o">)</span> &gt;&gt; ./data/data.js
+</pre></div>
+
+
+<p>That&#8217;s the whole <span class="caps">ETL</span> process! Next time, I&#8217;ll cover the d3.js&nbsp;viz.</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii" rel="bookmark" title="Permalink to Plotting the Czech Cadastre Land Use with d3: Data Transformation (part II)">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></h1>
+            <small>Written on Nov 14, 2016
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>,         <a href="https://www.zimmi.cz/posts/tag/d3.html">d3</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>        | <a href="https://www.zimmi.cz/posts/category/data.html">data</a>
+        </small>
+        <section>
+            <p>This post is the second part of the series summarizing the process of visualizing landuse data with bash, PostgreSQL and d3.js. Read other&nbsp;parts:</p>
+<ol>
+<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part&nbsp;I)</a></li>
+<li>you&#8217;re reading it&nbsp;now</li>
+<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">III</span>)</a></li>
+</ol>
+<h2><span class="caps">ETL</span>&nbsp;process</h2>
+<p>Before the d3 viz can be crafted, it&#8217;s necessary&nbsp;to:</p>
+<ol>
+<li>extract <span class="caps">CSV</span> data from the URLs provided via the Atom&nbsp;feed</li>
+<li>transform those data into a relational database, do some&nbsp;math</li>
+<li>load data into a d3.js&nbsp;viz</li>
+<li>profit (as&nbsp;usual)</li>
+</ol>
+<h3>Extract</h3>
+<p>See <a href="{filename}../2016/plotting-czech-cadastre-landuse-with-d3-part-i.md">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)</a>.</p>
 <h3>Transform</h3>
 <p>Last time, I extracted the data from multiple <span class="caps">CSV</span> files to separate PostgreSQL tables named by <code>data_YYYYMMDD</code> pattern. My current goal is to transform it into the one big <code>data</code> table, where each row represents one cadastral area. Here&#8217;s what I&#8217;m trying to&nbsp;achieve:</p>
 <div class="highlight"><pre><span></span>-<span class="o">[</span> RECORD <span class="m">1</span> <span class="o">]</span>----------+----------------------------------
@@ -192,14 +244,14 @@ psql -qAt --no-psqlrc -f transform.sql <span class="p">|</span> psql -qAt --no-p
 <p><code>psql -qAt --no-psqlrc -f transform.sql</code> builds the actual query from the query above, <code>| psql -qAt --no-psqlrc</code> sends it to the database again. This part was really fun to&nbsp;implement!</p>
 <p>I&#8217;m still considering to store diff values instead of absolute values in those <code>ARRAY</code>s - that would save some serious&nbsp;bandwidth!</p>
 <h2>Load</h2>
-<p>Will be covered in the next&nbsp;post.</p>
+<p>See <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">III</span>)</a>.</p>
         </section>
         </div>
     </div>
 
     <div class="panel card card-1">
         <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i/" rel="bookmark" title="Permalink to Plotting Czech Cadastre Land Use with d3: Data Extraction (part I)">Plotting Czech Cadastre Land Use with d3: Data Extraction (part&nbsp;I)</a></h1>
+            <h1><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i" rel="bookmark" title="Permalink to Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part&nbsp;I)</a></h1>
             <small>Written on Nov 13, 2016
         and marked as
         <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>,         <a href="https://www.zimmi.cz/posts/tag/d3.html">d3</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>        | <a href="https://www.zimmi.cz/posts/category/data.html">data</a>
@@ -208,7 +260,8 @@ psql -qAt --no-psqlrc -f transform.sql <span class="p">|</span> psql -qAt --no-p
             <p>This post is the first part of the upcoming series summarizing the process of visualizing landuse data with bash, PostgreSQL and d3.js. Read other&nbsp;parts:</p>
 <ol>
 <li>you&#8217;re reading it&nbsp;now</li>
-<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii/">Plotting Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></li>
+<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></li>
+<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">III</span>)</a></li>
 </ol>
 <p><a href="http://cuzk.cz/en">Czech Office for Surveying, Mapping and Cadastre</a> has recently published lot of data via <a href="http://atom.cuzk.cz">Atom feed</a>. There&#8217;s pretty small and a bit boring dataset included, featuring quarterly updated landuse-related values for all 13,091 cadastral&nbsp;areas:</p>
 <ul>
@@ -275,9 +328,9 @@ rm <span class="nv">$CSVFILE</span> <span class="nv">$CSVUTF8FILE</span>
 
 <p>This script downloads <span class="caps">CSV</span> file, deals with all the pitfalls mentioned above and, when done, <code>copy</code> command within <code>extract.sql</code> loads the data into a <code>data_YYYYMMDD</code> table. Putting all the files into the one table would have saved me a lot of transformation <span class="caps">SQL</span>, yet it didn&#8217;t feel quite right&nbsp;though.</p>
 <h2>Transform</h2>
-<p>See <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii/">Plotting Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a>.</p>
+<p>See <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a>.</p>
 <h2>Load</h2>
-<p>Will be covered in the post after the next post. Stay&nbsp;tuned!</p>
+<p>See <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">III</span>)</a>.</p>
         </section>
         </div>
     </div>

@@ -1,12 +1,15 @@
-Title: Plotting Czech Cadastre Land Use with d3: Data Extraction (part I)
+Title: Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)
 Date: 2016-11-13 18:30
 Category: data
 Tags: javascript, d3, postgresql, svg
+URL: 2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i
+save_as: 2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i/index.html
 
 This post is the first part of the upcoming series summarizing the process of visualizing landuse data with bash, PostgreSQL and d3.js. Read other parts:
 
 1. you're reading it now
-2. [Plotting Czech Cadastre Land Use with d3: Data Transformation (part II)]({filename}../2016/plotting-czech-cadastre-landuse-with-d3-part-ii.md)
+2. [Plotting the Czech Cadastre Land Use with d3: Data Transformation (part II)]({filename}../2016/plotting-czech-cadastre-land-use-with-d3-part-ii.md)
+3. [Plotting the Czech Cadastre Land Use with d3: Data Transformation (part III)]({filename}../2016/plotting-czech-cadastre-land-use-with-d3-part-iii.md)
 
 [Czech Office for Surveying, Mapping and Cadastre](http://cuzk.cz/en) has recently published lot of data via [Atom feed](http://atom.cuzk.cz). There's pretty small and a bit boring dataset included, featuring quarterly updated landuse-related values for all 13,091 cadastral areas:
 
@@ -74,7 +77,7 @@ Before the d3 viz can be crafted, it's necessary to:
 This script downloads CSV file, deals with all the pitfalls mentioned above and, when done, `copy` command within `extract.sql` loads the data into a `data_YYYYMMDD` table. Putting all the files into the one table would have saved me a lot of transformation SQL, yet it didn't feel quite right though.
 
 ## Transform
-See [Plotting Czech Cadastre Land Use with d3: Data Transformation (part II)]({filename}../2016/plotting-czech-cadastre-landuse-with-d3-part-ii.md).
+See [Plotting the Czech Cadastre Land Use with d3: Data Transformation (part II)]({filename}../2016/plotting-czech-cadastre-land-use-with-d3-part-ii.md).
 
 ## Load
-Will be covered in the post after the next post. Stay tuned!
+See [Plotting the Czech Cadastre Land Use with d3: Data Transformation (part III)]({filename}../2016/plotting-czech-cadastre-land-use-with-d3-part-iii.md).
