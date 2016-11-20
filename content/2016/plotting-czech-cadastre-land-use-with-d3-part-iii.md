@@ -5,7 +5,7 @@ Tags: postgresql, d3, javascript, svg
 URL: 2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/
 save_as: 2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/index.html
 
-This post is the second part of the series summarizing the process of visualizing landuse data with bash, PostgreSQL and d3.js. Read other parts:
+This post is the third part of the series summarizing the process of visualizing landuse data with bash, PostgreSQL and d3.js. Read other parts:
 
 1. [Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)]({filename}../2016/plotting-czech-cadastre-land-use-with-d3-part-i.md)
 2. [Plotting the Czech Cadastre Land Use with d3: Data Transformation (part II)]({filename}../2016/plotting-czech-cadastre-land-use-with-d3-part-ii.md)
