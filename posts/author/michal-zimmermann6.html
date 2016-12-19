@@ -38,6 +38,68 @@
 
     <div class="panel card card-1">
         <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2014/connecting-to-secured-arcgis-server-layer-with-openlayers-3/" rel="bookmark" title="Permalink to Connecting To Secured ArcGIS Server Layer With OpenLayers 3">Connecting To Secured ArcGIS Server Layer With OpenLayers&nbsp;3</a></h1>
+            <small>Written on Sep 12, 2014
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>,         <a href="https://www.zimmi.cz/posts/tag/openlayers.html">openlayers</a>,         <a href="https://www.zimmi.cz/posts/tag/ogc.html">ogc</a>        | <a href="https://www.zimmi.cz/posts/category/web-maps.html">web maps</a>
+        </small>
+        <section>
+            <p>I was made to use ArcGIS Server with <a href="http://openlayers.org">Openlayers 3</a> just recently as one of the projects I&#8217;ve been working on demands such different tools to work&nbsp;together.</p>
+<p><strong>tl;dr: I hate&nbsp;Esri.</strong></p>
+<p>I found myself in need to access secured layers published via <span class="caps">WMS</span> on ArcGIS Server using username and password I was given, so here&#8217;s a little how-to for anyone who would have to do the&nbsp;same.</p>
+<p>Let&#8217;s start with a simple ol.layer.Image and pretend this is the secured layer we&#8217;re looking&nbsp;for:</p>
+<div class="highlight"><pre><span></span>var layer = new ol.layer.Image({
+    extent: extent,
+    source: new ol.source.ImageWMS(/** @type {olx.source.ImageWMSOptions} */ ({
+        url: url,
+        params: {
+            &#39;LAYERS&#39;: &#39;layer&#39;,
+            &#39;CRS&#39;: &#39;EPSG:3857&#39;,
+        }
+    }))
+});
+</pre></div>
+
+
+<p>We need to retrieve the token, so we define a&nbsp;function:</p>
+<div class="highlight"><pre><span></span><span class="nt">function</span> <span class="nt">retrieveToken</span><span class="o">(</span><span class="nt">callback</span><span class="o">)</span> <span class="p">{</span>
+    <span class="n">var</span> <span class="n">req</span> <span class="o">=</span> <span class="n">new</span> <span class="n">XMLHttpRequest</span><span class="p">;</span>
+
+    <span class="n">req</span><span class="o">.</span><span class="n">onload</span> <span class="o">=</span> <span class="n">function</span><span class="p">()</span> <span class="err">{</span>
+        <span class="n">if</span> <span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;200&quot;</span><span class="p">)</span> <span class="err">{</span>
+            <span class="n">var</span> <span class="n">response</span> <span class="o">=</span> <span class="n">JSON</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">responseText</span><span class="p">);</span>
+            <span class="n">if</span> <span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">contents</span><span class="p">)</span> <span class="err">{</span>
+                <span class="n">callback</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">contents</span><span class="p">);</span> <span class="o">//</span> <span class="n">response</span> <span class="n">contents</span> <span class="n">is</span> <span class="n">where</span> <span class="n">the</span> <span class="n">token</span> <span class="n">is</span> <span class="n">stored</span>
+        <span class="p">}</span>
+    <span class="err">}</span><span class="o">;</span>
+    <span class="nt">req</span><span class="nc">.open</span><span class="o">(</span><span class="s2">&quot;get&quot;</span><span class="o">,</span> <span class="s2">&quot;http://server.address/arcgis/tokens/?request=getToken&amp;username=username&amp;password=password&amp;expiration=60&quot;</span><span class="o">,</span> <span class="nt">true</span><span class="o">);</span>
+    <span class="nt">req</span><span class="nc">.send</span><span class="o">()</span>
+<span class="err">}</span>
+</pre></div>
+
+
+<p>I pass a parameter called <code>callback</code> - that&#8217;s a very important step, otherwise you would not be able to retrieve the token when you actually need it (<span class="caps">AJAX</span> stands for asynchronous). Now you just pass the token to the layer params like&nbsp;this:</p>
+<div class="highlight"><pre><span></span>retrieveToken(function(token) {
+    layer.getSource().updateParams({
+        token: token
+    })
+}
+</pre></div>
+
+
+<p>When you open Firebug and inspect Network tab, you should find <code>token</code> <span class="caps">URL</span> parameter passed along with <span class="caps">WMS</span> <code>GetMap</code> request.</p>
+<p>Few&nbsp;sidenotes:</p>
+<ol>
+<li>Although you might be logged in ArcGIS Server via web interface, you might need to pass the <code>token</code>  <span class="caps">URL</span> param when trying to access Capabilities document. Don&#8217;t know why&nbsp;though.</li>
+<li>You should probably take care of calling the <code>retrieveToken()</code> in shorter interval than the token expiration is set to. Otherwise you might end up with invalid&nbsp;token.</li>
+<li>You need to hide the username and password from anonymous users (I guess that&#8217;s only possible with server side implementation of selective JavaScript&nbsp;loading).</li>
+</ol>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
             <h1><a href="https://www.zimmi.cz/posts/2014/blogging-on-docker-piecrust-to-the-rescue/" rel="bookmark" title="Permalink to Blogging On Docker: Piecrust To The Rescue">Blogging On Docker: Piecrust To The&nbsp;Rescue</a></h1>
             <small>Written on Sep 11, 2014
         and marked as

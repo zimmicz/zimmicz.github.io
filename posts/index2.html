@@ -37,6 +37,82 @@
 
     <div class="panel card card-1">
         <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2016/finding-polygons-lying-across-other-polygons-with-postgis/" rel="bookmark" title="Permalink to Finding Polygons Lying across Other Polygons with PostGIS">Finding Polygons Lying across Other Polygons with&nbsp;PostGIS</a></h1>
+            <small>Written on Aug 5, 2016
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
+        </small>
+        <section>
+            <p>Doing overlays (<code>ST_Intersection()</code>) in PostGIS based on spatial relationships (<code>ST_Intersects()</code>, <code>ST_Contains()</code>, &hellip;) is so easy it is not something you get particularly excited&nbsp;about.</p>
+<p>Today I faced a bit more interesting task: <strong>given two polygon layers, get me all the polygons from layer A such that they lie across the polygons from layer B and&hellip; a picture worth a thousand words,&nbsp;right?</strong></p>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/finding-polygons-lying-across-other-polygons-with-postgis/polygons.svg" /></div>
+
+<p>I hope you got the idea, it is fairly&nbsp;simple:</p>
+<ol>
+<li>Intersect A (red, blue) with B&nbsp;(green)</li>
+<li>Subtract the result of previous from layer&nbsp;A</li>
+<li>Combine results from steps 1 and&nbsp;2</li>
+<li>Keep polygon only if its id occurs more than twice (that means it went straight through the layer&nbsp;B)</li>
+<li>Profit!</li>
+</ol>
+<!-- codeblock -->
+
+<div class="highlight"><pre><span></span><span class="k">WITH</span> <span class="n">overlays</span> <span class="k">AS</span> <span class="p">(</span>
+<span class="cm">/* nothing fancy here */</span>
+    <span class="k">SELECT</span>
+        <span class="n">A</span><span class="p">.</span><span class="n">ogc_fid</span> <span class="n">a_id</span><span class="p">,</span>
+        <span class="n">B</span><span class="p">.</span><span class="n">ogc_fid</span> <span class="n">b_id</span><span class="p">,</span>
+        <span class="n">ST_Intersection</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">B</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">geom</span><span class="p">,</span>
+        <span class="n">ST_Area</span><span class="p">(</span><span class="n">ST_Intersection</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">B</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">area_shared</span>
+    <span class="k">FROM</span> <span class="n">A</span>
+    <span class="k">JOIN</span> <span class="n">B</span> <span class="k">ON</span> <span class="p">(</span><span class="n">ST_Intersects</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">B</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span>
+<span class="p">),</span>
+<span class="n">diffs</span> <span class="k">AS</span> <span class="p">(</span>
+<span class="cm">/* note this is a 1:1 relationship in ST_Difference */</span>
+<span class="cm">/* a little hack is needed to prevent PostGIS from returning its usual difference mess */</span>
+    <span class="k">SELECT</span>
+        <span class="n">o</span><span class="p">.</span><span class="n">a_id</span><span class="p">,</span>
+        <span class="n">o</span><span class="p">.</span><span class="n">b_id</span><span class="p">,</span>
+        <span class="p">(</span><span class="n">ST_Dump</span><span class="p">(</span><span class="n">ST_Difference</span><span class="p">(</span><span class="n">ST_Buffer</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="o">-</span><span class="mi">0</span><span class="p">.</span><span class="mi">0001</span><span class="p">),</span> <span class="n">o</span><span class="p">.</span><span class="n">geom</span><span class="p">))).</span><span class="n">geom</span><span class="p">,</span> <span class="c1">-- ugly hack</span>
+        <span class="n">o</span><span class="p">.</span><span class="n">area_shared</span>
+    <span class="k">FROM</span> <span class="n">overlays</span> <span class="n">o</span>
+    <span class="k">JOIN</span> <span class="n">A</span> <span class="k">ON</span> <span class="p">(</span><span class="n">o</span><span class="p">.</span><span class="n">a_id</span> <span class="o">=</span> <span class="n">A</span><span class="p">.</span><span class="n">id</span><span class="p">)</span>
+<span class="p">),</span>
+
+<span class="n">merged</span> <span class="k">AS</span> <span class="p">(</span>
+<span class="cm">/* put those two result sets together */</span>
+    <span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">overlays</span>
+    <span class="k">UNION</span> <span class="k">ALL</span>
+    <span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">diffs</span>
+<span class="p">),</span>
+
+<span class="n">merged_reduced</span> <span class="k">AS</span> <span class="p">(</span>
+<span class="cm">/* get only those A polygons that consist of three parts at least for each intersection with B polygon */</span>
+  <span class="k">SELECT</span>
+    <span class="n">m</span><span class="p">.</span><span class="o">*</span>
+  <span class="k">FROM</span> <span class="n">merged</span> <span class="n">m</span>
+  <span class="k">JOIN</span> <span class="p">(</span>
+    <span class="k">SELECT</span>
+      <span class="n">a_id</span><span class="p">,</span>
+      <span class="n">b_id</span>
+    <span class="k">FROM</span> <span class="n">merged</span>
+    <span class="k">GROUP</span> <span class="k">BY</span> <span class="n">a_id</span><span class="p">,</span> <span class="n">b_id</span>
+    <span class="k">HAVING</span> <span class="k">COUNT</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span>
+  <span class="p">)</span> <span class="n">a</span> <span class="k">ON</span> <span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">a_id</span> <span class="o">=</span> <span class="n">m</span><span class="p">.</span><span class="n">a_id</span> <span class="k">AND</span> <span class="n">a</span><span class="p">.</span><span class="n">b_id</span> <span class="o">=</span> <span class="n">m</span><span class="p">.</span><span class="n">b_id</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="cm">/* do as you wish with the result */</span>
+<span class="k">SELECT</span> <span class="o">*</span>
+<span class="k">FROM</span> <span class="n">merged_reduced</span><span class="p">;</span>
+</pre></div>
+
+
+<p>In my case, centerlines of layer B were also included and their length inside each intersection was used to divide the area of the smallest part with. It was fun,&nbsp;actually.</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
             <h1><a href="https://www.zimmi.cz/posts/2016/dead-simple-random-points-in-polygons-with-postgis/" rel="bookmark" title="Permalink to Dead Simple Random Points in Polygons with PostGIS">Dead Simple Random Points in Polygons with&nbsp;PostGIS</a></h1>
             <small>Written on Aug 3, 2016
         and marked as
@@ -631,77 +707,6 @@ psql <span class="nv">$DATABASE</span> <span class="s">&lt;&lt; EOF</span>
 <p class="text-center"><img title="When people tweet in the Czech Republic" src="https://www.zimmi.cz/posts/assets/twitter-rest-api-data-mining-on-openshift-part-ii/hours.png" class="img-responsive centered"></p>
 
 <p class="text-center"><img title="Languages on Twitter in the Czech Republic" src="https://www.zimmi.cz/posts/assets/twitter-rest-api-data-mining-on-openshift-part-ii/languages.png" class="img-responsive centered"></p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-iii/" rel="bookmark" title="Permalink to PostGIS Case Study: Vozejkmap Open Data (Part III)">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">III</span>)</a></h1>
-            <small>Written on Nov 14, 2015
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>,         <a href="https://www.zimmi.cz/posts/tag/leaflet.html">leaflet</a>,         <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>        | <a href="https://www.zimmi.cz/posts/category/web-maps.html">web maps</a>
-        </small>
-        <section>
-            <p>After a while I got back to my <a href="https://www.zimmi.cz/posts/2014/postgis-case-study-vozejkmap-open-data-part-i/">PostGIS open data</a> <a href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-ii/">case study</a>. Last time I left it with clustering implemented, looking forward to incorporate <a href="http://turfjs.org">Turf.js</a> in the future. <em>And the future is now.</em> <a href="https://github.com/zimmicz/vozejkmap-to-postgis">The code is still available on&nbsp;GitHub.</a></p>
-<h2>Subgroup&nbsp;clustering</h2>
-<p>Vozejkmap data is categorized based on the place type (banks, parking lots, pubs, &hellip;). One of the core features of map showing such data should be the easy way to turn these categories on and&nbsp;off.</p>
-<p>As far as I know, it&#8217;s not trivial to do this with the standard Leaflet library. Extending <code>L.control.layers</code> and implement its <code>addOverlay</code>, <code>removeOverlay</code> methods on your own might be the way to add needed behavior. Fortunately, there&#8217;s an easier option thanks to <a href="https://github.com/ghybs/Leaflet.FeatureGroup.SubGroup">Leaflet.FeatureGroup.SubGroup</a> that can handle such use case and is really straightforward. See the code&nbsp;below.</p>
-<div class="highlight"><pre><span></span><span class="nx">cluster</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">markerClusterGroup</span><span class="p">({</span>
-    <span class="nx">chunkedLoading</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
-    <span class="nx">chunkInterval</span><span class="o">:</span> <span class="mi">500</span>
-<span class="p">});</span>
-
-<span class="nx">cluster</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
-
-<span class="p">...</span>
-
-<span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">category</span> <span class="k">in</span> <span class="nx">categories</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">// just use L.featureGroup.subGroup instead of L.layerGroup or L.featureGroup</span>
-    <span class="nx">overlays</span><span class="p">[</span><span class="nx">my</span><span class="p">.</span><span class="nx">Style</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="nx">category</span><span class="p">).</span><span class="nx">type</span><span class="p">]</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">featureGroup</span><span class="p">.</span><span class="nx">subGroup</span><span class="p">(</span><span class="nx">cluster</span><span class="p">,</span> <span class="nx">categories</span><span class="p">[</span><span class="nx">category</span><span class="p">]);</span>
-<span class="p">}</span>
-
-<span class="nx">mapkey</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">control</span><span class="p">.</span><span class="nx">layers</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">overlays</span><span class="p">).</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
-</pre></div>
-
-
-<p>With this piece of code you get a map key with checkboxes for all the categories, yet they&#8217;re still kept in the single cluster on the map.&nbsp;Brilliant!</p>
-<p><img src="https://www.zimmi.cz/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/map.png" title="vozejkmap.cz data map" class="img-responsive centered"></p>
-<h2>Using Turf.js for&nbsp;analysis</h2>
-<p>Turf is one of those libraries I get amazed easily with, spending a week trying to find a use case, finally putting it aside with <em>&#8220;I&#8217;ll get back to it later&#8221;</em>. I usually don&#8217;t. This time it&#8217;s&nbsp;different.</p>
-<p>I use Turf to get the nearest neighbor for any marker on click. My first try ended up with the same marker being the result as it was a member of a feature collection passed to <code>turf.nearest()</code> method. After snooping around the docs I found <code>turf.remove()</code> method that can filter GeoJSON based on key-value&nbsp;pair.</p>
-<p>Another handy function is <code>turf.distance()</code> that gives you distance between two points. The code below adds an information about the nearest point and its distance into the&nbsp;popup.</p>
-<div class="highlight"><pre><span></span><span class="c1">// data is a geojson feature collection</span>
-<span class="nx">json</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">geoJson</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span> <span class="p">{</span>
-    <span class="nx">onEachFeature</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">feature</span><span class="p">,</span> <span class="nx">layer</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">layer</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;click&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
-            <span class="kd">var</span> <span class="nx">nearest</span> <span class="o">=</span> <span class="nx">turf</span><span class="p">.</span><span class="nx">nearest</span><span class="p">(</span><span class="nx">layer</span><span class="p">.</span><span class="nx">toGeoJSON</span><span class="p">(),</span> <span class="nx">turf</span><span class="p">.</span><span class="nx">remove</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="nx">feature</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">title</span><span class="p">)),</span>
-                <span class="nx">distance</span> <span class="o">=</span> <span class="nx">turf</span><span class="p">.</span><span class="nx">distance</span><span class="p">(</span><span class="nx">layer</span><span class="p">.</span><span class="nx">toGeoJSON</span><span class="p">(),</span> <span class="nx">nearest</span><span class="p">,</span> <span class="s2">&quot;kilometers&quot;</span><span class="p">).</span><span class="nx">toPrecision</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
-                <span class="nx">popup</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">popup</span><span class="p">({</span><span class="nx">offset</span><span class="o">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">35</span><span class="p">]}).</span><span class="nx">setLatLng</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">latlng</span><span class="p">),</span>
-                <span class="nx">content</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">Util</span><span class="p">.</span><span class="nx">template</span><span class="p">(</span>
-                    <span class="s2">&quot;&lt;h1&gt;{title}&lt;/h1&gt;&lt;p&gt;{description}&lt;/p&gt; \</span>
-<span class="s2">                    &lt;p&gt;Nejbližší bod: {nearest} je {distance} km daleko.&lt;/p&gt;&quot;</span><span class="p">,</span> <span class="p">{</span>
-                    <span class="nx">title</span><span class="o">:</span> <span class="nx">feature</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">title</span><span class="p">,</span>
-                    <span class="nx">description</span><span class="o">:</span> <span class="nx">feature</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">description</span><span class="p">,</span>
-                    <span class="nx">nearest</span><span class="o">:</span> <span class="nx">nearest</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">title</span><span class="p">,</span>
-                    <span class="nx">distance</span><span class="o">:</span> <span class="nx">distance</span>
-                <span class="p">});</span>
-
-            <span class="nx">popup</span><span class="p">.</span><span class="nx">setContent</span><span class="p">(</span><span class="nx">content</span><span class="p">);</span>
-            <span class="nx">popup</span><span class="p">.</span><span class="nx">openOn</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
-
-            <span class="p">...</span>
-</pre></div>
-
-
-<p>From what I&#8217;ve tried so far, Turf seems to be incredibly fast and easy to use. I&#8217;ll try to find the nearest point for any of the categories, that could take Turf some&nbsp;time.</p>
-<h2>Update</h2>
-<p>Turf is blazing fast! I&#8217;ve implemented nearest point for each of the categories and it gets done in a blink of an eye. Some screenshots below. Geolocation implemented as&nbsp;well.</p>
-<p><img src="https://www.zimmi.cz/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen1.png" title="vozejkmap.cz data map" class="img-responsive centered"> You can locate the point&nbsp;easily.</p>
-
-<p><img src="https://www.zimmi.cz/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen2.png" title="vozejkmap.cz data map" class="img-responsive centered"> You can hide the&nbsp;infobox.</p>
-
-<p><img src="https://www.zimmi.cz/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen3.png" title="vozejkmap.cz data map" class="img-responsive centered">You can jump to any of the nearest&nbsp;places.</p>
         </section>
         </div>
     </div>
