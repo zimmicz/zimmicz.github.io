@@ -38,6 +38,40 @@
 
     <div class="panel card card-1">
         <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-polygon-from-centroid/" rel="bookmark" title="Permalink to PostGIS Custom Function to Create Polygon from Centroid">PostGIS Custom Function to Create Polygon from&nbsp;Centroid</a></h1>
+            <small>Written on Aug 28, 2016
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
+        </small>
+        <section>
+            <p>Needed to create a polygon from a point defining its size in both axes, here&#8217;s a little syntax sugar to make life&nbsp;easier.</p>
+<!-- codeblock -->
+
+<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">OR</span> <span class="k">REPLACE</span> <span class="k">FUNCTION</span> <span class="n">ST_PolygonFromCentroid</span><span class="p">(</span><span class="n">centroid</span> <span class="n">geometry</span><span class="p">,</span> <span class="n">xsize</span> <span class="nb">numeric</span><span class="p">,</span> <span class="n">ysize</span> <span class="nb">numeric</span><span class="p">)</span>
+<span class="k">RETURNS</span> <span class="n">geometry</span>
+<span class="k">AS</span> <span class="err">$</span><span class="n">ST_PolygonFromCentroid$</span>
+<span class="k">SELECT</span> <span class="n">ST_MakeEnvelope</span><span class="p">(</span>
+    <span class="n">ST_X</span><span class="p">(</span><span class="n">ST_Translate</span><span class="p">(</span><span class="err">$</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="err">$</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="err">$</span><span class="mi">3</span><span class="p">)),</span>
+    <span class="n">ST_Y</span><span class="p">(</span><span class="n">ST_Translate</span><span class="p">(</span><span class="err">$</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="err">$</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="err">$</span><span class="mi">3</span><span class="p">)),</span>
+    <span class="n">ST_X</span><span class="p">(</span><span class="n">ST_Translate</span><span class="p">(</span><span class="err">$</span><span class="mi">1</span><span class="p">,</span> <span class="err">$</span><span class="mi">2</span><span class="p">,</span> <span class="err">$</span><span class="mi">3</span><span class="p">)),</span>
+    <span class="n">ST_Y</span><span class="p">(</span><span class="n">ST_Translate</span><span class="p">(</span><span class="err">$</span><span class="mi">1</span><span class="p">,</span> <span class="err">$</span><span class="mi">2</span><span class="p">,</span> <span class="err">$</span><span class="mi">3</span><span class="p">))</span>
+<span class="p">);</span>
+<span class="err">$</span><span class="n">ST_PolygonFromCentroid$</span>
+<span class="k">LANGUAGE</span> <span class="k">SQL</span><span class="p">;</span>
+</pre></div>
+
+
+<p>Run it&nbsp;as:</p>
+<!-- codeblock -->
+
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">ST_PolygonFromCentroid</span><span class="p">(</span><span class="n">ST_SetSRID</span><span class="p">(</span><span class="n">ST_MakePoint</span><span class="p">(</span><span class="mi">13</span><span class="p">.</span><span class="mi">912</span><span class="p">,</span><span class="mi">50</span><span class="p">.</span><span class="mi">633</span><span class="p">),</span><span class="mi">4326</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</pre></div>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
             <h1><a href="https://www.zimmi.cz/posts/2016/finding-polygons-lying-across-other-polygons-with-postgis/" rel="bookmark" title="Permalink to Finding Polygons Lying across Other Polygons with PostGIS">Finding Polygons Lying across Other Polygons with&nbsp;PostGIS</a></h1>
             <small>Written on Aug 5, 2016
         and marked as
@@ -622,92 +656,6 @@ gdaladdo <span class="si">${</span><span class="nv">OUTPUTPATH</span><span class
             <p><a href="https://www.liftago.com/cs">Liftago</a> (the Czech analogy of Uber) has recently <a href="http://try.liftago.com/info-wants-to-be-free/">released a sample of its data</a> covering four weeks of driver/pasenger&nbsp;interactions.</p>
 <p>Have a look at my infographics created with PostGIS, Inkscape, Python and&nbsp;pygal.</p>
 <p class="text-center"><a href="https://www.zimmi.cz/posts/assets/liftago-open-dataset-infographics/liftago.pdf"><img title="Liftago infographics" src="https://www.zimmi.cz/posts/assets/liftago-open-dataset-infographics/liftago.png" class="img-responsive centered"></a></p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2015/twitter-rest-api-data-mining-on-openshift-part-ii/" rel="bookmark" title="Permalink to Twitter REST API Data Mining on OpenShift (Part II)">Twitter <span class="caps">REST</span> <span class="caps">API</span> Data Mining on OpenShift (Part <span class="caps">II</span>)</a></h1>
-            <small>Written on Dec 6, 2015
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>,         <a href="https://www.zimmi.cz/posts/tag/openshift.html">openshift</a>,         <a href="https://www.zimmi.cz/posts/tag/twitter.html">twitter</a>        | <a href="https://www.zimmi.cz/posts/category/development.html">development</a>
-        </small>
-        <section>
-            <p>Last time I described <a href="https://www.zimmi.cz/posts/2015/twitter-rest-api-data-mining-on-openshift-part-i/">the setup of my OpenShift Twitter crawler</a> and let it running and downloading data. It&#8217;s been more than two months since I started and I got interesting amount of data. I also made a simple <span class="caps">ETL</span> process to load it into my local PostGIS database, which I&#8217;d like to cover in this&nbsp;post.</p>
-<h2>Extract&nbsp;data</h2>
-<p>Each day is written to the separate sqlite file with a name like <code>tw_day_D_M_YYYY</code>. <code>Bash</code> is used to gzip all the files before downloading them from&nbsp;OpenShift.</p>
-<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
-
-ssh openshift <span class="s">&lt;&lt; EOF</span>
-<span class="s">    cd app-root/data</span>
-<span class="s">    tar czf twitter.tar.gz *.db</span>
-<span class="s">EOF</span>
-
-scp openshift:/var/lib/openshift/55e487587628e1280b0000a9/app-root/data/twitter.tar.gz ./data
-<span class="nb">cd</span> data <span class="o">&amp;&amp;</span>
-tar -xzf twitter.tar.gz <span class="o">&amp;&amp;</span>
-<span class="nb">cd</span> -
-
-<span class="nb">echo</span> <span class="s2">&quot;Extract done&quot;</span>
-</pre></div>
-
-
-<h2>Transform&nbsp;data</h2>
-<p>The transformation part operates on downloaded files and merges them into one big <span class="caps">CSV</span> file. That&#8217;s pretty straightforward. Note that&#8217;s quite simple with sqlite flags, some <code>sed</code> and <code>tail</code> commands.</p>
-<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
-
-rm -rf ./data/csv
-mkdir ./data/csv
-
-<span class="k">for</span> db in ./data/*.db<span class="p">;</span> <span class="k">do</span>
-    <span class="nv">FILENAME</span><span class="o">=</span><span class="k">$(</span>basename <span class="nv">$db</span><span class="k">)</span>
-    <span class="nv">DBNAME</span><span class="o">=</span><span class="si">${</span><span class="nv">FILENAME</span><span class="p">%%.db</span><span class="si">}</span>
-    <span class="nv">CSVNAME</span><span class="o">=</span><span class="nv">$DBNAME</span>.csv
-    <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$DBNAME</span><span class="s2"> to csv...&quot;</span>
-    sqlite3 -header -csv <span class="nv">$db</span> <span class="s2">&quot;select * from </span><span class="nv">$DBNAME</span><span class="s2">;&quot;</span> &gt; ./data/csv/<span class="nv">$CSVNAME</span>
-<span class="k">done</span>
-
-<span class="nb">cd</span> ./data/csv
-touch tweets.csv
-<span class="nb">echo</span> <span class="k">$(</span>sed -n 1p <span class="k">$(</span>ls -d -1 *.csv <span class="p">|</span> head -n 1<span class="k">))</span> &gt; tweets.csv <span class="c1"># get column names</span>
-
-<span class="k">for</span> csv in tw_*.csv<span class="p">;</span> <span class="k">do</span>
-    <span class="nb">echo</span> <span class="nv">$csv</span>
-    tail -n +2 <span class="nv">$csv</span> &gt;&gt; tweets.csv <span class="c1"># get all lines without the first one</span>
-<span class="k">done</span>
-</pre></div>
-
-
-<h2>Load&nbsp;data</h2>
-<p>In the last step, the data is loaded with <span class="caps">SQL</span> <code>\copy</code> command.</p>
-<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
-
-<span class="nb">export</span> <span class="nv">PG_USE_COPY</span><span class="o">=</span>YES
-
-<span class="nv">DATABASE</span><span class="o">=</span>mzi_dizertace
-<span class="nv">SCHEMA</span><span class="o">=</span>dizertace
-<span class="nv">TABLE</span><span class="o">=</span>tweets
-
-psql <span class="nv">$DATABASE</span> <span class="s">&lt;&lt; EOF</span>
-<span class="s">    DROP TABLE IF EXISTS $SCHEMA.$TABLE;</span>
-<span class="s">    CREATE UNLOGGED TABLE $SCHEMA.$TABLE (id text, author text, author_id text, tweet text, created_at text, lon float, lat float, lang text);</span>
-<span class="s">    \copy $SCHEMA.$TABLE FROM &#39;data/csv/tweets.csv&#39; CSV HEADER DELIMITER &#39;,&#39;</span>
-<span class="s">    ALTER TABLE $SCHEMA.$TABLE ADD COLUMN wkb_geometry geometry(POINT, 4326);</span>
-<span class="s">    UPDATE $SCHEMA.$TABLE SET wkb_geometry = ST_SetSRID(ST_MakePoint(lon, lat), 4326);</span>
-<span class="s">    CREATE INDEX ${TABLE}_geom_idx ON $SCHEMA.$TABLE USING gist(wkb_geometry);</span>
-<span class="s">    COMMIT;</span>
-<span class="s">EOF</span>
-</pre></div>
-
-
-<h2>First&nbsp;statistics</h2>
-<p>Some interesting charts and numbers&nbsp;follow.</p>
-<p class="text-center"><img title="Top 100 Twitter users in the Czech Republic" src="https://www.zimmi.cz/posts/assets/twitter-rest-api-data-mining-on-openshift-part-ii/authors.png" class="img-responsive centered"></p>
-
-<p class="text-center"><img title="When people tweet in the Czech Republic" src="https://www.zimmi.cz/posts/assets/twitter-rest-api-data-mining-on-openshift-part-ii/hours.png" class="img-responsive centered"></p>
-
-<p class="text-center"><img title="Languages on Twitter in the Czech Republic" src="https://www.zimmi.cz/posts/assets/twitter-rest-api-data-mining-on-openshift-part-ii/languages.png" class="img-responsive centered"></p>
         </section>
         </div>
     </div>

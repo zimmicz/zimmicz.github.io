@@ -1,5 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0"><channel><title>Michal Zimmermann</title><link>https://www.zimmi.cz/posts/</link><description>Pieces of knowledge from the world of GIS.</description><lastBuildDate>Mon, 19 Dec 2016 17:50:00 +0100</lastBuildDate><item><title>Counting substring occurrences in PostgreSQL</title><link>https://www.zimmi.cz/posts/2016/counting-substring-occurrences-in-postgresql/</link><description>&lt;p&gt;I got to count occurrences of &lt;em&gt;/&lt;/em&gt; character today and found out no built-in function exists in PostgreSQL, so here&amp;#8217;s my shot at it. Pretty simple, yet&amp;nbsp;useful.&lt;/p&gt;
+<rss version="2.0"><channel><title>Michal Zimmermann</title><link>https://www.zimmi.cz/posts/</link><description>Pieces of knowledge from the world of GIS.</description><lastBuildDate>Tue, 10 Jan 2017 21:45:00 +0100</lastBuildDate><item><title>Subdivide and Conquer: Effective Spatial Indexes in PostGIS</title><link>https://www.zimmi.cz/posts/2017/subdivide-and-conquer-effective-spatial-indexes-in-postgis/</link><description>&lt;p&gt;Spatial indexes are absolutely crucial part of any spatial database and - as I tend to say quite often - only a fool would try to query spatial data without building spatial indexes&amp;nbsp;beforehand.&lt;/p&gt;
+&lt;p&gt;Spatial indexes are based on bounding box comparisons, which are generally very fast. Yet, there are situations when spatial indexes don&amp;#8217;t help much (or they don&amp;#8217;t help as much as they could, if you&amp;nbsp;wish).&lt;/p&gt;
+&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/subdivide-and-conquer-effective-spatial-indexes-in-postgis/index.svg" /&gt;&lt;/div&gt;
+
+&lt;p&gt;Bounding box comparisons are effective with lots of small bounding boxes rather then few large ones. Why? See the picture above. The curved line (imagine it&amp;#8217;s a pipeline for example) clearly demonstrates when the spatial index/bounding box comparison might fall short of what you&amp;#8217;d&amp;nbsp;expect.&lt;/p&gt;
+&lt;p&gt;Once the bounding box gets really big, it intersects so many other geometries&amp;#8217; bounding boxes that the whole comparison starts to slow&amp;nbsp;down.&lt;/p&gt;
+&lt;p&gt;Luckily, PostGIS 2.2 introduced a &lt;a href="http://postgis.net/docs/ST_Subdivide.html"&gt;ST_Subdivide&lt;/a&gt; function that can lend a helping hand in&amp;nbsp;here.&lt;/p&gt;
+&lt;p&gt;Until today, we delivered the parcel geometries into our &lt;a href="https://www.symap.cz"&gt;real estate acquisition process system&lt;/a&gt; with the following query, that takes all the geometries from the &lt;code&gt;req_geom&lt;/code&gt; table (pipelines, remember?) and intersects them with cadastral parcels. The second part of the query adds those parcels that haven&amp;#8217;t been digitalized and were created manually by one of my&amp;nbsp;workmates.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;INSERT&lt;/span&gt; &lt;span class="k"&gt;INTO&lt;/span&gt; &lt;span class="n"&gt;requested_parcels&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;uid&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;par_id&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="k"&gt;SELECT&lt;/span&gt;
+    &lt;span class="n"&gt;reqs&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;uid&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt; &lt;span class="n"&gt;par_id&lt;/span&gt;
+ &lt;span class="k"&gt;FROM&lt;/span&gt;
+    &lt;span class="n"&gt;running_requests&lt;/span&gt; &lt;span class="n"&gt;reqs&lt;/span&gt;
+ &lt;span class="k"&gt;JOIN&lt;/span&gt;
+    &lt;span class="n"&gt;req_geom&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="k"&gt;ON&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;reqs&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;uid&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;uid&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+ &lt;span class="k"&gt;JOIN&lt;/span&gt;
+    &lt;span class="n"&gt;pargeo&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt; &lt;span class="k"&gt;ON&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ST_Intersects&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;geom&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;geom&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+ &lt;span class="k"&gt;UNION&lt;/span&gt;
+ &lt;span class="k"&gt;SELECT&lt;/span&gt;
+    &lt;span class="n"&gt;reqs&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;uid&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;idpar&lt;/span&gt;&lt;span class="p"&gt;::&lt;/span&gt;&lt;span class="nb"&gt;numeric&lt;/span&gt;
+ &lt;span class="k"&gt;FROM&lt;/span&gt;
+    &lt;span class="n"&gt;running_requests&lt;/span&gt; &lt;span class="n"&gt;reqs&lt;/span&gt;
+ &lt;span class="k"&gt;JOIN&lt;/span&gt;
+     &lt;span class="n"&gt;req_man&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="k"&gt;ON&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;reqs&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;uid&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;uid&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;It&amp;#8217;s a perfectly standard query that intersects several request geometries with ~20M parcels, nothing really fancy. Except that it takes 25 minutes to finish. Why? Pipelines,&amp;nbsp;remember?&lt;/p&gt;
+&lt;p&gt;Yet, the query below takes only 30 seconds to finish (that&amp;#8217;s a huge time saver considering that the whole process used to take ~40 minutes)! Why? Because the &lt;code&gt;ST_Subdivide&lt;/code&gt; effectively shrinks the &lt;code&gt;req_geom&lt;/code&gt; geometries until they have 50 vertices each at most. Such small geometries are perfect input for the bounding box comparison. Remember to call &lt;code&gt;DISTINCT&lt;/code&gt; when using &lt;code&gt;ST_Subdivide&lt;/code&gt;, you&amp;#8217;d probably get duplicate parcel ids&amp;nbsp;otherwise.&lt;/p&gt;
+&lt;p&gt;I also replaced the &lt;code&gt;UNION&lt;/code&gt; with the &lt;a href="https://www.zimmi.cz/posts/2015/postgresql-in-vs-exists/"&gt;&lt;code&gt;WHERE NOT EXISTS&lt;/code&gt;&lt;/a&gt; expression, as it&amp;#8217;s reasonable to assume that numeric ids comparison will be&amp;nbsp;faster.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;INSERT&lt;/span&gt; &lt;span class="k"&gt;INTO&lt;/span&gt; &lt;span class="n"&gt;requested_parcels&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;uid&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;par_id&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="k"&gt;SELECT&lt;/span&gt; &lt;span class="k"&gt;DISTINCT&lt;/span&gt;
+    &lt;span class="n"&gt;reqs&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;uid&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt; &lt;span class="n"&gt;par_id&lt;/span&gt;
+ &lt;span class="k"&gt;FROM&lt;/span&gt;
+    &lt;span class="n"&gt;running_requests&lt;/span&gt; &lt;span class="n"&gt;reqs&lt;/span&gt;
+ &lt;span class="k"&gt;JOIN&lt;/span&gt;
+    &lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="k"&gt;SELECT&lt;/span&gt;
+            &lt;span class="n"&gt;uid&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+            &lt;span class="n"&gt;ST_Subdivide&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;geom&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;50&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;geom&lt;/span&gt;
+        &lt;span class="k"&gt;FROM&lt;/span&gt;
+            &lt;span class="n"&gt;req_geom&lt;/span&gt;
+     &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="k"&gt;ON&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;reqs&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;uid&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;uid&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+ &lt;span class="k"&gt;JOIN&lt;/span&gt;
+     &lt;span class="n"&gt;pargeo&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt; &lt;span class="k"&gt;ON&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ST_Intersects&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;geom&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;geom&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+
+ &lt;span class="k"&gt;INSERT&lt;/span&gt; &lt;span class="k"&gt;INTO&lt;/span&gt; &lt;span class="n"&gt;requested_parcels&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;uid&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;par_id&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+ &lt;span class="k"&gt;SELECT&lt;/span&gt;
+     &lt;span class="n"&gt;reqs&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;uid&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+     &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;idpar&lt;/span&gt;&lt;span class="p"&gt;::&lt;/span&gt;&lt;span class="nb"&gt;numeric&lt;/span&gt;
+ &lt;span class="k"&gt;FROM&lt;/span&gt;
+     &lt;span class="n"&gt;running_requests&lt;/span&gt; &lt;span class="n"&gt;reqs&lt;/span&gt;
+ &lt;span class="k"&gt;JOIN&lt;/span&gt;
+     &lt;span class="n"&gt;req_man&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="k"&gt;ON&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;reqs&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;uid&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;uid&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+ &lt;span class="k"&gt;WHERE&lt;/span&gt; &lt;span class="k"&gt;NOT&lt;/span&gt; &lt;span class="k"&gt;EXISTS&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+     &lt;span class="k"&gt;SELECT&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
+     &lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="n"&gt;pozadovane_parcely&lt;/span&gt; &lt;span class="n"&gt;pp&lt;/span&gt;
+     &lt;span class="k"&gt;WHERE&lt;/span&gt; &lt;span class="n"&gt;pp&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;par_id&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;idpar&lt;/span&gt;
+  &lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Michal Zimmermann</dc:creator><pubDate>Tue, 10 Jan 2017 21:45:00 +0100</pubDate><guid isPermaLink="false">tag:www.zimmi.cz,2017-01-10:posts/2017/subdivide-and-conquer-effective-spatial-indexes-in-postgis/</guid><category>sql</category><category>postgresql</category><category>postgis</category></item><item><title>Counting substring occurrences in PostgreSQL</title><link>https://www.zimmi.cz/posts/2016/counting-substring-occurrences-in-postgresql/</link><description>&lt;p&gt;I got to count occurrences of &lt;em&gt;/&lt;/em&gt; character today and found out no built-in function exists in PostgreSQL, so here&amp;#8217;s my shot at it. Pretty simple, yet&amp;nbsp;useful.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;CREATE&lt;/span&gt; &lt;span class="k"&gt;OR&lt;/span&gt; &lt;span class="k"&gt;REPLACE&lt;/span&gt; &lt;span class="k"&gt;FUNCTION&lt;/span&gt; &lt;span class="n"&gt;how_many&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;IN&lt;/span&gt; &lt;span class="nb"&gt;text&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;IN&lt;/span&gt; &lt;span class="nb"&gt;varchar&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;OUT&lt;/span&gt; &lt;span class="nb"&gt;integer&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="k"&gt;RETURNS&lt;/span&gt; &lt;span class="nb"&gt;integer&lt;/span&gt;
 &lt;span class="k"&gt;AS&lt;/span&gt;

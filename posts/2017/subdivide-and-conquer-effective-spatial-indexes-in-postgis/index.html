@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+          <title>Michal Zimmermann | Subdivide and Conquer: Effective Spatial Indexes in&nbsp;PostGIS</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+
+
+
+    <meta name="tags" content="sql" />
+    <meta name="tags" content="postgresql" />
+    <meta name="tags" content="postgis" />
+  <meta property="og:image" content="https://pbs.twimg.com/profile_images/770323886290440192/3G5hqp11_400x400.jpg" />
+  <meta property="og:title" content="Subdivide and Conquer: Effective Spatial Indexes in PostGIS" />
+  <meta property="og:description" content="Spatial indexes are absolutely crucial part of any spatial database and - as I tend to say quite often - only a fool would try to query spatial data without building spatial indexes beforehand. Spatial indexes are based on bounding box comparisons, ..." />
+  <meta property="og:url" content="https://www.zimmi.cz/posts/2017/subdivide-and-conquer-effective-spatial-indexes-in-postgis/" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?d5d1e141">
+</head>
+
+<body id="index" class="home">
+    <nav class="top-bar card-1" data-topbar role="navigation">
+        <ul class="title-area">
+            <li class="name">
+                <h1><a href="/posts">Home</a></h1>
+            </li>
+     <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+            <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+        </ul>
+        <section class="top-bar-section">
+    <!-- Right Nav Section -->
+            <ul class="right">
+                <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+                <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+                <li><a href="https://www.zimmi.cz/posts/feed.xml">RSS feed</a></li>
+            </ul>
+        </section>
+    </nav>
+        <div class="row">
+          <div class="large-12 columns header">
+            <h1><a href="/posts">Michal Zimmermann</a> <small>Pieces of knowledge from the world of GIS.</small></h1>
+          </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns">
+<div class="panel card card-1">
+    <div class="post-name">
+        <h1><a href="https://www.zimmi.cz/posts/2017/subdivide-and-conquer-effective-spatial-indexes-in-postgis/" rel="bookmark" title="Permalink to Subdivide and Conquer: Effective Spatial Indexes in PostGIS">Subdivide and Conquer: Effective Spatial Indexes in&nbsp;PostGIS</a></h1>
+        <small>Written on Jan 10, 2017
+    and marked as
+    <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>,     <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,     <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
+    </small>
+    <section>
+        <p>Spatial indexes are absolutely crucial part of any spatial database and - as I tend to say quite often - only a fool would try to query spatial data without building spatial indexes&nbsp;beforehand.</p>
+<p>Spatial indexes are based on bounding box comparisons, which are generally very fast. Yet, there are situations when spatial indexes don&#8217;t help much (or they don&#8217;t help as much as they could, if you&nbsp;wish).</p>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/subdivide-and-conquer-effective-spatial-indexes-in-postgis/index.svg" /></div>
+
+<p>Bounding box comparisons are effective with lots of small bounding boxes rather then few large ones. Why? See the picture above. The curved line (imagine it&#8217;s a pipeline for example) clearly demonstrates when the spatial index/bounding box comparison might fall short of what you&#8217;d&nbsp;expect.</p>
+<p>Once the bounding box gets really big, it intersects so many other geometries&#8217; bounding boxes that the whole comparison starts to slow&nbsp;down.</p>
+<p>Luckily, PostGIS 2.2 introduced a <a href="http://postgis.net/docs/ST_Subdivide.html">ST_Subdivide</a> function that can lend a helping hand in&nbsp;here.</p>
+<p>Until today, we delivered the parcel geometries into our <a href="https://www.symap.cz">real estate acquisition process system</a> with the following query, that takes all the geometries from the <code>req_geom</code> table (pipelines, remember?) and intersects them with cadastral parcels. The second part of the query adds those parcels that haven&#8217;t been digitalized and were created manually by one of my&nbsp;workmates.</p>
+<div class="highlight"><pre><span></span><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">requested_parcels</span> <span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">par_id</span><span class="p">)</span>
+<span class="k">SELECT</span>
+    <span class="n">reqs</span><span class="p">.</span><span class="n">uid</span><span class="p">,</span>
+    <span class="n">b</span><span class="p">.</span><span class="n">id</span> <span class="n">par_id</span>
+ <span class="k">FROM</span>
+    <span class="n">running_requests</span> <span class="n">reqs</span>
+ <span class="k">JOIN</span>
+    <span class="n">req_geom</span> <span class="n">a</span> <span class="k">ON</span> <span class="p">(</span><span class="n">reqs</span><span class="p">.</span><span class="n">uid</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">uid</span><span class="p">)</span>
+ <span class="k">JOIN</span>
+    <span class="n">pargeo</span> <span class="n">b</span> <span class="k">ON</span> <span class="p">(</span><span class="n">ST_Intersects</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span>
+ <span class="k">UNION</span>
+ <span class="k">SELECT</span>
+    <span class="n">reqs</span><span class="p">.</span><span class="n">uid</span><span class="p">,</span>
+    <span class="n">a</span><span class="p">.</span><span class="n">idpar</span><span class="p">::</span><span class="nb">numeric</span>
+ <span class="k">FROM</span>
+    <span class="n">running_requests</span> <span class="n">reqs</span>
+ <span class="k">JOIN</span>
+     <span class="n">req_man</span> <span class="n">a</span> <span class="k">ON</span> <span class="p">(</span><span class="n">reqs</span><span class="p">.</span><span class="n">uid</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">uid</span><span class="p">);</span>
+</pre></div>
+
+
+<p>It&#8217;s a perfectly standard query that intersects several request geometries with ~20M parcels, nothing really fancy. Except that it takes 25 minutes to finish. Why? Pipelines,&nbsp;remember?</p>
+<p>Yet, the query below takes only 30 seconds to finish (that&#8217;s a huge time saver considering that the whole process used to take ~40 minutes)! Why? Because the <code>ST_Subdivide</code> effectively shrinks the <code>req_geom</code> geometries until they have 50 vertices each at most. Such small geometries are perfect input for the bounding box comparison. Remember to call <code>DISTINCT</code> when using <code>ST_Subdivide</code>, you&#8217;d probably get duplicate parcel ids&nbsp;otherwise.</p>
+<p>I also replaced the <code>UNION</code> with the <a href="https://www.zimmi.cz/posts/2015/postgresql-in-vs-exists/"><code>WHERE NOT EXISTS</code></a> expression, as it&#8217;s reasonable to assume that numeric ids comparison will be&nbsp;faster.</p>
+<div class="highlight"><pre><span></span><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">requested_parcels</span> <span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">par_id</span><span class="p">)</span>
+<span class="k">SELECT</span> <span class="k">DISTINCT</span>
+    <span class="n">reqs</span><span class="p">.</span><span class="n">uid</span><span class="p">,</span>
+    <span class="n">b</span><span class="p">.</span><span class="n">id</span> <span class="n">par_id</span>
+ <span class="k">FROM</span>
+    <span class="n">running_requests</span> <span class="n">reqs</span>
+ <span class="k">JOIN</span>
+    <span class="p">(</span>
+        <span class="k">SELECT</span>
+            <span class="n">uid</span><span class="p">,</span>
+            <span class="n">ST_Subdivide</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span> <span class="n">geom</span>
+        <span class="k">FROM</span>
+            <span class="n">req_geom</span>
+     <span class="p">)</span> <span class="n">a</span> <span class="k">ON</span> <span class="p">(</span><span class="n">reqs</span><span class="p">.</span><span class="n">uid</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">uid</span><span class="p">)</span>
+ <span class="k">JOIN</span>
+     <span class="n">pargeo</span> <span class="n">b</span> <span class="k">ON</span> <span class="p">(</span><span class="n">ST_Intersects</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">geom</span><span class="p">));</span>
+
+ <span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">requested_parcels</span> <span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">par_id</span><span class="p">)</span>
+ <span class="k">SELECT</span>
+     <span class="n">reqs</span><span class="p">.</span><span class="n">uid</span><span class="p">,</span>
+     <span class="n">a</span><span class="p">.</span><span class="n">idpar</span><span class="p">::</span><span class="nb">numeric</span>
+ <span class="k">FROM</span>
+     <span class="n">running_requests</span> <span class="n">reqs</span>
+ <span class="k">JOIN</span>
+     <span class="n">req_man</span> <span class="n">a</span> <span class="k">ON</span> <span class="p">(</span><span class="n">reqs</span><span class="p">.</span><span class="n">uid</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">uid</span><span class="p">)</span>
+ <span class="k">WHERE</span> <span class="k">NOT</span> <span class="k">EXISTS</span> <span class="p">(</span>
+     <span class="k">SELECT</span> <span class="mi">1</span>
+     <span class="k">FROM</span> <span class="n">pozadovane_parcely</span> <span class="n">pp</span>
+     <span class="k">WHERE</span> <span class="n">pp</span><span class="p">.</span><span class="n">par_id</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">idpar</span>
+  <span class="p">);</span>
+</pre></div>
+    </section>
+    </div>
+<div class="neighbors">
+    <h3>More reading</h3>
+    <ul>
+        <li>
+            <a href="https://www.zimmi.cz/posts/2016/counting-substring-occurrences-in-postgresql/">
+                 Counting substring occurrences in&nbsp;PostgreSQL
+            </a>
+        </li>
+         <li>
+             <a href="https://www.zimmi.cz/posts/2016/counting-substring-occurrences-in-postgresql/">
+                 Counting substring occurrences in&nbsp;PostgreSQL
+             </a>
+         </li>
+        </li>
+    </ul>
+</div></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns footer">
+                <footer>
+                    <address>
+                    Written by <a href="http://www.zimmi.cz">Michal Zimmermann</a>.
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    </address><!-- /#about -->
+                </footer><!-- /#contentinfo -->
+            </div>
+        </div>
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-43432739-2']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+<script src="https://www.zimmi.cz/posts/theme/js/packed.js?8bee1467"></script>
+<script>
+$(document).foundation();
+</script>
+</body>
+</html>

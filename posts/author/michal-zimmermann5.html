@@ -38,6 +38,79 @@
 
     <div class="panel card card-1">
         <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-ii/" rel="bookmark" title="Permalink to PostGIS Case Study: Vozejkmap Open Data (Part II)">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">II</span>)</a></h1>
+            <small>Written on Feb 21, 2015
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
+        </small>
+        <section>
+            <p><a href="{{ pcposturl(2014, 12, 02, 'postgis-case-study-vozejkmap-open-data-part-i') }}">In the first part of my little case study</a> I downloaded <a href="http://vozejkmap.cz">vozejkmap.cz</a> dataset and imported it into the PostGIS database. Having spatial data safely stored the time comes to get it onto the map. Libraries used&nbsp;are:</p>
+<ul>
+<li><a href="http://leafletjs.com">Leaflet</a></li>
+<li><a href="https://github.com/lvoogdt/Leaflet.awesome-markers">Leaflet.awesome-markers</a></li>
+<li><a href="https://github.com/Leaflet/Leaflet.markercluster">Leaflet.markercluster</a></li>
+</ul>
+<p>I teach cartography visualization classes this semester and this map should serve well as an example of what can be done with online&nbsp;maps.</p>
+<h2>Retrieving data from the PostGIS&nbsp;database</h2>
+<p>Our goal is to build the whole map as a static <span class="caps">HTML</span> page without any backend logic. Thus, data needs to be extracted from the database into the format readable with Leaflet - <a href="http://geojson.org/">GeoJSON</a>.</p>
+<p>That&#8217;s fairly easy with the <a href="http://www.postgresonline.com/journal/archives/267-Creating-GeoJSON-Feature-Collections-with-JSON-and-PostGIS-functions.html">postgresonline.com tutorial</a>. It took me quite a time to find out what the following query does. Splitting it into smaller chunks helped a&nbsp;lot.</p>
+<div class="highlight"><pre><span></span>SELECT row_to_json(fc)
+FROM (
+SELECT &#39;FeatureCollection&#39; AS type,
+    array_to_json(array_agg(f)) AS features
+    FROM (SELECT &#39;Feature&#39; AS type,
+        ST_AsGeoJSON(lg.geom)::json As geometry,
+        row_to_json((SELECT l FROM (SELECT id, title, location_type, description, author_name, attr1, attr2, attr3) AS l
+  )) AS properties
+FROM vozejkmap AS lg ) AS f )  AS fc \g /path/to/file.json;
+</pre></div>
+
+
+<p>To get all rows with <code>type</code>, <code>geometry</code> and <code>properties</code> columns (these are the ones defined in GeoJSON specification, see the link above), run&nbsp;this:</p>
+<div class="highlight"><pre><span></span>SELECT &#39;Feature&#39; AS type,
+            ST_AsGeoJSON(lg.geom)::json As geometry,
+            row_to_json((SELECT l FROM (SELECT id, title, location_type, description, author_name, attr1, attr2, attr3) AS l
+      )) AS properties
+    FROM vozejkmap AS lg
+</pre></div>
+
+
+<p><code>array_agg()</code> squashes all the rows into an array while <code>array_to_json()</code> returns the array as <span class="caps">JSON</span>.</p>
+<div class="highlight"><pre><span></span>SELECT &#39;FeatureCollection&#39; AS type,
+    array_to_json(array_agg(f)) AS features
+    FROM (SELECT &#39;Feature&#39; AS type,
+        ST_AsGeoJSON(lg.geom)::json As geometry,
+        row_to_json((SELECT l FROM (SELECT id, title, location_type, description, author_name, attr1, attr2, attr3) AS l
+  )) AS properties
+FROM vozejkmap AS lg ) AS f
+</pre></div>
+
+
+<p>In the last step (the whole code as shown above) <code>row_to_json</code> returns the result as <span class="caps">JSON</span>.</p>
+<h3>Caveats</h3>
+<p>If you run this code from the psql console, be sure&nbsp;you</p>
+<ul>
+<li>set <em>show only row</em> to true with <code>\t</code></li>
+<li>set <em>expanded output</em> to false with <code>\x off</code></li>
+</ul>
+<p>If you don&#8217;t, you&#8217;ll have lots of hyphens and column names saved to the json&nbsp;file.</p>
+<h2>Leaflet&nbsp;map</h2>
+<p>Map JavaScript is rather simple with ~30 lines of code (not taking styles into account). Thanks to the great plugins it is easy to show ~7,600 points on the map real&nbsp;quick.</p>
+<p>I didn&#8217;t do much customization apart from styling markers and binding&nbsp;popups.</p>
+<p><img src="https://www.zimmi.cz/posts/assets/postgis-case-study-vozejkmap-open-data-part-ii/map.png" title="vozejkmap.cz data map" class="img-responsive centered"></p>
+<h2>What&#8217;s&nbsp;next</h2>
+<ol>
+<li><a href="http://turfjs.org">Turf</a> which means I need to think of what could be fun to do with this&nbsp;data</li>
+<li>Layers&nbsp;switching</li>
+<li>Map key (by extending&nbsp;L.Control)</li>
+</ol>
+<p>The code is still <a href="https://github.com/zimmicz/vozejkmap-to-postgis">available at my GitHub</a>.</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
             <h1><a href="https://www.zimmi.cz/posts/2015/using-postgresql-to-update-outdated-map-links/" rel="bookmark" title="Permalink to Using PostgreSQL To Update Outdated Map Links">Using PostgreSQL To Update Outdated Map&nbsp;Links</a></h1>
             <small>Written on Feb 16, 2015
         and marked as
@@ -459,33 +532,6 @@ Total runtime: 3930.270 ms
 </li>
 </ol>
 <p>You&#8217;re set to remotely connect to your database&nbsp;server.</p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2014/switch-latitude-and-longitude-with-regular-expression/" rel="bookmark" title="Permalink to Switch Latitude And Longitude With Regular Expression">Switch Latitude And Longitude With Regular&nbsp;Expression</a></h1>
-            <small>Written on Sep 14, 2014
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/sublime.html">sublime</a>,         <a href="https://www.zimmi.cz/posts/tag/regex.html">regex</a>        | <a href="https://www.zimmi.cz/posts/category/development.html">development</a>
-        </small>
-        <section>
-            <p>It happens that you receive a file with longitude and latitude just in the opposite order that you would like to have. It&#8217;s fairly easy to switch those without loading it into Excel or Calc and doing <code>Ctrl + C</code> and <code>Ctrl + V</code> on&nbsp;columns.</p>
-<p>If you have a file with tabular data that looks like&nbsp;this:</p>
-<div class="highlight"><pre><span></span> 50.52, 60.15
- 70.96, 80.1
--55.23, 62.03
-</pre></div>
-
-
-<p>You can use Sublime Text to switch the&nbsp;values:</p>
-<ol>
-<li>Press <code>Ctrl + H</code></li>
-<li>Copy <code>(\-?\d+\.?\d+),?[\t ]*(\-?\d+\.?\d+)$</code> to <em>Find What</em>&nbsp;input</li>
-<li>Copy <code>$2,$1</code> to <em>Replace With</em>&nbsp;input</li>
-</ol>
-<p>Hit <em>Replace All</em> button and you&#8217;re&nbsp;done.</p>
         </section>
         </div>
     </div>
