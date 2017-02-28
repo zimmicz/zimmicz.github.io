@@ -38,6 +38,29 @@
 
     <div class="panel card card-1">
         <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2017/executing-dynamic-sql-query-right-away/" rel="bookmark" title="Permalink to Executing dynamic SQL query right away">Executing dynamic <span class="caps">SQL</span> query right&nbsp;away</a></h1>
+            <small>Written on Feb 28, 2017
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
+        </small>
+        <section>
+            <p>PostgreSQL 9.6 comes with a handy <code>psql</code> command called <code>\gexec</code> that <em>sends the current query input buffer to the server and treats the result as a <span class="caps">SQL</span> statement to be executed</em> (right, whatever). What that means is that instead of doing&nbsp;this</p>
+<div class="highlight"><pre><span></span>psql -c <span class="s2">&quot;SELECT &#39;DROP TABLE &#39; || tablename FROM information_schema.tables WHERE table_name LIKE &#39;%to_be_dropped%&quot;</span> <span class="p">|</span> psql
+</pre></div>
+
+
+<p>you&#8217;ll do&nbsp;that</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="s1">&#39;DROP TABLE &#39;</span> <span class="o">||</span> <span class="n">tablename</span> <span class="k">FROM</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">tables</span> <span class="k">WHERE</span> <span class="k">table_name</span> <span class="k">LIKE</span> <span class="s1">&#39;%to_be_dropped%&#39;</span><span class="err">\</span><span class="n">gexec</span>
+</pre></div>
+
+
+<p>Brilliant.</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
             <h1><a href="https://www.zimmi.cz/posts/2017/subdivide-and-conquer-effective-spatial-indexes-in-postgis/" rel="bookmark" title="Permalink to Subdivide and Conquer: Effective Spatial Indexes in PostGIS">Subdivide and Conquer: Effective Spatial Indexes in&nbsp;PostGIS</a></h1>
             <small>Written on Jan 10, 2017
         and marked as
@@ -584,82 +607,6 @@ rm <span class="nv">$CSVFILE</span> <span class="nv">$CSVUTF8FILE</span>
 
 
 <p>The result can be piped to other <code>bash</code> functions, such as <code>less</code> or <code>more</code>. I call it <code>ogrinfotable</code>.</p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-wind-rose/" rel="bookmark" title="Permalink to PostGIS Custom Function to Create Wind Rose">PostGIS Custom Function to Create Wind&nbsp;Rose</a></h1>
-            <small>Written on Sep 1, 2016
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
-        </small>
-        <section>
-            <p>I&#8217;ve come across the <a href="http://gis.stackexchange.com/questions/208797/draw-wind-rose-with-qgis-from-postgis/">beautiful <span class="caps">GIS</span> StackExchange question</a> recently, asking how to draw a <a href="https://en.wikipedia.org/wiki/Wind_rose">wind rose</a> within&nbsp;PostGIS.</p>
-<div class="text-center">
-<img src="http://i.stack.imgur.com/0xAMU.png">
-</div>
-
-<p>It&#8217;s pretty easy to accomplish this with a custom <span class="caps">PLPGSQL</span> procedure below, that takes line geometry, number of sections and radius of the inner circle as&nbsp;parameters.</p>
-<!-- codeblock -->
-
-<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">OR</span> <span class="k">REPLACE</span> <span class="k">FUNCTION</span> <span class="n">ST_WindRose</span><span class="p">(</span>
-    <span class="n">line</span> <span class="n">geometry</span><span class="p">,</span>
-    <span class="n">directions</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">radius</span> <span class="nb">numeric</span>
-<span class="p">)</span>
-<span class="k">RETURNS</span> <span class="k">TABLE</span> <span class="p">(</span>
-    <span class="n">id</span> <span class="nb">integer</span><span class="p">,</span>
-    <span class="n">geom</span> <span class="n">geometry</span><span class="p">(</span><span class="n">LINESTRING</span><span class="p">)</span>
-<span class="p">)</span>
-<span class="k">AS</span> <span class="err">$</span><span class="n">ST_WindRose$</span>
-<span class="k">BEGIN</span>
-    <span class="k">IF</span> <span class="n">directions</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">&lt;&gt;</span> <span class="mi">0</span> <span class="k">THEN</span>
-        <span class="n">RAISE</span> <span class="k">EXCEPTION</span> <span class="s1">&#39;Odd number of directions found, please provide even number of directions instead.&#39;</span><span class="p">;</span>
-    <span class="k">END</span> <span class="k">IF</span><span class="p">;</span>
-
-<span class="k">IF</span> <span class="n">radius</span> <span class="o">&gt;</span> <span class="n">ST_Length</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="k">THEN</span>
-    <span class="n">RAISE</span> <span class="k">EXCEPTION</span> <span class="s1">&#39;Inner circle radius is bigger than the wind rose diameter, please make it smaller.&#39;</span><span class="p">;</span>
-<span class="k">END</span> <span class="k">IF</span><span class="p">;</span>
-
-<span class="k">RETURN</span> <span class="n">QUERY</span>
-<span class="k">WITH</span> <span class="n">rose</span> <span class="k">AS</span> <span class="p">(</span>
-    <span class="k">SELECT</span>
-        <span class="n">ST_Rotate</span><span class="p">(</span><span class="n">_line</span><span class="p">,</span> <span class="n">radians</span><span class="p">(</span><span class="mi">360</span><span class="p">)</span> <span class="o">/</span> <span class="n">directions</span> <span class="o">*</span> <span class="n">dirs</span><span class="p">.</span><span class="n">id</span><span class="p">,</span> <span class="n">ST_Centroid</span><span class="p">(</span><span class="n">_line</span><span class="p">))</span> <span class="n">_line</span>
-    <span class="k">FROM</span> <span class="p">(</span>
-        <span class="k">SELECT</span> <span class="n">line</span> <span class="n">_line</span>
-    <span class="p">)</span> <span class="n">a</span>
-    <span class="k">CROSS</span> <span class="k">JOIN</span> <span class="p">(</span>
-        <span class="k">SELECT</span> <span class="n">generate_series</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">directions</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="n">id</span>
-    <span class="p">)</span> <span class="n">dirs</span>
-<span class="p">)</span>
-<span class="k">SELECT</span>
-    <span class="n">row_number</span><span class="p">()</span> <span class="n">OVER</span> <span class="p">()::</span><span class="nb">integer</span> <span class="n">id</span><span class="p">,</span>
-    <span class="n">_line</span> <span class="n">geom</span>
-<span class="k">FROM</span> <span class="p">(</span>
-    <span class="k">SELECT</span> <span class="n">_line</span> <span class="k">FROM</span> <span class="n">rose</span>
-    <span class="k">UNION</span> <span class="k">ALL</span>
-    <span class="k">SELECT</span> <span class="n">ST_ExteriorRing</span><span class="p">(</span><span class="n">ST_Buffer</span><span class="p">(</span><span class="n">ST_Centroid</span><span class="p">(</span><span class="n">line</span><span class="p">),</span> <span class="n">radius</span><span class="p">,</span> <span class="mi">30</span><span class="p">))</span> <span class="c1">-- inner circle</span>
-    <span class="k">UNION</span> <span class="k">ALL</span>
-    <span class="k">SELECT</span> <span class="n">ST_ExteriorRing</span><span class="p">(</span><span class="n">ST_Buffer</span><span class="p">(</span><span class="n">ST_Centroid</span><span class="p">(</span><span class="n">line</span><span class="p">),</span> <span class="n">ST_Length</span><span class="p">(</span><span class="n">line</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mi">30</span><span class="p">))</span> <span class="c1">-- outer circle</span>
-<span class="p">)</span> <span class="n">a</span><span class="p">;</span>
-<span class="k">END</span>
-<span class="err">$</span><span class="n">ST_WindRose$</span>
-<span class="k">LANGUAGE</span> <span class="n">PLPGSQL</span><span class="p">;</span>
-</pre></div>
-
-
-<p>Wind rose created with this function might look like the one&nbsp;below.</p>
-<div class="text-center">
-<img src="http://i.stack.imgur.com/4OD0J.png">
-</div>
-
-<p>Run it as follows. The <code>line</code> parameter should be a simple straight line made of just two&nbsp;vertices.</p>
-<!-- codeblock -->
-
-<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">ST_WindRose</span><span class="p">(</span><span class="n">ST_MakeLine</span><span class="p">(</span><span class="n">ST_MakePoint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">ST_MakePoint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)),</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mi">01</span><span class="p">);</span>
-</pre></div>
         </section>
         </div>
     </div>

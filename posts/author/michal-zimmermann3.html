@@ -38,6 +38,21 @@
 
     <div class="panel card card-1">
         <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2015/liftago-open-dataset-infographics/" rel="bookmark" title="Permalink to Liftago Open Dataset Infographics">Liftago Open Dataset&nbsp;Infographics</a></h1>
+            <small>Written on Dec 21, 2015
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/python.html">python</a>,         <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>,         <a href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>,         <a href="https://www.zimmi.cz/posts/tag/visualization.html">visualization</a>        | <a href="https://www.zimmi.cz/posts/category/data.html">data</a>
+        </small>
+        <section>
+            <p><a href="https://www.liftago.com/cs">Liftago</a> (the Czech analogy of Uber) has recently <a href="http://try.liftago.com/info-wants-to-be-free/">released a sample of its data</a> covering four weeks of driver/pasenger&nbsp;interactions.</p>
+<p>Have a look at my infographics created with PostGIS, Inkscape, Python and&nbsp;pygal.</p>
+<p class="text-center"><a href="https://www.zimmi.cz/posts/assets/liftago-open-dataset-infographics/liftago.pdf"><img title="Liftago infographics" src="https://www.zimmi.cz/posts/assets/liftago-open-dataset-infographics/liftago.png" class="img-responsive centered"></a></p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
             <h1><a href="https://www.zimmi.cz/posts/2015/twitter-rest-api-data-mining-on-openshift-part-ii/" rel="bookmark" title="Permalink to Twitter REST API Data Mining on OpenShift (Part II)">Twitter <span class="caps">REST</span> <span class="caps">API</span> Data Mining on OpenShift (Part <span class="caps">II</span>)</a></h1>
             <small>Written on Dec 6, 2015
         and marked as
@@ -843,69 +858,6 @@ gdalwarp -dstalpha -s_srs <span class="s1">&#39;EPSG:5514&#39;</span> -t_srs <sp
     <span class="k">do</span> the_script_above.sh <span class="nv">$f</span>
 <span class="p">;</span><span class="k">done</span>
 </pre></div>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2015/filtering-points-by-distance-in-postgis/" rel="bookmark" title="Permalink to Filtering points by distance in PostGIS">Filtering points by distance in&nbsp;PostGIS</a></h1>
-            <small>Written on Jul 21, 2015
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
-        </small>
-        <section>
-            <p>Filtering really big (millions of rows) point datasets by distance might get catchy when solved with wrong PostGIS functions. Without spatial indexes PostGIS would take ages to finish such&nbsp;task.</p>
-<p><a href="https://gis.stackexchange.com/questions/148184/why-the-execution-of-a-query-is-very-slow-using-postgis">Someone over StackExchange asked</a> why the next query had been running for 15 hours (!) with no&nbsp;result:</p>
-<div class="highlight"><pre><span></span><span class="k">SELECT</span>
-    <span class="n">a</span><span class="p">.</span><span class="n">gid</span><span class="p">,</span>
-    <span class="n">b</span><span class="p">.</span><span class="n">gid</span><span class="p">,</span>
-    <span class="n">ST_Distance</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span><span class="n">b</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span>
-<span class="k">FROM</span>
-    <span class="n">shp1</span> <span class="n">a</span><span class="p">,</span>
-    <span class="n">shp2</span> <span class="n">b</span>
-<span class="k">WHERE</span>
-    <span class="n">ST_Intersects</span><span class="p">(</span>
-        <span class="n">ST_Difference</span><span class="p">(</span>
-            <span class="n">ST_Buffer</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span><span class="mi">2000</span><span class="p">),</span>
-            <span class="n">ST_Buffer</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span><span class="mi">500</span><span class="p">)</span>
-        <span class="p">),</span>
-        <span class="n">b</span><span class="p">.</span><span class="n">geom</span>
-    <span class="p">)</span> <span class="k">AND</span>
-    <span class="k">abs</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">value</span> <span class="o">-</span> <span class="n">b</span><span class="p">.</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">400</span>
-</pre></div>
-
-
-<p>The answer is quite simple: because it was using wrong functions. Let&#8217;s&nbsp;see:</p>
-<ol>
-<li><code>ST_Distance()</code> does not use spatial index, it&#8217;s a simple mathematical calculation, it&#8217;s expensive and it can be replaced by spatial operator for point&nbsp;datasets.</li>
-<li><code>ST_Buffer()</code> will definitely take time to build polygons around points. And it&#8217;s being run&nbsp;twice!</li>
-<li><code>ST_Difference()</code> needs more time to compare the buffers and return just the portion of space they don&#8217;t share. Isn&#8217;t it a huge waste to create buffers and then throw them&nbsp;away?</li>
-<li><code>ST_Intersects()</code> finally checks whether the point should be included in the&nbsp;result.</li>
-</ol>
-<p>That was a great challenge to test my knowledge of how PostGIS works and here&#8217;s my shot at&nbsp;it:</p>
-<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="p">(</span>
-    <span class="k">SELECT</span>
-        <span class="n">a</span><span class="p">.</span><span class="n">gid</span><span class="p">,</span>
-        <span class="n">b</span><span class="p">.</span><span class="n">gid</span><span class="p">,</span>
-        <span class="n">a</span><span class="p">.</span><span class="n">geom</span> <span class="o">&lt;-&gt;</span> <span class="n">b</span><span class="p">.</span><span class="n">geom</span> <span class="n">distance</span>
-    <span class="k">FROM</span>
-        <span class="n">shp1</span> <span class="n">a</span><span class="p">,</span> <span class="n">shp2</span> <span class="n">b</span>
-    <span class="k">WHERE</span>
-        <span class="k">abs</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">value</span> <span class="o">-</span> <span class="n">b</span><span class="p">.</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">400</span> <span class="k">AND</span>
-        <span class="n">ST_DWithin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="mi">2000</span><span class="p">)</span>
-    <span class="p">)</span> <span class="n">sq</span>
-<span class="k">WHERE</span>
-    <span class="n">distance</span> <span class="o">&gt;</span> <span class="mi">500</span><span class="p">;</span>
-</pre></div>
-
-
-<ol>
-<li>I use <a href="http://postgis.net/docs/geometry_distance_centroid.html"><code>&lt;-&gt;</code></a>, a.k.a geometry distance centroid instead of <code>ST_Distance()</code>. It takes advantage of spatial indexes, thus it&#8217;s fast. And it&#8217;s perfectly fine to use it with point dataset, because the centroid of a bounding box of a point is? That point, exactly. <strong>Spatial indexes have to be built&nbsp;beforehand.</strong></li>
-<li>Buffers are not necessary to check whether a geometry lies in a certain distance from another one. That&#8217;s what <code>ST_Dwithin()</code> was made for. With the inner <code>WHERE</code> clause I get all the points lying at most 2,000 meters from the current, having the absolute value difference bigger than 400. <code>ST_Dwithin()</code> will make use of any spatial index available, unlike <code>ST_Distance()</code>.</li>
-<li>The outer <code>WHERE</code> clause throws away all the points closer than 500 meters. Remember, we already got only those not further than 2,000 meters from the previous&nbsp;step.</li>
-</ol>
-<p>It took PostGIS 1060545,590 ms (~ 17 minutes) on my Quad-Core Intel® Core™ i5-4210M <span class="caps">CPU</span> @ 2.60GHz, 4 <span class="caps">GB</span> <span class="caps">RAM</span>, 500 <span class="caps">GB</span> <span class="caps">SSD</span> hard drive, PostgreSQL 9.3 and PostGIS 2.1 with two point datasets having 4M and 300K rows,&nbsp;respectively.</p>
         </section>
         </div>
     </div>
