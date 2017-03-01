@@ -1,5 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0"><channel><title>Michal Zimmermann</title><link>https://www.zimmi.cz/posts/</link><description>Pieces of knowledge from the world of GIS.</description><lastBuildDate>Tue, 28 Feb 2017 20:30:00 +0100</lastBuildDate><item><title>Executing dynamic SQL query right away</title><link>https://www.zimmi.cz/posts/2017/executing-dynamic-sql-query-right-away/</link><description>&lt;p&gt;PostgreSQL 9.6 comes with a handy &lt;code&gt;psql&lt;/code&gt; command called &lt;code&gt;\gexec&lt;/code&gt; that &lt;em&gt;sends the current query input buffer to the server and treats the result as a &lt;span class="caps"&gt;SQL&lt;/span&gt; statement to be executed&lt;/em&gt; (right, whatever). What that means is that instead of doing&amp;nbsp;this&lt;/p&gt;
+<rss version="2.0"><channel><title>Michal Zimmermann</title><link>https://www.zimmi.cz/posts/</link><description>Pieces of knowledge from the world of GIS.</description><lastBuildDate>Wed, 01 Mar 2017 09:30:00 +0100</lastBuildDate><item><title>Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with PostGIS</title><link>https://www.zimmi.cz/posts/2017/upgrading-postgresql-95-to-postgresql-96-with-postgis/</link><description>&lt;p&gt;Thanks to &lt;code&gt;pg_upgrade&lt;/code&gt; tool the PostgreSQL upgrade on Ubuntu is pretty straightforward. Different PostGIS versions might cause troubles though. This post covers PostgreSQL 9.5, PostGIS 2.2 to PostgreSQL 9.6, PostGIS 2.3&amp;nbsp;migration.&lt;/p&gt;
+&lt;p&gt;First of all, install the PostgreSQL 9.6 with PostGIS&amp;nbsp;2.3.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;apt install postgresql-9.6 postgresql-9.6-postgis-2.3
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Mind that newly installed database cluster runs on port &lt;code&gt;5433&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;If you run &lt;code&gt;pg_upgrade&lt;/code&gt; at this stage, it will fail with the following&amp;nbsp;error.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;could not load library &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$libdir&lt;/span&gt;&lt;span class="s2"&gt;/postgis_topology-2.2&amp;quot;&lt;/span&gt;:
+ERROR:  could not access file &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$libdir&lt;/span&gt;&lt;span class="s2"&gt;/postgis_topology-2.2&amp;quot;&lt;/span&gt;: No such file or directory
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;pg_upgrade&lt;/code&gt; can&amp;#8217;t run the upgrade because PostGIS versions don&amp;#8217;t match. Install the PostGIS 2.3 for PostgreSQL 9.5 and update extensions in all your&amp;nbsp;databases.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;apt install postgresql-9.5-postgis-2.3
+
+:::sql
+ALTER EXTENSION postgis UPDATE&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;With both clusters using the same PostGIS version, the upgrade can begin. First, stop them&amp;nbsp;with&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;service postgresql stop
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Then, run the actual &lt;code&gt;pg_upgrade&lt;/code&gt; command as &lt;code&gt;postgres&lt;/code&gt; user. Make sure the &lt;code&gt;pg_hba.conf&lt;/code&gt; file is set to allow local&amp;nbsp;connections.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;/usr/lib/postgresql/9.6/bin/pg_upgrade &lt;span class="se"&gt;\&lt;/span&gt;
+-b /usr/lib/postgresql/9.5/bin/ &lt;span class="se"&gt;\&lt;/span&gt;
+-B /usr/lib/postgresql/9.6/bin/ &lt;span class="se"&gt;\&lt;/span&gt;
+-d /var/lib/postgresql/9.5/main &lt;span class="se"&gt;\&lt;/span&gt;
+-D /var/lib/postgresql/9.6/main &lt;span class="se"&gt;\&lt;/span&gt;
+-o &lt;span class="s1"&gt;&amp;#39; -c config_file=/etc/postgresql/9.5/main/postgresql.conf&amp;#39;&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+-O &lt;span class="s1"&gt;&amp;#39; -c config_file=/etc/postgresql/9.6/main/postgresql.conf&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The following result means the upgrade was&amp;nbsp;smooth.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Performing Consistency Checks
+-----------------------------
+Checking cluster versions                                   ok
+Checking database user is the install user                  ok
+Checking database connection settings                       ok
+Checking &lt;span class="k"&gt;for&lt;/span&gt; prepared transactions                          ok
+Checking &lt;span class="k"&gt;for&lt;/span&gt; reg* system OID user data types                ok
+Checking &lt;span class="k"&gt;for&lt;/span&gt; contrib/isn with bigint-passing mismatch       ok
+Checking &lt;span class="k"&gt;for&lt;/span&gt; roles starting with &lt;span class="s1"&gt;&amp;#39;pg_&amp;#39;&lt;/span&gt;                      ok
+Creating dump of global objects                             ok
+Creating dump of database schemas
+                                                            ok
+Checking &lt;span class="k"&gt;for&lt;/span&gt; presence of required libraries                 ok
+Checking database user is the install user                  ok
+Checking &lt;span class="k"&gt;for&lt;/span&gt; prepared transactions                          ok
+
+If pg_upgrade fails after this point, you must re-initdb the
+new cluster before continuing.
+
+Performing Upgrade
+------------------
+Analyzing all rows in the new cluster                       ok
+Freezing all rows on the new cluster                        ok
+Deleting files from new pg_clog                             ok
+Copying old pg_clog to new server                           ok
+Setting next transaction ID and epoch &lt;span class="k"&gt;for&lt;/span&gt; new cluster       ok
+Deleting files from new pg_multixact/offsets                ok
+Copying old pg_multixact/offsets to new server              ok
+Deleting files from new pg_multixact/members                ok
+Copying old pg_multixact/members to new server              ok
+Setting next multixact ID and offset &lt;span class="k"&gt;for&lt;/span&gt; new cluster        ok
+Resetting WAL archives                                      ok
+Setting frozenxid and minmxid counters in new cluster       ok
+Restoring global objects in the new cluster                 ok
+Restoring database schemas in the new cluster
+                                                            ok
+Copying user relation files
+                                                            ok
+Setting next OID &lt;span class="k"&gt;for&lt;/span&gt; new cluster                            ok
+Sync data directory to disk                                 ok
+Creating script to analyze new cluster                      ok
+Creating script to delete old cluster                       ok
+
+Upgrade Complete
+----------------
+Optimizer statistics are not transferred by pg_upgrade so,
+once you start the new server, consider running:
+    ./analyze_new_cluster.sh
+
+Running this script will delete the old cluster&lt;span class="err"&gt;&amp;#39;&lt;/span&gt;s data files:
+    ./delete_old_cluster.sh
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The old cluster can be removed and the new one switched back to port &lt;code&gt;5432&lt;/code&gt;. Run &lt;code&gt;/usr/lib/postgresql/9.6/bin/vacuumdb -p 5433 --all --analyze-in-stages&lt;/code&gt; to collect&amp;nbsp;statistics.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Michal Zimmermann</dc:creator><pubDate>Wed, 01 Mar 2017 09:30:00 +0100</pubDate><guid isPermaLink="false">tag:www.zimmi.cz,2017-03-01:posts/2017/upgrading-postgresql-95-to-postgresql-96-with-postgis/</guid><category>sql</category><category>postgresql</category></item><item><title>Executing dynamic SQL query right away</title><link>https://www.zimmi.cz/posts/2017/executing-dynamic-sql-query-right-away/</link><description>&lt;p&gt;PostgreSQL 9.6 comes with a handy &lt;code&gt;psql&lt;/code&gt; command called &lt;code&gt;\gexec&lt;/code&gt; that &lt;em&gt;sends the current query input buffer to the server and treats the result as a &lt;span class="caps"&gt;SQL&lt;/span&gt; statement to be executed&lt;/em&gt; (right, whatever). What that means is that instead of doing&amp;nbsp;this&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;psql -c &lt;span class="s2"&gt;&amp;quot;SELECT &amp;#39;DROP TABLE &amp;#39; || tablename FROM information_schema.tables WHERE table_name LIKE &amp;#39;%to_be_dropped%&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; psql
 &lt;/pre&gt;&lt;/div&gt;
 

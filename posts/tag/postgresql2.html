@@ -38,6 +38,91 @@
 
     <div class="panel card card-1">
         <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2016/dead-simple-random-points-in-polygons-with-postgis/" rel="bookmark" title="Permalink to Dead Simple Random Points in Polygons with PostGIS">Dead Simple Random Points in Polygons with&nbsp;PostGIS</a></h1>
+            <small>Written on Aug 3, 2016
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
+        </small>
+        <section>
+            <p>Since PostgreSQL 9.3 there has been a handy little keyword called <code>LATERAL</code>, which - combined with <code>JOIN</code> - might rock your <span class="caps">GIS</span> world in a second. To keep it simple, a <code>LATERAL JOIN</code> enables a subquery in the <code>FROM</code> part of a query to reference columns from preceding expressions in the <code>FROM</code> list. What the&nbsp;heck?</p>
+<p>Imagine that not so unusual request to <strong>generate random points in polygons</strong> (something I needed to do today). Do it automatically without your favorite piece of desktop <span class="caps">GIS</span>&nbsp;software.</p>
+<p>It is pretty easy using <code>LATERAL JOIN</code>:</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span>
+    <span class="n">a</span><span class="p">.</span><span class="n">id</span><span class="p">,</span>
+    <span class="n">b</span><span class="p">.</span><span class="o">*</span>
+<span class="k">FROM</span> <span class="p">(</span>
+    <span class="k">VALUES</span><span class="p">(</span>
+        <span class="mi">1</span><span class="p">,</span>
+        <span class="n">ST_SetSRID</span><span class="p">(</span>
+            <span class="n">ST_GeomFromText</span><span class="p">(</span>
+                <span class="s1">&#39;POLYGON((0 0, -1 0, -1 -1, 0 -1, 0 0))&#39;</span>
+            <span class="p">),</span>
+        <span class="mi">4326</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">UNION</span> <span class="k">ALL</span>
+    <span class="k">VALUES</span><span class="p">(</span>
+        <span class="mi">2</span><span class="p">,</span>
+        <span class="n">ST_SetSRID</span><span class="p">(</span>
+            <span class="n">ST_GeomFromText</span><span class="p">(</span>
+                <span class="s1">&#39;POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))&#39;</span>
+            <span class="p">),</span>
+        <span class="mi">4326</span><span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">)</span> <span class="n">a</span><span class="p">(</span><span class="n">id</span><span class="p">,</span> <span class="n">geom</span><span class="p">)</span>
+<span class="k">CROSS</span> <span class="k">JOIN</span> <span class="k">LATERAL</span> <span class="p">(</span>
+    <span class="k">SELECT</span> <span class="n">ST_SetSRID</span><span class="p">(</span><span class="n">ST_MakePoint</span><span class="p">(</span><span class="n">tmp</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">tmp</span><span class="p">.</span><span class="n">y</span><span class="p">),</span> <span class="mi">4326</span><span class="p">)</span> <span class="n">geom</span>
+    <span class="k">FROM</span> <span class="p">(</span>
+        <span class="k">SELECT</span>
+            <span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">ST_XMax</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="o">-</span> <span class="n">ST_XMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span> <span class="o">+</span> <span class="n">ST_XMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">x</span><span class="p">,</span>
+            <span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">ST_YMax</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="o">-</span> <span class="n">ST_YMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span> <span class="o">+</span> <span class="n">ST_YMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">y</span>
+        <span class="k">FROM</span> <span class="n">generate_series</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">)</span>
+    <span class="p">)</span> <span class="n">tmp</span>
+<span class="p">)</span> <span class="n">b</span><span class="p">;</span>
+</pre></div>
+
+
+<p>What actually happened over there? If you want to put points inside polygons, you need&#8230; polygons. We will do just fine with two of them created inside this&nbsp;query:</p>
+<div class="highlight"><pre><span></span><span class="k">VALUES</span><span class="p">(</span>
+    <span class="mi">1</span><span class="p">,</span>
+    <span class="n">ST_SetSRID</span><span class="p">(</span>
+        <span class="n">ST_GeomFromText</span><span class="p">(</span>
+            <span class="s1">&#39;POLYGON((0 0, -1 0, -1 -1, 0 -1, 0 0))&#39;</span>
+        <span class="p">),</span>
+    <span class="mi">4326</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="k">UNION</span> <span class="k">ALL</span>
+<span class="k">VALUES</span><span class="p">(</span>
+    <span class="mi">2</span><span class="p">,</span>
+    <span class="n">ST_SetSRID</span><span class="p">(</span>
+        <span class="n">ST_GeomFromText</span><span class="p">(</span>
+            <span class="s1">&#39;POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))&#39;</span>
+        <span class="p">),</span>
+    <span class="mi">4326</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+
+
+<p>All the magic happens inside the <code>LATERAL JOIN</code> part of the&nbsp;query:</p>
+<div class="highlight"><pre><span></span><span class="k">CROSS</span> <span class="k">JOIN</span> <span class="k">LATERAL</span> <span class="p">(</span>
+    <span class="k">SELECT</span> <span class="n">ST_SetSRID</span><span class="p">(</span><span class="n">ST_MakePoint</span><span class="p">(</span><span class="n">tmp</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">tmp</span><span class="p">.</span><span class="n">y</span><span class="p">),</span> <span class="mi">4326</span><span class="p">)</span> <span class="n">geom</span>
+    <span class="k">FROM</span> <span class="p">(</span>
+        <span class="k">SELECT</span>
+            <span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">ST_XMax</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="o">-</span> <span class="n">ST_XMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span> <span class="o">+</span> <span class="n">ST_XMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">x</span><span class="p">,</span>
+            <span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">ST_YMax</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="o">-</span> <span class="n">ST_YMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span> <span class="o">+</span> <span class="n">ST_YMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">y</span>
+        <span class="k">FROM</span> <span class="n">generate_series</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">)</span>
+    <span class="p">)</span> <span class="n">tmp</span>
+<span class="p">)</span> <span class="n">b</span><span class="p">;</span>
+</pre></div>
+
+
+<p>The inner <code>SELECT</code> calculates random points based on the extent of the polygon. Note it directly calls <code>a.geom</code>, a value that comes from the previous <code>SELECT</code>! The <code>LATERAL JOIN</code> part is thus run for every row of the previous <code>SELECT</code> statement inside <code>FROM</code> part of the query. This means it will return 201 points for each of the two polygons (run the query inside <span class="caps">QGIS</span> to see the&nbsp;result).</p>
+<p>Note all the points fall inside the polygons by accident, because they are <strong>square</strong>. Otherwise a <code>ST_Contains</code> or <code>ST_Within</code> should be used inside the outermost <code>WHERE</code> query to filter outliers. This part could use some&nbsp;tweaking.</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
             <h1><a href="https://www.zimmi.cz/posts/2016/syncing-two-postgresql-databases-faster/" rel="bookmark" title="Permalink to Syncing Two PostgreSQL Databases Faster">Syncing Two PostgreSQL Databases&nbsp;Faster</a></h1>
             <small>Written on Jul 17, 2016
         and marked as
@@ -891,79 +976,6 @@ ALTER TABLE uni ADD PRIMARY KEY(id);
 <li>Never stop learning and trying different&nbsp;approaches.</li>
 <li>Although using <code>CTE</code> might be tempting, creating separate tables for separate steps of the whole process is much more comfortable for&nbsp;debugging.</li>
 </ul>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-ii/" rel="bookmark" title="Permalink to PostGIS Case Study: Vozejkmap Open Data (Part II)">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">II</span>)</a></h1>
-            <small>Written on Feb 21, 2015
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
-        </small>
-        <section>
-            <p><a href="{{ pcposturl(2014, 12, 02, 'postgis-case-study-vozejkmap-open-data-part-i') }}">In the first part of my little case study</a> I downloaded <a href="http://vozejkmap.cz">vozejkmap.cz</a> dataset and imported it into the PostGIS database. Having spatial data safely stored the time comes to get it onto the map. Libraries used&nbsp;are:</p>
-<ul>
-<li><a href="http://leafletjs.com">Leaflet</a></li>
-<li><a href="https://github.com/lvoogdt/Leaflet.awesome-markers">Leaflet.awesome-markers</a></li>
-<li><a href="https://github.com/Leaflet/Leaflet.markercluster">Leaflet.markercluster</a></li>
-</ul>
-<p>I teach cartography visualization classes this semester and this map should serve well as an example of what can be done with online&nbsp;maps.</p>
-<h2>Retrieving data from the PostGIS&nbsp;database</h2>
-<p>Our goal is to build the whole map as a static <span class="caps">HTML</span> page without any backend logic. Thus, data needs to be extracted from the database into the format readable with Leaflet - <a href="http://geojson.org/">GeoJSON</a>.</p>
-<p>That&#8217;s fairly easy with the <a href="http://www.postgresonline.com/journal/archives/267-Creating-GeoJSON-Feature-Collections-with-JSON-and-PostGIS-functions.html">postgresonline.com tutorial</a>. It took me quite a time to find out what the following query does. Splitting it into smaller chunks helped a&nbsp;lot.</p>
-<div class="highlight"><pre><span></span>SELECT row_to_json(fc)
-FROM (
-SELECT &#39;FeatureCollection&#39; AS type,
-    array_to_json(array_agg(f)) AS features
-    FROM (SELECT &#39;Feature&#39; AS type,
-        ST_AsGeoJSON(lg.geom)::json As geometry,
-        row_to_json((SELECT l FROM (SELECT id, title, location_type, description, author_name, attr1, attr2, attr3) AS l
-  )) AS properties
-FROM vozejkmap AS lg ) AS f )  AS fc \g /path/to/file.json;
-</pre></div>
-
-
-<p>To get all rows with <code>type</code>, <code>geometry</code> and <code>properties</code> columns (these are the ones defined in GeoJSON specification, see the link above), run&nbsp;this:</p>
-<div class="highlight"><pre><span></span>SELECT &#39;Feature&#39; AS type,
-            ST_AsGeoJSON(lg.geom)::json As geometry,
-            row_to_json((SELECT l FROM (SELECT id, title, location_type, description, author_name, attr1, attr2, attr3) AS l
-      )) AS properties
-    FROM vozejkmap AS lg
-</pre></div>
-
-
-<p><code>array_agg()</code> squashes all the rows into an array while <code>array_to_json()</code> returns the array as <span class="caps">JSON</span>.</p>
-<div class="highlight"><pre><span></span>SELECT &#39;FeatureCollection&#39; AS type,
-    array_to_json(array_agg(f)) AS features
-    FROM (SELECT &#39;Feature&#39; AS type,
-        ST_AsGeoJSON(lg.geom)::json As geometry,
-        row_to_json((SELECT l FROM (SELECT id, title, location_type, description, author_name, attr1, attr2, attr3) AS l
-  )) AS properties
-FROM vozejkmap AS lg ) AS f
-</pre></div>
-
-
-<p>In the last step (the whole code as shown above) <code>row_to_json</code> returns the result as <span class="caps">JSON</span>.</p>
-<h3>Caveats</h3>
-<p>If you run this code from the psql console, be sure&nbsp;you</p>
-<ul>
-<li>set <em>show only row</em> to true with <code>\t</code></li>
-<li>set <em>expanded output</em> to false with <code>\x off</code></li>
-</ul>
-<p>If you don&#8217;t, you&#8217;ll have lots of hyphens and column names saved to the json&nbsp;file.</p>
-<h2>Leaflet&nbsp;map</h2>
-<p>Map JavaScript is rather simple with ~30 lines of code (not taking styles into account). Thanks to the great plugins it is easy to show ~7,600 points on the map real&nbsp;quick.</p>
-<p>I didn&#8217;t do much customization apart from styling markers and binding&nbsp;popups.</p>
-<p><img src="https://www.zimmi.cz/posts/assets/postgis-case-study-vozejkmap-open-data-part-ii/map.png" title="vozejkmap.cz data map" class="img-responsive centered"></p>
-<h2>What&#8217;s&nbsp;next</h2>
-<ol>
-<li><a href="http://turfjs.org">Turf</a> which means I need to think of what could be fun to do with this&nbsp;data</li>
-<li>Layers&nbsp;switching</li>
-<li>Map key (by extending&nbsp;L.Control)</li>
-</ol>
-<p>The code is still <a href="https://github.com/zimmicz/vozejkmap-to-postgis">available at my GitHub</a>.</p>
         </section>
         </div>
     </div>

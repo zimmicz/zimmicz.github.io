@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+          <title>Michal Zimmermann | Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with&nbsp;PostGIS</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+
+
+
+    <meta name="tags" content="sql" />
+    <meta name="tags" content="postgresql" />
+  <meta property="og:image" content="https://pbs.twimg.com/profile_images/770323886290440192/3G5hqp11_400x400.jpg" />
+  <meta property="og:title" content="Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with PostGIS" />
+  <meta property="og:description" content="Thanks to pg_upgrade tool the PostgreSQL upgrade on Ubuntu is pretty straightforward. Different PostGIS versions might cause troubles though. This post covers PostgreSQL 9.5, PostGIS 2.2 to PostgreSQL 9.6, PostGIS 2.3 migration. First of all, install ..." />
+  <meta property="og:url" content="https://www.zimmi.cz/posts/2017/upgrading-postgresql-95-to-postgresql-96-with-postgis/" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?d5d1e141">
+</head>
+
+<body id="index" class="home">
+    <nav class="top-bar card-1" data-topbar role="navigation">
+        <ul class="title-area">
+            <li class="name">
+                <h1><a href="/posts">Home</a></h1>
+            </li>
+     <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+            <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+        </ul>
+        <section class="top-bar-section">
+    <!-- Right Nav Section -->
+            <ul class="right">
+                <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+                <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+                <li><a href="https://www.zimmi.cz/posts/feed.xml">RSS feed</a></li>
+            </ul>
+        </section>
+    </nav>
+        <div class="row">
+          <div class="large-12 columns header">
+            <h1><a href="/posts">Michal Zimmermann</a> <small>Pieces of knowledge from the world of GIS.</small></h1>
+          </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns">
+<div class="panel card card-1">
+    <div class="post-name">
+        <h1><a href="https://www.zimmi.cz/posts/2017/upgrading-postgresql-95-to-postgresql-96-with-postgis/" rel="bookmark" title="Permalink to Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with PostGIS">Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with&nbsp;PostGIS</a></h1>
+        <small>Written on Mar 1, 2017
+    and marked as
+    <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>,     <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
+    </small>
+    <section>
+        <p>Thanks to <code>pg_upgrade</code> tool the PostgreSQL upgrade on Ubuntu is pretty straightforward. Different PostGIS versions might cause troubles though. This post covers PostgreSQL 9.5, PostGIS 2.2 to PostgreSQL 9.6, PostGIS 2.3&nbsp;migration.</p>
+<p>First of all, install the PostgreSQL 9.6 with PostGIS&nbsp;2.3.</p>
+<div class="highlight"><pre><span></span>apt install postgresql-9.6 postgresql-9.6-postgis-2.3
+</pre></div>
+
+
+<p>Mind that newly installed database cluster runs on port <code>5433</code>.</p>
+<p>If you run <code>pg_upgrade</code> at this stage, it will fail with the following&nbsp;error.</p>
+<div class="highlight"><pre><span></span>could not load library <span class="s2">&quot;</span><span class="nv">$libdir</span><span class="s2">/postgis_topology-2.2&quot;</span>:
+ERROR:  could not access file <span class="s2">&quot;</span><span class="nv">$libdir</span><span class="s2">/postgis_topology-2.2&quot;</span>: No such file or directory
+</pre></div>
+
+
+<p><code>pg_upgrade</code> can&#8217;t run the upgrade because PostGIS versions don&#8217;t match. Install the PostGIS 2.3 for PostgreSQL 9.5 and update extensions in all your&nbsp;databases.</p>
+<div class="highlight"><pre><span></span>apt install postgresql-9.5-postgis-2.3
+
+:::sql
+ALTER EXTENSION postgis UPDATE<span class="p">;</span>
+</pre></div>
+
+
+<p>With both clusters using the same PostGIS version, the upgrade can begin. First, stop them&nbsp;with</p>
+<div class="highlight"><pre><span></span>service postgresql stop
+</pre></div>
+
+
+<p>Then, run the actual <code>pg_upgrade</code> command as <code>postgres</code> user. Make sure the <code>pg_hba.conf</code> file is set to allow local&nbsp;connections.</p>
+<div class="highlight"><pre><span></span>/usr/lib/postgresql/9.6/bin/pg_upgrade <span class="se">\</span>
+-b /usr/lib/postgresql/9.5/bin/ <span class="se">\</span>
+-B /usr/lib/postgresql/9.6/bin/ <span class="se">\</span>
+-d /var/lib/postgresql/9.5/main <span class="se">\</span>
+-D /var/lib/postgresql/9.6/main <span class="se">\</span>
+-o <span class="s1">&#39; -c config_file=/etc/postgresql/9.5/main/postgresql.conf&#39;</span> <span class="se">\</span>
+-O <span class="s1">&#39; -c config_file=/etc/postgresql/9.6/main/postgresql.conf&#39;</span>
+</pre></div>
+
+
+<p>The following result means the upgrade was&nbsp;smooth.</p>
+<div class="highlight"><pre><span></span>Performing Consistency Checks
+-----------------------------
+Checking cluster versions                                   ok
+Checking database user is the install user                  ok
+Checking database connection settings                       ok
+Checking <span class="k">for</span> prepared transactions                          ok
+Checking <span class="k">for</span> reg* system OID user data types                ok
+Checking <span class="k">for</span> contrib/isn with bigint-passing mismatch       ok
+Checking <span class="k">for</span> roles starting with <span class="s1">&#39;pg_&#39;</span>                      ok
+Creating dump of global objects                             ok
+Creating dump of database schemas
+                                                            ok
+Checking <span class="k">for</span> presence of required libraries                 ok
+Checking database user is the install user                  ok
+Checking <span class="k">for</span> prepared transactions                          ok
+
+If pg_upgrade fails after this point, you must re-initdb the
+new cluster before continuing.
+
+Performing Upgrade
+------------------
+Analyzing all rows in the new cluster                       ok
+Freezing all rows on the new cluster                        ok
+Deleting files from new pg_clog                             ok
+Copying old pg_clog to new server                           ok
+Setting next transaction ID and epoch <span class="k">for</span> new cluster       ok
+Deleting files from new pg_multixact/offsets                ok
+Copying old pg_multixact/offsets to new server              ok
+Deleting files from new pg_multixact/members                ok
+Copying old pg_multixact/members to new server              ok
+Setting next multixact ID and offset <span class="k">for</span> new cluster        ok
+Resetting WAL archives                                      ok
+Setting frozenxid and minmxid counters in new cluster       ok
+Restoring global objects in the new cluster                 ok
+Restoring database schemas in the new cluster
+                                                            ok
+Copying user relation files
+                                                            ok
+Setting next OID <span class="k">for</span> new cluster                            ok
+Sync data directory to disk                                 ok
+Creating script to analyze new cluster                      ok
+Creating script to delete old cluster                       ok
+
+Upgrade Complete
+----------------
+Optimizer statistics are not transferred by pg_upgrade so,
+once you start the new server, consider running:
+    ./analyze_new_cluster.sh
+
+Running this script will delete the old cluster<span class="err">&#39;</span>s data files:
+    ./delete_old_cluster.sh
+</pre></div>
+
+
+<p>The old cluster can be removed and the new one switched back to port <code>5432</code>. Run <code>/usr/lib/postgresql/9.6/bin/vacuumdb -p 5433 --all --analyze-in-stages</code> to collect&nbsp;statistics.</p>
+    </section>
+    </div>
+<div class="neighbors">
+    <h3>More reading</h3>
+    <ul>
+        <li>
+            <a href="https://www.zimmi.cz/posts/2017/executing-dynamic-sql-query-right-away/">
+                 Executing dynamic <span class="caps">SQL</span> query right&nbsp;away
+            </a>
+        </li>
+         <li>
+             <a href="https://www.zimmi.cz/posts/2017/executing-dynamic-sql-query-right-away/">
+                 Executing dynamic <span class="caps">SQL</span> query right&nbsp;away
+             </a>
+         </li>
+        </li>
+    </ul>
+</div></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns footer">
+                <footer>
+                    <address>
+                    Written by <a href="http://www.zimmi.cz">Michal Zimmermann</a>.
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    </address><!-- /#about -->
+                </footer><!-- /#contentinfo -->
+            </div>
+        </div>
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-43432739-2']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+<script src="https://www.zimmi.cz/posts/theme/js/packed.js?8bee1467"></script>
+<script>
+$(document).foundation();
+</script>
+</body>
+</html>
