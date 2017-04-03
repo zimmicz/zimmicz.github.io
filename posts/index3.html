@@ -37,6 +37,59 @@
 
     <div class="panel card card-1">
         <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2016/how-to-convert-dgn-to-tiff-with-gdal/" rel="bookmark" title="Permalink to How to convert DGN to Tiff with GDAL">How to convert <span class="caps">DGN</span> to Tiff with <span class="caps">GDAL</span></a></h1>
+            <small>Written on Feb 21, 2016
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>        | <a href="https://www.zimmi.cz/posts/category/automation.html">automation</a>
+        </small>
+        <section>
+            <p>We have to deal with <span class="caps">DGN</span> drawings quite often at <a href="http://www.clevermaps.cz">CleverMaps</a> - heavily used for infrastructure projects (highways, roads, pipelines), they are a pure nightmare to the <span class="caps">GIS</span> person inside me. Right now, I&#8217;m only capable of converting it into a raster file and serve it with Geoserver. The transformation from <span class="caps">DGN</span> to <span class="caps">PDF</span> to <span class="caps">PNG</span> to Tiff is not something that makes me utterly happy&nbsp;though.</p>
+<p>All you need to do the same is <a href="https://www.zimmi.cz/posts/tag/gdal.html"><span class="caps">GDAL</span></a>, ImageMagick, some <span class="caps">PDF</span> documents created out of <span class="caps">DGN</span> files - something MicroStation can help you with - and their upper left and lower right corner&nbsp;coordinates.</p>
+<div class="highlight"><pre><span></span><span class="c1"># I recommend putting some limits on ImageMagick - it tends to eat up all the resources and quit</span>
+<span class="nb">export</span> <span class="nv">MAGICK_MEMORY_LIMIT</span><span class="o">=</span><span class="m">1512</span>
+<span class="nb">export</span> <span class="nv">MAGICK_MAP_LIMIT</span><span class="o">=</span><span class="m">512</span>
+<span class="nb">export</span> <span class="nv">MAGICK_AREA_LIMIT</span><span class="o">=</span><span class="m">1024</span>
+<span class="nb">export</span> <span class="nv">MAGICK_FILES_LIMIT</span><span class="o">=</span><span class="m">512</span>
+<span class="nb">export</span> <span class="nv">MAGICK_TMPDIR</span><span class="o">=</span>/partition/large/enough
+
+<span class="c1"># I expect two files on the input: the first is PDF file with drawing, the second is a simple text file with four coordinates on a single line in the following order: upper left x, upper left y, lower right x, lower right y</span>
+<span class="nv">INPUT</span><span class="o">=</span><span class="si">${</span><span class="nv">1</span><span class="p">:?</span><span class="s2">&quot;PDF file path&quot;</span><span class="si">}</span>
+<span class="nv">COORDS</span><span class="o">=</span><span class="si">${</span><span class="nv">2</span><span class="p">:?</span><span class="s2">&quot;Bounding box file path&quot;</span><span class="si">}</span>
+<span class="nv">OUTPUTDIRNAME</span><span class="o">=</span><span class="k">$(</span>dirname <span class="nv">$INPUT</span><span class="k">)</span>
+<span class="nv">OUTPUTFILENAME</span><span class="o">=</span><span class="k">$(</span>basename <span class="nv">$INPUT</span> <span class="p">|</span> cut -d. -f1<span class="k">)</span>.png
+<span class="nv">OUTPUTPATH</span><span class="o">=</span><span class="nv">$OUTPUTDIRNAME</span>/<span class="nv">$OUTPUTFILENAME</span>
+
+<span class="c1"># create PNG image - I actually don&#39;t remember why it didn&#39;t work directly to Tiff</span>
+gdal_translate <span class="se">\</span>
+    -co <span class="nv">WORLDFILE</span><span class="o">=</span>YES <span class="se">\</span>
+    -co <span class="nv">ZLEVEL</span><span class="o">=</span><span class="m">5</span> <span class="se">\</span>
+    -of PNG <span class="se">\</span>
+    --config GDAL_CACHEMAX <span class="m">500</span> <span class="se">\</span>
+    --config GDAL_PDF_DPI <span class="m">300</span> <span class="se">\</span>
+    -a_srs EPSG:5514 <span class="se">\ </span><span class="c1"># Czech local CRS</span>
+    -a_ullr <span class="k">$(</span><span class="nb">echo</span> <span class="k">$(</span>cat <span class="nv">$COORDS</span><span class="k">))</span> <span class="se">\ </span><span class="c1"># read the file with coordinates</span>
+    <span class="nv">$INPUT</span> <span class="se">\</span>
+    <span class="nv">$OUTPUTPATH</span>
+
+<span class="c1"># convert to Tiff image</span>
+convert <span class="se">\</span>
+    -define tiff:tile-geometry<span class="o">=</span>256x256 <span class="se">\</span>
+    -transparent white <span class="se">\ </span><span class="c1"># drawings come with white background</span>
+    <span class="nv">$OUTPUTPATH</span> <span class="se">\</span>
+    <span class="si">${</span><span class="nv">OUTPUTPATH</span><span class="p">/.png</span><span class="si">}</span>_alpha.tif
+
+<span class="c1"># build overwies to speed things up</span>
+gdaladdo <span class="si">${</span><span class="nv">OUTPUTPATH</span><span class="p">/.png</span><span class="si">}</span>_alpha.tif <span class="m">2</span> <span class="m">4</span> <span class="m">8</span> <span class="m">16</span> <span class="m">32</span>
+</pre></div>
+
+
+<p>And you&#8217;re done. The <code>.wld</code> file will be present for each resulting file. I rename it manually to match the name of a GeoTiff - that should be probably done automatically as&nbsp;well.</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
             <h1><a href="https://www.zimmi.cz/posts/2016/looking-for-the-next-row-with-postgresql/" rel="bookmark" title="Permalink to Looking for the Next Row with PostgreSQL">Looking for the Next Row with&nbsp;PostgreSQL</a></h1>
             <small>Written on Jan 23, 2016
         and marked as
@@ -174,7 +227,7 @@ mkdir ./data/csv
 
 <span class="nb">cd</span> ./data/csv
 touch tweets.csv
-<span class="nb">echo</span> <span class="k">$(</span>sed -n 1p <span class="k">$(</span>ls -d -1 *.csv <span class="p">|</span> head -n 1<span class="k">))</span> &gt; tweets.csv <span class="c1"># get column names</span>
+<span class="nb">echo</span> <span class="k">$(</span>sed -n 1p <span class="k">$(</span>ls -d -1 *.csv <span class="p">|</span> head -n <span class="m">1</span><span class="k">))</span> &gt; tweets.csv <span class="c1"># get column names</span>
 
 <span class="k">for</span> csv in tw_*.csv<span class="p">;</span> <span class="k">do</span>
     <span class="nb">echo</span> <span class="nv">$csv</span>
@@ -361,7 +414,7 @@ git merge origin/master <span class="o">&amp;&amp;</span> <span class="se">\</sp
 git commit --allow-empty -m <span class="s2">&quot;Restart gear&quot;</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
 git push <span class="o">&amp;&amp;</span> <span class="se">\</span>
 <span class="nb">echo</span> <span class="s2">&quot;Success&quot;</span> <span class="p">;</span> 
-<span class="o">}</span> &gt;&gt; <span class="nv">$logfile</span> 2&gt;<span class="p">&amp;</span>1
+<span class="o">}</span> &gt;&gt; <span class="nv">$logfile</span> <span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span>
 </pre></div>
 
 
@@ -438,7 +491,7 @@ tar xzf postgis-2.2.0.tar.gz
 <span class="nv">CORES</span><span class="o">=</span><span class="k">$(</span>nproc<span class="k">)</span>
 
 <span class="k">if</span> <span class="o">[[</span> <span class="nv">$CORES</span> &gt; <span class="m">1</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
-    <span class="nv">CORES</span><span class="o">=</span><span class="k">$(</span>expr <span class="nv">$CORES</span> - 1<span class="k">)</span> <span class="c1"># be nice to your PC</span>
+    <span class="nv">CORES</span><span class="o">=</span><span class="k">$(</span>expr <span class="nv">$CORES</span> - <span class="m">1</span><span class="k">)</span> <span class="c1"># be nice to your PC</span>
 <span class="k">fi</span>
 
 <span class="nb">cd</span> gmp-6.0.0
@@ -508,7 +561,7 @@ unrar dem.rar -d copernicus
 
 <h2>Hillshade and color&nbsp;relief</h2>
 <p>Use <span class="caps">GDAL</span> to create hillshade with a simple command. No need to use <code>-s</code> flag to convert units, it already comes in meters. Exaggerate heights a bit with <code>-z</code> flag.</p>
-<div class="highlight"><pre><span></span>gdaldem hillshade EUD_CP-DEMS_4500025000-AA.tif hillshade.tif -z 3
+<div class="highlight"><pre><span></span>gdaldem hillshade EUD_CP-DEMS_4500025000-AA.tif hillshade.tif -z <span class="m">3</span>
 </pre></div>
 
 
@@ -598,8 +651,8 @@ rm color_relief.tif
 rm hillshade.tif
 mv color_relief.compress.tif color_relief.tif
 mv hillshade.compress.tif hillshade.tif
-gdaladdo color_relief.tif <span class="m">2</span> <span class="m">4</span> <span class="m">8</span> 16
-gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span class="m">8</span> 16
+gdaladdo color_relief.tif <span class="m">2</span> <span class="m">4</span> <span class="m">8</span> <span class="m">16</span>
+gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span class="m">8</span> <span class="m">16</span>
 </pre></div>
 
 
@@ -723,7 +776,7 @@ gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span c
         </small>
         <section>
             <p>Having more than 120K <span class="caps">5MB</span>+ images that should be moved to the server is a great oportunity for some automatic bash processing. It might be good idea to use <a href="http://www.imagemagick.org/script/index.php">ImageMagick</a> <a href="http://www.imagemagick.org/script/convert.php">convert tool</a> to make images smaller in a simple for loop. <a href="http://www.gnu.org/software/parallel/"><span class="caps">GNU</span> Parallel</a> can significantly increase the performance by running one job per <span class="caps">CPU</span>&nbsp;core.</p>
-<div class="highlight"><pre><span></span>parallel --verbose convert <span class="o">{}</span> -quality 40% <span class="o">{}</span> ::: *.jpg
+<div class="highlight"><pre><span></span>parallel --verbose convert <span class="o">{}</span> -quality <span class="m">40</span>% <span class="o">{}</span> ::: *.jpg
 </pre></div>
 
 
@@ -740,156 +793,6 @@ gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span c
 
 <p>By default, <code>inotifywait</code> stops after receiving a single event, while <code>-m</code> flag runs it indefinitely. <code>-e</code> flag defines an event to watch for, in my case that&#8217;s a <code>close_write</code> event. The <code>inotifywait</code> output can be piped to <code>rsync</code> that takes care of syncing local files to remote&nbsp;server.</p>
 <p>The last step, as usual, is&nbsp;profit.</p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/" rel="bookmark" title="Permalink to Automated Map Creation With QGIS, PostGIS, Python, SVG and ImageMagick">Automated Map Creation With <span class="caps">QGIS</span>, PostGIS, Python, <span class="caps">SVG</span> and&nbsp;ImageMagick</a></h1>
-            <small>Written on Aug 9, 2015
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>,         <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>,         <a href="https://www.zimmi.cz/posts/tag/python.html">python</a>,         <a href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>,         <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>        | <a href="https://www.zimmi.cz/posts/category/automation.html">automation</a>
-        </small>
-        <section>
-            <p>As mentioned in <a href="https://www.zimmi.cz/posts/2015/qgis-tips-for-collaborative-mapping/"><span class="caps">QGIS</span> Tips For Collaborative Mapping</a> we&#8217;re in the middle of crop evaluation project at <a href="http://www.clevermaps.cz/">CleverMaps</a>.</p>
-<p>With the <span class="caps">QGIS</span> workflow up and running, I&#8217;ve been focused on different <span class="caps">QGIS</span> related task: <strong>automatic map generation</strong> for land blocks that meet certain conditions. The logic behind identifying such land blocks is as&nbsp;follows:</p>
-<ul>
-<li>if the original area and the measured one differ more than 0.5 %&nbsp;or</li>
-<li>number of declared crops differs from number of crops identified&nbsp;or</li>
-<li>at least one parcel in the land block was given a certain error&nbsp;code</li>
-</ul>
-<p>Let&#8217;s assume that with several lines of <span class="caps">SQL</span> code we can store these mentioned above in a table called <code>land_blocks</code> with geometries being the result of calling <code>ST_Union()</code> over parcels for each land&nbsp;block.</p>
-<h2>Map&nbsp;composition</h2>
-<p>Every map should feature following&nbsp;layers:</p>
-<ul>
-<li>land blocks (remember the <code>land_blocks</code> table?) - labeled with <span class="caps">ID</span>, yellowish borders, no&nbsp;fill</li>
-<li>land parcels - that&#8217;s my source layer - labeled with letters, blue borders, no&nbsp;fill</li>
-<li>other&nbsp;layers</li>
-<li><span class="caps">HR</span>, <span class="caps">VHR</span>, <span class="caps">NIR</span> imagery, orthophoto - served via <span class="caps">WMS</span></li>
-</ul>
-<p>Labels should be visible only for the featured land block (both for the land parcels and the land block itself. The whole map scales dynamically, showing small land blocks zoomed in and the large ones zoomed&nbsp;out.</p>
-<p class='text-center'><a id="desired-map" title="Desired map" href="https://www.zimmi.cz/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map.jpg"><img title="Desired map" src="https://www.zimmi.cz/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map.jpg" width=70% class="img-responsive centered"></a></p>
-
-<p>Every map features additional&nbsp;items:</p>
-<ul>
-<li>dynamic list of subsidies farmer asks for - showing both measured and declared&nbsp;area</li>
-<li>dynamic list of land parcels with their areas and error&nbsp;codes</li>
-<li>scalebar</li>
-<li>map&nbsp;key</li>
-<li>logos</li>
-</ul>
-<h2>Atlas&nbsp;creation</h2>
-<p>Now with requirements defined, let&#8217;s create some maps. It&#8217;s incredibly easy to generate a series of maps with <span class="caps">QGIS</span> atlas&nbsp;options.</p>
-<h3>Atlas generation&nbsp;settings</h3>
-<p><strong>Coverage layer</strong> is presumably the only thing you really need - as the name suggests, it covers your area of interest. One map will be created for each feature in this layer, unless you decide to use some <strong>filtering</strong> - which I&nbsp;did.</p>
-<p><strong>Output filenames</strong> can be tweaked to your needs, here&#8217;s what such a function might look like. If there is a slash in the land block <span class="caps">ID</span> (<span class="caps">XXXXXXX</span>/Y), the filename is set to <code>USER-ID_XXXXXXX-00Y_M_00</code>, <code>USER-ID_XXXXXXX-000_M_00</code> otherwise.</p>
-<div class="highlight"><pre><span></span><span class="k">CASE</span> <span class="k">WHEN</span> <span class="n">strpos</span><span class="p">(</span><span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">),</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span>
-    <span class="k">THEN</span>
-        <span class="n">ji</span> <span class="o">||</span> <span class="s1">&#39;_&#39;</span> <span class="o">||</span>
-        <span class="n">substr</span><span class="p">(</span>
-            <span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="n">strpos</span><span class="p">(</span><span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">),</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span> <span class="c1">-- slash position</span>
-        <span class="p">)</span> <span class="o">||</span> <span class="s1">&#39;-&#39;</span> <span class="o">||</span>
-        <span class="n">lpad</span><span class="p">(</span>
-            <span class="n">substr</span><span class="p">(</span>
-                <span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">),</span>
-                <span class="n">strpos</span><span class="p">(</span><span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">),</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span>
-                <span class="k">length</span><span class="p">(</span><span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">))</span>
-            <span class="p">),</span>
-        <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">)</span> <span class="o">||</span> <span class="s1">&#39;_M_00&#39;</span>
-    <span class="k">ELSE</span>
-        <span class="n">ji</span> <span class="o">||</span> <span class="s1">&#39;_&#39;</span> <span class="o">||</span> <span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">)</span> <span class="o">||</span> <span class="s1">&#39;-000_M_00&#39;</span>
-<span class="k">END</span>
-</pre></div>
-
-
-<h3>Map scale <span class="amp">&amp;</span> variable&nbsp;substitutions</h3>
-<p>Different land blocks are of different sizes, thus needing different <strong>scales</strong> to fit in the map. Again, <span class="caps">QGIS</span> handles this <em>might-become-a-nightmare-pretty-easily</em> issue with a single click. You can define the scale&nbsp;as:</p>
-<ul>
-<li>margin around feature: percentage of the space displayed&nbsp;around</li>
-<li>predefined scale (best fit): my choice, sometimes it doesn&#8217;t display the entire land block&nbsp;though</li>
-<li>fixed scale: sets the scale the same for all the&nbsp;maps</li>
-</ul>
-<p>With these settings, I get a map similar to the one below. Notice two interesting&nbsp;things:</p>
-<p class='text-center'><a title="QGIS map skeleton" href="https://www.zimmi.cz/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map_skeleton.png"><img title="QGIS map skeleton" src="https://www.zimmi.cz/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map_skeleton.png" width=70% class="img-responsive centered"></a></p>
-
-<ul>
-<li>Scale uses decimal places, which I find <em>a huge failure</em>. Has anyone ever seen a map with such scale? The worst is there is no easy way to hide these, or at least I didn&#8217;t find&nbsp;one.</li>
-<li>You can see a bunch of <code>[something in the brackets]</code> notations. These will be substituted with actual values during the atlas generation. Showing land block <span class="caps">ID</span> with a preceeding label is as easy as <code>[%concat('PB: ', "kod_pb")%]</code> (mind the percentage&nbsp;sign).</li>
-</ul>
-<h3>Styling the map using atlas&nbsp;features</h3>
-<p>Atlas features are a great help for <strong>map customization</strong>. As mentioned earlier, in my case, only one land block label per map should be visible. That can be achieved with a simple label dialog&nbsp;expression:</p>
-<div class="highlight"><pre><span></span><span class="k">CASE</span>
-    <span class="k">WHEN</span> <span class="err">$</span><span class="n">id</span> <span class="o">=</span> <span class="err">$</span><span class="n">atlasfeatureid</span>
-    <span class="k">THEN</span> <span class="ss">&quot;kod_pb&quot;</span>
-<span class="k">END</span>
-</pre></div>
-
-
-<p><span class="caps">QGIS</span> keeps reference to each coverage layer feature <span class="caps">ID</span> during atlas generation, so you can use it for comparison. The best part is you can use IDs with <strong>any layer</strong> you&nbsp;need:</p>
-<div class="highlight"><pre><span></span><span class="k">CASE</span>
-    <span class="k">WHEN</span> <span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">)</span> <span class="o">=</span> <span class="ss">&quot;kod_pb&quot;</span>
-    <span class="k">THEN</span> <span class="ss">&quot;kod_zp&quot;</span>
-<span class="k">END</span>
-</pre></div>
-
-
-<p>With this simple expression, I get labels only for those land parcels that are part of the mapped land block. Even the <strong>layer style</strong> can be controlled with atlas feature. Land parcels inside the land block have blue borders, the rest is yellowish, remember? It&#8217;s a piece of cake with rule-based&nbsp;styling.</p>
-<p class='text-center'><a title="Layer style based on atlas feature" href="https://www.zimmi.cz/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/atlas_feature_style.png"><img title="Layer style based on atlas feature" src="https://www.zimmi.cz/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/atlas_feature_style.png" width=70% class="img-responsive centered"></a></p>
-
-<h3>Atlas&nbsp;generation</h3>
-<p>When you&#8217;re set, atlas can be created with a single button. I used <span class="caps">SVG</span> as an output format to easily manipulate the map content afterwards. The resulting maps look like the one in <a href="#desired-map">the first picture</a> without the text in the red rectangle. A Python script appends this to each map&nbsp;afterwards.</p>
-<p>Roughly speaking, generating 300 maps takes an hour or so, I guess that depends on the map complexity and hardware&nbsp;though.</p>
-<h3>Adding textual&nbsp;content</h3>
-<p><span class="caps">SVG</span> output is just plain old <span class="caps">XML</span> that you can edit by hand or by script. A simple Python script, part of map post-processing, loads <span class="caps">SVG</span> from the database and adds it to the left pane of each&nbsp;map.</p>
-<div class="highlight"><pre><span></span><span class="k">SELECT</span>
-      <span class="n">ji</span><span class="p">,</span>
-      <span class="n">kod_pb</span><span class="p">,</span>
-      <span class="n">concat</span><span class="p">(</span>
-            <span class="s1">&#39;&lt;g fill=&quot;none&quot; stroke=&quot;#000000&quot; stroke-opacity=&quot;1&quot; stroke-width=&quot;1&quot;</span>
-<span class="s1">                  stroke-linecap=&quot;square&quot; stroke-linejoin=&quot;bevel&quot; transform=&quot;matrix(1.18081,0,0,1.18081,270.0,550.0)&quot;</span>
-<span class="s1">                  font-family=&quot;Droid Sans&quot; font-size=&quot;35&quot; font-style=&quot;normal&quot;&gt;&#39;</span><span class="p">,</span>
-            <span class="n">kultura</span><span class="p">,</span> <span class="n">vymery</span><span class="p">,</span> <span class="n">vymery_hodnoty</span><span class="p">,</span>
-            <span class="n">vcs_titul</span><span class="p">,</span> <span class="n">vcs_brk</span><span class="p">,</span> <span class="n">vcs_brs</span><span class="p">,</span> <span class="n">vcs_chmel</span><span class="p">,</span>
-            <span class="n">vcs_zvv</span><span class="p">,</span> <span class="n">vcs_zv</span><span class="p">,</span> <span class="n">vcs_ovv</span><span class="p">,</span> <span class="n">vcs_ov</span><span class="p">,</span> <span class="n">vcs_cur</span><span class="p">,</span> <span class="n">vcs_bip</span><span class="p">,</span>
-            <span class="n">lfa</span><span class="p">,</span> <span class="n">lfa_h1</span><span class="p">,</span> <span class="n">lfa_h2</span><span class="p">,</span> <span class="n">lfa_h3</span><span class="p">,</span>
-            <span class="n">lfa_h4</span><span class="p">,</span> <span class="n">lfa_h5</span><span class="p">,</span> <span class="n">lfa_oa</span><span class="p">,</span> <span class="n">lfa_ob</span><span class="p">,</span> <span class="n">lfa_s</span><span class="p">,</span>
-            <span class="n">natura</span><span class="p">,</span> <span class="n">aeo_eafrd_text</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_a1</span><span class="p">,</span>
-            <span class="n">dv_aeo_eafrd_a2o</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_a2v</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_b1</span><span class="p">,</span>
-            <span class="n">dv_aeo_eafrd_b2</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_b3</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_b4</span><span class="p">,</span>
-            <span class="n">dv_aeo_eafrd_b5</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_b6</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_b7</span><span class="p">,</span>
-            <span class="n">dv_aeo_eafrd_b8</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_b9</span><span class="p">,</span> <span class="n">dv_aeo_eafrd_c1</span><span class="p">,</span>
-            <span class="n">dv_aeo_eafrd_c3</span><span class="p">,</span> <span class="n">aeko_text</span><span class="p">,</span> <span class="n">dv_aeko_a</span><span class="p">,</span> <span class="n">dv_aeko_b</span><span class="p">,</span> <span class="n">dv_aeko_c</span><span class="p">,</span>
-            <span class="n">dv_aeko_d1</span><span class="p">,</span> <span class="n">dv_aeko_d2</span><span class="p">,</span> <span class="n">dv_aeko_d3</span><span class="p">,</span> <span class="n">dv_aeko_d4</span><span class="p">,</span> <span class="n">dv_aeko_d5</span><span class="p">,</span>
-            <span class="n">dv_aeko_d6</span><span class="p">,</span> <span class="n">dv_aeko_d7</span><span class="p">,</span> <span class="n">dv_aeko_d8</span><span class="p">,</span> <span class="n">dv_aeko_d9</span><span class="p">,</span> <span class="n">dv_aeko_d10</span><span class="p">,</span>
-            <span class="n">dv_aeko_e</span><span class="p">,</span> <span class="n">dv_aeko_f</span><span class="p">,</span> <span class="n">ez</span><span class="p">,</span> <span class="n">dzes_text</span><span class="p">,</span> <span class="n">rep</span><span class="p">,</span> <span class="n">obi</span><span class="p">,</span> <span class="n">seop</span><span class="p">,</span> <span class="n">meop</span><span class="p">,</span> <span class="n">pbz</span><span class="p">,</span> <span class="n">dzes7</span><span class="p">,</span>
-            <span class="s1">&#39;&lt;/g&gt;&#39;</span>
-      <span class="p">)</span> <span class="n">popis</span>
-<span class="k">FROM</span> <span class="p">(...);</span>
-</pre></div>
-
-
-<p>Each column from the previous query is a result of <code>SELECT</code> similar to the one&nbsp;below.</p>
-<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">concat</span><span class="p">(</span><span class="s1">&#39;&lt;text fill=&quot;#000000&quot; fill-opacity=&quot;1&quot; stroke=&quot;none&quot;&gt;BrK: &#39;</span><span class="p">,</span> <span class="n">dv_brk</span><span class="p">,</span> <span class="s1">&#39; ha / &#39;</span><span class="p">,</span> <span class="ss">&quot;MV_BRK&quot;</span><span class="p">,</span> <span class="s1">&#39; ha;&#39;</span><span class="p">,</span> <span class="n">kod_dpz</span><span class="p">,</span> <span class="s1">&#39;&lt;/text&gt;&#39;</span><span class="p">)</span> <span class="n">vcs_brk</span>
-</pre></div>
-
-
-<p>The <code>transform="matrix(1.18081,0,0,1.18081,270.0,550.0)</code> part puts the text on the right spot. Great finding about <span class="caps">SVG</span> is that it places each <code>&lt;text&gt;</code> element on the new line, so you don&#8217;t need to deal with calculating the position in your&nbsp;script.</p>
-<p>Scale adjustment is done with a dirty lambda&nbsp;function.</p>
-<div class="highlight"><pre><span></span><span class="n">content</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">r&quot;&gt;(\d{1,3}\.\d{3,5})&lt;/text&gt;&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">m</span> <span class="p">:</span><span class="s2">&quot;&gt;    &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)))))</span> <span class="o">+</span> <span class="s2">&quot;&lt;/text&gt;&quot;</span><span class="p">,</span> <span class="n">old_map</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
-</pre></div>
-
-
-<h3><span class="caps">SVG</span> to <span class="caps">JPEG</span>&nbsp;conversion</h3>
-<p>We deliver maps as <span class="caps">JPEG</span> files with 150 <span class="caps">DPI</span> on A4 paper format. <a href="http://www.imagemagick.org/script/index.php">ImageMagick</a> converts the formats with a simple shell&nbsp;command:</p>
-<div class="highlight"><pre><span></span>convert -density <span class="m">150</span> -resize 1753x1240 input.svg output.jpg
-</pre></div>
-
-
-<h2>Conclusion</h2>
-<p>I created pretty efficient semi-automated workflow using several open source technologies that saves me a lot of work. Although <span class="caps">QGIS</span> has some minor pet peeves (scale with decimal places, not showing the entire feature, not substituting variables at times), it definitely makes boring map creation quite amusing. The more I work with big data / on big tasks, the more I find Linux a&nbsp;must-have.</p>
-<p>The whole process was done with <span class="caps">QGIS</span> 2.10, PostGIS 2.1, PostgreSQL 9.3, Python 2.7, ImageMagick&nbsp;6.7.</p>
         </section>
         </div>
     </div>

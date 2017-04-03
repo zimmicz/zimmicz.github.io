@@ -102,37 +102,37 @@
         </small>
         <section>
             <p>I found an <a href="http://stackoverflow.com/questions/25952380/php-find-a-maximum-average-for-10-subsequent-numbers-in-a-list-of-50-random-numb">interesting question</a> at StackOverflow asking for help finding solution to what I have already mentioned in the title, with <span class="caps">PHP</span>. I gave it a try before reading answers and came up with the following&nbsp;code:</p>
-<div class="highlight"><pre><span></span><span class="p">$</span><span class="nv">avg</span><span class="x">  = // value we are looking for</span>
-<span class="p">$</span><span class="nv">size</span><span class="x"> = count(</span><span class="p">$</span><span class="nv">numbers</span><span class="x">);</span>
+<div class="highlight"><pre><span></span>$avg  = // value we are looking for
+$size = count($numbers);
 
-<span class="x">for (</span><span class="p">$</span><span class="nv">i</span><span class="x"> = 0; </span><span class="p">$</span><span class="nv">i</span><span class="x"> &lt; </span><span class="p">$</span><span class="nv">size</span><span class="x">; </span><span class="p">$</span><span class="nv">i</span><span class="x"> += 1) </span><span class="err">{</span><span class="x"></span>
-<span class="x">    if (</span><span class="p">$</span><span class="nv">i</span><span class="x"> + 9 &lt; 51) </span><span class="err">{</span><span class="x"></span>
-<span class="x">        </span><span class="p">$</span><span class="nv">val</span><span class="x"> += </span><span class="p">$</span><span class="nv">numbers</span><span class="x">[</span><span class="p">$</span><span class="nv">i</span><span class="x">];</span>
-<span class="x">        for (</span><span class="p">$</span><span class="nv">j</span><span class="x"> = </span><span class="p">$</span><span class="nv">i</span><span class="x"> + 1; </span><span class="p">$</span><span class="nv">j</span><span class="x"> &lt; 10 + </span><span class="p">$</span><span class="nv">i</span><span class="x">; </span><span class="p">$</span><span class="nv">j</span><span class="x"> += 1) </span><span class="err">{</span><span class="x"></span>
-<span class="x">            </span><span class="p">$</span><span class="nv">val</span><span class="x"> += </span><span class="p">$</span><span class="nv">numbers</span><span class="x">[</span><span class="p">$</span><span class="nv">j</span><span class="x">];</span>
-<span class="x">        }</span>
-<span class="x">        if (</span><span class="p">$</span><span class="nv">val</span><span class="x"> / 10 &gt;= </span><span class="p">$</span><span class="nv">avg</span><span class="x">) </span><span class="err">{</span><span class="x"> // hit</span>
-<span class="x">            // do something</span>
-<span class="x">        }</span>
-<span class="x">        </span><span class="p">$</span><span class="nv">val</span><span class="x"> = 0;</span>
-<span class="x">    }</span>
-<span class="x">}</span>
+for ($i = 0; $i &lt; $size; $i += 1) {
+    if ($i + 9 &lt; 51) {
+        $val += $numbers[$i];
+        for ($j = $i + 1; $j &lt; 10 + $i; $j += 1) {
+            $val += $numbers[$j];
+        }
+        if ($val / 10 &gt;= $avg) { // hit
+            // do something
+        }
+        $val = 0;
+    }
+}
 </pre></div>
 
 
 <p>That was the first that I could think of. And it worked. The answer given by Dave Chen was much more elegant than my solution (although I think it does something a bit different, but that&#8217;s not the point&nbsp;here):</p>
-<div class="highlight"><pre><span></span><span class="p">$</span><span class="nv">number</span><span class="x"> = 10; //numbers in a set</span>
-<span class="p">$</span><span class="nv">max</span><span class="x"> = 0;</span>
-<span class="p">$</span><span class="nv">index</span><span class="x"> = 0;</span>
+<div class="highlight"><pre><span></span>$number = 10; //numbers in a set
+$max = 0;
+$index = 0;
 
-<span class="p">$</span><span class="nv">size</span><span class="x"> = sizeof(</span><span class="p">$</span><span class="nv">numbers</span><span class="x">) - </span><span class="p">$</span><span class="nv">number</span><span class="x">;</span>
-<span class="x">for (</span><span class="p">$</span><span class="nv">i</span><span class="x"> = 0; </span><span class="p">$</span><span class="nv">i</span><span class="x"> &lt; </span><span class="p">$</span><span class="nv">size</span><span class="x">; </span><span class="p">$</span><span class="nv">i</span><span class="x">++) </span><span class="err">{</span><span class="x"></span>
-<span class="x">    </span><span class="p">$</span><span class="nv">tmp</span><span class="x"> = array_sum(array_slice(</span><span class="p">$</span><span class="nv">numbers</span><span class="x">, </span><span class="p">$</span><span class="nv">i</span><span class="x">, </span><span class="p">$</span><span class="nv">number</span><span class="x">)) / </span><span class="p">$</span><span class="nv">number</span><span class="x">;</span>
-<span class="x">    if (</span><span class="p">$</span><span class="nv">tmp</span><span class="x"> &gt; </span><span class="p">$</span><span class="nv">max</span><span class="x">) </span><span class="err">{</span><span class="x"></span>
-<span class="x">        </span><span class="p">$</span><span class="nv">max</span><span class="x"> = </span><span class="p">$</span><span class="nv">tmp</span><span class="x">;</span>
-<span class="x">        </span><span class="p">$</span><span class="nv">index</span><span class="x"> = </span><span class="p">$</span><span class="nv">i</span><span class="x">;</span>
-<span class="x">    }</span>
-<span class="x">}</span>
+$size = sizeof($numbers) - $number;
+for ($i = 0; $i &lt; $size; $i++) {
+    $tmp = array_sum(array_slice($numbers, $i, $number)) / $number;
+    if ($tmp &gt; $max) {
+        $max = $tmp;
+        $index = $i;
+    }
+}
 </pre></div>
 
 
@@ -213,16 +213,16 @@
 <p>I love having clean <span class="caps">OS</span>. That&#8217;s what <a href="http://docker.com">Docker</a> is all about - for me. Running PieCrust on Docker is really easy, it does not clutter your <span class="caps">PC</span> and it just&nbsp;works.</p>
 <p>If you ever want to use PieCrust on Docker, why don&#8217;t you start with this code?
     <span class="caps">FROM</span>&nbsp;centos:centos6</p>
-<div class="highlight"><pre><span></span><span class="nt">RUN</span> <span class="nt">rpm</span> <span class="nt">-Uvh</span> <span class="nt">http</span><span class="o">://</span><span class="nt">mirror</span><span class="nc">.webtatic.com</span><span class="o">/</span><span class="nt">yum</span><span class="o">/</span><span class="nt">el6</span><span class="o">/</span><span class="nt">latest</span><span class="nc">.rpm</span>
-<span class="nt">RUN</span> <span class="nt">rpm</span> <span class="nt">-Uvh</span> <span class="nt">http</span><span class="o">://</span><span class="nt">download</span><span class="nc">.fedoraproject.org</span><span class="o">/</span><span class="nt">pub</span><span class="o">/</span><span class="nt">epel</span><span class="o">/</span><span class="nt">6</span><span class="o">/</span><span class="nt">x86_64</span><span class="o">/</span><span class="nt">epel-release-6-8</span><span class="nc">.noarch.rpm</span>
-<span class="nt">RUN</span> <span class="nt">rpm</span> <span class="nt">-Uvh</span> <span class="nt">http</span><span class="o">://</span><span class="nt">rpms</span><span class="nc">.famillecollet.com</span><span class="o">/</span><span class="nt">enterprise</span><span class="o">/</span><span class="nt">remi-release-6</span><span class="nc">.rpm</span>
+<div class="highlight"><pre><span></span><span class="nt">RUN</span> <span class="nt">rpm</span> <span class="nt">-Uvh</span> <span class="nt">http</span><span class="o">://</span><span class="nt">mirror</span><span class="p">.</span><span class="nc">webtatic</span><span class="p">.</span><span class="nc">com</span><span class="o">/</span><span class="nt">yum</span><span class="o">/</span><span class="nt">el6</span><span class="o">/</span><span class="nt">latest</span><span class="p">.</span><span class="nc">rpm</span>
+<span class="nt">RUN</span> <span class="nt">rpm</span> <span class="nt">-Uvh</span> <span class="nt">http</span><span class="o">://</span><span class="nt">download</span><span class="p">.</span><span class="nc">fedoraproject</span><span class="p">.</span><span class="nc">org</span><span class="o">/</span><span class="nt">pub</span><span class="o">/</span><span class="nt">epel</span><span class="o">/</span><span class="nt">6</span><span class="o">/</span><span class="nt">x86_64</span><span class="o">/</span><span class="nt">epel-release-6-8</span><span class="p">.</span><span class="nc">noarch</span><span class="p">.</span><span class="nc">rpm</span>
+<span class="nt">RUN</span> <span class="nt">rpm</span> <span class="nt">-Uvh</span> <span class="nt">http</span><span class="o">://</span><span class="nt">rpms</span><span class="p">.</span><span class="nc">famillecollet</span><span class="p">.</span><span class="nc">com</span><span class="o">/</span><span class="nt">enterprise</span><span class="o">/</span><span class="nt">remi-release-6</span><span class="p">.</span><span class="nc">rpm</span>
 
 <span class="nt">RUN</span> <span class="nt">yum</span> <span class="nt">--enablerepo</span><span class="o">=</span><span class="nt">remi</span><span class="o">,</span><span class="nt">remi-php55</span> <span class="nt">install</span> <span class="nt">-y</span> <span class="nt">php</span> <span class="nt">php-mbstring</span> <span class="nt">php-opcache</span> <span class="nt">php-cli</span> <span class="nt">php-pear</span> <span class="nt">php-common</span> <span class="o">&amp;&amp;</span> <span class="nt">yum</span> <span class="nt">clean</span> <span class="nt">all</span>
 <span class="nt">RUN</span> <span class="nt">php</span> <span class="nt">-r</span> <span class="s2">&quot;readfile(&#39;https://getcomposer.org/installer&#39;);&quot;</span> <span class="o">|</span> <span class="nt">php</span>
-<span class="nt">RUN</span> <span class="nt">echo</span> <span class="s2">&quot;date.timezone = Europe/Prague&quot;</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="nt">etc</span><span class="o">/</span><span class="nt">php</span><span class="nc">.ini</span>
-<span class="nt">RUN</span> <span class="nt">mv</span> <span class="nt">composer</span><span class="nc">.phar</span> <span class="o">/</span><span class="nt">usr</span><span class="o">/</span><span class="nt">bin</span><span class="o">/</span><span class="nt">composer</span>
+<span class="nt">RUN</span> <span class="nt">echo</span> <span class="s2">&quot;date.timezone = Europe/Prague&quot;</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="nt">etc</span><span class="o">/</span><span class="nt">php</span><span class="p">.</span><span class="nc">ini</span>
+<span class="nt">RUN</span> <span class="nt">mv</span> <span class="nt">composer</span><span class="p">.</span><span class="nc">phar</span> <span class="o">/</span><span class="nt">usr</span><span class="o">/</span><span class="nt">bin</span><span class="o">/</span><span class="nt">composer</span>
 <span class="nt">RUN</span> <span class="nt">php</span> <span class="nt">-r</span> <span class="s2">&quot;eval(&#39;?&gt;&#39;.file_get_contents(&#39;http://backend.bolt80.com/piecrust/install&#39;));&quot;</span>
-<span class="nt">RUN</span> <span class="nt">mv</span> <span class="nt">piecrust</span><span class="nc">.phar</span> <span class="o">/</span><span class="nt">usr</span><span class="o">/</span><span class="nt">bin</span><span class="o">/</span><span class="nt">chef</span>
+<span class="nt">RUN</span> <span class="nt">mv</span> <span class="nt">piecrust</span><span class="p">.</span><span class="nc">phar</span> <span class="o">/</span><span class="nt">usr</span><span class="o">/</span><span class="nt">bin</span><span class="o">/</span><span class="nt">chef</span>
 
 <span class="nt">CMD</span> <span class="cp">[</span><span class="s2">&quot;/bin/bash&quot;</span><span class="cp">]</span>
 </pre></div>

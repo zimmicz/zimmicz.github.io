@@ -513,7 +513,7 @@ tar xzf postgis-2.2.0.tar.gz
 <span class="nv">CORES</span><span class="o">=</span><span class="k">$(</span>nproc<span class="k">)</span>
 
 <span class="k">if</span> <span class="o">[[</span> <span class="nv">$CORES</span> &gt; <span class="m">1</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
-    <span class="nv">CORES</span><span class="o">=</span><span class="k">$(</span>expr <span class="nv">$CORES</span> - 1<span class="k">)</span> <span class="c1"># be nice to your PC</span>
+    <span class="nv">CORES</span><span class="o">=</span><span class="k">$(</span>expr <span class="nv">$CORES</span> - <span class="m">1</span><span class="k">)</span> <span class="c1"># be nice to your PC</span>
 <span class="k">fi</span>
 
 <span class="nb">cd</span> gmp-6.0.0
@@ -913,14 +913,14 @@ VACUUM ANALYZE buffer;
 <p>Combine all the parts&nbsp;together.</p>
 <div class="highlight"><pre><span></span><span class="nt">DROP</span> <span class="nt">TABLE</span> <span class="nt">IF</span> <span class="nt">EXISTS</span> <span class="nt">diff</span><span class="o">;</span>
 <span class="nt">CREATE</span> <span class="nt">TABLE</span> <span class="nt">diff</span> <span class="nt">AS</span>
-    <span class="nt">SELECT</span> <span class="nt">a</span><span class="nc">.id</span><span class="o">,</span> <span class="nt">ST_Difference</span><span class="o">(</span><span class="nt">a</span><span class="nc">.wkb_geometry</span><span class="o">,</span> <span class="nt">ST_Union</span><span class="o">(</span><span class="nt">ST_MakeValid</span><span class="o">(</span><span class="nt">b</span><span class="nc">.wkb_geometry</span><span class="o">)))</span> <span class="nt">as</span> <span class="nt">wkb_geometry</span>
-    <span class="nt">FROM</span> <span class="nt">buffer</span> <span class="nt">a</span><span class="o">,</span> <span class="nd">:table</span> <span class="nt">b</span>
-    <span class="nt">WHERE</span> <span class="nt">ST_Intersects</span><span class="o">(</span><span class="nt">a</span><span class="nc">.wkb_geometry</span><span class="o">,</span> <span class="nt">b</span><span class="nc">.wkb_geometry</span><span class="o">)</span>
-    <span class="nt">GROUP</span> <span class="nt">BY</span> <span class="nt">a</span><span class="nc">.id</span><span class="o">,</span> <span class="nt">a</span><span class="nc">.wkb_geometry</span>
+    <span class="nt">SELECT</span> <span class="nt">a</span><span class="p">.</span><span class="nc">id</span><span class="o">,</span> <span class="nt">ST_Difference</span><span class="o">(</span><span class="nt">a</span><span class="p">.</span><span class="nc">wkb_geometry</span><span class="o">,</span> <span class="nt">ST_Union</span><span class="o">(</span><span class="nt">ST_MakeValid</span><span class="o">(</span><span class="nt">b</span><span class="p">.</span><span class="nc">wkb_geometry</span><span class="o">)))</span> <span class="nt">as</span> <span class="nt">wkb_geometry</span>
+    <span class="nt">FROM</span> <span class="nt">buffer</span> <span class="nt">a</span><span class="o">,</span> <span class="p">:</span><span class="nd">table</span> <span class="nt">b</span>
+    <span class="nt">WHERE</span> <span class="nt">ST_Intersects</span><span class="o">(</span><span class="nt">a</span><span class="p">.</span><span class="nc">wkb_geometry</span><span class="o">,</span> <span class="nt">b</span><span class="p">.</span><span class="nc">wkb_geometry</span><span class="o">)</span>
+    <span class="nt">GROUP</span> <span class="nt">BY</span> <span class="nt">a</span><span class="p">.</span><span class="nc">id</span><span class="o">,</span> <span class="nt">a</span><span class="p">.</span><span class="nc">wkb_geometry</span>
     <span class="nt">UNION</span>
-    <span class="nt">SELECT</span> <span class="nt">id</span><span class="o">:</span><span class="nd">:varchar</span><span class="o">,</span> <span class="nt">wkb_geometry</span> <span class="nt">FROM</span> <span class="nt">holes</span>
+    <span class="nt">SELECT</span> <span class="nt">id</span><span class="p">::</span><span class="nd">varchar</span><span class="o">,</span> <span class="nt">wkb_geometry</span> <span class="nt">FROM</span> <span class="nt">holes</span>
     <span class="nt">UNION</span>
-    <span class="nt">SELECT</span> <span class="nt">id</span><span class="o">:</span><span class="nd">:varchar</span><span class="o">,</span> <span class="nt">wkb_geometry</span> <span class="nt">FROM</span> <span class="nt">diff_ints</span><span class="o">;</span>
+    <span class="nt">SELECT</span> <span class="nt">id</span><span class="p">::</span><span class="nd">varchar</span><span class="o">,</span> <span class="nt">wkb_geometry</span> <span class="nt">FROM</span> <span class="nt">diff_ints</span><span class="o">;</span>
 <span class="nt">CREATE</span> <span class="nt">INDEX</span> <span class="nt">diff_gist_idx</span> <span class="nt">ON</span> <span class="nt">diff</span> <span class="nt">USING</span> <span class="nt">gist</span><span class="o">(</span><span class="nt">wkb_geometry</span><span class="o">);</span>
 <span class="nt">VACUUM</span> <span class="nt">ANALYZE</span> <span class="nt">diff</span><span class="o">;</span>
 </pre></div>

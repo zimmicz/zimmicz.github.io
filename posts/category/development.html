@@ -155,7 +155,7 @@ mkdir ./data/csv
 
 <span class="nb">cd</span> ./data/csv
 touch tweets.csv
-<span class="nb">echo</span> <span class="k">$(</span>sed -n 1p <span class="k">$(</span>ls -d -1 *.csv <span class="p">|</span> head -n 1<span class="k">))</span> &gt; tweets.csv <span class="c1"># get column names</span>
+<span class="nb">echo</span> <span class="k">$(</span>sed -n 1p <span class="k">$(</span>ls -d -1 *.csv <span class="p">|</span> head -n <span class="m">1</span><span class="k">))</span> &gt; tweets.csv <span class="c1"># get column names</span>
 
 <span class="k">for</span> csv in tw_*.csv<span class="p">;</span> <span class="k">do</span>
     <span class="nb">echo</span> <span class="nv">$csv</span>
@@ -271,7 +271,7 @@ git merge origin/master <span class="o">&amp;&amp;</span> <span class="se">\</sp
 git commit --allow-empty -m <span class="s2">&quot;Restart gear&quot;</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
 git push <span class="o">&amp;&amp;</span> <span class="se">\</span>
 <span class="nb">echo</span> <span class="s2">&quot;Success&quot;</span> <span class="p">;</span> 
-<span class="o">}</span> &gt;&gt; <span class="nv">$logfile</span> 2&gt;<span class="p">&amp;</span>1
+<span class="o">}</span> &gt;&gt; <span class="nv">$logfile</span> <span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span>
 </pre></div>
 
 
@@ -348,7 +348,7 @@ tar xzf postgis-2.2.0.tar.gz
 <span class="nv">CORES</span><span class="o">=</span><span class="k">$(</span>nproc<span class="k">)</span>
 
 <span class="k">if</span> <span class="o">[[</span> <span class="nv">$CORES</span> &gt; <span class="m">1</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
-    <span class="nv">CORES</span><span class="o">=</span><span class="k">$(</span>expr <span class="nv">$CORES</span> - 1<span class="k">)</span> <span class="c1"># be nice to your PC</span>
+    <span class="nv">CORES</span><span class="o">=</span><span class="k">$(</span>expr <span class="nv">$CORES</span> - <span class="m">1</span><span class="k">)</span> <span class="c1"># be nice to your PC</span>
 <span class="k">fi</span>
 
 <span class="nb">cd</span> gmp-6.0.0
@@ -521,7 +521,7 @@ sudo -u postgres psql -d spatial_template -c <span class="s2">&quot;SELECT postg
             <span class="nb">exit</span>
         <span class="k">else</span> <span class="nb">echo</span> <span class="s2">&quot;Not yet&quot;</span>
     <span class="k">fi</span>
-    sleep 60
+    sleep <span class="m">60</span>
 <span class="k">done</span>
 </pre></div>
 
@@ -585,7 +585,7 @@ www.posts.zimmi.cz CNAME posts-zimmi.rhcloud.com
         <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>,         <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>        | <a href="https://www.zimmi.cz/posts/category/development.html">development</a>
         </small>
         <section>
-            <div class="highlight"><pre><span></span><span class="x">for f in *; do mv &quot;</span><span class="p">$</span><span class="nv">f</span><span class="x">&quot; &quot;prepend_</span><span class="p">$</span><span class="nv">f</span><span class="x">&quot;; done</span>
+            <div class="highlight"><pre><span></span>for f in *; do mv &quot;$f&quot; &quot;prepend_$f&quot;; done
 </pre></div>
 
 

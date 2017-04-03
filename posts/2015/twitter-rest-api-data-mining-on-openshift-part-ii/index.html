@@ -14,7 +14,7 @@
     <meta name="tags" content="twitter" />
   <meta property="og:image" content="https://pbs.twimg.com/profile_images/770323886290440192/3G5hqp11_400x400.jpg" />
   <meta property="og:title" content="Twitter REST API Data Mining on OpenShift (Part II)" />
-  <meta property="og:description" content="Last time I described the setup of my OpenShift Twitter crawler and let it running and downloading data. It’s been more than two months since I started and I got interesting amount of data. I also made a simple ETL process to load it into my local ..." />
+  <meta property="og:description" content="Last time I described the setup of my OpenShift Twitter crawler and let it running and downloading data. It’s been more than two months since I started and I got interesting amount of data. I also made a simple ETL process to load it into my local..." />
   <meta property="og:url" content="https://www.zimmi.cz/posts/2015/twitter-rest-api-data-mining-on-openshift-part-ii/" />
         <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?d5d1e141">
 </head>
@@ -88,7 +88,7 @@ mkdir ./data/csv
 
 <span class="nb">cd</span> ./data/csv
 touch tweets.csv
-<span class="nb">echo</span> <span class="k">$(</span>sed -n 1p <span class="k">$(</span>ls -d -1 *.csv <span class="p">|</span> head -n 1<span class="k">))</span> &gt; tweets.csv <span class="c1"># get column names</span>
+<span class="nb">echo</span> <span class="k">$(</span>sed -n 1p <span class="k">$(</span>ls -d -1 *.csv <span class="p">|</span> head -n <span class="m">1</span><span class="k">))</span> &gt; tweets.csv <span class="c1"># get column names</span>
 
 <span class="k">for</span> csv in tw_*.csv<span class="p">;</span> <span class="k">do</span>
     <span class="nb">echo</span> <span class="nv">$csv</span>

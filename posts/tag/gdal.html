@@ -168,10 +168,10 @@ OPTIONS (LAYER &#39;A05_Vodni_nadrze&#39;);
             <p>We have to deal with <span class="caps">DGN</span> drawings quite often at <a href="http://www.clevermaps.cz">CleverMaps</a> - heavily used for infrastructure projects (highways, roads, pipelines), they are a pure nightmare to the <span class="caps">GIS</span> person inside me. Right now, I&#8217;m only capable of converting it into a raster file and serve it with Geoserver. The transformation from <span class="caps">DGN</span> to <span class="caps">PDF</span> to <span class="caps">PNG</span> to Tiff is not something that makes me utterly happy&nbsp;though.</p>
 <p>All you need to do the same is <a href="https://www.zimmi.cz/posts/tag/gdal.html"><span class="caps">GDAL</span></a>, ImageMagick, some <span class="caps">PDF</span> documents created out of <span class="caps">DGN</span> files - something MicroStation can help you with - and their upper left and lower right corner&nbsp;coordinates.</p>
 <div class="highlight"><pre><span></span><span class="c1"># I recommend putting some limits on ImageMagick - it tends to eat up all the resources and quit</span>
-<span class="nb">export</span> <span class="nv">MAGICK_MEMORY_LIMIT</span><span class="o">=</span>1512
-<span class="nb">export</span> <span class="nv">MAGICK_MAP_LIMIT</span><span class="o">=</span>512
-<span class="nb">export</span> <span class="nv">MAGICK_AREA_LIMIT</span><span class="o">=</span>1024
-<span class="nb">export</span> <span class="nv">MAGICK_FILES_LIMIT</span><span class="o">=</span>512
+<span class="nb">export</span> <span class="nv">MAGICK_MEMORY_LIMIT</span><span class="o">=</span><span class="m">1512</span>
+<span class="nb">export</span> <span class="nv">MAGICK_MAP_LIMIT</span><span class="o">=</span><span class="m">512</span>
+<span class="nb">export</span> <span class="nv">MAGICK_AREA_LIMIT</span><span class="o">=</span><span class="m">1024</span>
+<span class="nb">export</span> <span class="nv">MAGICK_FILES_LIMIT</span><span class="o">=</span><span class="m">512</span>
 <span class="nb">export</span> <span class="nv">MAGICK_TMPDIR</span><span class="o">=</span>/partition/large/enough
 
 <span class="c1"># I expect two files on the input: the first is PDF file with drawing, the second is a simple text file with four coordinates on a single line in the following order: upper left x, upper left y, lower right x, lower right y</span>
@@ -201,7 +201,7 @@ convert <span class="se">\</span>
     <span class="si">${</span><span class="nv">OUTPUTPATH</span><span class="p">/.png</span><span class="si">}</span>_alpha.tif
 
 <span class="c1"># build overwies to speed things up</span>
-gdaladdo <span class="si">${</span><span class="nv">OUTPUTPATH</span><span class="p">/.png</span><span class="si">}</span>_alpha.tif <span class="m">2</span> <span class="m">4</span> <span class="m">8</span> <span class="m">16</span> 32
+gdaladdo <span class="si">${</span><span class="nv">OUTPUTPATH</span><span class="p">/.png</span><span class="si">}</span>_alpha.tif <span class="m">2</span> <span class="m">4</span> <span class="m">8</span> <span class="m">16</span> <span class="m">32</span>
 </pre></div>
 
 
@@ -231,7 +231,7 @@ unrar dem.rar -d copernicus
 
 <h2>Hillshade and color&nbsp;relief</h2>
 <p>Use <span class="caps">GDAL</span> to create hillshade with a simple command. No need to use <code>-s</code> flag to convert units, it already comes in meters. Exaggerate heights a bit with <code>-z</code> flag.</p>
-<div class="highlight"><pre><span></span>gdaldem hillshade EUD_CP-DEMS_4500025000-AA.tif hillshade.tif -z 3
+<div class="highlight"><pre><span></span>gdaldem hillshade EUD_CP-DEMS_4500025000-AA.tif hillshade.tif -z <span class="m">3</span>
 </pre></div>
 
 
@@ -321,8 +321,8 @@ rm color_relief.tif
 rm hillshade.tif
 mv color_relief.compress.tif color_relief.tif
 mv hillshade.compress.tif hillshade.tif
-gdaladdo color_relief.tif <span class="m">2</span> <span class="m">4</span> <span class="m">8</span> 16
-gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span class="m">8</span> 16
+gdaladdo color_relief.tif <span class="m">2</span> <span class="m">4</span> <span class="m">8</span> <span class="m">16</span>
+gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span class="m">8</span> <span class="m">16</span>
 </pre></div>
 
 

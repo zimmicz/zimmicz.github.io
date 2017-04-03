@@ -15,7 +15,7 @@
     <meta name="tags" content="svg" />
   <meta property="og:image" content="https://pbs.twimg.com/profile_images/770323886290440192/3G5hqp11_400x400.jpg" />
   <meta property="og:title" content="Plotting the Czech Cadastre Land Use with d3: Data Transformation (part II)" />
-  <meta property="og:description" content="This post is the second part of the series summarizing the process of visualizing landuse data with bash, PostgreSQL and d3.js. Read other parts: Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I) you’re reading it now Plotting the ..." />
+  <meta property="og:description" content="This post is the second part of the series summarizing the process of visualizing landuse data with bash, PostgreSQL and d3.js. Read other parts: Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I) you’re reading it now Plotting the..." />
   <meta property="og:url" content="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii" />
         <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?d5d1e141">
 </head>
@@ -72,60 +72,60 @@
 <h3>Transform</h3>
 <p>Last time, I extracted the data from multiple <span class="caps">CSV</span> files to separate PostgreSQL tables named by <code>data_YYYYMMDD</code> pattern. My current goal is to transform it into the one big <code>data</code> table, where each row represents one cadastral area. Here&#8217;s what I&#8217;m trying to&nbsp;achieve:</p>
 <div class="highlight"><pre><span></span>-<span class="o">[</span> RECORD <span class="m">1</span> <span class="o">]</span>----------+----------------------------------
-ku_kod                 <span class="p">|</span> 600881
+ku_kod                 <span class="p">|</span> <span class="m">600881</span>
 ku_nazev               <span class="p">|</span> Bantice
-celkova_vymera         <span class="p">|</span> <span class="o">{</span>3763255,3763255,3763256,3763256<span class="o">}</span>
-celkovy_pocet_parcel   <span class="p">|</span> <span class="o">{</span>670,668,664,667<span class="o">}</span>
-chmelnice_pp           <span class="p">|</span> <span class="o">{</span>0,0,0,0<span class="o">}</span>
-chmelnice_pp_r         <span class="p">|</span> <span class="o">{</span>0.00,0.00,0.00,0.00<span class="o">}</span>
-chmelnice_v            <span class="p">|</span> <span class="o">{</span>0,0,0,0<span class="o">}</span>
-chmelnice_v_avg        <span class="p">|</span> <span class="o">{</span>0,0,0,0<span class="o">}</span>
-chmelnice_v_r          <span class="p">|</span> <span class="o">{</span>0.00,0.00,0.00,0.00<span class="o">}</span>
-lesni_pozemek_pp       <span class="p">|</span> <span class="o">{</span>25,25,25,25<span class="o">}</span>
-lesni_pozemek_pp_r     <span class="p">|</span> <span class="o">{</span>3.73,3.74,3.77,3.75<span class="o">}</span>
-lesni_pozemek_v        <span class="p">|</span> <span class="o">{</span>83879,83879,83879,83879<span class="o">}</span>
-lesni_pozemek_v_avg    <span class="p">|</span> <span class="o">{</span>3355,3355,3355,3355<span class="o">}</span>
-lesni_pozemek_v_r      <span class="p">|</span> <span class="o">{</span>2.23,2.23,2.23,2.23<span class="o">}</span>
-orna_puda_pp           <span class="p">|</span> <span class="o">{</span>88,88,89,89<span class="o">}</span>
-orna_puda_pp_r         <span class="p">|</span> <span class="o">{</span>13.13,13.17,13.40,13.34<span class="o">}</span>
-orna_puda_v            <span class="p">|</span> <span class="o">{</span>3066230,3066230,3066230,3066230<span class="o">}</span>
-orna_puda_v_avg        <span class="p">|</span> <span class="o">{</span>34844,34844,34452,34452<span class="o">}</span>
-orna_puda_v_r          <span class="p">|</span> <span class="o">{</span>81.48,81.48,81.48,81.48<span class="o">}</span>
-ostatni_plocha_pp      <span class="p">|</span> <span class="o">{</span>201,199,199,201<span class="o">}</span>
-ostatni_plocha_pp_r    <span class="p">|</span> <span class="o">{</span>30.00,29.79,29.97,30.13<span class="o">}</span>
-ostatni_plocha_v       <span class="p">|</span> <span class="o">{</span>283468,283468,283468,284562<span class="o">}</span>
-ostatni_plocha_v_avg   <span class="p">|</span> <span class="o">{</span>1410,1424,1424,1416<span class="o">}</span>
-ostatni_plocha_v_r     <span class="p">|</span> <span class="o">{</span>7.53,7.53,7.53,7.56<span class="o">}</span>
-ovocny_sad_pp          <span class="p">|</span> <span class="o">{</span>0,0,0,0<span class="o">}</span>
-ovocny_sad_pp_r        <span class="p">|</span> <span class="o">{</span>0.00,0.00,0.00,0.00<span class="o">}</span>
-ovocny_sad_v           <span class="p">|</span> <span class="o">{</span>0,0,0,0<span class="o">}</span>
-ovocny_sad_v_avg       <span class="p">|</span> <span class="o">{</span>0,0,0,0<span class="o">}</span>
-ovocny_sad_v_r         <span class="p">|</span> <span class="o">{</span>0.00,0.00,0.00,0.00<span class="o">}</span>
-ttp_pp                 <span class="p">|</span> <span class="o">{</span>44,44,44,45<span class="o">}</span>
-ttp_pp_r               <span class="p">|</span> <span class="o">{</span>6.57,6.59,6.63,6.75<span class="o">}</span>
-ttp_v                  <span class="p">|</span> <span class="o">{</span>49002,49002,49002,47908<span class="o">}</span>
-ttp_v_avg              <span class="p">|</span> <span class="o">{</span>1114,1114,1114,1065<span class="o">}</span>
-ttp_v_r                <span class="p">|</span> <span class="o">{</span>1.30,1.30,1.30,1.27<span class="o">}</span>
-vinice_pp              <span class="p">|</span> <span class="o">{</span>1,1,1,1<span class="o">}</span>
-vinice_pp_r            <span class="p">|</span> <span class="o">{</span>0.15,0.15,0.15,0.15<span class="o">}</span>
-vinice_v               <span class="p">|</span> <span class="o">{</span>106178,106178,106178,106178<span class="o">}</span>
-vinice_v_avg           <span class="p">|</span> <span class="o">{</span>106178,106178,106178,106178<span class="o">}</span>
-vinice_v_r             <span class="p">|</span> <span class="o">{</span>2.82,2.82,2.82,2.82<span class="o">}</span>
-vodni_plocha_pp        <span class="p">|</span> <span class="o">{</span>23,23,23,23<span class="o">}</span>
-vodni_plocha_pp_r      <span class="p">|</span> <span class="o">{</span>3.43,3.44,3.46,3.45<span class="o">}</span>
-vodni_plocha_v         <span class="p">|</span> <span class="o">{</span>27877,27877,27877,27877<span class="o">}</span>
-vodni_plocha_v_avg     <span class="p">|</span> <span class="o">{</span>1212,1212,1212,1212<span class="o">}</span>
-vodni_plocha_v_r       <span class="p">|</span> <span class="o">{</span>0.74,0.74,0.74,0.74<span class="o">}</span>
-zahrada_pp             <span class="p">|</span> <span class="o">{</span>115,115,115,115<span class="o">}</span>
-zahrada_pp_r           <span class="p">|</span> <span class="o">{</span>17.16,17.22,17.32,17.24<span class="o">}</span>
-zahrada_v              <span class="p">|</span> <span class="o">{</span>77381,77381,77353,77353<span class="o">}</span>
-zahrada_v_avg          <span class="p">|</span> <span class="o">{</span>673,673,673,673<span class="o">}</span>
-zahrada_v_r            <span class="p">|</span> <span class="o">{</span>2.06,2.06,2.06,2.06<span class="o">}</span>
-zastavena_plocha_pp    <span class="p">|</span> <span class="o">{</span>173,173,168,168<span class="o">}</span>
-zastavena_plocha_pp_r  <span class="p">|</span> <span class="o">{</span>25.82,25.90,25.30,25.19<span class="o">}</span>
-zastavena_plocha_v     <span class="p">|</span> <span class="o">{</span>69240,69240,69269,69269<span class="o">}</span>
-zastavena_plocha_v_avg <span class="p">|</span> <span class="o">{</span>400,400,412,412<span class="o">}</span>
-zastavena_plocha_v_r   <span class="p">|</span> <span class="o">{</span>1.84,1.84,1.84,1.84<span class="o">}</span>
+celkova_vymera         <span class="p">|</span> <span class="o">{</span><span class="m">3763255</span>,3763255,3763256,3763256<span class="o">}</span>
+celkovy_pocet_parcel   <span class="p">|</span> <span class="o">{</span><span class="m">670</span>,668,664,667<span class="o">}</span>
+chmelnice_pp           <span class="p">|</span> <span class="o">{</span><span class="m">0</span>,0,0,0<span class="o">}</span>
+chmelnice_pp_r         <span class="p">|</span> <span class="o">{</span><span class="m">0</span>.00,0.00,0.00,0.00<span class="o">}</span>
+chmelnice_v            <span class="p">|</span> <span class="o">{</span><span class="m">0</span>,0,0,0<span class="o">}</span>
+chmelnice_v_avg        <span class="p">|</span> <span class="o">{</span><span class="m">0</span>,0,0,0<span class="o">}</span>
+chmelnice_v_r          <span class="p">|</span> <span class="o">{</span><span class="m">0</span>.00,0.00,0.00,0.00<span class="o">}</span>
+lesni_pozemek_pp       <span class="p">|</span> <span class="o">{</span><span class="m">25</span>,25,25,25<span class="o">}</span>
+lesni_pozemek_pp_r     <span class="p">|</span> <span class="o">{</span><span class="m">3</span>.73,3.74,3.77,3.75<span class="o">}</span>
+lesni_pozemek_v        <span class="p">|</span> <span class="o">{</span><span class="m">83879</span>,83879,83879,83879<span class="o">}</span>
+lesni_pozemek_v_avg    <span class="p">|</span> <span class="o">{</span><span class="m">3355</span>,3355,3355,3355<span class="o">}</span>
+lesni_pozemek_v_r      <span class="p">|</span> <span class="o">{</span><span class="m">2</span>.23,2.23,2.23,2.23<span class="o">}</span>
+orna_puda_pp           <span class="p">|</span> <span class="o">{</span><span class="m">88</span>,88,89,89<span class="o">}</span>
+orna_puda_pp_r         <span class="p">|</span> <span class="o">{</span><span class="m">13</span>.13,13.17,13.40,13.34<span class="o">}</span>
+orna_puda_v            <span class="p">|</span> <span class="o">{</span><span class="m">3066230</span>,3066230,3066230,3066230<span class="o">}</span>
+orna_puda_v_avg        <span class="p">|</span> <span class="o">{</span><span class="m">34844</span>,34844,34452,34452<span class="o">}</span>
+orna_puda_v_r          <span class="p">|</span> <span class="o">{</span><span class="m">81</span>.48,81.48,81.48,81.48<span class="o">}</span>
+ostatni_plocha_pp      <span class="p">|</span> <span class="o">{</span><span class="m">201</span>,199,199,201<span class="o">}</span>
+ostatni_plocha_pp_r    <span class="p">|</span> <span class="o">{</span><span class="m">30</span>.00,29.79,29.97,30.13<span class="o">}</span>
+ostatni_plocha_v       <span class="p">|</span> <span class="o">{</span><span class="m">283468</span>,283468,283468,284562<span class="o">}</span>
+ostatni_plocha_v_avg   <span class="p">|</span> <span class="o">{</span><span class="m">1410</span>,1424,1424,1416<span class="o">}</span>
+ostatni_plocha_v_r     <span class="p">|</span> <span class="o">{</span><span class="m">7</span>.53,7.53,7.53,7.56<span class="o">}</span>
+ovocny_sad_pp          <span class="p">|</span> <span class="o">{</span><span class="m">0</span>,0,0,0<span class="o">}</span>
+ovocny_sad_pp_r        <span class="p">|</span> <span class="o">{</span><span class="m">0</span>.00,0.00,0.00,0.00<span class="o">}</span>
+ovocny_sad_v           <span class="p">|</span> <span class="o">{</span><span class="m">0</span>,0,0,0<span class="o">}</span>
+ovocny_sad_v_avg       <span class="p">|</span> <span class="o">{</span><span class="m">0</span>,0,0,0<span class="o">}</span>
+ovocny_sad_v_r         <span class="p">|</span> <span class="o">{</span><span class="m">0</span>.00,0.00,0.00,0.00<span class="o">}</span>
+ttp_pp                 <span class="p">|</span> <span class="o">{</span><span class="m">44</span>,44,44,45<span class="o">}</span>
+ttp_pp_r               <span class="p">|</span> <span class="o">{</span><span class="m">6</span>.57,6.59,6.63,6.75<span class="o">}</span>
+ttp_v                  <span class="p">|</span> <span class="o">{</span><span class="m">49002</span>,49002,49002,47908<span class="o">}</span>
+ttp_v_avg              <span class="p">|</span> <span class="o">{</span><span class="m">1114</span>,1114,1114,1065<span class="o">}</span>
+ttp_v_r                <span class="p">|</span> <span class="o">{</span><span class="m">1</span>.30,1.30,1.30,1.27<span class="o">}</span>
+vinice_pp              <span class="p">|</span> <span class="o">{</span><span class="m">1</span>,1,1,1<span class="o">}</span>
+vinice_pp_r            <span class="p">|</span> <span class="o">{</span><span class="m">0</span>.15,0.15,0.15,0.15<span class="o">}</span>
+vinice_v               <span class="p">|</span> <span class="o">{</span><span class="m">106178</span>,106178,106178,106178<span class="o">}</span>
+vinice_v_avg           <span class="p">|</span> <span class="o">{</span><span class="m">106178</span>,106178,106178,106178<span class="o">}</span>
+vinice_v_r             <span class="p">|</span> <span class="o">{</span><span class="m">2</span>.82,2.82,2.82,2.82<span class="o">}</span>
+vodni_plocha_pp        <span class="p">|</span> <span class="o">{</span><span class="m">23</span>,23,23,23<span class="o">}</span>
+vodni_plocha_pp_r      <span class="p">|</span> <span class="o">{</span><span class="m">3</span>.43,3.44,3.46,3.45<span class="o">}</span>
+vodni_plocha_v         <span class="p">|</span> <span class="o">{</span><span class="m">27877</span>,27877,27877,27877<span class="o">}</span>
+vodni_plocha_v_avg     <span class="p">|</span> <span class="o">{</span><span class="m">1212</span>,1212,1212,1212<span class="o">}</span>
+vodni_plocha_v_r       <span class="p">|</span> <span class="o">{</span><span class="m">0</span>.74,0.74,0.74,0.74<span class="o">}</span>
+zahrada_pp             <span class="p">|</span> <span class="o">{</span><span class="m">115</span>,115,115,115<span class="o">}</span>
+zahrada_pp_r           <span class="p">|</span> <span class="o">{</span><span class="m">17</span>.16,17.22,17.32,17.24<span class="o">}</span>
+zahrada_v              <span class="p">|</span> <span class="o">{</span><span class="m">77381</span>,77381,77353,77353<span class="o">}</span>
+zahrada_v_avg          <span class="p">|</span> <span class="o">{</span><span class="m">673</span>,673,673,673<span class="o">}</span>
+zahrada_v_r            <span class="p">|</span> <span class="o">{</span><span class="m">2</span>.06,2.06,2.06,2.06<span class="o">}</span>
+zastavena_plocha_pp    <span class="p">|</span> <span class="o">{</span><span class="m">173</span>,173,168,168<span class="o">}</span>
+zastavena_plocha_pp_r  <span class="p">|</span> <span class="o">{</span><span class="m">25</span>.82,25.90,25.30,25.19<span class="o">}</span>
+zastavena_plocha_v     <span class="p">|</span> <span class="o">{</span><span class="m">69240</span>,69240,69269,69269<span class="o">}</span>
+zastavena_plocha_v_avg <span class="p">|</span> <span class="o">{</span><span class="m">400</span>,400,412,412<span class="o">}</span>
+zastavena_plocha_v_r   <span class="p">|</span> <span class="o">{</span><span class="m">1</span>.84,1.84,1.84,1.84<span class="o">}</span>
 </pre></div>
 
 

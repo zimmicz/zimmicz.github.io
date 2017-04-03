@@ -37,6 +37,46 @@
 
     <div class="panel card card-1">
         <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2017/exploiting-prague-open-data-without-api/" rel="bookmark" title="Permalink to Exploiting Prague Open Data without API">Exploiting Prague Open Data without <span class="caps">API</span></a></h1>
+            <small>Written on Apr 3, 2017
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>        | <a href="https://www.zimmi.cz/posts/category/data.html">data</a>
+        </small>
+        <section>
+            <p>Speaking the Czech Republic, <a href="http://www.geoportalpraha.cz">Prague is an undoubted leader in open data publishing</a>. However, there is no public <span class="caps">API</span> to explore/search existing&nbsp;datasets.</p>
+<p>I wanted to download the <span class="caps">ESRI</span> Shapefile of the city urban plan that <a href="http://www.geoportalpraha.cz/cs/opendata/21733E1F-21B7-4ABC-B1C2-DC19C0237380#.WOKHMbmFvVM">is divided into more than a hundred files</a> (a file representing a cadastral&nbsp;area).</p>
+<p>This becomes a piece of cake with Opera Developer tools and a bit of JavaScript&nbsp;code</p>
+<div class="highlight"><pre><span></span><span class="kd">let</span> <span class="nx">links</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementsByClassName</span><span class="p">(</span><span class="s1">&#39;open-data-icon-rastr open-data-link tooltipstered&#39;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">link</span> <span class="k">of</span> <span class="nx">links</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">link</span><span class="p">.</span><span class="nx">href</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s1">&#39;SHP&#39;</span><span class="p">)</span> <span class="o">===</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span> <span class="k">continue</span><span class="p">;}</span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">link</span><span class="p">.</span><span class="nx">href</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>With the list saved to a file called <code>list.txt</code>, <code>wget --input-file=list.txt</code> will download the data. Followed by <code>for f in *.zip; do unzip $f -d ${f%%.zip}; done</code>, each archive will be extracted in the directory called by its&nbsp;name.</p>
+<p>Once done and assuming that the files are named consistently across the folders, <code>ogr2ogr</code> will merge all of them into a single GeoPackage file, resulting in just four files. Not bad considered I began with more than a hundred &times;&nbsp;4.</p>
+<div class="highlight"><pre><span></span>ogr2ogr -f <span class="s2">&quot;GPKG&quot;</span> pvp_fvu_p.gpkg ./PVP_fvu_p_Bechovice_SHP/PVP_fvu_p.shp
+find -type f -not -path <span class="s1">&#39;./PVP_fvu_p_Bechovice_SHP*&#39;</span> -iname <span class="s1">&#39;*fvu_p.shp&#39;</span> -exec ogr2ogr -update -append -f <span class="s2">&quot;GPKG&quot;</span> pvp_fvu_p.gpkg <span class="s1">&#39;{}&#39;</span> <span class="se">\;</span>
+
+ogr2ogr -f <span class="s2">&quot;GPKG&quot;</span> pvp_fvu_popis_z_a.gpkg ./PVP_fvu_p_Bechovice_SHP/PVP_fvu_popis_z_a.shp
+find -type f -not -path <span class="s1">&#39;./PVP_fvu_p_Bechovice_SHP*&#39;</span> -iname <span class="s1">&#39;*fvu_popis_z_a.shp&#39;</span> -exec ogr2ogr -update -append -f <span class="s2">&quot;GPKG&quot;</span> pvp_fvu_popis_z_a.gpkg <span class="s1">&#39;{}&#39;</span> <span class="se">\;</span>
+
+ogr2ogr -f <span class="s2">&quot;GPKG&quot;</span> pvp_pp_pl_a.gpkg ./PVP_fvu_p_Bechovice_SHP/PVP_pp_pl_a.shp
+find -type f -not -path <span class="s1">&#39;./PVP_fvu_p_Bechovice_SHP*&#39;</span> -iname <span class="s1">&#39;*pp_pl_a.shp&#39;</span> -exec ogr2ogr -update -append -f <span class="s2">&quot;GPKG&quot;</span> pvp_pp_pl_a.gpkg <span class="s1">&#39;{}&#39;</span> <span class="se">\;</span>
+
+ogr2ogr -f <span class="s2">&quot;GPKG&quot;</span> pvp_pp_s_a.gpkg ./PVP_fvu_p_Bechovice_SHP/PVP_pp_s_a.shp
+find -type f -not -path <span class="s1">&#39;./PVP_fvu_p_Bechovice_SHP*&#39;</span> -iname <span class="s1">&#39;*pp_s_a.shp&#39;</span> -exec ogr2ogr -update -append -f <span class="s2">&quot;GPKG&quot;</span> pvp_pp_s_a.gpkg <span class="s1">&#39;{}&#39;</span> <span class="se">\;</span>
+</pre></div>
+
+
+<p>A boring task that would take me hours five years ago transformed into simple, yet fun, piece of work done in no more than half an&nbsp;hour.</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
             <h1><a href="https://www.zimmi.cz/posts/2017/upgrading-postgresql-95-to-postgresql-96-with-postgis/" rel="bookmark" title="Permalink to Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with PostGIS">Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with&nbsp;PostGIS</a></h1>
             <small>Written on Mar 1, 2017
         and marked as
@@ -396,60 +436,60 @@ cat <span class="s">&lt;&lt; EOF | psql -qAt --no-psqlrc</span>
 <h3>Transform</h3>
 <p>Last time, I extracted the data from multiple <span class="caps">CSV</span> files to separate PostgreSQL tables named by <code>data_YYYYMMDD</code> pattern. My current goal is to transform it into the one big <code>data</code> table, where each row represents one cadastral area. Here&#8217;s what I&#8217;m trying to&nbsp;achieve:</p>
 <div class="highlight"><pre><span></span>-<span class="o">[</span> RECORD <span class="m">1</span> <span class="o">]</span>----------+----------------------------------
-ku_kod                 <span class="p">|</span> 600881
+ku_kod                 <span class="p">|</span> <span class="m">600881</span>
 ku_nazev               <span class="p">|</span> Bantice
-celkova_vymera         <span class="p">|</span> <span class="o">{</span>3763255,3763255,3763256,3763256<span class="o">}</span>
-celkovy_pocet_parcel   <span class="p">|</span> <span class="o">{</span>670,668,664,667<span class="o">}</span>
-chmelnice_pp           <span class="p">|</span> <span class="o">{</span>0,0,0,0<span class="o">}</span>
-chmelnice_pp_r         <span class="p">|</span> <span class="o">{</span>0.00,0.00,0.00,0.00<span class="o">}</span>
-chmelnice_v            <span class="p">|</span> <span class="o">{</span>0,0,0,0<span class="o">}</span>
-chmelnice_v_avg        <span class="p">|</span> <span class="o">{</span>0,0,0,0<span class="o">}</span>
-chmelnice_v_r          <span class="p">|</span> <span class="o">{</span>0.00,0.00,0.00,0.00<span class="o">}</span>
-lesni_pozemek_pp       <span class="p">|</span> <span class="o">{</span>25,25,25,25<span class="o">}</span>
-lesni_pozemek_pp_r     <span class="p">|</span> <span class="o">{</span>3.73,3.74,3.77,3.75<span class="o">}</span>
-lesni_pozemek_v        <span class="p">|</span> <span class="o">{</span>83879,83879,83879,83879<span class="o">}</span>
-lesni_pozemek_v_avg    <span class="p">|</span> <span class="o">{</span>3355,3355,3355,3355<span class="o">}</span>
-lesni_pozemek_v_r      <span class="p">|</span> <span class="o">{</span>2.23,2.23,2.23,2.23<span class="o">}</span>
-orna_puda_pp           <span class="p">|</span> <span class="o">{</span>88,88,89,89<span class="o">}</span>
-orna_puda_pp_r         <span class="p">|</span> <span class="o">{</span>13.13,13.17,13.40,13.34<span class="o">}</span>
-orna_puda_v            <span class="p">|</span> <span class="o">{</span>3066230,3066230,3066230,3066230<span class="o">}</span>
-orna_puda_v_avg        <span class="p">|</span> <span class="o">{</span>34844,34844,34452,34452<span class="o">}</span>
-orna_puda_v_r          <span class="p">|</span> <span class="o">{</span>81.48,81.48,81.48,81.48<span class="o">}</span>
-ostatni_plocha_pp      <span class="p">|</span> <span class="o">{</span>201,199,199,201<span class="o">}</span>
-ostatni_plocha_pp_r    <span class="p">|</span> <span class="o">{</span>30.00,29.79,29.97,30.13<span class="o">}</span>
-ostatni_plocha_v       <span class="p">|</span> <span class="o">{</span>283468,283468,283468,284562<span class="o">}</span>
-ostatni_plocha_v_avg   <span class="p">|</span> <span class="o">{</span>1410,1424,1424,1416<span class="o">}</span>
-ostatni_plocha_v_r     <span class="p">|</span> <span class="o">{</span>7.53,7.53,7.53,7.56<span class="o">}</span>
-ovocny_sad_pp          <span class="p">|</span> <span class="o">{</span>0,0,0,0<span class="o">}</span>
-ovocny_sad_pp_r        <span class="p">|</span> <span class="o">{</span>0.00,0.00,0.00,0.00<span class="o">}</span>
-ovocny_sad_v           <span class="p">|</span> <span class="o">{</span>0,0,0,0<span class="o">}</span>
-ovocny_sad_v_avg       <span class="p">|</span> <span class="o">{</span>0,0,0,0<span class="o">}</span>
-ovocny_sad_v_r         <span class="p">|</span> <span class="o">{</span>0.00,0.00,0.00,0.00<span class="o">}</span>
-ttp_pp                 <span class="p">|</span> <span class="o">{</span>44,44,44,45<span class="o">}</span>
-ttp_pp_r               <span class="p">|</span> <span class="o">{</span>6.57,6.59,6.63,6.75<span class="o">}</span>
-ttp_v                  <span class="p">|</span> <span class="o">{</span>49002,49002,49002,47908<span class="o">}</span>
-ttp_v_avg              <span class="p">|</span> <span class="o">{</span>1114,1114,1114,1065<span class="o">}</span>
-ttp_v_r                <span class="p">|</span> <span class="o">{</span>1.30,1.30,1.30,1.27<span class="o">}</span>
-vinice_pp              <span class="p">|</span> <span class="o">{</span>1,1,1,1<span class="o">}</span>
-vinice_pp_r            <span class="p">|</span> <span class="o">{</span>0.15,0.15,0.15,0.15<span class="o">}</span>
-vinice_v               <span class="p">|</span> <span class="o">{</span>106178,106178,106178,106178<span class="o">}</span>
-vinice_v_avg           <span class="p">|</span> <span class="o">{</span>106178,106178,106178,106178<span class="o">}</span>
-vinice_v_r             <span class="p">|</span> <span class="o">{</span>2.82,2.82,2.82,2.82<span class="o">}</span>
-vodni_plocha_pp        <span class="p">|</span> <span class="o">{</span>23,23,23,23<span class="o">}</span>
-vodni_plocha_pp_r      <span class="p">|</span> <span class="o">{</span>3.43,3.44,3.46,3.45<span class="o">}</span>
-vodni_plocha_v         <span class="p">|</span> <span class="o">{</span>27877,27877,27877,27877<span class="o">}</span>
-vodni_plocha_v_avg     <span class="p">|</span> <span class="o">{</span>1212,1212,1212,1212<span class="o">}</span>
-vodni_plocha_v_r       <span class="p">|</span> <span class="o">{</span>0.74,0.74,0.74,0.74<span class="o">}</span>
-zahrada_pp             <span class="p">|</span> <span class="o">{</span>115,115,115,115<span class="o">}</span>
-zahrada_pp_r           <span class="p">|</span> <span class="o">{</span>17.16,17.22,17.32,17.24<span class="o">}</span>
-zahrada_v              <span class="p">|</span> <span class="o">{</span>77381,77381,77353,77353<span class="o">}</span>
-zahrada_v_avg          <span class="p">|</span> <span class="o">{</span>673,673,673,673<span class="o">}</span>
-zahrada_v_r            <span class="p">|</span> <span class="o">{</span>2.06,2.06,2.06,2.06<span class="o">}</span>
-zastavena_plocha_pp    <span class="p">|</span> <span class="o">{</span>173,173,168,168<span class="o">}</span>
-zastavena_plocha_pp_r  <span class="p">|</span> <span class="o">{</span>25.82,25.90,25.30,25.19<span class="o">}</span>
-zastavena_plocha_v     <span class="p">|</span> <span class="o">{</span>69240,69240,69269,69269<span class="o">}</span>
-zastavena_plocha_v_avg <span class="p">|</span> <span class="o">{</span>400,400,412,412<span class="o">}</span>
-zastavena_plocha_v_r   <span class="p">|</span> <span class="o">{</span>1.84,1.84,1.84,1.84<span class="o">}</span>
+celkova_vymera         <span class="p">|</span> <span class="o">{</span><span class="m">3763255</span>,3763255,3763256,3763256<span class="o">}</span>
+celkovy_pocet_parcel   <span class="p">|</span> <span class="o">{</span><span class="m">670</span>,668,664,667<span class="o">}</span>
+chmelnice_pp           <span class="p">|</span> <span class="o">{</span><span class="m">0</span>,0,0,0<span class="o">}</span>
+chmelnice_pp_r         <span class="p">|</span> <span class="o">{</span><span class="m">0</span>.00,0.00,0.00,0.00<span class="o">}</span>
+chmelnice_v            <span class="p">|</span> <span class="o">{</span><span class="m">0</span>,0,0,0<span class="o">}</span>
+chmelnice_v_avg        <span class="p">|</span> <span class="o">{</span><span class="m">0</span>,0,0,0<span class="o">}</span>
+chmelnice_v_r          <span class="p">|</span> <span class="o">{</span><span class="m">0</span>.00,0.00,0.00,0.00<span class="o">}</span>
+lesni_pozemek_pp       <span class="p">|</span> <span class="o">{</span><span class="m">25</span>,25,25,25<span class="o">}</span>
+lesni_pozemek_pp_r     <span class="p">|</span> <span class="o">{</span><span class="m">3</span>.73,3.74,3.77,3.75<span class="o">}</span>
+lesni_pozemek_v        <span class="p">|</span> <span class="o">{</span><span class="m">83879</span>,83879,83879,83879<span class="o">}</span>
+lesni_pozemek_v_avg    <span class="p">|</span> <span class="o">{</span><span class="m">3355</span>,3355,3355,3355<span class="o">}</span>
+lesni_pozemek_v_r      <span class="p">|</span> <span class="o">{</span><span class="m">2</span>.23,2.23,2.23,2.23<span class="o">}</span>
+orna_puda_pp           <span class="p">|</span> <span class="o">{</span><span class="m">88</span>,88,89,89<span class="o">}</span>
+orna_puda_pp_r         <span class="p">|</span> <span class="o">{</span><span class="m">13</span>.13,13.17,13.40,13.34<span class="o">}</span>
+orna_puda_v            <span class="p">|</span> <span class="o">{</span><span class="m">3066230</span>,3066230,3066230,3066230<span class="o">}</span>
+orna_puda_v_avg        <span class="p">|</span> <span class="o">{</span><span class="m">34844</span>,34844,34452,34452<span class="o">}</span>
+orna_puda_v_r          <span class="p">|</span> <span class="o">{</span><span class="m">81</span>.48,81.48,81.48,81.48<span class="o">}</span>
+ostatni_plocha_pp      <span class="p">|</span> <span class="o">{</span><span class="m">201</span>,199,199,201<span class="o">}</span>
+ostatni_plocha_pp_r    <span class="p">|</span> <span class="o">{</span><span class="m">30</span>.00,29.79,29.97,30.13<span class="o">}</span>
+ostatni_plocha_v       <span class="p">|</span> <span class="o">{</span><span class="m">283468</span>,283468,283468,284562<span class="o">}</span>
+ostatni_plocha_v_avg   <span class="p">|</span> <span class="o">{</span><span class="m">1410</span>,1424,1424,1416<span class="o">}</span>
+ostatni_plocha_v_r     <span class="p">|</span> <span class="o">{</span><span class="m">7</span>.53,7.53,7.53,7.56<span class="o">}</span>
+ovocny_sad_pp          <span class="p">|</span> <span class="o">{</span><span class="m">0</span>,0,0,0<span class="o">}</span>
+ovocny_sad_pp_r        <span class="p">|</span> <span class="o">{</span><span class="m">0</span>.00,0.00,0.00,0.00<span class="o">}</span>
+ovocny_sad_v           <span class="p">|</span> <span class="o">{</span><span class="m">0</span>,0,0,0<span class="o">}</span>
+ovocny_sad_v_avg       <span class="p">|</span> <span class="o">{</span><span class="m">0</span>,0,0,0<span class="o">}</span>
+ovocny_sad_v_r         <span class="p">|</span> <span class="o">{</span><span class="m">0</span>.00,0.00,0.00,0.00<span class="o">}</span>
+ttp_pp                 <span class="p">|</span> <span class="o">{</span><span class="m">44</span>,44,44,45<span class="o">}</span>
+ttp_pp_r               <span class="p">|</span> <span class="o">{</span><span class="m">6</span>.57,6.59,6.63,6.75<span class="o">}</span>
+ttp_v                  <span class="p">|</span> <span class="o">{</span><span class="m">49002</span>,49002,49002,47908<span class="o">}</span>
+ttp_v_avg              <span class="p">|</span> <span class="o">{</span><span class="m">1114</span>,1114,1114,1065<span class="o">}</span>
+ttp_v_r                <span class="p">|</span> <span class="o">{</span><span class="m">1</span>.30,1.30,1.30,1.27<span class="o">}</span>
+vinice_pp              <span class="p">|</span> <span class="o">{</span><span class="m">1</span>,1,1,1<span class="o">}</span>
+vinice_pp_r            <span class="p">|</span> <span class="o">{</span><span class="m">0</span>.15,0.15,0.15,0.15<span class="o">}</span>
+vinice_v               <span class="p">|</span> <span class="o">{</span><span class="m">106178</span>,106178,106178,106178<span class="o">}</span>
+vinice_v_avg           <span class="p">|</span> <span class="o">{</span><span class="m">106178</span>,106178,106178,106178<span class="o">}</span>
+vinice_v_r             <span class="p">|</span> <span class="o">{</span><span class="m">2</span>.82,2.82,2.82,2.82<span class="o">}</span>
+vodni_plocha_pp        <span class="p">|</span> <span class="o">{</span><span class="m">23</span>,23,23,23<span class="o">}</span>
+vodni_plocha_pp_r      <span class="p">|</span> <span class="o">{</span><span class="m">3</span>.43,3.44,3.46,3.45<span class="o">}</span>
+vodni_plocha_v         <span class="p">|</span> <span class="o">{</span><span class="m">27877</span>,27877,27877,27877<span class="o">}</span>
+vodni_plocha_v_avg     <span class="p">|</span> <span class="o">{</span><span class="m">1212</span>,1212,1212,1212<span class="o">}</span>
+vodni_plocha_v_r       <span class="p">|</span> <span class="o">{</span><span class="m">0</span>.74,0.74,0.74,0.74<span class="o">}</span>
+zahrada_pp             <span class="p">|</span> <span class="o">{</span><span class="m">115</span>,115,115,115<span class="o">}</span>
+zahrada_pp_r           <span class="p">|</span> <span class="o">{</span><span class="m">17</span>.16,17.22,17.32,17.24<span class="o">}</span>
+zahrada_v              <span class="p">|</span> <span class="o">{</span><span class="m">77381</span>,77381,77353,77353<span class="o">}</span>
+zahrada_v_avg          <span class="p">|</span> <span class="o">{</span><span class="m">673</span>,673,673,673<span class="o">}</span>
+zahrada_v_r            <span class="p">|</span> <span class="o">{</span><span class="m">2</span>.06,2.06,2.06,2.06<span class="o">}</span>
+zastavena_plocha_pp    <span class="p">|</span> <span class="o">{</span><span class="m">173</span>,173,168,168<span class="o">}</span>
+zastavena_plocha_pp_r  <span class="p">|</span> <span class="o">{</span><span class="m">25</span>.82,25.90,25.30,25.19<span class="o">}</span>
+zastavena_plocha_v     <span class="p">|</span> <span class="o">{</span><span class="m">69240</span>,69240,69269,69269<span class="o">}</span>
+zastavena_plocha_v_avg <span class="p">|</span> <span class="o">{</span><span class="m">400</span>,400,412,412<span class="o">}</span>
+zastavena_plocha_v_r   <span class="p">|</span> <span class="o">{</span><span class="m">1</span>.84,1.84,1.84,1.84<span class="o">}</span>
 </pre></div>
 
 
@@ -582,7 +622,7 @@ psql -qAt --no-psqlrc -f transform.sql <span class="p">|</span> psql -qAt --no-p
 <span class="nv">URL</span><span class="o">=</span>http://services.cuzk.cz/sestavy/UHDP/UHDP-
 <span class="nv">CSVFILE</span><span class="o">=</span><span class="nv">$FILE</span>.csv
 <span class="nv">CSVUTF8FILE</span><span class="o">=</span><span class="si">${</span><span class="nv">CSVFILE</span><span class="p">%.*</span><span class="si">}</span>.utf.csv
-URL+<span class="o">=</span><span class="nv">$CSVFILE</span>
+<span class="nv">URL</span><span class="o">+=</span><span class="nv">$CSVFILE</span>
 
 <span class="nb">echo</span> <span class="s2">&quot;downloading </span><span class="nv">$URL</span><span class="s2">&quot;</span>
 wget -q <span class="nv">$URL</span> -O <span class="nv">$CSVFILE</span>
@@ -647,30 +687,6 @@ rm <span class="nv">$CSVFILE</span> <span class="nv">$CSVUTF8FILE</span>
 <li>the other one lets you type name highlighted feature (much&nbsp;tougher)</li>
 </ul>
 <p>Have&nbsp;fun!</p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2016/degrees-to-decimal-with-javascript-reworked/" rel="bookmark" title="Permalink to Degrees To Decimal With Javascript Reworked">Degrees To Decimal With Javascript&nbsp;Reworked</a></h1>
-            <small>Written on Oct 28, 2016
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>        | <a href="https://www.zimmi.cz/posts/category/development.html">development</a>
-        </small>
-        <section>
-            <p>Two years ago I was pretty happy with <a href="https://www.zimmi.cz/posts/2014/degrees-to-decimal-with-javascript/">this little piece of code to transform degrees to the decimal value</a>. Yesterday, I found a neater way to do the&nbsp;same:</p>
-<div class="highlight"><pre><span></span><span class="kd">let</span> <span class="nx">deg</span> <span class="o">=</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">0</span><span class="p">];</span>
-
-<span class="kd">function</span> <span class="nx">degToDec</span><span class="p">(</span><span class="nx">prev</span><span class="p">,</span> <span class="nx">cur</span><span class="p">,</span> <span class="nx">curIndex</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">prev</span> <span class="o">+</span> <span class="nx">cur</span> <span class="o">/</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="nx">curIndex</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="nx">deg</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">degToDec</span><span class="p">);</span>
-</pre></div>
-
-
-<p>Once you have an input array, that&#8217;s pretty much it. Love&nbsp;JavaScript.</p>
         </section>
         </div>
     </div>

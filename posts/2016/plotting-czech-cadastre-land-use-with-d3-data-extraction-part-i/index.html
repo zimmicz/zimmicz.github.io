@@ -15,7 +15,7 @@
     <meta name="tags" content="svg" />
   <meta property="og:image" content="https://pbs.twimg.com/profile_images/770323886290440192/3G5hqp11_400x400.jpg" />
   <meta property="og:title" content="Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)" />
-  <meta property="og:description" content="This post is the first part of the upcoming series summarizing the process of visualizing landuse data with bash, PostgreSQL and d3.js. Read other parts: you’re reading it now Plotting the Czech Cadastre Land Use with d3: Data Transformation (part II) ..." />
+  <meta property="og:description" content="This post is the first part of the upcoming series summarizing the process of visualizing landuse data with bash, PostgreSQL and d3.js. Read other parts: you’re reading it now Plotting the Czech Cadastre Land Use with d3: Data Transformation (part II)..." />
   <meta property="og:url" content="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i" />
         <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?d5d1e141">
 </head>
@@ -96,7 +96,7 @@
 <span class="nv">URL</span><span class="o">=</span>http://services.cuzk.cz/sestavy/UHDP/UHDP-
 <span class="nv">CSVFILE</span><span class="o">=</span><span class="nv">$FILE</span>.csv
 <span class="nv">CSVUTF8FILE</span><span class="o">=</span><span class="si">${</span><span class="nv">CSVFILE</span><span class="p">%.*</span><span class="si">}</span>.utf.csv
-URL+<span class="o">=</span><span class="nv">$CSVFILE</span>
+<span class="nv">URL</span><span class="o">+=</span><span class="nv">$CSVFILE</span>
 
 <span class="nb">echo</span> <span class="s2">&quot;downloading </span><span class="nv">$URL</span><span class="s2">&quot;</span>
 wget -q <span class="nv">$URL</span> -O <span class="nv">$CSVFILE</span>

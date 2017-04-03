@@ -45,37 +45,37 @@
         </small>
         <section>
             <p>I found an <a href="http://stackoverflow.com/questions/25952380/php-find-a-maximum-average-for-10-subsequent-numbers-in-a-list-of-50-random-numb">interesting question</a> at StackOverflow asking for help finding solution to what I have already mentioned in the title, with <span class="caps">PHP</span>. I gave it a try before reading answers and came up with the following&nbsp;code:</p>
-<div class="highlight"><pre><span></span><span class="p">$</span><span class="nv">avg</span><span class="x">  = // value we are looking for</span>
-<span class="p">$</span><span class="nv">size</span><span class="x"> = count(</span><span class="p">$</span><span class="nv">numbers</span><span class="x">);</span>
+<div class="highlight"><pre><span></span>$avg  = // value we are looking for
+$size = count($numbers);
 
-<span class="x">for (</span><span class="p">$</span><span class="nv">i</span><span class="x"> = 0; </span><span class="p">$</span><span class="nv">i</span><span class="x"> &lt; </span><span class="p">$</span><span class="nv">size</span><span class="x">; </span><span class="p">$</span><span class="nv">i</span><span class="x"> += 1) </span><span class="err">{</span><span class="x"></span>
-<span class="x">    if (</span><span class="p">$</span><span class="nv">i</span><span class="x"> + 9 &lt; 51) </span><span class="err">{</span><span class="x"></span>
-<span class="x">        </span><span class="p">$</span><span class="nv">val</span><span class="x"> += </span><span class="p">$</span><span class="nv">numbers</span><span class="x">[</span><span class="p">$</span><span class="nv">i</span><span class="x">];</span>
-<span class="x">        for (</span><span class="p">$</span><span class="nv">j</span><span class="x"> = </span><span class="p">$</span><span class="nv">i</span><span class="x"> + 1; </span><span class="p">$</span><span class="nv">j</span><span class="x"> &lt; 10 + </span><span class="p">$</span><span class="nv">i</span><span class="x">; </span><span class="p">$</span><span class="nv">j</span><span class="x"> += 1) </span><span class="err">{</span><span class="x"></span>
-<span class="x">            </span><span class="p">$</span><span class="nv">val</span><span class="x"> += </span><span class="p">$</span><span class="nv">numbers</span><span class="x">[</span><span class="p">$</span><span class="nv">j</span><span class="x">];</span>
-<span class="x">        }</span>
-<span class="x">        if (</span><span class="p">$</span><span class="nv">val</span><span class="x"> / 10 &gt;= </span><span class="p">$</span><span class="nv">avg</span><span class="x">) </span><span class="err">{</span><span class="x"> // hit</span>
-<span class="x">            // do something</span>
-<span class="x">        }</span>
-<span class="x">        </span><span class="p">$</span><span class="nv">val</span><span class="x"> = 0;</span>
-<span class="x">    }</span>
-<span class="x">}</span>
+for ($i = 0; $i &lt; $size; $i += 1) {
+    if ($i + 9 &lt; 51) {
+        $val += $numbers[$i];
+        for ($j = $i + 1; $j &lt; 10 + $i; $j += 1) {
+            $val += $numbers[$j];
+        }
+        if ($val / 10 &gt;= $avg) { // hit
+            // do something
+        }
+        $val = 0;
+    }
+}
 </pre></div>
 
 
 <p>That was the first that I could think of. And it worked. The answer given by Dave Chen was much more elegant than my solution (although I think it does something a bit different, but that&#8217;s not the point&nbsp;here):</p>
-<div class="highlight"><pre><span></span><span class="p">$</span><span class="nv">number</span><span class="x"> = 10; //numbers in a set</span>
-<span class="p">$</span><span class="nv">max</span><span class="x"> = 0;</span>
-<span class="p">$</span><span class="nv">index</span><span class="x"> = 0;</span>
+<div class="highlight"><pre><span></span>$number = 10; //numbers in a set
+$max = 0;
+$index = 0;
 
-<span class="p">$</span><span class="nv">size</span><span class="x"> = sizeof(</span><span class="p">$</span><span class="nv">numbers</span><span class="x">) - </span><span class="p">$</span><span class="nv">number</span><span class="x">;</span>
-<span class="x">for (</span><span class="p">$</span><span class="nv">i</span><span class="x"> = 0; </span><span class="p">$</span><span class="nv">i</span><span class="x"> &lt; </span><span class="p">$</span><span class="nv">size</span><span class="x">; </span><span class="p">$</span><span class="nv">i</span><span class="x">++) </span><span class="err">{</span><span class="x"></span>
-<span class="x">    </span><span class="p">$</span><span class="nv">tmp</span><span class="x"> = array_sum(array_slice(</span><span class="p">$</span><span class="nv">numbers</span><span class="x">, </span><span class="p">$</span><span class="nv">i</span><span class="x">, </span><span class="p">$</span><span class="nv">number</span><span class="x">)) / </span><span class="p">$</span><span class="nv">number</span><span class="x">;</span>
-<span class="x">    if (</span><span class="p">$</span><span class="nv">tmp</span><span class="x"> &gt; </span><span class="p">$</span><span class="nv">max</span><span class="x">) </span><span class="err">{</span><span class="x"></span>
-<span class="x">        </span><span class="p">$</span><span class="nv">max</span><span class="x"> = </span><span class="p">$</span><span class="nv">tmp</span><span class="x">;</span>
-<span class="x">        </span><span class="p">$</span><span class="nv">index</span><span class="x"> = </span><span class="p">$</span><span class="nv">i</span><span class="x">;</span>
-<span class="x">    }</span>
-<span class="x">}</span>
+$size = sizeof($numbers) - $number;
+for ($i = 0; $i &lt; $size; $i++) {
+    $tmp = array_sum(array_slice($numbers, $i, $number)) / $number;
+    if ($tmp &gt; $max) {
+        $max = $tmp;
+        $index = $i;
+    }
+}
 </pre></div>
 
 

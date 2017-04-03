@@ -62,19 +62,19 @@
 
 
 <p>We need to retrieve the token, so we define a&nbsp;function:</p>
-<div class="highlight"><pre><span></span><span class="nt">function</span> <span class="nt">retrieveToken</span><span class="o">(</span><span class="nt">callback</span><span class="o">)</span> <span class="p">{</span>
-    <span class="n">var</span> <span class="n">req</span> <span class="o">=</span> <span class="n">new</span> <span class="n">XMLHttpRequest</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><span class="kd">function</span> <span class="nx">retrieveToken</span><span class="p">(</span><span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">req</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">XMLHttpRequest</span><span class="p">;</span>
 
-    <span class="n">req</span><span class="o">.</span><span class="n">onload</span> <span class="o">=</span> <span class="n">function</span><span class="p">()</span> <span class="err">{</span>
-        <span class="n">if</span> <span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;200&quot;</span><span class="p">)</span> <span class="err">{</span>
-            <span class="n">var</span> <span class="n">response</span> <span class="o">=</span> <span class="n">JSON</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">responseText</span><span class="p">);</span>
-            <span class="n">if</span> <span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">contents</span><span class="p">)</span> <span class="err">{</span>
-                <span class="n">callback</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">contents</span><span class="p">);</span> <span class="o">//</span> <span class="n">response</span> <span class="n">contents</span> <span class="n">is</span> <span class="n">where</span> <span class="n">the</span> <span class="n">token</span> <span class="n">is</span> <span class="n">stored</span>
+    <span class="nx">req</span><span class="p">.</span><span class="nx">onload</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">status</span> <span class="o">==</span> <span class="s2">&quot;200&quot;</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kd">var</span> <span class="nx">response</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">responseText</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">contents</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">callback</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">contents</span><span class="p">);</span> <span class="c1">// response contents is where the token is stored</span>
         <span class="p">}</span>
-    <span class="err">}</span><span class="o">;</span>
-    <span class="nt">req</span><span class="nc">.open</span><span class="o">(</span><span class="s2">&quot;get&quot;</span><span class="o">,</span> <span class="s2">&quot;http://server.address/arcgis/tokens/?request=getToken&amp;username=username&amp;password=password&amp;expiration=60&quot;</span><span class="o">,</span> <span class="nt">true</span><span class="o">);</span>
-    <span class="nt">req</span><span class="nc">.send</span><span class="o">()</span>
-<span class="err">}</span>
+    <span class="p">};</span>
+    <span class="nx">req</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="s2">&quot;http://server.address/arcgis/tokens/?request=getToken&amp;username=username&amp;password=password&amp;expiration=60&quot;</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+    <span class="nx">req</span><span class="p">.</span><span class="nx">send</span><span class="p">()</span>
+<span class="p">}</span>
 </pre></div>
 
 

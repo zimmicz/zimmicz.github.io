@@ -14,7 +14,7 @@
     <meta name="tags" content="linux" />
   <meta property="og:image" content="https://pbs.twimg.com/profile_images/770323886290440192/3G5hqp11_400x400.jpg" />
   <meta property="og:title" content="Installing PostGIS 2.2 with SFCGAL on Ubuntu-based OS" />
-  <meta property="og:description" content="I’ve seen a bunch of questions on GIS StackExchange recently related to SFCGAL extension for PostGIS 2.2. Great news are it can be installed with one simple query CREATE EXTENSION postgis_sfcgal. Not so great news are you have to compile it from ..." />
+  <meta property="og:description" content="I’ve seen a bunch of questions on GIS StackExchange recently related to SFCGAL extension for PostGIS 2.2. Great news are it can be installed with one simple query CREATE EXTENSION postgis_sfcgal. Not so great news are you have to compile it from..." />
   <meta property="og:url" content="https://www.zimmi.cz/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/" />
         <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?d5d1e141">
 </head>
@@ -105,7 +105,7 @@ tar xzf postgis-2.2.0.tar.gz
 <span class="nv">CORES</span><span class="o">=</span><span class="k">$(</span>nproc<span class="k">)</span>
 
 <span class="k">if</span> <span class="o">[[</span> <span class="nv">$CORES</span> &gt; <span class="m">1</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
-    <span class="nv">CORES</span><span class="o">=</span><span class="k">$(</span>expr <span class="nv">$CORES</span> - 1<span class="k">)</span> <span class="c1"># be nice to your PC</span>
+    <span class="nv">CORES</span><span class="o">=</span><span class="k">$(</span>expr <span class="nv">$CORES</span> - <span class="m">1</span><span class="k">)</span> <span class="c1"># be nice to your PC</span>
 <span class="k">fi</span>
 
 <span class="nb">cd</span> gmp-6.0.0

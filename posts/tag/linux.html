@@ -97,7 +97,7 @@ tar xzf postgis-2.2.0.tar.gz
 <span class="nv">CORES</span><span class="o">=</span><span class="k">$(</span>nproc<span class="k">)</span>
 
 <span class="k">if</span> <span class="o">[[</span> <span class="nv">$CORES</span> &gt; <span class="m">1</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
-    <span class="nv">CORES</span><span class="o">=</span><span class="k">$(</span>expr <span class="nv">$CORES</span> - 1<span class="k">)</span> <span class="c1"># be nice to your PC</span>
+    <span class="nv">CORES</span><span class="o">=</span><span class="k">$(</span>expr <span class="nv">$CORES</span> - <span class="m">1</span><span class="k">)</span> <span class="c1"># be nice to your PC</span>
 <span class="k">fi</span>
 
 <span class="nb">cd</span> gmp-6.0.0
@@ -167,7 +167,7 @@ unrar dem.rar -d copernicus
 
 <h2>Hillshade and color&nbsp;relief</h2>
 <p>Use <span class="caps">GDAL</span> to create hillshade with a simple command. No need to use <code>-s</code> flag to convert units, it already comes in meters. Exaggerate heights a bit with <code>-z</code> flag.</p>
-<div class="highlight"><pre><span></span>gdaldem hillshade EUD_CP-DEMS_4500025000-AA.tif hillshade.tif -z 3
+<div class="highlight"><pre><span></span>gdaldem hillshade EUD_CP-DEMS_4500025000-AA.tif hillshade.tif -z <span class="m">3</span>
 </pre></div>
 
 
@@ -257,8 +257,8 @@ rm color_relief.tif
 rm hillshade.tif
 mv color_relief.compress.tif color_relief.tif
 mv hillshade.compress.tif hillshade.tif
-gdaladdo color_relief.tif <span class="m">2</span> <span class="m">4</span> <span class="m">8</span> 16
-gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span class="m">8</span> 16
+gdaladdo color_relief.tif <span class="m">2</span> <span class="m">4</span> <span class="m">8</span> <span class="m">16</span>
+gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span class="m">8</span> <span class="m">16</span>
 </pre></div>
 
 
@@ -282,7 +282,7 @@ gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span c
         </small>
         <section>
             <p>Having more than 120K <span class="caps">5MB</span>+ images that should be moved to the server is a great oportunity for some automatic bash processing. It might be good idea to use <a href="http://www.imagemagick.org/script/index.php">ImageMagick</a> <a href="http://www.imagemagick.org/script/convert.php">convert tool</a> to make images smaller in a simple for loop. <a href="http://www.gnu.org/software/parallel/"><span class="caps">GNU</span> Parallel</a> can significantly increase the performance by running one job per <span class="caps">CPU</span>&nbsp;core.</p>
-<div class="highlight"><pre><span></span>parallel --verbose convert <span class="o">{}</span> -quality 40% <span class="o">{}</span> ::: *.jpg
+<div class="highlight"><pre><span></span>parallel --verbose convert <span class="o">{}</span> -quality <span class="m">40</span>% <span class="o">{}</span> ::: *.jpg
 </pre></div>
 
 
@@ -436,7 +436,7 @@ gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span c
 
 <p>The <code>transform="matrix(1.18081,0,0,1.18081,270.0,550.0)</code> part puts the text on the right spot. Great finding about <span class="caps">SVG</span> is that it places each <code>&lt;text&gt;</code> element on the new line, so you don&#8217;t need to deal with calculating the position in your&nbsp;script.</p>
 <p>Scale adjustment is done with a dirty lambda&nbsp;function.</p>
-<div class="highlight"><pre><span></span><span class="n">content</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">r&quot;&gt;(\d{1,3}\.\d{3,5})&lt;/text&gt;&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">m</span> <span class="p">:</span><span class="s2">&quot;&gt;    &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)))))</span> <span class="o">+</span> <span class="s2">&quot;&lt;/text&gt;&quot;</span><span class="p">,</span> <span class="n">old_map</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+<div class="highlight"><pre><span></span><span class="n">content</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;&gt;(\d{1,3}\.\d{3,5})&lt;/text&gt;&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">m</span> <span class="p">:</span><span class="s2">&quot;&gt;    &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)))))</span> <span class="o">+</span> <span class="s2">&quot;&lt;/text&gt;&quot;</span><span class="p">,</span> <span class="n">old_map</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
 </pre></div>
 
 
@@ -524,7 +524,7 @@ gdalwarp -dstalpha -s_srs <span class="s1">&#39;EPSG:5514&#39;</span> -t_srs <sp
             <span class="nb">exit</span>
         <span class="k">else</span> <span class="nb">echo</span> <span class="s2">&quot;Not yet&quot;</span>
     <span class="k">fi</span>
-    sleep 60
+    sleep <span class="m">60</span>
 <span class="k">done</span>
 </pre></div>
 
@@ -542,7 +542,7 @@ gdalwarp -dstalpha -s_srs <span class="s1">&#39;EPSG:5514&#39;</span> -t_srs <sp
         <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>,         <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>        | <a href="https://www.zimmi.cz/posts/category/development.html">development</a>
         </small>
         <section>
-            <div class="highlight"><pre><span></span><span class="x">for f in *; do mv &quot;</span><span class="p">$</span><span class="nv">f</span><span class="x">&quot; &quot;prepend_</span><span class="p">$</span><span class="nv">f</span><span class="x">&quot;; done</span>
+            <div class="highlight"><pre><span></span>for f in *; do mv &quot;$f&quot; &quot;prepend_$f&quot;; done
 </pre></div>
 
 
@@ -615,16 +615,16 @@ gdalwarp -dstalpha -s_srs <span class="s1">&#39;EPSG:5514&#39;</span> -t_srs <sp
 <p>I love having clean <span class="caps">OS</span>. That&#8217;s what <a href="http://docker.com">Docker</a> is all about - for me. Running PieCrust on Docker is really easy, it does not clutter your <span class="caps">PC</span> and it just&nbsp;works.</p>
 <p>If you ever want to use PieCrust on Docker, why don&#8217;t you start with this code?
     <span class="caps">FROM</span>&nbsp;centos:centos6</p>
-<div class="highlight"><pre><span></span><span class="nt">RUN</span> <span class="nt">rpm</span> <span class="nt">-Uvh</span> <span class="nt">http</span><span class="o">://</span><span class="nt">mirror</span><span class="nc">.webtatic.com</span><span class="o">/</span><span class="nt">yum</span><span class="o">/</span><span class="nt">el6</span><span class="o">/</span><span class="nt">latest</span><span class="nc">.rpm</span>
-<span class="nt">RUN</span> <span class="nt">rpm</span> <span class="nt">-Uvh</span> <span class="nt">http</span><span class="o">://</span><span class="nt">download</span><span class="nc">.fedoraproject.org</span><span class="o">/</span><span class="nt">pub</span><span class="o">/</span><span class="nt">epel</span><span class="o">/</span><span class="nt">6</span><span class="o">/</span><span class="nt">x86_64</span><span class="o">/</span><span class="nt">epel-release-6-8</span><span class="nc">.noarch.rpm</span>
-<span class="nt">RUN</span> <span class="nt">rpm</span> <span class="nt">-Uvh</span> <span class="nt">http</span><span class="o">://</span><span class="nt">rpms</span><span class="nc">.famillecollet.com</span><span class="o">/</span><span class="nt">enterprise</span><span class="o">/</span><span class="nt">remi-release-6</span><span class="nc">.rpm</span>
+<div class="highlight"><pre><span></span><span class="nt">RUN</span> <span class="nt">rpm</span> <span class="nt">-Uvh</span> <span class="nt">http</span><span class="o">://</span><span class="nt">mirror</span><span class="p">.</span><span class="nc">webtatic</span><span class="p">.</span><span class="nc">com</span><span class="o">/</span><span class="nt">yum</span><span class="o">/</span><span class="nt">el6</span><span class="o">/</span><span class="nt">latest</span><span class="p">.</span><span class="nc">rpm</span>
+<span class="nt">RUN</span> <span class="nt">rpm</span> <span class="nt">-Uvh</span> <span class="nt">http</span><span class="o">://</span><span class="nt">download</span><span class="p">.</span><span class="nc">fedoraproject</span><span class="p">.</span><span class="nc">org</span><span class="o">/</span><span class="nt">pub</span><span class="o">/</span><span class="nt">epel</span><span class="o">/</span><span class="nt">6</span><span class="o">/</span><span class="nt">x86_64</span><span class="o">/</span><span class="nt">epel-release-6-8</span><span class="p">.</span><span class="nc">noarch</span><span class="p">.</span><span class="nc">rpm</span>
+<span class="nt">RUN</span> <span class="nt">rpm</span> <span class="nt">-Uvh</span> <span class="nt">http</span><span class="o">://</span><span class="nt">rpms</span><span class="p">.</span><span class="nc">famillecollet</span><span class="p">.</span><span class="nc">com</span><span class="o">/</span><span class="nt">enterprise</span><span class="o">/</span><span class="nt">remi-release-6</span><span class="p">.</span><span class="nc">rpm</span>
 
 <span class="nt">RUN</span> <span class="nt">yum</span> <span class="nt">--enablerepo</span><span class="o">=</span><span class="nt">remi</span><span class="o">,</span><span class="nt">remi-php55</span> <span class="nt">install</span> <span class="nt">-y</span> <span class="nt">php</span> <span class="nt">php-mbstring</span> <span class="nt">php-opcache</span> <span class="nt">php-cli</span> <span class="nt">php-pear</span> <span class="nt">php-common</span> <span class="o">&amp;&amp;</span> <span class="nt">yum</span> <span class="nt">clean</span> <span class="nt">all</span>
 <span class="nt">RUN</span> <span class="nt">php</span> <span class="nt">-r</span> <span class="s2">&quot;readfile(&#39;https://getcomposer.org/installer&#39;);&quot;</span> <span class="o">|</span> <span class="nt">php</span>
-<span class="nt">RUN</span> <span class="nt">echo</span> <span class="s2">&quot;date.timezone = Europe/Prague&quot;</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="nt">etc</span><span class="o">/</span><span class="nt">php</span><span class="nc">.ini</span>
-<span class="nt">RUN</span> <span class="nt">mv</span> <span class="nt">composer</span><span class="nc">.phar</span> <span class="o">/</span><span class="nt">usr</span><span class="o">/</span><span class="nt">bin</span><span class="o">/</span><span class="nt">composer</span>
+<span class="nt">RUN</span> <span class="nt">echo</span> <span class="s2">&quot;date.timezone = Europe/Prague&quot;</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="nt">etc</span><span class="o">/</span><span class="nt">php</span><span class="p">.</span><span class="nc">ini</span>
+<span class="nt">RUN</span> <span class="nt">mv</span> <span class="nt">composer</span><span class="p">.</span><span class="nc">phar</span> <span class="o">/</span><span class="nt">usr</span><span class="o">/</span><span class="nt">bin</span><span class="o">/</span><span class="nt">composer</span>
 <span class="nt">RUN</span> <span class="nt">php</span> <span class="nt">-r</span> <span class="s2">&quot;eval(&#39;?&gt;&#39;.file_get_contents(&#39;http://backend.bolt80.com/piecrust/install&#39;));&quot;</span>
-<span class="nt">RUN</span> <span class="nt">mv</span> <span class="nt">piecrust</span><span class="nc">.phar</span> <span class="o">/</span><span class="nt">usr</span><span class="o">/</span><span class="nt">bin</span><span class="o">/</span><span class="nt">chef</span>
+<span class="nt">RUN</span> <span class="nt">mv</span> <span class="nt">piecrust</span><span class="p">.</span><span class="nc">phar</span> <span class="o">/</span><span class="nt">usr</span><span class="o">/</span><span class="nt">bin</span><span class="o">/</span><span class="nt">chef</span>
 
 <span class="nt">CMD</span> <span class="cp">[</span><span class="s2">&quot;/bin/bash&quot;</span><span class="cp">]</span>
 </pre></div>

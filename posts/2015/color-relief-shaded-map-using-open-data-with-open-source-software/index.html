@@ -15,7 +15,7 @@
     <meta name="tags" content="qgis" />
   <meta property="og:image" content="https://pbs.twimg.com/profile_images/770323886290440192/3G5hqp11_400x400.jpg" />
   <meta property="og:title" content="Color Relief Shaded Map Using Open Data with Open Source Software" />
-  <meta property="og:description" content="The Digital Elevation Model over Europe (EU-DEM) has been recently released for public usage at Copernicus Land Monitoring Services homepage. Strictly speaking, it is a digital surface model coming from weighted average of SRTM and ASTER GDEM with ..." />
+  <meta property="og:description" content="The Digital Elevation Model over Europe (EU-DEM) has been recently released for public usage at Copernicus Land Monitoring Services homepage. Strictly speaking, it is a digital surface model coming from weighted average of SRTM and ASTER GDEM with..." />
   <meta property="og:url" content="https://www.zimmi.cz/posts/2015/color-relief-shaded-map-using-open-data-with-open-source-software/" />
         <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?d5d1e141">
 </head>
@@ -66,7 +66,7 @@ unrar dem.rar -d copernicus
 
 <h2>Hillshade and color&nbsp;relief</h2>
 <p>Use <span class="caps">GDAL</span> to create hillshade with a simple command. No need to use <code>-s</code> flag to convert units, it already comes in meters. Exaggerate heights a bit with <code>-z</code> flag.</p>
-<div class="highlight"><pre><span></span>gdaldem hillshade EUD_CP-DEMS_4500025000-AA.tif hillshade.tif -z 3
+<div class="highlight"><pre><span></span>gdaldem hillshade EUD_CP-DEMS_4500025000-AA.tif hillshade.tif -z <span class="m">3</span>
 </pre></div>
 
 
@@ -156,8 +156,8 @@ rm color_relief.tif
 rm hillshade.tif
 mv color_relief.compress.tif color_relief.tif
 mv hillshade.compress.tif hillshade.tif
-gdaladdo color_relief.tif <span class="m">2</span> <span class="m">4</span> <span class="m">8</span> 16
-gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span class="m">8</span> 16
+gdaladdo color_relief.tif <span class="m">2</span> <span class="m">4</span> <span class="m">8</span> <span class="m">16</span>
+gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span class="m">8</span> <span class="m">16</span>
 </pre></div>
 
 

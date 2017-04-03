@@ -80,7 +80,7 @@ mkdir ./data/csv
 
 <span class="nb">cd</span> ./data/csv
 touch tweets.csv
-<span class="nb">echo</span> <span class="k">$(</span>sed -n 1p <span class="k">$(</span>ls -d -1 *.csv <span class="p">|</span> head -n 1<span class="k">))</span> &gt; tweets.csv <span class="c1"># get column names</span>
+<span class="nb">echo</span> <span class="k">$(</span>sed -n 1p <span class="k">$(</span>ls -d -1 *.csv <span class="p">|</span> head -n <span class="m">1</span><span class="k">))</span> &gt; tweets.csv <span class="c1"># get column names</span>
 
 <span class="k">for</span> csv in tw_*.csv<span class="p">;</span> <span class="k">do</span>
     <span class="nb">echo</span> <span class="nv">$csv</span>
@@ -196,7 +196,7 @@ git merge origin/master <span class="o">&amp;&amp;</span> <span class="se">\</sp
 git commit --allow-empty -m <span class="s2">&quot;Restart gear&quot;</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
 git push <span class="o">&amp;&amp;</span> <span class="se">\</span>
 <span class="nb">echo</span> <span class="s2">&quot;Success&quot;</span> <span class="p">;</span> 
-<span class="o">}</span> &gt;&gt; <span class="nv">$logfile</span> 2&gt;<span class="p">&amp;</span>1
+<span class="o">}</span> &gt;&gt; <span class="nv">$logfile</span> <span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span>
 </pre></div>
 
 

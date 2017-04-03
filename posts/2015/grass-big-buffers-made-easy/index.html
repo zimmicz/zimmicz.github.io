@@ -12,7 +12,7 @@
     <meta name="tags" content="grass" />
   <meta property="og:image" content="https://pbs.twimg.com/profile_images/770323886290440192/3G5hqp11_400x400.jpg" />
   <meta property="og:title" content="GRASS: Big Buffers Made Easy" />
-  <meta property="og:description" content="Recently I’ve written about struggling with fairly complex geometries in PostGIS. Lesson learned from the last time was to use more smaller geometries instead of several really huge. You can obtain the small ones from the big by cutting it with a ..." />
+  <meta property="og:description" content="Recently I’ve written about struggling with fairly complex geometries in PostGIS. Lesson learned from the last time was to use more smaller geometries instead of several really huge. You can obtain the small ones from the big by cutting it with a..." />
   <meta property="og:url" content="https://www.zimmi.cz/posts/2015/grass-big-buffers-made-easy/" />
         <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?d5d1e141">
 </head>
@@ -68,7 +68,7 @@ v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&
 v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&quot;PG:host=localhost dbname=db user=postgres password=postgres&quot;</span> <span class="nv">output</span><span class="o">=</span>lollipops_050 <span class="nv">layer</span><span class="o">=</span>lollipops.lollipops_2015_050_tmp <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
 v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&quot;PG:host=localhost dbname=db user=postgres password=postgres&quot;</span> <span class="nv">output</span><span class="o">=</span>holes_050 <span class="nv">layer</span><span class="o">=</span>phase_3.holes_050 <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
 v.db.addcolumn <span class="nv">map</span><span class="o">=</span>ilot_050 <span class="nv">columns</span><span class="o">=</span><span class="s2">&quot;id_0 int&quot;</span>
-v.db.update <span class="nv">map</span><span class="o">=</span>ilot_050 <span class="nv">column</span><span class="o">=</span>id_0 <span class="nv">value</span><span class="o">=</span>1
+v.db.update <span class="nv">map</span><span class="o">=</span>ilot_050 <span class="nv">column</span><span class="o">=</span>id_0 <span class="nv">value</span><span class="o">=</span><span class="m">1</span>
 
 <span class="c1"># dissolve didn&#39;t work without a column specified, dunno why</span>
 v.dissolve <span class="nv">input</span><span class="o">=</span>ilot_050 <span class="nv">column</span><span class="o">=</span>id_0 <span class="nv">output</span><span class="o">=</span>ilot_050_dissolve --overwrite
@@ -84,11 +84,11 @@ v.overlay <span class="nv">ainput</span><span class="o">=</span>combined_050_01 
 v.out.ogr <span class="nv">input</span><span class="o">=</span>combined_050_02 <span class="nv">output</span><span class="o">=</span>combined_050 <span class="nv">format</span><span class="o">=</span>ESRI_Shapefile --overwrite
 v.in.ogr <span class="nv">input</span><span class="o">=</span>combined_050 <span class="nv">output</span><span class="o">=</span>combined_050_in <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
 v.db.addcolumn <span class="nv">map</span><span class="o">=</span>combined_050_in <span class="nv">columns</span><span class="o">=</span><span class="s2">&quot;id_1 int&quot;</span>
-v.db.update <span class="nv">map</span><span class="o">=</span>combined_050_in <span class="nv">column</span><span class="o">=</span>id_1 <span class="nv">value</span><span class="o">=</span>1
+v.db.update <span class="nv">map</span><span class="o">=</span>combined_050_in <span class="nv">column</span><span class="o">=</span>id_1 <span class="nv">value</span><span class="o">=</span><span class="m">1</span>
 v.dissolve <span class="nv">input</span><span class="o">=</span>combined_050_in <span class="nv">column</span><span class="o">=</span>id_1 <span class="nv">output</span><span class="o">=</span>combined_050_dissolve --overwrite
 
 <span class="c1"># get rid of &lt; 10cm edges</span>
-v.generalize <span class="nv">input</span><span class="o">=</span>combined_050_dissolve <span class="nv">output</span><span class="o">=</span>combined_050_gen <span class="nv">method</span><span class="o">=</span>reduction <span class="nv">threshold</span><span class="o">=</span>0.1 --overwrite
+v.generalize <span class="nv">input</span><span class="o">=</span>combined_050_dissolve <span class="nv">output</span><span class="o">=</span>combined_050_gen <span class="nv">method</span><span class="o">=</span>reduction <span class="nv">threshold</span><span class="o">=</span><span class="m">0</span>.1 --overwrite
 v.out.ogr <span class="nv">input</span><span class="o">=</span>combined_050_gen <span class="nv">output</span><span class="o">=</span>combined_050_gen <span class="nv">format</span><span class="o">=</span>ESRI_Shapefile --overwrite
 v.in.ogr <span class="nv">input</span><span class="o">=</span>combined_050_gen <span class="nv">output</span><span class="o">=</span>combined_050_gen <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
 v.overlay <span class="nv">ainput</span><span class="o">=</span>combined_050_gen <span class="nv">binput</span><span class="o">=</span>ilot_050 <span class="nv">operator</span><span class="o">=</span>not <span class="nv">snap</span><span class="o">=</span>1e-05 --overwrite <span class="nv">output</span><span class="o">=</span>ilot_050_diff
