@@ -27,5 +27,6 @@ ARTICLE_URL = '{date:%Y}/{slug}/'
 ARTICLE_SAVE_AS = '{date:%Y}/{slug}/index.html'
 GOOGLE_ANALYTICS = 'UA-43432739-2'
 
-PLUGIN_PATHS = ['content/plugins']
+PLUGIN_PATHS = ['content/pelican-plugins']
 PLUGINS = ['neighbors', 'assets', 'optimize_images']
+

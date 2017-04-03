@@ -46,5 +46,7 @@ LOCALE = 'en_US.UTF-8'
 CATEGORIES_SAVE_AS = 'categories/index.html'
 TAGS_SAVE_AS = 'tags/index.html'
 
-PLUGIN_PATHS = ['content/plugins']
+PLUGIN_PATHS = ['content/pelican-plugins']
 PLUGINS = ['neighbors', 'assets']
+
+
