@@ -1,2 +1,4 @@
 *.pid
 *.pyc
+content/**/*.pyc
+
