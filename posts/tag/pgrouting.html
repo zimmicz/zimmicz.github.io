@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+        <title>Michal Zimmermann | tag: pgrouting</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?d5d1e141">
+</head>
+
+<body id="index" class="home">
+    <nav class="top-bar card-1" data-topbar role="navigation">
+        <ul class="title-area">
+            <li class="name">
+                <h1><a href="/posts">Home</a></h1>
+            </li>
+     <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+            <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+        </ul>
+        <section class="top-bar-section">
+    <!-- Right Nav Section -->
+            <ul class="right">
+                <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+                <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+                <li><a href="https://www.zimmi.cz/posts/feed.xml">RSS feed</a></li>
+            </ul>
+        </section>
+    </nav>
+        <div class="row">
+          <div class="large-12 columns header">
+            <h1><a href="/posts">Michal Zimmermann</a> <small>Pieces of knowledge from the world of GIS.</small></h1>
+          </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns">
+<h2 class="text-center">Articles tagged with pgrouting tag</h2>
+
+    <div class="panel card card-1">
+        <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/" rel="bookmark" title="Permalink to Routing with pgRouting: Catchment Area Calculation">Routing with pgRouting: Catchment Area&nbsp;Calculation</a></h1>
+            <small>Written on Apr 14, 2017
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>,         <a href="https://www.zimmi.cz/posts/tag/pgrouting.html">pgrouting</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
+        </small>
+        <section>
+            <p>For a long time I&#8217;ve wanted to play with <a href="http://pgrouting.org/">pgRouting</a> and that time has finally come. Among many other routing functions there is one that caught my eye, called <code>pgr_drivingdistance</code>. As the documentation says, it <em>returns the driving distance from a start node</em> using Dijkstra algorithm. The aforementioned distance doesn&#8217;t need to be defined in Euclidean space (the real distance between two points), it might be calculated in units of time, slopeness etc. How to get it&nbsp;going?</p>
+<h2>Data</h2>
+<p><span class="caps">OSM</span> will do as it always does. There is a tool called <code>osm2pgrouting</code> to help you load the data, the pure <span class="caps">GDAL</span> seems to be a better way to me though. Importing the downloaded data is&nbsp;trivial.</p>
+<div class="highlight"><pre><span></span>ogr2ogr -f <span class="s2">&quot;PostgreSQL&quot;</span> PG:<span class="s2">&quot;dbname=pgrouting active_schema=cze&quot;</span> <span class="se">\</span>
+    -s_srs EPSG:4326 <span class="se">\</span>
+    -t_srs EPSG:5514 <span class="se">\</span>
+    roads.shp <span class="se">\</span>
+    -nln roads <span class="se">\</span>
+    -lco <span class="nv">GEOMETRY_NAME</span><span class="o">=</span>the_geom <span class="se">\</span>
+    -lco <span class="nv">FID</span><span class="o">=</span>id <span class="se">\</span>
+    -gt <span class="m">65000</span> <span class="se">\</span>
+    -nlt PROMOTE_TO_MULTI <span class="se">\</span>
+    -clipsrc <span class="m">16</span>.538 <span class="m">49</span>.147 <span class="m">16</span>.699 <span class="m">49</span>.240
+</pre></div>
+
+
+<p>To route the network, it has to be properly noded. Although pgRouting comes with built-in <code>pgr_nodenetwork</code>, it didn&#8217;t seem to work very well. To node the network, use PostGIS <code>ST_Node</code>. <strong>Note this doesn&#8217;t consider bridges and&nbsp;tunnels.</strong></p>
+<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="k">AS</span>
+<span class="k">SELECT</span>
+    <span class="p">(</span><span class="n">ST_Dump</span><span class="p">(</span><span class="n">geom</span><span class="p">)).</span><span class="n">geom</span> <span class="n">the_geom</span>
+<span class="k">FROM</span> <span class="p">(</span>
+    <span class="k">SELECT</span>
+        <span class="n">ST_Node</span><span class="p">(</span><span class="n">geom</span><span class="p">)</span> <span class="n">geom</span>
+    <span class="k">FROM</span> <span class="p">(</span>
+        <span class="k">SELECT</span> <span class="n">ST_Union</span><span class="p">(</span><span class="n">the_geom</span><span class="p">)</span> <span class="n">geom</span>
+        <span class="k">FROM</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads</span>
+    <span class="p">)</span> <span class="n">a</span>
+<span class="p">)</span> <span class="n">b</span><span class="p">;</span>
+</pre></div>
+
+
+<p>After noding the network, all the information about speed limits and oneways is lost. If needed, it can be brought back with&nbsp;following:</p>
+<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">INDEX</span> <span class="k">ON</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="k">USING</span> <span class="n">gist</span><span class="p">(</span><span class="n">the_geom</span><span class="p">);</span>
+<span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="k">ADD</span> <span class="k">COLUMN</span> <span class="n">id</span> <span class="nb">SERIAL</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">;</span>
+<span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="k">ADD</span> <span class="k">COLUMN</span> <span class="n">maxspeed</span> <span class="nb">integer</span><span class="p">;</span>
+
+<span class="k">UPDATE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span>
+<span class="k">SET</span> <span class="n">maxspeed</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">maxspeed</span>
+<span class="k">FROM</span> <span class="p">(</span>
+    <span class="k">SELECT</span> <span class="k">DISTINCT</span> <span class="k">ON</span> <span class="p">(</span><span class="n">rn</span><span class="p">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="n">rn</span><span class="p">.</span><span class="n">id</span><span class="p">,</span>
+        <span class="n">r</span><span class="p">.</span><span class="n">maxspeed</span>
+    <span class="k">FROM</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="n">rn</span>
+    <span class="k">JOIN</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads</span> <span class="n">r</span> <span class="k">ON</span> <span class="p">(</span><span class="n">ST_Intersects</span><span class="p">(</span><span class="n">rn</span><span class="p">.</span><span class="n">the_geom</span><span class="p">,</span> <span class="n">r</span><span class="p">.</span><span class="n">the_geom</span><span class="p">))</span>
+    <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">rn</span><span class="p">.</span><span class="n">id</span><span class="p">,</span> <span class="n">ST_Length</span><span class="p">(</span><span class="n">ST_Intersection</span><span class="p">(</span><span class="n">rn</span><span class="p">.</span><span class="n">the_geom</span><span class="p">,</span> <span class="n">r</span><span class="p">.</span><span class="n">the_geom</span><span class="p">))</span> <span class="k">DESC</span>
+<span class="p">)</span> <span class="n">a</span>
+<span class="k">WHERE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">id</span><span class="p">;</span>
+</pre></div>
+
+
+<p>With everything set, the topology can be&nbsp;built.</p>
+<div class="highlight"><pre><span></span><span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="k">ADD</span> <span class="k">COLUMN</span> <span class="k">source</span> <span class="nb">integer</span><span class="p">;</span>
+<span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="k">ADD</span> <span class="k">COLUMN</span> <span class="n">target</span> <span class="nb">integer</span><span class="p">;</span>
+<span class="k">SELECT</span> <span class="n">pgr_createTopology</span><span class="p">(</span><span class="s1">&#39;cze.roads_noded&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</pre></div>
+
+
+<p>This function creates the <code>cze.roads_noded_vertices_pgr</code> that contains all the extracted nodes from the&nbsp;network.</p>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-pgrouting-catchment-area-calculation/nodes.png" width="70%" /></div>
+
+<p>As already mentioned, measures other than length can be used as a distance, I chose the time to get to a given node on&nbsp;foot.</p>
+<div class="highlight"><pre><span></span><span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="k">ADD</span> <span class="k">COLUMN</span> <span class="n">cost_minutes</span> <span class="nb">integer</span><span class="p">;</span>
+<span class="k">UPDATE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span>
+<span class="k">SET</span> <span class="n">cost_minutes</span> <span class="o">=</span> <span class="p">(</span><span class="n">ST_Length</span><span class="p">(</span><span class="n">the_geom</span><span class="p">)</span> <span class="o">/</span> <span class="mi">83</span><span class="p">.</span><span class="mi">0</span><span class="p">)::</span><span class="nb">integer</span><span class="p">;</span> <span class="c1">-- it takes average person one minute to walk 83 meters</span>
+
+<span class="k">UPDATE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span>
+<span class="k">SET</span> <span class="n">cost_minutes</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="k">WHERE</span> <span class="n">cost_minutes</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</pre></div>
+
+
+<h2>Routing</h2>
+<p>Now the interesting part. All the routing functions are built on what&#8217;s called <a href="http://docs.pgrouting.org/2.4/en/pgRouting-concepts.html#inner-queries"><em>inner queries</em></a> that are expected to return a certain data structure with no geometry included. As I want to see the results in <span class="caps">QGIS</span> immediately, I had to use a simple anonymous <span class="caps">PL</span>/pgSQL block that writes polygonal catchment areas to a table (consider it a proof of concept, not the final&nbsp;solution).</p>
+<div class="highlight"><pre><span></span><span class="k">DROP</span> <span class="k">TABLE</span> <span class="k">IF</span> <span class="k">EXISTS</span> <span class="n">cze</span><span class="p">.</span><span class="n">temp</span><span class="p">;</span>
+<span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">cze</span><span class="p">.</span><span class="n">temp</span> <span class="k">AS</span>
+<span class="k">SELECT</span> <span class="o">*</span>
+<span class="k">FROM</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded_vertices_pgr</span> <span class="n">ver</span>
+<span class="k">JOIN</span> <span class="p">(</span>
+    <span class="k">SELECT</span> <span class="o">*</span>
+    <span class="k">FROM</span> <span class="n">pgr_drivingDistance</span><span class="p">(</span>
+        <span class="s1">&#39;SELECT id, source, target, cost_minutes as cost, cost_minutes as reverse_cost FROM cze.roads_noded&#39;</span><span class="p">,</span>
+        <span class="mi">6686</span><span class="p">,</span>
+        <span class="mi">10</span><span class="p">,</span>
+        <span class="k">true</span>
+    <span class="p">)</span>
+<span class="p">)</span><span class="n">dist</span> <span class="k">ON</span> <span class="n">ver</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">dist</span><span class="p">.</span><span class="n">node</span><span class="p">;</span>
+
+<span class="k">DO</span> <span class="err">$$</span>
+<span class="k">DECLARE</span>
+    <span class="k">c</span> <span class="nb">integer</span><span class="p">;</span>
+<span class="k">BEGIN</span>
+    <span class="k">DROP</span> <span class="k">TABLE</span> <span class="k">IF</span> <span class="k">EXISTS</span> <span class="n">tmp</span><span class="p">;</span>
+    <span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">tmp</span> <span class="p">(</span>
+        <span class="n">agg_cost</span> <span class="nb">integer</span><span class="p">,</span>
+        <span class="n">geom</span> <span class="n">geometry</span><span class="p">(</span><span class="n">MULTIPOLYGON</span><span class="p">,</span> <span class="mi">5514</span><span class="p">)</span>
+    <span class="p">);</span>
+
+    <span class="c1">-- order by the biggest area so the polygons are not hidden beneath the bigger ones</span>
+    <span class="k">FOR</span> <span class="k">c</span> <span class="k">IN</span> <span class="k">SELECT</span> <span class="n">agg_cost</span> <span class="k">FROM</span> <span class="n">cze</span><span class="p">.</span><span class="n">temp</span> <span class="k">GROUP</span> <span class="k">BY</span> <span class="n">agg_cost</span> <span class="k">HAVING</span> <span class="k">COUNT</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="mi">1</span> <span class="k">DESC</span> <span class="n">LOOP</span>
+        <span class="n">RAISE</span> <span class="n">INFO</span> <span class="s1">&#39;%&#39;</span><span class="p">,</span> <span class="k">c</span><span class="p">;</span>
+        <span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">tmp</span> <span class="p">(</span><span class="n">agg_cost</span><span class="p">,</span> <span class="n">geom</span><span class="p">)</span>
+        <span class="k">SELECT</span>
+            <span class="k">c</span><span class="p">,</span>
+            <span class="n">ST_Multi</span><span class="p">(</span><span class="n">ST_SetSRID</span><span class="p">(</span><span class="n">pgr_pointsAsPolygon</span><span class="p">(</span>
+                <span class="s1">&#39;SELECT</span>
+<span class="s1">                        temp.id::integer,</span>
+<span class="s1">                        ST_X(temp.the_geom)::float AS x,</span>
+<span class="s1">                        ST_Y(temp.the_geom)::float AS y</span>
+<span class="s1">                FROM cze.temp</span>
+<span class="s1">                WHERE agg_cost = &#39;</span> <span class="o">||</span> <span class="k">c</span>
+            <span class="p">),</span> <span class="mi">5514</span><span class="p">));</span>
+    <span class="k">END</span> <span class="n">LOOP</span><span class="p">;</span>
+<span class="k">END</span><span class="err">$$</span><span class="p">;</span>
+</pre></div>
+
+
+<p>Using <code>pgr_pointsAsPolygon</code> renders resulting nodes accessible in 10-minute walk in polygons, but weird looking ones. Not bad, could be better&nbsp;though.</p>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-pgrouting-catchment-area-calculation/area1.png" width="70%" /></div>
+
+<p>How about seeing only nodes instead of&nbsp;polygons?</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span>
+    <span class="n">agg_cost</span><span class="p">,</span>
+    <span class="n">ST_PointN</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+<span class="k">FROM</span> <span class="p">(</span>
+    <span class="k">SELECT</span>
+        <span class="n">agg_cost</span><span class="p">,</span>
+        <span class="n">ST_ExteriorRing</span><span class="p">((</span><span class="n">ST_Dump</span><span class="p">(</span><span class="n">geom</span><span class="p">)).</span><span class="n">geom</span><span class="p">)</span> <span class="n">geom</span><span class="p">,</span>
+        <span class="n">generate_series</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">ST_NumPoints</span><span class="p">(</span><span class="n">ST_ExteriorRing</span><span class="p">((</span><span class="n">ST_Dump</span><span class="p">(</span><span class="n">geom</span><span class="p">)).</span><span class="n">geom</span><span class="p">)))</span> <span class="n">i</span>
+    <span class="k">FROM</span> <span class="n">tmp</span>
+<span class="p">)</span> <span class="n">a</span><span class="p">;</span>
+</pre></div>
+
+
+<p>Looks good, could be better&nbsp;though.</p>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png" width="70%" /></div>
+
+<p>How about creating concave hulls from the extracted&nbsp;nodes?</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span>
+    <span class="n">agg_cost</span><span class="p">,</span>
+    <span class="n">ST_ConcaveHull</span><span class="p">(</span><span class="n">ST_Union</span><span class="p">(</span><span class="n">geom</span><span class="p">))</span> <span class="n">geom</span>
+<span class="k">FROM</span> <span class="p">(</span>
+    <span class="k">SELECT</span>
+        <span class="n">agg_cost</span><span class="p">,</span>
+        <span class="n">ST_PointN</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="n">geom</span>
+    <span class="k">FROM</span> <span class="p">(</span>
+        <span class="k">SELECT</span>
+            <span class="n">agg_cost</span><span class="p">,</span><span class="o">&lt;</span><span class="n">div</span> <span class="k">class</span><span class="o">=</span><span class="ss">&quot;text-center&quot;</span><span class="o">&gt;&lt;</span><span class="n">img</span> <span class="n">src</span><span class="o">=</span><span class="ss">&quot;{filename}/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png&quot;</span> <span class="n">width</span><span class="o">=</span><span class="ss">&quot;70%&quot;</span> <span class="o">/&gt;&lt;/</span><span class="n">div</span><span class="o">&gt;</span>
+            <span class="n">ST_ExteriorRing</span><span class="p">((</span><span class="n">ST_Dump</span><span class="p">(</span><span class="n">geom</span><span class="p">)).</span><span class="n">geom</span><span class="p">)</span> <span class="n">geom</span><span class="p">,</span>
+            <span class="n">generate_series</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">ST_NumPoints</span><span class="p">(</span><span class="n">ST_ExteriorRing</span><span class="p">((</span><span class="n">ST_Dump</span><span class="p">(</span><span class="n">geom</span><span class="p">)).</span><span class="n">geom</span><span class="p">)))</span> <span class="n">i</span>
+        <span class="k">FROM</span> <span class="n">tmp</span>
+    <span class="p">)</span> <span class="n">a</span>
+<span class="p">)</span> <span class="n">b</span>
+<span class="k">GROUP</span> <span class="k">BY</span> <span class="n">agg_cost</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="n">agg_cost</span> <span class="k">DESC</span><span class="p">;</span>
+</pre></div>
+
+
+<p>This one looks the best I&nbsp;guess.</p>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-pgrouting-catchment-area-calculation/area2.png" width="70%" /></div>
+
+<h2>Remarks</h2>
+<ul>
+<li>The documentation doesn&#8217;t help&nbsp;much.</li>
+<li>I&#8217;d expect existing functions to return different data structures to be easy-to-use,&nbsp;actually.</li>
+<li><code>LATERAL</code> might be really handy with those inner queries, have to give it a shot in the&nbsp;future.</li>
+<li>Pedestrians usually don&#8217;t follow the road&nbsp;network.</li>
+<li>Bridges and tunnels might be an&nbsp;issue.</li>
+</ul>
+        </section>
+        </div>
+    </div>
+
+<div class="pagination row">
+    <div class="large-6 columns">
+    </div>
+    <div class="large-6 columns">
+    </div>
+    <!-- <p class="paginator">
+    </p> -->
+</div>            </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns footer">
+                <footer>
+                    <address>
+                    Written by <a href="http://www.zimmi.cz">Michal Zimmermann</a>.
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    </address><!-- /#about -->
+                </footer><!-- /#contentinfo -->
+            </div>
+        </div>
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-43432739-2']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+<script src="https://www.zimmi.cz/posts/theme/js/packed.js?8bee1467"></script>
+<script>
+$(document).foundation();
+</script>
+</body>
+</html>

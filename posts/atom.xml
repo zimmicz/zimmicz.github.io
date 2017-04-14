@@ -1,5 +1,172 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Michal Zimmermann</title><link href="https://www.zimmi.cz/posts/" rel="alternate"></link><link href="https://www.zimmi.cz/posts/atom.xml" rel="self"></link><id>https://www.zimmi.cz/posts/</id><updated>2017-04-03T19:30:00+02:00</updated><entry><title>Exploiting Prague Open Data without API</title><link href="https://www.zimmi.cz/posts/2017/exploiting-prague-open-data-without-api/" rel="alternate"></link><published>2017-04-03T19:30:00+02:00</published><updated>2017-04-03T19:30:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-04-03:/posts/2017/exploiting-prague-open-data-without-api/</id><summary type="html">&lt;p&gt;Speaking the Czech Republic, &lt;a href="http://www.geoportalpraha.cz"&gt;Prague is an undoubted leader in open data publishing&lt;/a&gt;. However, there is no public &lt;span class="caps"&gt;API&lt;/span&gt; to explore/search existing&amp;nbsp;datasets.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Michal Zimmermann</title><link href="https://www.zimmi.cz/posts/" rel="alternate"></link><link href="https://www.zimmi.cz/posts/atom.xml" rel="self"></link><id>https://www.zimmi.cz/posts/</id><updated>2017-04-14T17:30:00+02:00</updated><entry><title>Routing with pgRouting: Catchment Area Calculation</title><link href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/" rel="alternate"></link><published>2017-04-14T17:30:00+02:00</published><updated>2017-04-14T17:30:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-04-14:/posts/2017/routing-with-pgrouting-catchment-area-calculation/</id><summary type="html">&lt;p&gt;For a long time I&amp;#8217;ve wanted to play with &lt;a href="http://pgrouting.org/"&gt;pgRouting&lt;/a&gt; and that time has finally come. Among many other routing functions there is one that caught my eye, called &lt;code&gt;pgr_drivingdistance&lt;/code&gt;. As the documentation says, it &lt;em&gt;returns the driving distance from a start node&lt;/em&gt; using Dijkstra algorithm. The aforementioned distance …&lt;/p&gt;</summary><content type="html">&lt;p&gt;For a long time I&amp;#8217;ve wanted to play with &lt;a href="http://pgrouting.org/"&gt;pgRouting&lt;/a&gt; and that time has finally come. Among many other routing functions there is one that caught my eye, called &lt;code&gt;pgr_drivingdistance&lt;/code&gt;. As the documentation says, it &lt;em&gt;returns the driving distance from a start node&lt;/em&gt; using Dijkstra algorithm. The aforementioned distance doesn&amp;#8217;t need to be defined in Euclidean space (the real distance between two points), it might be calculated in units of time, slopeness etc. How to get it&amp;nbsp;going?&lt;/p&gt;
+&lt;h2&gt;Data&lt;/h2&gt;
+&lt;p&gt;&lt;span class="caps"&gt;OSM&lt;/span&gt; will do as it always does. There is a tool called &lt;code&gt;osm2pgrouting&lt;/code&gt; to help you load the data, the pure &lt;span class="caps"&gt;GDAL&lt;/span&gt; seems to be a better way to me though. Importing the downloaded data is&amp;nbsp;trivial.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;ogr2ogr -f &lt;span class="s2"&gt;&amp;quot;PostgreSQL&amp;quot;&lt;/span&gt; PG:&lt;span class="s2"&gt;&amp;quot;dbname=pgrouting active_schema=cze&amp;quot;&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+    -s_srs EPSG:4326 &lt;span class="se"&gt;\&lt;/span&gt;
+    -t_srs EPSG:5514 &lt;span class="se"&gt;\&lt;/span&gt;
+    roads.shp &lt;span class="se"&gt;\&lt;/span&gt;
+    -nln roads &lt;span class="se"&gt;\&lt;/span&gt;
+    -lco &lt;span class="nv"&gt;GEOMETRY_NAME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;the_geom &lt;span class="se"&gt;\&lt;/span&gt;
+    -lco &lt;span class="nv"&gt;FID&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;id &lt;span class="se"&gt;\&lt;/span&gt;
+    -gt &lt;span class="m"&gt;65000&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+    -nlt PROMOTE_TO_MULTI &lt;span class="se"&gt;\&lt;/span&gt;
+    -clipsrc &lt;span class="m"&gt;16&lt;/span&gt;.538 &lt;span class="m"&gt;49&lt;/span&gt;.147 &lt;span class="m"&gt;16&lt;/span&gt;.699 &lt;span class="m"&gt;49&lt;/span&gt;.240
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;To route the network, it has to be properly noded. Although pgRouting comes with built-in &lt;code&gt;pgr_nodenetwork&lt;/code&gt;, it didn&amp;#8217;t seem to work very well. To node the network, use PostGIS &lt;code&gt;ST_Node&lt;/code&gt;. &lt;strong&gt;Note this doesn&amp;#8217;t consider bridges and&amp;nbsp;tunnels.&lt;/strong&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;CREATE&lt;/span&gt; &lt;span class="k"&gt;TABLE&lt;/span&gt; &lt;span class="n"&gt;cze&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;roads_noded&lt;/span&gt; &lt;span class="k"&gt;AS&lt;/span&gt;
+&lt;span class="k"&gt;SELECT&lt;/span&gt;
+    &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ST_Dump&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;geom&lt;/span&gt;&lt;span class="p"&gt;)).&lt;/span&gt;&lt;span class="n"&gt;geom&lt;/span&gt; &lt;span class="n"&gt;the_geom&lt;/span&gt;
+&lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="k"&gt;SELECT&lt;/span&gt;
+        &lt;span class="n"&gt;ST_Node&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;geom&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;geom&lt;/span&gt;
+    &lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="k"&gt;SELECT&lt;/span&gt; &lt;span class="n"&gt;ST_Union&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;the_geom&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;geom&lt;/span&gt;
+        &lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="n"&gt;cze&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;roads&lt;/span&gt;
+    &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;After noding the network, all the information about speed limits and oneways is lost. If needed, it can be brought back with&amp;nbsp;following:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;CREATE&lt;/span&gt; &lt;span class="k"&gt;INDEX&lt;/span&gt; &lt;span class="k"&gt;ON&lt;/span&gt; &lt;span class="n"&gt;cze&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;roads_noded&lt;/span&gt; &lt;span class="k"&gt;USING&lt;/span&gt; &lt;span class="n"&gt;gist&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;the_geom&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="k"&gt;ALTER&lt;/span&gt; &lt;span class="k"&gt;TABLE&lt;/span&gt; &lt;span class="n"&gt;cze&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;roads_noded&lt;/span&gt; &lt;span class="k"&gt;ADD&lt;/span&gt; &lt;span class="k"&gt;COLUMN&lt;/span&gt; &lt;span class="n"&gt;id&lt;/span&gt; &lt;span class="nb"&gt;SERIAL&lt;/span&gt; &lt;span class="k"&gt;PRIMARY&lt;/span&gt; &lt;span class="k"&gt;KEY&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;ALTER&lt;/span&gt; &lt;span class="k"&gt;TABLE&lt;/span&gt; &lt;span class="n"&gt;cze&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;roads_noded&lt;/span&gt; &lt;span class="k"&gt;ADD&lt;/span&gt; &lt;span class="k"&gt;COLUMN&lt;/span&gt; &lt;span class="n"&gt;maxspeed&lt;/span&gt; &lt;span class="nb"&gt;integer&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="k"&gt;UPDATE&lt;/span&gt; &lt;span class="n"&gt;cze&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;roads_noded&lt;/span&gt;
+&lt;span class="k"&gt;SET&lt;/span&gt; &lt;span class="n"&gt;maxspeed&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;maxspeed&lt;/span&gt;
+&lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="k"&gt;SELECT&lt;/span&gt; &lt;span class="k"&gt;DISTINCT&lt;/span&gt; &lt;span class="k"&gt;ON&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;rn&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;rn&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;maxspeed&lt;/span&gt;
+    &lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="n"&gt;cze&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;roads_noded&lt;/span&gt; &lt;span class="n"&gt;rn&lt;/span&gt;
+    &lt;span class="k"&gt;JOIN&lt;/span&gt; &lt;span class="n"&gt;cze&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;roads&lt;/span&gt; &lt;span class="n"&gt;r&lt;/span&gt; &lt;span class="k"&gt;ON&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ST_Intersects&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;rn&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;the_geom&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;the_geom&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+    &lt;span class="k"&gt;ORDER&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="n"&gt;rn&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;ST_Length&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ST_Intersection&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;rn&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;the_geom&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;the_geom&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="k"&gt;DESC&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;
+&lt;span class="k"&gt;WHERE&lt;/span&gt; &lt;span class="n"&gt;cze&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;roads_noded&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;With everything set, the topology can be&amp;nbsp;built.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;ALTER&lt;/span&gt; &lt;span class="k"&gt;TABLE&lt;/span&gt; &lt;span class="n"&gt;cze&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;roads_noded&lt;/span&gt; &lt;span class="k"&gt;ADD&lt;/span&gt; &lt;span class="k"&gt;COLUMN&lt;/span&gt; &lt;span class="k"&gt;source&lt;/span&gt; &lt;span class="nb"&gt;integer&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;ALTER&lt;/span&gt; &lt;span class="k"&gt;TABLE&lt;/span&gt; &lt;span class="n"&gt;cze&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;roads_noded&lt;/span&gt; &lt;span class="k"&gt;ADD&lt;/span&gt; &lt;span class="k"&gt;COLUMN&lt;/span&gt; &lt;span class="n"&gt;target&lt;/span&gt; &lt;span class="nb"&gt;integer&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;SELECT&lt;/span&gt; &lt;span class="n"&gt;pgr_createTopology&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;cze.roads_noded&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This function creates the &lt;code&gt;cze.roads_noded_vertices_pgr&lt;/code&gt; that contains all the extracted nodes from the&amp;nbsp;network.&lt;/p&gt;
+&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/routing-with-pgrouting-catchment-area-calculation/nodes.png" width="70%" /&gt;&lt;/div&gt;
+
+&lt;p&gt;As already mentioned, measures other than length can be used as a distance, I chose the time to get to a given node on&amp;nbsp;foot.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;ALTER&lt;/span&gt; &lt;span class="k"&gt;TABLE&lt;/span&gt; &lt;span class="n"&gt;cze&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;roads_noded&lt;/span&gt; &lt;span class="k"&gt;ADD&lt;/span&gt; &lt;span class="k"&gt;COLUMN&lt;/span&gt; &lt;span class="n"&gt;cost_minutes&lt;/span&gt; &lt;span class="nb"&gt;integer&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;UPDATE&lt;/span&gt; &lt;span class="n"&gt;cze&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;roads_noded&lt;/span&gt;
+&lt;span class="k"&gt;SET&lt;/span&gt; &lt;span class="n"&gt;cost_minutes&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ST_Length&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;the_geom&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="mi"&gt;83&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)::&lt;/span&gt;&lt;span class="nb"&gt;integer&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c1"&gt;-- it takes average person one minute to walk 83 meters&lt;/span&gt;
+
+&lt;span class="k"&gt;UPDATE&lt;/span&gt; &lt;span class="n"&gt;cze&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;roads_noded&lt;/span&gt;
+&lt;span class="k"&gt;SET&lt;/span&gt; &lt;span class="n"&gt;cost_minutes&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
+&lt;span class="k"&gt;WHERE&lt;/span&gt; &lt;span class="n"&gt;cost_minutes&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Routing&lt;/h2&gt;
+&lt;p&gt;Now the interesting part. All the routing functions are built on what&amp;#8217;s called &lt;a href="http://docs.pgrouting.org/2.4/en/pgRouting-concepts.html#inner-queries"&gt;&lt;em&gt;inner queries&lt;/em&gt;&lt;/a&gt; that are expected to return a certain data structure with no geometry included. As I want to see the results in &lt;span class="caps"&gt;QGIS&lt;/span&gt; immediately, I had to use a simple anonymous &lt;span class="caps"&gt;PL&lt;/span&gt;/pgSQL block that writes polygonal catchment areas to a table (consider it a proof of concept, not the final&amp;nbsp;solution).&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;DROP&lt;/span&gt; &lt;span class="k"&gt;TABLE&lt;/span&gt; &lt;span class="k"&gt;IF&lt;/span&gt; &lt;span class="k"&gt;EXISTS&lt;/span&gt; &lt;span class="n"&gt;cze&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;temp&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;CREATE&lt;/span&gt; &lt;span class="k"&gt;TABLE&lt;/span&gt; &lt;span class="n"&gt;cze&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;temp&lt;/span&gt; &lt;span class="k"&gt;AS&lt;/span&gt;
+&lt;span class="k"&gt;SELECT&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;
+&lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="n"&gt;cze&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;roads_noded_vertices_pgr&lt;/span&gt; &lt;span class="n"&gt;ver&lt;/span&gt;
+&lt;span class="k"&gt;JOIN&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="k"&gt;SELECT&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;
+    &lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="n"&gt;pgr_drivingDistance&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="s1"&gt;&amp;#39;SELECT id, source, target, cost_minutes as cost, cost_minutes as reverse_cost FROM cze.roads_noded&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="mi"&gt;6686&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="k"&gt;true&lt;/span&gt;
+    &lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="n"&gt;dist&lt;/span&gt; &lt;span class="k"&gt;ON&lt;/span&gt; &lt;span class="n"&gt;ver&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;dist&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;node&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="k"&gt;DO&lt;/span&gt; &lt;span class="err"&gt;$$&lt;/span&gt;
+&lt;span class="k"&gt;DECLARE&lt;/span&gt;
+    &lt;span class="k"&gt;c&lt;/span&gt; &lt;span class="nb"&gt;integer&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;BEGIN&lt;/span&gt;
+    &lt;span class="k"&gt;DROP&lt;/span&gt; &lt;span class="k"&gt;TABLE&lt;/span&gt; &lt;span class="k"&gt;IF&lt;/span&gt; &lt;span class="k"&gt;EXISTS&lt;/span&gt; &lt;span class="n"&gt;tmp&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;CREATE&lt;/span&gt; &lt;span class="k"&gt;TABLE&lt;/span&gt; &lt;span class="n"&gt;tmp&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="n"&gt;agg_cost&lt;/span&gt; &lt;span class="nb"&gt;integer&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="n"&gt;geom&lt;/span&gt; &lt;span class="n"&gt;geometry&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;MULTIPOLYGON&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;5514&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="p"&gt;);&lt;/span&gt;
+
+    &lt;span class="c1"&gt;-- order by the biggest area so the polygons are not hidden beneath the bigger ones&lt;/span&gt;
+    &lt;span class="k"&gt;FOR&lt;/span&gt; &lt;span class="k"&gt;c&lt;/span&gt; &lt;span class="k"&gt;IN&lt;/span&gt; &lt;span class="k"&gt;SELECT&lt;/span&gt; &lt;span class="n"&gt;agg_cost&lt;/span&gt; &lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="n"&gt;cze&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;temp&lt;/span&gt; &lt;span class="k"&gt;GROUP&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="n"&gt;agg_cost&lt;/span&gt; &lt;span class="k"&gt;HAVING&lt;/span&gt; &lt;span class="k"&gt;COUNT&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt; &lt;span class="k"&gt;ORDER&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="k"&gt;DESC&lt;/span&gt; &lt;span class="n"&gt;LOOP&lt;/span&gt;
+        &lt;span class="n"&gt;RAISE&lt;/span&gt; &lt;span class="n"&gt;INFO&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;%&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;c&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+        &lt;span class="k"&gt;INSERT&lt;/span&gt; &lt;span class="k"&gt;INTO&lt;/span&gt; &lt;span class="n"&gt;tmp&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;agg_cost&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;geom&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="k"&gt;SELECT&lt;/span&gt;
+            &lt;span class="k"&gt;c&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+            &lt;span class="n"&gt;ST_Multi&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ST_SetSRID&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pgr_pointsAsPolygon&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+                &lt;span class="s1"&gt;&amp;#39;SELECT&lt;/span&gt;
+&lt;span class="s1"&gt;                        temp.id::integer,&lt;/span&gt;
+&lt;span class="s1"&gt;                        ST_X(temp.the_geom)::float AS x,&lt;/span&gt;
+&lt;span class="s1"&gt;                        ST_Y(temp.the_geom)::float AS y&lt;/span&gt;
+&lt;span class="s1"&gt;                FROM cze.temp&lt;/span&gt;
+&lt;span class="s1"&gt;                WHERE agg_cost = &amp;#39;&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="k"&gt;c&lt;/span&gt;
+            &lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="mi"&gt;5514&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+    &lt;span class="k"&gt;END&lt;/span&gt; &lt;span class="n"&gt;LOOP&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;END&lt;/span&gt;&lt;span class="err"&gt;$$&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Using &lt;code&gt;pgr_pointsAsPolygon&lt;/code&gt; renders resulting nodes accessible in 10-minute walk in polygons, but weird looking ones. Not bad, could be better&amp;nbsp;though.&lt;/p&gt;
+&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/routing-with-pgrouting-catchment-area-calculation/area1.png" width="70%" /&gt;&lt;/div&gt;
+
+&lt;p&gt;How about seeing only nodes instead of&amp;nbsp;polygons?&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt;
+    &lt;span class="n"&gt;agg_cost&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;ST_PointN&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;geom&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="k"&gt;SELECT&lt;/span&gt;
+        &lt;span class="n"&gt;agg_cost&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="n"&gt;ST_ExteriorRing&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="n"&gt;ST_Dump&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;geom&lt;/span&gt;&lt;span class="p"&gt;)).&lt;/span&gt;&lt;span class="n"&gt;geom&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;geom&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="n"&gt;generate_series&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;ST_NumPoints&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ST_ExteriorRing&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="n"&gt;ST_Dump&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;geom&lt;/span&gt;&lt;span class="p"&gt;)).&lt;/span&gt;&lt;span class="n"&gt;geom&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;
+    &lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="n"&gt;tmp&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Looks good, could be better&amp;nbsp;though.&lt;/p&gt;
+&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png" width="70%" /&gt;&lt;/div&gt;
+
+&lt;p&gt;How about creating concave hulls from the extracted&amp;nbsp;nodes?&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt;
+    &lt;span class="n"&gt;agg_cost&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;ST_ConcaveHull&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ST_Union&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;geom&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="n"&gt;geom&lt;/span&gt;
+&lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="k"&gt;SELECT&lt;/span&gt;
+        &lt;span class="n"&gt;agg_cost&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="n"&gt;ST_PointN&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;geom&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;geom&lt;/span&gt;
+    &lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="k"&gt;SELECT&lt;/span&gt;
+            &lt;span class="n"&gt;agg_cost&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;div&lt;/span&gt; &lt;span class="k"&gt;class&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;text-center&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;img&lt;/span&gt; &lt;span class="n"&gt;src&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;{filename}/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png&amp;quot;&lt;/span&gt; &lt;span class="n"&gt;width&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;70%&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;/&amp;gt;&amp;lt;/&lt;/span&gt;&lt;span class="n"&gt;div&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+            &lt;span class="n"&gt;ST_ExteriorRing&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="n"&gt;ST_Dump&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;geom&lt;/span&gt;&lt;span class="p"&gt;)).&lt;/span&gt;&lt;span class="n"&gt;geom&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;geom&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+            &lt;span class="n"&gt;generate_series&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;ST_NumPoints&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ST_ExteriorRing&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="n"&gt;ST_Dump&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;geom&lt;/span&gt;&lt;span class="p"&gt;)).&lt;/span&gt;&lt;span class="n"&gt;geom&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;
+        &lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="n"&gt;tmp&lt;/span&gt;
+    &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt;
+&lt;span class="k"&gt;GROUP&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="n"&gt;agg_cost&lt;/span&gt;
+&lt;span class="k"&gt;ORDER&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="n"&gt;agg_cost&lt;/span&gt; &lt;span class="k"&gt;DESC&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This one looks the best I&amp;nbsp;guess.&lt;/p&gt;
+&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/routing-with-pgrouting-catchment-area-calculation/area2.png" width="70%" /&gt;&lt;/div&gt;
+
+&lt;h2&gt;Remarks&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;The documentation doesn&amp;#8217;t help&amp;nbsp;much.&lt;/li&gt;
+&lt;li&gt;I&amp;#8217;d expect existing functions to return different data structures to be easy-to-use,&amp;nbsp;actually.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;LATERAL&lt;/code&gt; might be really handy with those inner queries, have to give it a shot in the&amp;nbsp;future.&lt;/li&gt;
+&lt;li&gt;Pedestrians usually don&amp;#8217;t follow the road&amp;nbsp;network.&lt;/li&gt;
+&lt;li&gt;Bridges and tunnels might be an&amp;nbsp;issue.&lt;/li&gt;
+&lt;/ul&gt;</content><category term="postgis"></category><category term="pgrouting"></category></entry><entry><title>Exploiting Prague Open Data without API</title><link href="https://www.zimmi.cz/posts/2017/exploiting-prague-open-data-without-api/" rel="alternate"></link><published>2017-04-03T19:30:00+02:00</published><updated>2017-04-03T19:30:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-04-03:/posts/2017/exploiting-prague-open-data-without-api/</id><summary type="html">&lt;p&gt;Speaking the Czech Republic, &lt;a href="http://www.geoportalpraha.cz"&gt;Prague is an undoubted leader in open data publishing&lt;/a&gt;. However, there is no public &lt;span class="caps"&gt;API&lt;/span&gt; to explore/search existing&amp;nbsp;datasets.&lt;/p&gt;
 &lt;p&gt;I wanted to download the &lt;span class="caps"&gt;ESRI&lt;/span&gt; Shapefile of the city urban plan that &lt;a href="http://www.geoportalpraha.cz/cs/opendata/21733E1F-21B7-4ABC-B1C2-DC19C0237380#.WOKHMbmFvVM"&gt;is divided into more than a hundred files&lt;/a&gt; (a file representing a cadastral …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Speaking the Czech Republic, &lt;a href="http://www.geoportalpraha.cz"&gt;Prague is an undoubted leader in open data publishing&lt;/a&gt;. However, there is no public &lt;span class="caps"&gt;API&lt;/span&gt; to explore/search existing&amp;nbsp;datasets.&lt;/p&gt;
 &lt;p&gt;I wanted to download the &lt;span class="caps"&gt;ESRI&lt;/span&gt; Shapefile of the city urban plan that &lt;a href="http://www.geoportalpraha.cz/cs/opendata/21733E1F-21B7-4ABC-B1C2-DC19C0237380#.WOKHMbmFvVM"&gt;is divided into more than a hundred files&lt;/a&gt; (a file representing a cadastral&amp;nbsp;area).&lt;/p&gt;
 &lt;p&gt;This becomes a piece of cake with Opera Developer tools and a bit of JavaScript&amp;nbsp;code&lt;/p&gt;
