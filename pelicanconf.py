@@ -49,4 +49,4 @@ TAGS_SAVE_AS = 'tags/index.html'
 PLUGIN_PATHS = ['content/pelican-plugins']
 PLUGINS = ['neighbors', 'assets']
 
-
+IGNORE_FILES = ['*.rst', 'pelican-plugins/**/*.md']

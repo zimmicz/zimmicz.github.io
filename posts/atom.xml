@@ -1,5 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Michal Zimmermann</title><link href="https://www.zimmi.cz/posts/" rel="alternate"></link><link href="https://www.zimmi.cz/posts/atom.xml" rel="self"></link><id>https://www.zimmi.cz/posts/</id><updated>2017-04-14T17:30:00+02:00</updated><entry><title>Routing with pgRouting: Catchment Area Calculation</title><link href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/" rel="alternate"></link><published>2017-04-14T17:30:00+02:00</published><updated>2017-04-14T17:30:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-04-14:/posts/2017/routing-with-pgrouting-catchment-area-calculation/</id><summary type="html">&lt;p&gt;For a long time I&amp;#8217;ve wanted to play with &lt;a href="http://pgrouting.org/"&gt;pgRouting&lt;/a&gt; and that time has finally come. Among many other routing functions there is one that caught my eye, called &lt;code&gt;pgr_drivingdistance&lt;/code&gt;. As the documentation says, it &lt;em&gt;returns the driving distance from a start node&lt;/em&gt; using Dijkstra algorithm. The aforementioned distance …&lt;/p&gt;</summary><content type="html">&lt;p&gt;For a long time I&amp;#8217;ve wanted to play with &lt;a href="http://pgrouting.org/"&gt;pgRouting&lt;/a&gt; and that time has finally come. Among many other routing functions there is one that caught my eye, called &lt;code&gt;pgr_drivingdistance&lt;/code&gt;. As the documentation says, it &lt;em&gt;returns the driving distance from a start node&lt;/em&gt; using Dijkstra algorithm. The aforementioned distance doesn&amp;#8217;t need to be defined in Euclidean space (the real distance between two points), it might be calculated in units of time, slopeness etc. How to get it&amp;nbsp;going?&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Michal Zimmermann</title><link href="https://www.zimmi.cz/posts/" rel="alternate"></link><link href="https://www.zimmi.cz/posts/atom.xml" rel="self"></link><id>https://www.zimmi.cz/posts/</id><updated>2017-04-20T17:30:00+02:00</updated><entry><title>Routing with GRASS GIS: Catchment Area Calculation</title><link href="https://www.zimmi.cz/posts/2017/routing-with-grass-gis-catchment-area-calculation/" rel="alternate"></link><published>2017-04-20T17:30:00+02:00</published><updated>2017-04-20T17:30:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-04-20:/posts/2017/routing-with-grass-gis-catchment-area-calculation/</id><summary type="html">&lt;p&gt;I got my hands on &lt;a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/"&gt;pgRouting&lt;/a&gt; in the last post and I&amp;#8217;m about to do the same with &lt;span class="caps"&gt;GRASS&lt;/span&gt; &lt;span class="caps"&gt;GIS&lt;/span&gt; in this&amp;nbsp;one.&lt;/p&gt;
+&lt;p&gt;&lt;span class="caps"&gt;GRASS&lt;/span&gt; &lt;span class="caps"&gt;GIS&lt;/span&gt; stores the topology for the native vector format by default, which makes it easy to use for the network analysis. All the commands associated …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I got my hands on &lt;a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/"&gt;pgRouting&lt;/a&gt; in the last post and I&amp;#8217;m about to do the same with &lt;span class="caps"&gt;GRASS&lt;/span&gt; &lt;span class="caps"&gt;GIS&lt;/span&gt; in this&amp;nbsp;one.&lt;/p&gt;
+&lt;p&gt;&lt;span class="caps"&gt;GRASS&lt;/span&gt; &lt;span class="caps"&gt;GIS&lt;/span&gt; stores the topology for the native vector format by default, which makes it easy to use for the network analysis. All the commands associated with the network analysis can be found in the &lt;code&gt;v.net&lt;/code&gt; family. The ones I&amp;#8217;m going to discuss in this post are &lt;code&gt;v.net&lt;/code&gt; itself, &lt;code&gt;v.net.path&lt;/code&gt;, &lt;code&gt;.v.net.alloc&lt;/code&gt; and &lt;code&gt;v.net.iso&lt;/code&gt;,&amp;nbsp;respectively.&lt;/p&gt;
+&lt;h2&gt;Data&lt;/h2&gt;
+&lt;p&gt;I&amp;#8217;m going to use the roads data &lt;a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/"&gt;from the previous post&lt;/a&gt; together with some random points used as catchment areas&amp;nbsp;centers.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# create the new GRASS GIS location&lt;/span&gt;
+grass -text -c ./osm/czech
+
+&lt;span class="c1"&gt;# import the roads&lt;/span&gt;
+v.in.ogr &lt;span class="nv"&gt;input&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;PG:host=localhost dbname=pgrouting&amp;quot;&lt;/span&gt; &lt;span class="nv"&gt;layer&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;cze.roads &lt;span class="nv"&gt;output&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;roads -eo  --overwrite
+
+&lt;span class="c1"&gt;# import the random points&lt;/span&gt;
+v.in.ogr &lt;span class="nv"&gt;input&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;PG:host=localhost dbname=pgrouting&amp;quot;&lt;/span&gt; &lt;span class="nv"&gt;layer&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;temp.points &lt;span class="nv"&gt;output&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;points -eo --overwrite
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;I got six different points and the pretty dense road network. Note none of the points is connected to the existing&amp;nbsp;network.&lt;/p&gt;
+&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/roads_points.png"/&gt;&lt;/div&gt;
+
+&lt;p&gt;You have to have routable network to do the actual routing (the worst sentence ever written). To do so,&amp;nbsp;let&amp;#8217;s:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;connect the random points to the&amp;nbsp;network&lt;/li&gt;
+&lt;li&gt;add nodes to ends and intersections of the&amp;nbsp;roads&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Note I&amp;#8217;m using the 500m as the max distance in which to connect the points to the&amp;nbsp;network.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;v.net &lt;span class="nv"&gt;input&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;roads &lt;span class="nv"&gt;points&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;points &lt;span class="nv"&gt;operation&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;connect &lt;span class="nv"&gt;threshold&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;500&lt;/span&gt; &lt;span class="nv"&gt;output&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;network
+v.net &lt;span class="nv"&gt;input&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;network &lt;span class="nv"&gt;output&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;network_noded &lt;span class="nv"&gt;operation&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;nodes
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Finding the shortest path between two&amp;nbsp;points&lt;/h2&gt;
+&lt;p&gt;Once the network is routable, it is easy to find the shortest path between points number 1 and 4 and store it in the new&amp;nbsp;map.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;1 1 4&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; v.net.path &lt;span class="nv"&gt;input&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;network_noded &lt;span class="nv"&gt;output&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;path_1_4
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The algorithm doesn&amp;#8217;t take bridges, tunnels and oneways into account, it&amp;#8217;s capable of doing so&amp;nbsp;though.&lt;/p&gt;
+&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/shortest_path.png" width="70%"/&gt;&lt;/div&gt;
+
+&lt;h2&gt;Distributing the subnets for nearest&amp;nbsp;centers&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;v.net.alloc &lt;span class="nv"&gt;input&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;network_noded &lt;span class="nv"&gt;output&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;network_alloc &lt;span class="nv"&gt;center_cats&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;-6 &lt;span class="nv"&gt;node_layer&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;v.net.alloc&lt;/code&gt; module takes the given centers and distributes the network so each of its parts belongs to exactly one center - the nearest one (speaking the distance, time units,&amp;nbsp;&amp;hellip;).&lt;/p&gt;
+&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/subnets.png" width="70%"/&gt;&lt;/div&gt;
+
+&lt;h2&gt;Creating catchment&amp;nbsp;areas&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;v.net.iso &lt;span class="nv"&gt;input&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;network_noded &lt;span class="nv"&gt;output&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;network_iso &lt;span class="nv"&gt;center_cats&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;-6 &lt;span class="nv"&gt;costs&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;1000&lt;/span&gt;,3000,5000
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;v.net.iso&lt;/code&gt; splits net by cost isolines. Again, the costs might be specified as lengths, time units,&amp;nbsp;&amp;hellip;.&lt;/p&gt;
+&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/isolines.png" width="70%"/&gt;&lt;/div&gt;
+
+&lt;p&gt;Two different ways lead to the actual catchment area creation. First, you extract nodes from the roads with their values, turn them into the raster grid and either extract contours or polygonize the raster. I find the last step suboptimal and would love to find another way of polygonizing the&amp;nbsp;results.&lt;/p&gt;
+&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/catchment_area.gif" width="70%"/&gt;&lt;/div&gt;
+
+&lt;p&gt;Note when extracting contours the interval has to be set to the reasonable number depending on the nodes&amp;nbsp;values.&lt;/p&gt;
+&lt;h2&gt;Remarks&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Once you grasp the basics, &lt;span class="caps"&gt;GRASS&lt;/span&gt; &lt;span class="caps"&gt;GIS&lt;/span&gt; is real fun. Grasping the basics is pretty tough&amp;nbsp;though.&lt;/li&gt;
+&lt;li&gt;Pedestrians usually don&amp;#8217;t follow the road&amp;nbsp;network.&lt;/li&gt;
+&lt;li&gt;Bridges and tunnels might be an&amp;nbsp;issue.&lt;/li&gt;
+&lt;li&gt;Personally, I find &lt;span class="caps"&gt;GRASS&lt;/span&gt; &lt;span class="caps"&gt;GIS&lt;/span&gt; easier to use for the network analysis compared to&amp;nbsp;pgRouting.&lt;/li&gt;
+&lt;/ul&gt;</content><category term="grass"></category></entry><entry><title>Routing with pgRouting: Catchment Area Calculation</title><link href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/" rel="alternate"></link><published>2017-04-14T17:30:00+02:00</published><updated>2017-04-14T17:30:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-04-14:/posts/2017/routing-with-pgrouting-catchment-area-calculation/</id><summary type="html">&lt;p&gt;For a long time I&amp;#8217;ve wanted to play with &lt;a href="http://pgrouting.org/"&gt;pgRouting&lt;/a&gt; and that time has finally come. Among many other routing functions there is one that caught my eye, called &lt;code&gt;pgr_drivingdistance&lt;/code&gt;. As the documentation says, it &lt;em&gt;returns the driving distance from a start node&lt;/em&gt; using Dijkstra algorithm. The aforementioned distance …&lt;/p&gt;</summary><content type="html">&lt;p&gt;For a long time I&amp;#8217;ve wanted to play with &lt;a href="http://pgrouting.org/"&gt;pgRouting&lt;/a&gt; and that time has finally come. Among many other routing functions there is one that caught my eye, called &lt;code&gt;pgr_drivingdistance&lt;/code&gt;. As the documentation says, it &lt;em&gt;returns the driving distance from a start node&lt;/em&gt; using Dijkstra algorithm. The aforementioned distance doesn&amp;#8217;t need to be defined in Euclidean space (the real distance between two points), it might be calculated in units of time, slopeness etc. How to get it&amp;nbsp;going?&lt;/p&gt;
 &lt;h2&gt;Data&lt;/h2&gt;
 &lt;p&gt;&lt;span class="caps"&gt;OSM&lt;/span&gt; will do as it always does. There is a tool called &lt;code&gt;osm2pgrouting&lt;/code&gt; to help you load the data, the pure &lt;span class="caps"&gt;GDAL&lt;/span&gt; seems to be a better way to me though. Importing the downloaded data is&amp;nbsp;trivial.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;ogr2ogr -f &lt;span class="s2"&gt;&amp;quot;PostgreSQL&amp;quot;&lt;/span&gt; PG:&lt;span class="s2"&gt;&amp;quot;dbname=pgrouting active_schema=cze&amp;quot;&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;

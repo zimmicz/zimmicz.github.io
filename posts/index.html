@@ -37,6 +37,83 @@
 
     <div class="panel card card-1">
         <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2017/routing-with-grass-gis-catchment-area-calculation/" rel="bookmark" title="Permalink to Routing with GRASS GIS: Catchment Area Calculation">Routing with <span class="caps">GRASS</span> <span class="caps">GIS</span>: Catchment Area&nbsp;Calculation</a></h1>
+            <small>Written on Apr 20, 2017
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/grass.html">grass</a>        | <a href="https://www.zimmi.cz/posts/category/gis.html">GIS</a>
+        </small>
+        <section>
+            <p>I got my hands on <a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/">pgRouting</a> in the last post and I&#8217;m about to do the same with <span class="caps">GRASS</span> <span class="caps">GIS</span> in this&nbsp;one.</p>
+<p><span class="caps">GRASS</span> <span class="caps">GIS</span> stores the topology for the native vector format by default, which makes it easy to use for the network analysis. All the commands associated with the network analysis can be found in the <code>v.net</code> family. The ones I&#8217;m going to discuss in this post are <code>v.net</code> itself, <code>v.net.path</code>, <code>.v.net.alloc</code> and <code>v.net.iso</code>,&nbsp;respectively.</p>
+<h2>Data</h2>
+<p>I&#8217;m going to use the roads data <a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/">from the previous post</a> together with some random points used as catchment areas&nbsp;centers.</p>
+<div class="highlight"><pre><span></span><span class="c1"># create the new GRASS GIS location</span>
+grass -text -c ./osm/czech
+
+<span class="c1"># import the roads</span>
+v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&quot;PG:host=localhost dbname=pgrouting&quot;</span> <span class="nv">layer</span><span class="o">=</span>cze.roads <span class="nv">output</span><span class="o">=</span>roads -eo  --overwrite
+
+<span class="c1"># import the random points</span>
+v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&quot;PG:host=localhost dbname=pgrouting&quot;</span> <span class="nv">layer</span><span class="o">=</span>temp.points <span class="nv">output</span><span class="o">=</span>points -eo --overwrite
+</pre></div>
+
+
+<p>I got six different points and the pretty dense road network. Note none of the points is connected to the existing&nbsp;network.</p>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/roads_points.png"/></div>
+
+<p>You have to have routable network to do the actual routing (the worst sentence ever written). To do so,&nbsp;let&#8217;s:</p>
+<ul>
+<li>connect the random points to the&nbsp;network</li>
+<li>add nodes to ends and intersections of the&nbsp;roads</li>
+</ul>
+<p>Note I&#8217;m using the 500m as the max distance in which to connect the points to the&nbsp;network.</p>
+<div class="highlight"><pre><span></span>v.net <span class="nv">input</span><span class="o">=</span>roads <span class="nv">points</span><span class="o">=</span>points <span class="nv">operation</span><span class="o">=</span>connect <span class="nv">threshold</span><span class="o">=</span><span class="m">500</span> <span class="nv">output</span><span class="o">=</span>network
+v.net <span class="nv">input</span><span class="o">=</span>network <span class="nv">output</span><span class="o">=</span>network_noded <span class="nv">operation</span><span class="o">=</span>nodes
+</pre></div>
+
+
+<h2>Finding the shortest path between two&nbsp;points</h2>
+<p>Once the network is routable, it is easy to find the shortest path between points number 1 and 4 and store it in the new&nbsp;map.</p>
+<div class="highlight"><pre><span></span><span class="nb">echo</span> <span class="s2">&quot;1 1 4&quot;</span> <span class="p">|</span> v.net.path <span class="nv">input</span><span class="o">=</span>network_noded <span class="nv">output</span><span class="o">=</span>path_1_4
+</pre></div>
+
+
+<p>The algorithm doesn&#8217;t take bridges, tunnels and oneways into account, it&#8217;s capable of doing so&nbsp;though.</p>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/shortest_path.png" width="70%"/></div>
+
+<h2>Distributing the subnets for nearest&nbsp;centers</h2>
+<div class="highlight"><pre><span></span>v.net.alloc <span class="nv">input</span><span class="o">=</span>network_noded <span class="nv">output</span><span class="o">=</span>network_alloc <span class="nv">center_cats</span><span class="o">=</span><span class="m">1</span>-6 <span class="nv">node_layer</span><span class="o">=</span><span class="m">2</span>
+</pre></div>
+
+
+<p><code>v.net.alloc</code> module takes the given centers and distributes the network so each of its parts belongs to exactly one center - the nearest one (speaking the distance, time units,&nbsp;&hellip;).</p>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/subnets.png" width="70%"/></div>
+
+<h2>Creating catchment&nbsp;areas</h2>
+<div class="highlight"><pre><span></span>v.net.iso <span class="nv">input</span><span class="o">=</span>network_noded <span class="nv">output</span><span class="o">=</span>network_iso <span class="nv">center_cats</span><span class="o">=</span><span class="m">1</span>-6 <span class="nv">costs</span><span class="o">=</span><span class="m">1000</span>,3000,5000
+</pre></div>
+
+
+<p><code>v.net.iso</code> splits net by cost isolines. Again, the costs might be specified as lengths, time units,&nbsp;&hellip;.</p>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/isolines.png" width="70%"/></div>
+
+<p>Two different ways lead to the actual catchment area creation. First, you extract nodes from the roads with their values, turn them into the raster grid and either extract contours or polygonize the raster. I find the last step suboptimal and would love to find another way of polygonizing the&nbsp;results.</p>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/catchment_area.gif" width="70%"/></div>
+
+<p>Note when extracting contours the interval has to be set to the reasonable number depending on the nodes&nbsp;values.</p>
+<h2>Remarks</h2>
+<ul>
+<li>Once you grasp the basics, <span class="caps">GRASS</span> <span class="caps">GIS</span> is real fun. Grasping the basics is pretty tough&nbsp;though.</li>
+<li>Pedestrians usually don&#8217;t follow the road&nbsp;network.</li>
+<li>Bridges and tunnels might be an&nbsp;issue.</li>
+<li>Personally, I find <span class="caps">GRASS</span> <span class="caps">GIS</span> easier to use for the network analysis compared to&nbsp;pgRouting.</li>
+</ul>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
             <h1><a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/" rel="bookmark" title="Permalink to Routing with pgRouting: Catchment Area Calculation">Routing with pgRouting: Catchment Area&nbsp;Calculation</a></h1>
             <small>Written on Apr 14, 2017
         and marked as
@@ -745,92 +822,6 @@ psql -qAt --no-psqlrc -f transform.sql <span class="p">|</span> psql -qAt --no-p
 
 <p><code>psql -qAt --no-psqlrc -f transform.sql</code> builds the actual query from the query above, <code>| psql -qAt --no-psqlrc</code> sends it to the database again. This part was really fun to&nbsp;implement!</p>
 <p>I&#8217;m still considering to store diff values instead of absolute values in those <code>ARRAY</code>s - that would save some serious&nbsp;bandwidth!</p>
-<h2>Load</h2>
-<p>See <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">III</span>)</a>.</p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i" rel="bookmark" title="Permalink to Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part&nbsp;I)</a></h1>
-            <small>Written on Nov 13, 2016
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>,         <a href="https://www.zimmi.cz/posts/tag/d3.html">d3</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>        | <a href="https://www.zimmi.cz/posts/category/data.html">data</a>
-        </small>
-        <section>
-            <p>This post is the first part of the upcoming series summarizing the process of visualizing landuse data with bash, PostgreSQL and d3.js. Read other&nbsp;parts:</p>
-<ol>
-<li>you&#8217;re reading it&nbsp;now</li>
-<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></li>
-<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">III</span>)</a></li>
-</ol>
-<p><a href="http://cuzk.cz/en">Czech Office for Surveying, Mapping and Cadastre</a> has recently published lot of data via <a href="http://atom.cuzk.cz">Atom feed</a>. There&#8217;s pretty small and a bit boring dataset included, featuring quarterly updated landuse-related values for all 13,091 cadastral&nbsp;areas:</p>
-<ul>
-<li>absolute number of land lots within given category (arable land, forests,&nbsp;etc.)</li>
-<li>absolute area of land lots within given&nbsp;category</li>
-</ul>
-<p>Data are published as <span class="caps">CSV</span> files linked from the Atom feed. Sadly, they come windows-1250 encoded, using Windows line endings, with trailing semicolons and header rows using&nbsp;diacritics.</p>
-<h2><span class="caps">ETL</span>&nbsp;process</h2>
-<p>Before the d3 viz can be crafted, it&#8217;s necessary&nbsp;to:</p>
-<ol>
-<li>extract <span class="caps">CSV</span> data from the URLs provided via the Atom&nbsp;feed</li>
-<li>transform those data into a relational database, do some&nbsp;math</li>
-<li>load data into a d3.js&nbsp;viz</li>
-<li>profit (as&nbsp;usual)</li>
-</ol>
-<h3>Extract</h3>
-<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
-<span class="c1"># extract.sh -f YYYYMMDD</span>
-
-<span class="k">while</span> <span class="o">[[</span> <span class="nv">$#</span> -gt <span class="m">1</span> <span class="o">]]</span>
-<span class="k">do</span>
-<span class="nv">key</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>
-
-<span class="k">case</span> <span class="nv">$key</span> in
-    -f<span class="p">|</span>--file<span class="o">)</span>
-    <span class="nv">FILE</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$2</span><span class="s2">&quot;</span>
-    <span class="nb">shift</span> <span class="c1"># past argument</span>
-    <span class="p">;;</span>
-    *<span class="o">)</span>
-        <span class="c1"># unknown option</span>
-    <span class="p">;;</span>
-<span class="k">esac</span>
-<span class="nb">shift</span> <span class="c1"># past argument or value</span>
-<span class="k">done</span>
-
-<span class="nv">URL</span><span class="o">=</span>http://services.cuzk.cz/sestavy/UHDP/UHDP-
-<span class="nv">CSVFILE</span><span class="o">=</span><span class="nv">$FILE</span>.csv
-<span class="nv">CSVUTF8FILE</span><span class="o">=</span><span class="si">${</span><span class="nv">CSVFILE</span><span class="p">%.*</span><span class="si">}</span>.utf.csv
-<span class="nv">URL</span><span class="o">+=</span><span class="nv">$CSVFILE</span>
-
-<span class="nb">echo</span> <span class="s2">&quot;downloading </span><span class="nv">$URL</span><span class="s2">&quot;</span>
-wget -q <span class="nv">$URL</span> -O <span class="nv">$CSVFILE</span>
-
-<span class="k">if</span> <span class="o">[[</span> <span class="nv">$?</span> !<span class="o">=</span> <span class="m">0</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
-    rm -f <span class="nv">$CSVFILE</span>
-    <span class="nb">echo</span> <span class="s2">&quot;download failed&quot;</span>
-    <span class="nb">exit</span>
-<span class="k">fi</span>
-
-<span class="nb">echo</span> <span class="s2">&quot;converting to utf-8&quot;</span>
-iconv -f WINDOWS-1250 -t UTF-8 <span class="nv">$CSVFILE</span> -o <span class="nv">$CSVUTF8FILE</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
-<span class="nb">echo</span> <span class="s2">&quot;modifying </span><span class="si">${</span><span class="nv">FILE</span><span class="si">}</span><span class="s2">&quot;</span>
-sed -i <span class="s1">&#39;s/^M$//&#39;</span> <span class="nv">$CSVUTF8FILE</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
-sed -i <span class="s1">&#39;s/\r$//&#39;</span> <span class="nv">$CSVUTF8FILE</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
-sed -i <span class="s1">&#39;s/;*$//g&#39;</span> <span class="nv">$CSVUTF8FILE</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
-sed -i <span class="s1">&#39;1d&#39;</span> <span class="nv">$CSVUTF8FILE</span>
-
-<span class="nb">echo</span> <span class="s2">&quot;importing to database&quot;</span>
-sed -e <span class="s2">&quot;s/\${DATE}/</span><span class="nv">$FILE</span><span class="s2">/g&quot;</span> extract.sql <span class="p">|</span> psql -qAt --no-psqlrc
-
-rm <span class="nv">$CSVFILE</span> <span class="nv">$CSVUTF8FILE</span>
-</pre></div>
-
-
-<p>This script downloads <span class="caps">CSV</span> file, deals with all the pitfalls mentioned above and, when done, <code>copy</code> command within <code>extract.sql</code> loads the data into a <code>data_YYYYMMDD</code> table. Putting all the files into the one table would have saved me a lot of transformation <span class="caps">SQL</span>, yet it didn&#8217;t feel quite right&nbsp;though.</p>
-<h2>Transform</h2>
-<p>See <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a>.</p>
 <h2>Load</h2>
 <p>See <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">III</span>)</a>.</p>
         </section>
