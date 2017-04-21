@@ -33,6 +33,7 @@
         {% assets filters="cssmin", output="css/style.min.css", "css/foundation.min.css", "css/pygment.css", "css/screen.css" %}
         <link rel="stylesheet" href="{{ SITEURL }}/{{ ASSET_URL }}">
         {% endassets %}
+        {% include 'drift.html' %}
 </head>
 
 <body id="index" class="home">
