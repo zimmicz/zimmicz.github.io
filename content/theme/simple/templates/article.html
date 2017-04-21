@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{ SITENAME }} | {{ article.title }}{% endblock %}
+{% block title %}{{ SITENAME }} | {{ article.title | striptags }}{% endblock %}
 {% block head %}
   {{ super() }}
   {% for keyword in article.keywords %}
@@ -13,7 +13,9 @@
   {% for tag in article.tags %}
     <meta name="tags" content="{{tag}}" />
   {% endfor %}
-  <meta property="og:image" content="https://pbs.twimg.com/profile_images/770323886290440192/3G5hqp11_400x400.jpg" />
+  {% if article.image %}
+    <meta property="og:image" content="{{ article.image }}" />
+  {% endif %}
   <meta property="og:title" content="{{ article.title|striptags }}" />
   <meta property="og:description" content="{{ article.content|striptags|truncate }}" />
   <meta property="og:url" content="{{ SITEURL }}/{{ article.url }}" />

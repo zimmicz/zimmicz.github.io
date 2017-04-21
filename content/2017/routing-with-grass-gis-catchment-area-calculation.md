@@ -2,6 +2,7 @@ Title: Routing with GRASS GIS: Catchment Area Calculation
 Date: 2017-04-20 17:30
 Category: GIS
 Tags: grass
+Image: https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/isolines.png
 
 I got my hands on [pgRouting]({filename}routing-with-pgrouting-catchment-area-calculation.md) in the last post and I'm about to do the same with GRASS GIS in this one.
 
