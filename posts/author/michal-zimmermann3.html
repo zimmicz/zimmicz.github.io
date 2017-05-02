@@ -62,6 +62,87 @@
 
     <div class="panel card card-1">
         <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2016/testing-postgresql-ogr-fdw/" rel="bookmark" title="Permalink to Testing PostgreSQL OGR FDW">Testing PostgreSQL <span class="caps">OGR</span> <span class="caps">FDW</span></a></h1>
+            <small>Written on Jul 1, 2016
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
+        </small>
+        <section>
+            <p><a href="https://wiki.postgresql.org/wiki/Foreign_data_wrappers">PostgreSQL foreign data wrappers</a> are used to connect PostgreSQL database to different datasources, e.g. other <span class="caps">SQL</span> databases, <span class="caps">CSV</span> files, <span class="caps">XLS</span>&nbsp;spreadsheets&times;</p>
+<p>The one I&#8217;ve been interested in for several months is <a href="https://github.com/pramsey/pgsql-ogr-fdw">Paul Ramsey&#8217;s <span class="caps">OGR</span> <span class="caps">FDW</span></a> - it gives you access to <span class="caps">OGR</span> supported spatial formats directly from your database. <em>No more shapefiles lying&nbsp;around?</em></p>
+<p>Each foreign data wrapper should have three basic&nbsp;components:</p>
+<ul>
+<li>foreign server&nbsp;object</li>
+<li>foreign user mapping - not necessary if you&#8217;re not connecting to other&nbsp;database</li>
+<li>foreign&nbsp;table(s)</li>
+</ul>
+<p>I got some data about <a href="http://www.dibavod.cz/download.php?id_souboru=1413">rivers</a> and <a href="http://www.dibavod.cz/download.php?id_souboru=1416">dams</a> from <a href="http://www.dibavod.cz"><span class="caps">DIBAVOD</span></a> open datasets to play&nbsp;with.</p>
+<p>First define the foreign server&nbsp;object:</p>
+<div class="highlight"><pre><span></span>CREATE SERVER dibavod
+FOREIGN DATA WRAPPER ogr_fdw
+OPTIONS (
+    datasource &#39;/downloads/dibavod&#39;,
+    format &#39;ESRI Shapefile&#39;,
+    config_options &#39;SHAPE_ENCODING=CP1250&#39;
+);
+</pre></div>
+
+
+<p>Note the <span class="caps">OGR</span> specific driver configuration options are available inside <code>config_options</code>. In case of <span class="caps">ESRI</span> Shapefiles, the <code>datasource</code> is the directory your files reside&nbsp;in.</p>
+<p>Let&#8217;s create PostgreSQL tables (use <code>ogrinfo</code> or Paul&#8217;s <code>ogr_fdw_info</code> to list the&nbsp;columns):</p>
+<div class="highlight"><pre><span></span>CREATE FOREIGN TABLE rivers (
+    fid integer,
+    utokj_id numeric,
+    utokjn_id numeric,
+    utokjn_f numeric,
+    prprop_z integer,
+    ex_jh integer,
+    pozn text,
+    shape_leng numeric,
+    naz_tok text,
+    idvt integer,
+    tok_id numeric,
+    shape_len numeric,
+    geom geometry(LINESTRING, 5514)
+)
+SERVER dibavod
+OPTIONS (layer &#39;A02_Vodni_tok_JU&#39;);
+
+CREATE FOREIGN TABLE dams (
+    fid integer,
+    objectid integer,
+    naz_na text,
+    nadr_gid numeric,
+    kota_hladi numeric,
+    hloubka numeric,
+    zatop_ploc numeric,
+    objem numeric,
+    kota_hraz numeric,
+    kota_preli numeric,
+    kota_vypus numeric,
+    plocha_m2 numeric,
+    shape_area numeric,
+    shape_len numeric,
+    geom geometry(MULTIPOLYGON, 5514)
+)
+SERVER dibavod
+OPTIONS (LAYER &#39;A05_Vodni_nadrze&#39;);
+</pre></div>
+
+
+<p>Note the <code>fid</code> column - required for <strong>write access</strong> to underlying&nbsp;datasource.</p>
+<p>Things to&nbsp;remember:</p>
+<ul>
+<li>foreign tables mean no constraints nor&nbsp;indices</li>
+<li>no indices mean spatial queries are terribly slow compared to&nbsp;PostGIS</li>
+<li>I like the idea of <code>CREATE UNLOGGED TABLE dams2 AS SELECT * FROM dams</code>, not sure what to use it for&nbsp;though</li>
+</ul>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
             <h1><a href="https://www.zimmi.cz/posts/2016/a-month-of-commuting-on-my-own/" rel="bookmark" title="Permalink to A Month of Commuting on My Own">A Month of Commuting on My&nbsp;Own</a></h1>
             <small>Written on Apr 9, 2016
         and marked as
@@ -662,133 +743,6 @@ sudo -u postgres psql -d spatial_template -c <span class="s2">&quot;CREATE EXTEN
 sudo -u postgres psql -d spatial_template -c <span class="s2">&quot;CREATE EXTENSION postgis_sfcgal;&quot;</span>
 sudo -u postgres psql -d spatial_template -c <span class="s2">&quot;SELECT postgis_full_version();&quot;</span>
 </pre></div>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2015/color-relief-shaded-map-using-open-data-with-open-source-software/" rel="bookmark" title="Permalink to Color Relief Shaded Map Using Open Data with Open Source Software">Color Relief Shaded Map Using Open Data with Open Source&nbsp;Software</a></h1>
-            <small>Written on Oct 25, 2015
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>,         <a href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>,         <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>,         <a href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>        | <a href="https://www.zimmi.cz/posts/category/automation.html">automation</a>
-        </small>
-        <section>
-            <p>The Digital Elevation Model over Europe (<span class="caps">EU</span>-<span class="caps">DEM</span>) has been recently released for public usage at <a href="http://land.copernicus.eu/in-situ/eu-dem">Copernicus Land Monitoring Services homepage</a>. Strictly speaking, it is a <strong>digital surface model</strong> coming from weighted average of <span class="caps">SRTM</span> and <span class="caps">ASTER</span> <span class="caps">GDEM</span> with geographic accuracy of 25 m. Data are provided as GeoTIFF files projected in 1 degree by 1 degree tiles (projected to <span class="caps">EPSG</span>:3035), so they correspond to the <span class="caps">SRTM</span> naming&nbsp;convention.</p>
-<p>If you can&#8217;t see the map to choose the data to download, make sure you&#8217;re not using <span class="caps">HTTPS</span> Everywhere or similar browser&nbsp;plugin.</p>
-<p>I chose <strong>Austria</strong> to play with the&nbsp;data.</p>
-<h2>Obtaining the&nbsp;data</h2>
-<p>It&#8217;s so easy I doubt it&#8217;s even worth a word. Get zipped data with <code>wget</code>, extract them to a&nbsp;directory.</p>
-<div class="highlight"><pre><span></span>wget https://cws-download.eea.europa.eu/in-situ/eudem/eu-dem/EUD_CP-DEMS_4500025000-AA.rar -O dem.rar
-unrar dem.rar -d copernicus
-<span class="nb">cd</span> copernicus
-</pre></div>
-
-
-<h2>Hillshade and color&nbsp;relief</h2>
-<p>Use <span class="caps">GDAL</span> to create hillshade with a simple command. No need to use <code>-s</code> flag to convert units, it already comes in meters. Exaggerate heights a bit with <code>-z</code> flag.</p>
-<div class="highlight"><pre><span></span>gdaldem hillshade EUD_CP-DEMS_4500025000-AA.tif hillshade.tif -z <span class="m">3</span>
-</pre></div>
-
-
-<p>And here comes the&nbsp;Alps.</p>
-<p class="text-center"><img title="Hillshade" src="https://www.zimmi.cz/posts/assets/color-relief-shaded-map-using-open-data-and-open-source-software/hillshade.png" class="center"></p>
-
-<p>To create a color relief you need a ramp of heights with colors. <a href="http://cartographicperspectives.org/index.php/journal/article/viewFile/20/70">&#8220;The Development and Rationale of Cross-blended Hypsometric Tints&#8221;</a> by T. Patterson and B. Jenny is a great read on <strong>hypsometric tints</strong>. They also give advice on what colors to choose in different environments (see the table at the last page of the article). I settled for warm humid color&nbsp;values.</p>
-<table class="center">
-<thead>
-    <tr>
-        <th>Elevation [m]</th>
-        <th>Red</th>
-        <th>Green</th>
-        <th>Blue</th>
-    </tr>
-</thead>
-<tbody>
-<tr style="background: rgb(220, 220, 220)">
-<td>5000</td>
-<td>220</td>
-<td>220</td>
-<td>220</td>
-</tr>
-<tr style="background: rgb(212, 207, 204)">
-<td>4000</td>
-<td>212</td>
-<td>207</td>
-<td>204</td>
-</tr>
-<tr style="background: rgb(212, 193, 179)">
-<td>3000</td>
-<td>212</td>
-<td>193</td>
-<td>179</td>
-</tr>
-<tr style="background: rgb(212, 184, 163)">
-<td>2000</td>
-<td>212</td>
-<td>184</td>
-<td>163</td>
-</tr>
-<tr style="background: rgb(212, 201, 180)">
-<td>1000</td>
-<td>212</td>
-<td>201</td>
-<td>180</td>
-</tr>
-<tr style="background: rgb(196, 192, 166)">
-<td>600</td>
-<td>169</td>
-<td>192</td>
-<td>166</td>
-</tr>
-<tr style="background: rgb(134, 184, 159)">
-<td>200</td>
-<td>134</td>
-<td>184</td>
-<td>159</td>
-</tr>
-<tr style="background: rgb(120, 172, 149)">
-<td>50</td>
-<td>120</td>
-<td>172</td>
-<td>149</td>
-</tr>
-<tr style="background: rgb(114, 164, 141)">
-<td>0</td>
-<td>114</td>
-<td>164</td>
-<td>141</td>
-</tr>
-</tbody>
-</table>
-
-<p>I created a color relief with another <span class="caps">GDAL</span>&nbsp;command.</p>
-<div class="highlight"><pre><span></span>gdaldem color-relief EUD_CP-DEMS_4500025000-AA.tif ramp_humid.txt color_relief.tif
-</pre></div>
-
-
-<p>And here comes hypsometric&nbsp;tints.</p>
-<p class="text-center"><img title="Color relief" src="https://www.zimmi.cz/posts/assets/color-relief-shaded-map-using-open-data-and-open-source-software/color_relief.png" class="center"></p>
-
-<p>Add a bit of compression and some overviews to make it smaller and load&nbsp;faster.</p>
-<div class="highlight"><pre><span></span>gdal_translate -of GTiff -co <span class="nv">TILED</span><span class="o">=</span>YES -co <span class="nv">COMPRESS</span><span class="o">=</span>DEFLATE color_relief.tif color_relief.compress.tif
-gdal_translate -of GTiff -co <span class="nv">TILED</span><span class="o">=</span>YES -co <span class="nv">COMPRESS</span><span class="o">=</span>DEFLATE hillshade.tif hillshade.compress.tif
-rm color_relief.tif
-rm hillshade.tif
-mv color_relief.compress.tif color_relief.tif
-mv hillshade.compress.tif hillshade.tif
-gdaladdo color_relief.tif <span class="m">2</span> <span class="m">4</span> <span class="m">8</span> <span class="m">16</span>
-gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span class="m">8</span> <span class="m">16</span>
-</pre></div>
-
-
-<h2>Map&nbsp;composition</h2>
-<p>I chose Austria for its excessive amount of freely available datasets. What I didn&#8217;t take into consideration was my lack of knowledge when it comes to German (#fail). States come from <a href="http://data.gv.at">data.gv.at</a> and was dissolved from smaller administrative units. State capitals were downloaded from <a href="http://naturalearth.com">naturalearth.com</a>.</p>
-<p class="text-center"><a href="https://www.zimmi.cz/posts/assets/color-relief-shaded-map-using-open-data-and-open-source-software/map.pdf" title="Click for PDF version"><img title="Austria" src="https://www.zimmi.cz/posts/assets/color-relief-shaded-map-using-open-data-and-open-source-software/map.png" class="center"></a></p>
-
-<p>I&#8217;d like to add some more thematic layers in the future. And translate the map to&nbsp;English.</p>
-<h2>Few words on <span class="caps">INSPIRE</span>&nbsp;Geoportal</h2>
-<p><a href="http://inspire-geoportal.ec.europa.eu/"><span class="caps">INSPIRE</span> Geoportal</a> should be the first place you go to search for European spatial data (at last <span class="caps">EU</span> thinks so). I used it to find data for this map and it was a very frustrating experience. It was actually more frustrating than using Austrian open data portal in German. Last news are from May 21, 2015, but the whole site looks and feels like deep 90s or early 2000 at&nbsp;least.</p>
         </section>
         </div>
     </div>

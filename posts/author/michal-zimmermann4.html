@@ -62,6 +62,133 @@
 
     <div class="panel card card-1">
         <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2015/color-relief-shaded-map-using-open-data-with-open-source-software/" rel="bookmark" title="Permalink to Color Relief Shaded Map Using Open Data with Open Source Software">Color Relief Shaded Map Using Open Data with Open Source&nbsp;Software</a></h1>
+            <small>Written on Oct 25, 2015
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>,         <a href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>,         <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>,         <a href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>        | <a href="https://www.zimmi.cz/posts/category/automation.html">automation</a>
+        </small>
+        <section>
+            <p>The Digital Elevation Model over Europe (<span class="caps">EU</span>-<span class="caps">DEM</span>) has been recently released for public usage at <a href="http://land.copernicus.eu/in-situ/eu-dem">Copernicus Land Monitoring Services homepage</a>. Strictly speaking, it is a <strong>digital surface model</strong> coming from weighted average of <span class="caps">SRTM</span> and <span class="caps">ASTER</span> <span class="caps">GDEM</span> with geographic accuracy of 25 m. Data are provided as GeoTIFF files projected in 1 degree by 1 degree tiles (projected to <span class="caps">EPSG</span>:3035), so they correspond to the <span class="caps">SRTM</span> naming&nbsp;convention.</p>
+<p>If you can&#8217;t see the map to choose the data to download, make sure you&#8217;re not using <span class="caps">HTTPS</span> Everywhere or similar browser&nbsp;plugin.</p>
+<p>I chose <strong>Austria</strong> to play with the&nbsp;data.</p>
+<h2>Obtaining the&nbsp;data</h2>
+<p>It&#8217;s so easy I doubt it&#8217;s even worth a word. Get zipped data with <code>wget</code>, extract them to a&nbsp;directory.</p>
+<div class="highlight"><pre><span></span>wget https://cws-download.eea.europa.eu/in-situ/eudem/eu-dem/EUD_CP-DEMS_4500025000-AA.rar -O dem.rar
+unrar dem.rar -d copernicus
+<span class="nb">cd</span> copernicus
+</pre></div>
+
+
+<h2>Hillshade and color&nbsp;relief</h2>
+<p>Use <span class="caps">GDAL</span> to create hillshade with a simple command. No need to use <code>-s</code> flag to convert units, it already comes in meters. Exaggerate heights a bit with <code>-z</code> flag.</p>
+<div class="highlight"><pre><span></span>gdaldem hillshade EUD_CP-DEMS_4500025000-AA.tif hillshade.tif -z <span class="m">3</span>
+</pre></div>
+
+
+<p>And here comes the&nbsp;Alps.</p>
+<p class="text-center"><img title="Hillshade" src="https://www.zimmi.cz/posts/assets/color-relief-shaded-map-using-open-data-and-open-source-software/hillshade.png" class="center"></p>
+
+<p>To create a color relief you need a ramp of heights with colors. <a href="http://cartographicperspectives.org/index.php/journal/article/viewFile/20/70">&#8220;The Development and Rationale of Cross-blended Hypsometric Tints&#8221;</a> by T. Patterson and B. Jenny is a great read on <strong>hypsometric tints</strong>. They also give advice on what colors to choose in different environments (see the table at the last page of the article). I settled for warm humid color&nbsp;values.</p>
+<table class="center">
+<thead>
+    <tr>
+        <th>Elevation [m]</th>
+        <th>Red</th>
+        <th>Green</th>
+        <th>Blue</th>
+    </tr>
+</thead>
+<tbody>
+<tr style="background: rgb(220, 220, 220)">
+<td>5000</td>
+<td>220</td>
+<td>220</td>
+<td>220</td>
+</tr>
+<tr style="background: rgb(212, 207, 204)">
+<td>4000</td>
+<td>212</td>
+<td>207</td>
+<td>204</td>
+</tr>
+<tr style="background: rgb(212, 193, 179)">
+<td>3000</td>
+<td>212</td>
+<td>193</td>
+<td>179</td>
+</tr>
+<tr style="background: rgb(212, 184, 163)">
+<td>2000</td>
+<td>212</td>
+<td>184</td>
+<td>163</td>
+</tr>
+<tr style="background: rgb(212, 201, 180)">
+<td>1000</td>
+<td>212</td>
+<td>201</td>
+<td>180</td>
+</tr>
+<tr style="background: rgb(196, 192, 166)">
+<td>600</td>
+<td>169</td>
+<td>192</td>
+<td>166</td>
+</tr>
+<tr style="background: rgb(134, 184, 159)">
+<td>200</td>
+<td>134</td>
+<td>184</td>
+<td>159</td>
+</tr>
+<tr style="background: rgb(120, 172, 149)">
+<td>50</td>
+<td>120</td>
+<td>172</td>
+<td>149</td>
+</tr>
+<tr style="background: rgb(114, 164, 141)">
+<td>0</td>
+<td>114</td>
+<td>164</td>
+<td>141</td>
+</tr>
+</tbody>
+</table>
+
+<p>I created a color relief with another <span class="caps">GDAL</span>&nbsp;command.</p>
+<div class="highlight"><pre><span></span>gdaldem color-relief EUD_CP-DEMS_4500025000-AA.tif ramp_humid.txt color_relief.tif
+</pre></div>
+
+
+<p>And here comes hypsometric&nbsp;tints.</p>
+<p class="text-center"><img title="Color relief" src="https://www.zimmi.cz/posts/assets/color-relief-shaded-map-using-open-data-and-open-source-software/color_relief.png" class="center"></p>
+
+<p>Add a bit of compression and some overviews to make it smaller and load&nbsp;faster.</p>
+<div class="highlight"><pre><span></span>gdal_translate -of GTiff -co <span class="nv">TILED</span><span class="o">=</span>YES -co <span class="nv">COMPRESS</span><span class="o">=</span>DEFLATE color_relief.tif color_relief.compress.tif
+gdal_translate -of GTiff -co <span class="nv">TILED</span><span class="o">=</span>YES -co <span class="nv">COMPRESS</span><span class="o">=</span>DEFLATE hillshade.tif hillshade.compress.tif
+rm color_relief.tif
+rm hillshade.tif
+mv color_relief.compress.tif color_relief.tif
+mv hillshade.compress.tif hillshade.tif
+gdaladdo color_relief.tif <span class="m">2</span> <span class="m">4</span> <span class="m">8</span> <span class="m">16</span>
+gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span class="m">8</span> <span class="m">16</span>
+</pre></div>
+
+
+<h2>Map&nbsp;composition</h2>
+<p>I chose Austria for its excessive amount of freely available datasets. What I didn&#8217;t take into consideration was my lack of knowledge when it comes to German (#fail). States come from <a href="http://data.gv.at">data.gv.at</a> and was dissolved from smaller administrative units. State capitals were downloaded from <a href="http://naturalearth.com">naturalearth.com</a>.</p>
+<p class="text-center"><a href="https://www.zimmi.cz/posts/assets/color-relief-shaded-map-using-open-data-and-open-source-software/map.pdf" title="Click for PDF version"><img title="Austria" src="https://www.zimmi.cz/posts/assets/color-relief-shaded-map-using-open-data-and-open-source-software/map.png" class="center"></a></p>
+
+<p>I&#8217;d like to add some more thematic layers in the future. And translate the map to&nbsp;English.</p>
+<h2>Few words on <span class="caps">INSPIRE</span>&nbsp;Geoportal</h2>
+<p><a href="http://inspire-geoportal.ec.europa.eu/"><span class="caps">INSPIRE</span> Geoportal</a> should be the first place you go to search for European spatial data (at last <span class="caps">EU</span> thinks so). I used it to find data for this map and it was a very frustrating experience. It was actually more frustrating than using Austrian open data portal in German. Last news are from May 21, 2015, but the whole site looks and feels like deep 90s or early 2000 at&nbsp;least.</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
             <h1><a href="https://www.zimmi.cz/posts/2015/postgresql-in-vs-exists/" rel="bookmark" title="Permalink to PostgreSQL IN vs EXISTS">PostgreSQL <span class="caps">IN</span> vs <span class="caps">EXISTS</span></a></h1>
             <small>Written on Oct 9, 2015
         and marked as
@@ -795,71 +922,6 @@ v.out.postgis <span class="nv">input</span><span class="o">=</span>buffer_050_gr
 <li>It is great to exploit synergy of different <span class="caps">GIS</span> tools used for what they&#8217;re best&nbsp;at.</li>
 </ul>
 <p>The more I work with big data, the more I get used to not seeing them. That&#8217;s kind of a twist after crafting maps at&nbsp;university.</p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2015/postgis-finding-biggest-land-users-nearby/" rel="bookmark" title="Permalink to PostGIS: Finding Biggest Land Users Nearby">PostGIS: Finding Biggest Land Users&nbsp;Nearby</a></h1>
-            <small>Written on Apr 3, 2015
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
-        </small>
-        <section>
-            <p>At <a href="http://clevermaps.cz">CleverMaps</a> we heavily rely on the cadastre of real estate, which is probably the biggest data source in my country. Using their excellent knowledge of this data set, my teammates often supply me with all kinds of weird&nbsp;challenges.</p>
-<h2>Give me the biggest land users&nbsp;nearby</h2>
-<p><em>Find the biggest land users in surrounding cadastral communities for each cadastral community (~ 13K)</em> being the latest task, here&#8217;s the query I tackled it&nbsp;with:</p>
-<div class="highlight"><pre><span></span>WITH users_ AS (
-    SELECT
-        cad_code,
-        id,
-        zipcode,
-        city,
-        concat_ws(&#39; &#39;,street, concat_ws(&#39;/&#39;, house_number, street_number)) as street,
-        name,
-        &#39;Users with more than 10 ha&#39;::text note,
-        SUM(acreage) area
-        FROM land_blocks -- being a table with info about all the agricultural land blocks
-        JOIN users u ON id_uz = id
-        GROUP BY cad_code, u.id
-        HAVING SUM(acreage) &gt; 10
-),
-ints AS (
-    SELECT
-        ku.cad_code as community,
-        ku2.cad_code as surrounding,
-        ku2.cad_name
-    FROM cadastral_community ku
-    JOIN cadastral_community ku2
-        ON ST_Intersects(ku.geom, ku2.geom)
-    WHERE ku.cad_code &lt;&gt; ku2.cad_code
-)
-SELECT
-    DISTINCT ON (surrounding, cad_name, u.zipcode, u.city, u.street, u.name)
-    surrounding,
-    cad_name,
-    u.zipcode,
-    u.city,
-    u.street,
-    u.name,
-    u.note,
-    u.area
-FROM
-    users_ u
-JOIN ints
-    ON cad_code = community;
-</pre></div>
-
-
-<p>Few things to&nbsp;note:</p>
-<ul>
-<li><code>concat_ws()</code> is a great function for joining values that might be <code>NULL</code>. If such a value is found, it is skipped and the function continues with the next one (if any). Thus, you&#8217;ll never get a string ending with a trailing slash (<code>Street name 55/</code>).</li>
-<li>With <code>users_</code> <span class="caps">CTE</span> I get a list of owners having more than 10 hectares of land for each cadastral community. This gives me the inverse result of what I want (if I know the biggest owners in the cadastral community, I know these are the ones that should be listed for surrounding c.&nbsp;communities).</li>
-<li>This <em>putting-it-all-together</em> step is done with <code>ints</code> <span class="caps">CTE</span> that outputs the list of surrounding c. communities for each of&nbsp;them.</li>
-<li><code>DISTINCT ON</code> cleans up the list so the same owners don&#8217;t appear more than once for any given c.&nbsp;community.</li>
-</ul>
-<p>Writing this makes me realize the list should be probably sorted by area so only the occurence with the biggest value is kept for each c. community. Simple <code>ORDER BY</code> should deal with this just fine. Or even more sophisticated, using <code>GROUP BY</code> to output the total acreage in all surrounding c.&nbsp;communities.</p>
         </section>
         </div>
     </div>

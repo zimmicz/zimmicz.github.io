@@ -1,5 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Michal Zimmermann</title><link href="https://www.zimmi.cz/posts/" rel="alternate"></link><link href="https://www.zimmi.cz/posts/atom.xml" rel="self"></link><id>https://www.zimmi.cz/posts/</id><updated>2017-04-20T17:30:00+02:00</updated><entry><title>Routing with GRASS GIS: Catchment Area Calculation</title><link href="https://www.zimmi.cz/posts/2017/routing-with-grass-gis-catchment-area-calculation/" rel="alternate"></link><published>2017-04-20T17:30:00+02:00</published><updated>2017-04-20T17:30:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-04-20:/posts/2017/routing-with-grass-gis-catchment-area-calculation/</id><summary type="html">&lt;p&gt;I got my hands on &lt;a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/"&gt;pgRouting&lt;/a&gt; in the last post and I&amp;#8217;m about to do the same with &lt;span class="caps"&gt;GRASS&lt;/span&gt; &lt;span class="caps"&gt;GIS&lt;/span&gt; in this&amp;nbsp;one.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Michal Zimmermann</title><link href="https://www.zimmi.cz/posts/" rel="alternate"></link><link href="https://www.zimmi.cz/posts/atom.xml" rel="self"></link><id>https://www.zimmi.cz/posts/</id><updated>2017-05-02T18:30:00+02:00</updated><entry><title>Wifileaks Wi-Fi Networks Dataviz</title><link href="https://www.zimmi.cz/posts/2017/wifileaks-wi-fi-networks-dataviz/" rel="alternate"></link><published>2017-05-02T18:30:00+02:00</published><updated>2017-05-02T18:30:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-05-02:/posts/2017/wifileaks-wi-fi-networks-dataviz/</id><summary type="html">&lt;p&gt;&lt;a href="http://www.wifileaks.cz"&gt;Wifileaks&lt;/a&gt; is a project by Jakub Čížek aimed to map the Czech wi-fi networks with Android/iOS app. The data gathered by people using the app &lt;a href="http://download.wifileaks.cz/data/wifileaks_raw_170416.tar.gz"&gt;is available to download&lt;/a&gt; and features ~&amp;nbsp;90,000,000 records, each representing the position of the cellphone when connecting to the network. Just about …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://www.wifileaks.cz"&gt;Wifileaks&lt;/a&gt; is a project by Jakub Čížek aimed to map the Czech wi-fi networks with Android/iOS app. The data gathered by people using the app &lt;a href="http://download.wifileaks.cz/data/wifileaks_raw_170416.tar.gz"&gt;is available to download&lt;/a&gt; and features ~&amp;nbsp;90,000,000 records, each representing the position of the cellphone when connecting to the network. Just about perfect to craft some&amp;nbsp;maps!&lt;/p&gt;
+&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/cr.png"/&gt;&lt;/div&gt;
+
+&lt;h2&gt;Using PostgreSQL&amp;nbsp;cstore_fdw&lt;/h2&gt;
+&lt;p&gt;I ran out of disk space immediately after loading the dataset into the PostgreSQL database. After fiddling around I remembered that columnar store should be a bit space-friendlier than the old fashioned relational database. Thus, I installed the &lt;a href="https://github.com/citusdata/cstore_fdw"&gt;cstore_fdw&lt;/a&gt; by Citus Data in just few&amp;nbsp;steps.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;sudo apt install libprotobuf-c-dev libprotobuf-c1 protobuf-c-compiler postgresql-server-dev-9.6
+git clone git@github.com:citusdata/cstore_fdw.git
+&lt;span class="nv"&gt;PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/usr/bin/:&lt;span class="nv"&gt;$PATH&lt;/span&gt; make
+&lt;span class="nv"&gt;PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/usr/bin/:&lt;span class="nv"&gt;$PATH&lt;/span&gt; make install
+
+&lt;span class="c1"&gt;# when the cstore_fdw installation finishes, add the following line to your postgresql.conf and restart the database cluster&lt;/span&gt;
+&lt;span class="nv"&gt;shared_preload_libraries&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;cstore_fdw&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This makes &lt;a href="https://www.zimmi.cz/posts/2016/testing-postgresql-ogr-fdw/"&gt;another &lt;span class="caps"&gt;FDW&lt;/span&gt; available&lt;/a&gt; to you inside the PostgreSQL. The actual foreign server has to be created before loading the data into a foreign&amp;nbsp;table.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;cat &lt;span class="s"&gt;&amp;lt;&amp;lt;END | psql -qAt --no-psqlrc&lt;/span&gt;
+&lt;span class="s"&gt;    CREATE SERVER cstore_server FOREIGN DATA WRAPPER cstore_fdw;&lt;/span&gt;
+&lt;span class="s"&gt;    CREATE SCHEMA data_cstore;&lt;/span&gt;
+&lt;span class="s"&gt;    CREATE FOREIGN TABLE data_cstore.wifi (&lt;/span&gt;
+&lt;span class="s"&gt;        id integer,&lt;/span&gt;
+&lt;span class="s"&gt;        mac text,&lt;/span&gt;
+&lt;span class="s"&gt;        ssid text,&lt;/span&gt;
+&lt;span class="s"&gt;        signal_strength numeric,&lt;/span&gt;
+&lt;span class="s"&gt;        security integer,&lt;/span&gt;
+&lt;span class="s"&gt;        lat numeric,&lt;/span&gt;
+&lt;span class="s"&gt;        lon numeric,&lt;/span&gt;
+&lt;span class="s"&gt;        alt numeric,&lt;/span&gt;
+&lt;span class="s"&gt;        unixtime bigint,&lt;/span&gt;
+&lt;span class="s"&gt;        filename text&lt;/span&gt;
+&lt;span class="s"&gt;    )&lt;/span&gt;
+&lt;span class="s"&gt;    SERVER cstore_server&lt;/span&gt;
+&lt;span class="s"&gt;    OPTIONS (compression &amp;#39;pglz&amp;#39;);&lt;/span&gt;
+&lt;span class="s"&gt;END&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The foreign table &lt;strong&gt;is 3&amp;times; smaller&lt;/strong&gt; than it&amp;#8217;s standard counterpart. However, this comes with some&amp;nbsp;costs:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;neither &lt;code&gt;UPDATE&lt;/code&gt; nor &lt;code&gt;DELETE&lt;/code&gt; can be&amp;nbsp;used&lt;/li&gt;
+&lt;li&gt;no &lt;code&gt;CREATE INDEX&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;no &lt;code&gt;SERIAL&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;To overcome these shortcomings I used &lt;code&gt;COPY&lt;/code&gt; statement to spit out the slightly modified table and immediately loaded it back&amp;nbsp;in.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;cat &lt;span class="s"&gt;&amp;lt;&amp;lt;END | psql -qAt --no-psqlrc&lt;/span&gt;
+&lt;span class="s"&gt;COPY (&lt;/span&gt;
+&lt;span class="s"&gt;    SELECT&lt;/span&gt;
+&lt;span class="s"&gt;        row_number() OVER (),&lt;/span&gt;
+&lt;span class="s"&gt;        mac,&lt;/span&gt;
+&lt;span class="s"&gt;        ssid,&lt;/span&gt;
+&lt;span class="s"&gt;        signal_strength,&lt;/span&gt;
+&lt;span class="s"&gt;        security,&lt;/span&gt;
+&lt;span class="s"&gt;        split_part(filename, &amp;#39;_&amp;#39;, 2)::integer,&lt;/span&gt;
+&lt;span class="s"&gt;        to_timestamp(unixtime),&lt;/span&gt;
+&lt;span class="s"&gt;        ST_Transform(ST_SetSRID(ST_MakePoint(lon, lat, alt), 4326), 32633)&lt;/span&gt;
+&lt;span class="s"&gt;    FROM data_cstore.wifi&lt;/span&gt;
+&lt;span class="s"&gt;    WHERE lon BETWEEN 0 AND 20&lt;/span&gt;
+&lt;span class="s"&gt;        AND lat BETWEEN 18 AND 84&lt;/span&gt;
+&lt;span class="s"&gt;) TO &amp;#39;/tmp/wifileaks.db&amp;#39; WITH CSV DELIMITER &amp;#39;;&amp;#39;&lt;/span&gt;
+&lt;span class="s"&gt;    DROP SCHEMA IF EXISTS data_cstore CASCADE;&lt;/span&gt;
+
+&lt;span class="s"&gt;DROP SCHEMA data_cstore;&lt;/span&gt;
+&lt;span class="s"&gt;CREATE SCHEMA data_cstore;&lt;/span&gt;
+&lt;span class="s"&gt;CREATE FOREIGN TABLE data_cstore.wifi (&lt;/span&gt;
+&lt;span class="s"&gt;    id integer,&lt;/span&gt;
+&lt;span class="s"&gt;    mac text,&lt;/span&gt;
+&lt;span class="s"&gt;    ssid text,&lt;/span&gt;
+&lt;span class="s"&gt;    signal_strength numeric,&lt;/span&gt;
+&lt;span class="s"&gt;    security integer,&lt;/span&gt;
+&lt;span class="s"&gt;    userid integer,&lt;/span&gt;
+&lt;span class="s"&gt;    unixtime timestamp without time zone,&lt;/span&gt;
+&lt;span class="s"&gt;    geom geometry(POINTZ, 32633)&lt;/span&gt;
+&lt;span class="s"&gt;)&lt;/span&gt;
+&lt;span class="s"&gt;SERVER cstore_server&lt;/span&gt;
+&lt;span class="s"&gt;OPTIONS (compression &amp;#39;pglz&amp;#39;);&lt;/span&gt;
+&lt;span class="s"&gt;END&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Putting the networks on the&amp;nbsp;map&lt;/h2&gt;
+&lt;table&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"&gt;&lt;/a&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"&gt;&lt;/a&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;p&gt;As mentioned, each row of data represents the cellphone&amp;#8217;s location when connecting to a wi-fi network. To get real wi-fi transmitter position, I calculated the average of location of each cellphone ever connected (although the signal strength should be taken into account here as&amp;nbsp;well).&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;CREATE&lt;/span&gt; &lt;span class="n"&gt;UNLOGGED&lt;/span&gt; &lt;span class="k"&gt;TABLE&lt;/span&gt; &lt;span class="n"&gt;data_cstore&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;wifi_avg_loc&lt;/span&gt; &lt;span class="k"&gt;AS&lt;/span&gt;
+&lt;span class="k"&gt;SELECT&lt;/span&gt;
+    &lt;span class="n"&gt;row_number&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="n"&gt;OVER&lt;/span&gt; &lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;mac&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;ST_SetSRID&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ST_MakePoint&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="mi"&gt;32633&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;geom&lt;/span&gt;
+&lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="k"&gt;SELECT&lt;/span&gt;
+        &lt;span class="n"&gt;mac&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="k"&gt;AVG&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ST_X&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;geom&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="k"&gt;AVG&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ST_Y&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;geom&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt;
+    &lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="n"&gt;data_cstore&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;wifi_loc&lt;/span&gt;
+    &lt;span class="k"&gt;GROUP&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</content><category term="qgis"></category><category term="visualization"></category></entry><entry><title>Routing with GRASS GIS: Catchment Area Calculation</title><link href="https://www.zimmi.cz/posts/2017/routing-with-grass-gis-catchment-area-calculation/" rel="alternate"></link><published>2017-04-20T17:30:00+02:00</published><updated>2017-04-20T17:30:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-04-20:/posts/2017/routing-with-grass-gis-catchment-area-calculation/</id><summary type="html">&lt;p&gt;I got my hands on &lt;a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/"&gt;pgRouting&lt;/a&gt; in the last post and I&amp;#8217;m about to do the same with &lt;span class="caps"&gt;GRASS&lt;/span&gt; &lt;span class="caps"&gt;GIS&lt;/span&gt; in this&amp;nbsp;one.&lt;/p&gt;
 &lt;p&gt;&lt;span class="caps"&gt;GRASS&lt;/span&gt; &lt;span class="caps"&gt;GIS&lt;/span&gt; stores the topology for the native vector format by default, which makes it easy to use for the network analysis. All the commands associated …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I got my hands on &lt;a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/"&gt;pgRouting&lt;/a&gt; in the last post and I&amp;#8217;m about to do the same with &lt;span class="caps"&gt;GRASS&lt;/span&gt; &lt;span class="caps"&gt;GIS&lt;/span&gt; in this&amp;nbsp;one.&lt;/p&gt;
 &lt;p&gt;&lt;span class="caps"&gt;GRASS&lt;/span&gt; &lt;span class="caps"&gt;GIS&lt;/span&gt; stores the topology for the native vector format by default, which makes it easy to use for the network analysis. All the commands associated with the network analysis can be found in the &lt;code&gt;v.net&lt;/code&gt; family. The ones I&amp;#8217;m going to discuss in this post are &lt;code&gt;v.net&lt;/code&gt; itself, &lt;code&gt;v.net.path&lt;/code&gt;, &lt;code&gt;.v.net.alloc&lt;/code&gt; and &lt;code&gt;v.net.iso&lt;/code&gt;,&amp;nbsp;respectively.&lt;/p&gt;
 &lt;h2&gt;Data&lt;/h2&gt;

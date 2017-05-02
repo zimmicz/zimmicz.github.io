@@ -62,6 +62,126 @@
 
     <div class="panel card card-1">
         <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2017/wifileaks-wi-fi-networks-dataviz/" rel="bookmark" title="Permalink to Wifileaks Wi-Fi Networks Dataviz">Wifileaks Wi-Fi Networks&nbsp;Dataviz</a></h1>
+            <small>Written on May 2, 2017
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>,         <a href="https://www.zimmi.cz/posts/tag/visualization.html">visualization</a>        | <a href="https://www.zimmi.cz/posts/category/gis.html">GIS</a>
+        </small>
+        <section>
+            <p><a href="http://www.wifileaks.cz">Wifileaks</a> is a project by Jakub Čížek aimed to map the Czech wi-fi networks with Android/iOS app. The data gathered by people using the app <a href="http://download.wifileaks.cz/data/wifileaks_raw_170416.tar.gz">is available to download</a> and features ~&nbsp;90,000,000 records, each representing the position of the cellphone when connecting to the network. Just about perfect to craft some&nbsp;maps!</p>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/cr.png"/></div>
+
+<h2>Using PostgreSQL&nbsp;cstore_fdw</h2>
+<p>I ran out of disk space immediately after loading the dataset into the PostgreSQL database. After fiddling around I remembered that columnar store should be a bit space-friendlier than the old fashioned relational database. Thus, I installed the <a href="https://github.com/citusdata/cstore_fdw">cstore_fdw</a> by Citus Data in just few&nbsp;steps.</p>
+<div class="highlight"><pre><span></span>sudo apt install libprotobuf-c-dev libprotobuf-c1 protobuf-c-compiler postgresql-server-dev-9.6
+git clone git@github.com:citusdata/cstore_fdw.git
+<span class="nv">PATH</span><span class="o">=</span>/usr/bin/:<span class="nv">$PATH</span> make
+<span class="nv">PATH</span><span class="o">=</span>/usr/bin/:<span class="nv">$PATH</span> make install
+
+<span class="c1"># when the cstore_fdw installation finishes, add the following line to your postgresql.conf and restart the database cluster</span>
+<span class="nv">shared_preload_libraries</span> <span class="o">=</span> <span class="s1">&#39;cstore_fdw&#39;</span>
+</pre></div>
+
+
+<p>This makes <a href="https://www.zimmi.cz/posts/2016/testing-postgresql-ogr-fdw/">another <span class="caps">FDW</span> available</a> to you inside the PostgreSQL. The actual foreign server has to be created before loading the data into a foreign&nbsp;table.</p>
+<div class="highlight"><pre><span></span>cat <span class="s">&lt;&lt;END | psql -qAt --no-psqlrc</span>
+<span class="s">    CREATE SERVER cstore_server FOREIGN DATA WRAPPER cstore_fdw;</span>
+<span class="s">    CREATE SCHEMA data_cstore;</span>
+<span class="s">    CREATE FOREIGN TABLE data_cstore.wifi (</span>
+<span class="s">        id integer,</span>
+<span class="s">        mac text,</span>
+<span class="s">        ssid text,</span>
+<span class="s">        signal_strength numeric,</span>
+<span class="s">        security integer,</span>
+<span class="s">        lat numeric,</span>
+<span class="s">        lon numeric,</span>
+<span class="s">        alt numeric,</span>
+<span class="s">        unixtime bigint,</span>
+<span class="s">        filename text</span>
+<span class="s">    )</span>
+<span class="s">    SERVER cstore_server</span>
+<span class="s">    OPTIONS (compression &#39;pglz&#39;);</span>
+<span class="s">END</span>
+</pre></div>
+
+
+<p>The foreign table <strong>is 3&times; smaller</strong> than it&#8217;s standard counterpart. However, this comes with some&nbsp;costs:</p>
+<ul>
+<li>neither <code>UPDATE</code> nor <code>DELETE</code> can be&nbsp;used</li>
+<li>no <code>CREATE INDEX</code></li>
+<li>no <code>SERIAL</code></li>
+</ul>
+<p>To overcome these shortcomings I used <code>COPY</code> statement to spit out the slightly modified table and immediately loaded it back&nbsp;in.</p>
+<div class="highlight"><pre><span></span>cat <span class="s">&lt;&lt;END | psql -qAt --no-psqlrc</span>
+<span class="s">COPY (</span>
+<span class="s">    SELECT</span>
+<span class="s">        row_number() OVER (),</span>
+<span class="s">        mac,</span>
+<span class="s">        ssid,</span>
+<span class="s">        signal_strength,</span>
+<span class="s">        security,</span>
+<span class="s">        split_part(filename, &#39;_&#39;, 2)::integer,</span>
+<span class="s">        to_timestamp(unixtime),</span>
+<span class="s">        ST_Transform(ST_SetSRID(ST_MakePoint(lon, lat, alt), 4326), 32633)</span>
+<span class="s">    FROM data_cstore.wifi</span>
+<span class="s">    WHERE lon BETWEEN 0 AND 20</span>
+<span class="s">        AND lat BETWEEN 18 AND 84</span>
+<span class="s">) TO &#39;/tmp/wifileaks.db&#39; WITH CSV DELIMITER &#39;;&#39;</span>
+<span class="s">    DROP SCHEMA IF EXISTS data_cstore CASCADE;</span>
+
+<span class="s">DROP SCHEMA data_cstore;</span>
+<span class="s">CREATE SCHEMA data_cstore;</span>
+<span class="s">CREATE FOREIGN TABLE data_cstore.wifi (</span>
+<span class="s">    id integer,</span>
+<span class="s">    mac text,</span>
+<span class="s">    ssid text,</span>
+<span class="s">    signal_strength numeric,</span>
+<span class="s">    security integer,</span>
+<span class="s">    userid integer,</span>
+<span class="s">    unixtime timestamp without time zone,</span>
+<span class="s">    geom geometry(POINTZ, 32633)</span>
+<span class="s">)</span>
+<span class="s">SERVER cstore_server</span>
+<span class="s">OPTIONS (compression &#39;pglz&#39;);</span>
+<span class="s">END</span>
+</pre></div>
+
+
+<h2>Putting the networks on the&nbsp;map</h2>
+<table>
+    <tr>
+        <td><a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"><img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"></a></td>
+        <td><a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"><img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"></a></td>
+        <td><a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"><img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"></a></td>
+    </tr>
+    <tr>
+        <td><a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"><img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"></a></td>
+        <td><a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"><img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"></a></td>
+        <td><a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"><img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"></a></td>
+    </tr>
+</table>
+
+<p>As mentioned, each row of data represents the cellphone&#8217;s location when connecting to a wi-fi network. To get real wi-fi transmitter position, I calculated the average of location of each cellphone ever connected (although the signal strength should be taken into account here as&nbsp;well).</p>
+<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="n">UNLOGGED</span> <span class="k">TABLE</span> <span class="n">data_cstore</span><span class="p">.</span><span class="n">wifi_avg_loc</span> <span class="k">AS</span>
+<span class="k">SELECT</span>
+    <span class="n">row_number</span><span class="p">()</span> <span class="n">OVER</span> <span class="p">()</span> <span class="n">id</span><span class="p">,</span>
+    <span class="n">mac</span><span class="p">,</span>
+    <span class="n">ST_SetSRID</span><span class="p">(</span><span class="n">ST_MakePoint</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="mi">32633</span><span class="p">)</span> <span class="n">geom</span>
+<span class="k">FROM</span> <span class="p">(</span>
+    <span class="k">SELECT</span>
+        <span class="n">mac</span><span class="p">,</span>
+        <span class="k">AVG</span><span class="p">(</span><span class="n">ST_X</span><span class="p">(</span><span class="n">geom</span><span class="p">))</span> <span class="n">x</span><span class="p">,</span>
+        <span class="k">AVG</span><span class="p">(</span><span class="n">ST_Y</span><span class="p">(</span><span class="n">geom</span><span class="p">))</span> <span class="n">y</span>
+    <span class="k">FROM</span> <span class="n">data_cstore</span><span class="p">.</span><span class="n">wifi_loc</span>
+    <span class="k">GROUP</span> <span class="k">BY</span> <span class="mi">1</span>
+<span class="p">)</span> <span class="n">a</span><span class="p">;</span>
+</pre></div>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
             <h1><a href="https://www.zimmi.cz/posts/2017/routing-with-grass-gis-catchment-area-calculation/" rel="bookmark" title="Permalink to Routing with GRASS GIS: Catchment Area Calculation">Routing with <span class="caps">GRASS</span> <span class="caps">GIS</span>: Catchment Area&nbsp;Calculation</a></h1>
             <small>Written on Apr 20, 2017
         and marked as
@@ -687,168 +807,6 @@ cat <span class="s">&lt;&lt; EOF | psql -qAt --no-psqlrc</span>
 
 
 <p>That&#8217;s the whole <span class="caps">ETL</span> process! Next time, I&#8217;ll cover the d3.js&nbsp;viz.</p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii" rel="bookmark" title="Permalink to Plotting the Czech Cadastre Land Use with d3: Data Transformation (part II)">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></h1>
-            <small>Written on Nov 14, 2016
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>,         <a href="https://www.zimmi.cz/posts/tag/d3.html">d3</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>        | <a href="https://www.zimmi.cz/posts/category/data.html">data</a>
-        </small>
-        <section>
-            <p>This post is the second part of the series summarizing the process of visualizing landuse data with bash, PostgreSQL and d3.js. Read other&nbsp;parts:</p>
-<ol>
-<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part&nbsp;I)</a></li>
-<li>you&#8217;re reading it&nbsp;now</li>
-<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">III</span>)</a></li>
-</ol>
-<h2><span class="caps">ETL</span>&nbsp;process</h2>
-<p>Before the d3 viz can be crafted, it&#8217;s necessary&nbsp;to:</p>
-<ol>
-<li>extract <span class="caps">CSV</span> data from the URLs provided via the Atom&nbsp;feed</li>
-<li>transform those data into a relational database, do some&nbsp;math</li>
-<li>load data into a d3.js&nbsp;viz</li>
-<li>profit (as&nbsp;usual)</li>
-</ol>
-<h3>Extract</h3>
-<p>See <a href="{filename}../2016/plotting-czech-cadastre-landuse-with-d3-part-i.md">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)</a>.</p>
-<h3>Transform</h3>
-<p>Last time, I extracted the data from multiple <span class="caps">CSV</span> files to separate PostgreSQL tables named by <code>data_YYYYMMDD</code> pattern. My current goal is to transform it into the one big <code>data</code> table, where each row represents one cadastral area. Here&#8217;s what I&#8217;m trying to&nbsp;achieve:</p>
-<div class="highlight"><pre><span></span>-<span class="o">[</span> RECORD <span class="m">1</span> <span class="o">]</span>----------+----------------------------------
-ku_kod                 <span class="p">|</span> <span class="m">600881</span>
-ku_nazev               <span class="p">|</span> Bantice
-celkova_vymera         <span class="p">|</span> <span class="o">{</span><span class="m">3763255</span>,3763255,3763256,3763256<span class="o">}</span>
-celkovy_pocet_parcel   <span class="p">|</span> <span class="o">{</span><span class="m">670</span>,668,664,667<span class="o">}</span>
-chmelnice_pp           <span class="p">|</span> <span class="o">{</span><span class="m">0</span>,0,0,0<span class="o">}</span>
-chmelnice_pp_r         <span class="p">|</span> <span class="o">{</span><span class="m">0</span>.00,0.00,0.00,0.00<span class="o">}</span>
-chmelnice_v            <span class="p">|</span> <span class="o">{</span><span class="m">0</span>,0,0,0<span class="o">}</span>
-chmelnice_v_avg        <span class="p">|</span> <span class="o">{</span><span class="m">0</span>,0,0,0<span class="o">}</span>
-chmelnice_v_r          <span class="p">|</span> <span class="o">{</span><span class="m">0</span>.00,0.00,0.00,0.00<span class="o">}</span>
-lesni_pozemek_pp       <span class="p">|</span> <span class="o">{</span><span class="m">25</span>,25,25,25<span class="o">}</span>
-lesni_pozemek_pp_r     <span class="p">|</span> <span class="o">{</span><span class="m">3</span>.73,3.74,3.77,3.75<span class="o">}</span>
-lesni_pozemek_v        <span class="p">|</span> <span class="o">{</span><span class="m">83879</span>,83879,83879,83879<span class="o">}</span>
-lesni_pozemek_v_avg    <span class="p">|</span> <span class="o">{</span><span class="m">3355</span>,3355,3355,3355<span class="o">}</span>
-lesni_pozemek_v_r      <span class="p">|</span> <span class="o">{</span><span class="m">2</span>.23,2.23,2.23,2.23<span class="o">}</span>
-orna_puda_pp           <span class="p">|</span> <span class="o">{</span><span class="m">88</span>,88,89,89<span class="o">}</span>
-orna_puda_pp_r         <span class="p">|</span> <span class="o">{</span><span class="m">13</span>.13,13.17,13.40,13.34<span class="o">}</span>
-orna_puda_v            <span class="p">|</span> <span class="o">{</span><span class="m">3066230</span>,3066230,3066230,3066230<span class="o">}</span>
-orna_puda_v_avg        <span class="p">|</span> <span class="o">{</span><span class="m">34844</span>,34844,34452,34452<span class="o">}</span>
-orna_puda_v_r          <span class="p">|</span> <span class="o">{</span><span class="m">81</span>.48,81.48,81.48,81.48<span class="o">}</span>
-ostatni_plocha_pp      <span class="p">|</span> <span class="o">{</span><span class="m">201</span>,199,199,201<span class="o">}</span>
-ostatni_plocha_pp_r    <span class="p">|</span> <span class="o">{</span><span class="m">30</span>.00,29.79,29.97,30.13<span class="o">}</span>
-ostatni_plocha_v       <span class="p">|</span> <span class="o">{</span><span class="m">283468</span>,283468,283468,284562<span class="o">}</span>
-ostatni_plocha_v_avg   <span class="p">|</span> <span class="o">{</span><span class="m">1410</span>,1424,1424,1416<span class="o">}</span>
-ostatni_plocha_v_r     <span class="p">|</span> <span class="o">{</span><span class="m">7</span>.53,7.53,7.53,7.56<span class="o">}</span>
-ovocny_sad_pp          <span class="p">|</span> <span class="o">{</span><span class="m">0</span>,0,0,0<span class="o">}</span>
-ovocny_sad_pp_r        <span class="p">|</span> <span class="o">{</span><span class="m">0</span>.00,0.00,0.00,0.00<span class="o">}</span>
-ovocny_sad_v           <span class="p">|</span> <span class="o">{</span><span class="m">0</span>,0,0,0<span class="o">}</span>
-ovocny_sad_v_avg       <span class="p">|</span> <span class="o">{</span><span class="m">0</span>,0,0,0<span class="o">}</span>
-ovocny_sad_v_r         <span class="p">|</span> <span class="o">{</span><span class="m">0</span>.00,0.00,0.00,0.00<span class="o">}</span>
-ttp_pp                 <span class="p">|</span> <span class="o">{</span><span class="m">44</span>,44,44,45<span class="o">}</span>
-ttp_pp_r               <span class="p">|</span> <span class="o">{</span><span class="m">6</span>.57,6.59,6.63,6.75<span class="o">}</span>
-ttp_v                  <span class="p">|</span> <span class="o">{</span><span class="m">49002</span>,49002,49002,47908<span class="o">}</span>
-ttp_v_avg              <span class="p">|</span> <span class="o">{</span><span class="m">1114</span>,1114,1114,1065<span class="o">}</span>
-ttp_v_r                <span class="p">|</span> <span class="o">{</span><span class="m">1</span>.30,1.30,1.30,1.27<span class="o">}</span>
-vinice_pp              <span class="p">|</span> <span class="o">{</span><span class="m">1</span>,1,1,1<span class="o">}</span>
-vinice_pp_r            <span class="p">|</span> <span class="o">{</span><span class="m">0</span>.15,0.15,0.15,0.15<span class="o">}</span>
-vinice_v               <span class="p">|</span> <span class="o">{</span><span class="m">106178</span>,106178,106178,106178<span class="o">}</span>
-vinice_v_avg           <span class="p">|</span> <span class="o">{</span><span class="m">106178</span>,106178,106178,106178<span class="o">}</span>
-vinice_v_r             <span class="p">|</span> <span class="o">{</span><span class="m">2</span>.82,2.82,2.82,2.82<span class="o">}</span>
-vodni_plocha_pp        <span class="p">|</span> <span class="o">{</span><span class="m">23</span>,23,23,23<span class="o">}</span>
-vodni_plocha_pp_r      <span class="p">|</span> <span class="o">{</span><span class="m">3</span>.43,3.44,3.46,3.45<span class="o">}</span>
-vodni_plocha_v         <span class="p">|</span> <span class="o">{</span><span class="m">27877</span>,27877,27877,27877<span class="o">}</span>
-vodni_plocha_v_avg     <span class="p">|</span> <span class="o">{</span><span class="m">1212</span>,1212,1212,1212<span class="o">}</span>
-vodni_plocha_v_r       <span class="p">|</span> <span class="o">{</span><span class="m">0</span>.74,0.74,0.74,0.74<span class="o">}</span>
-zahrada_pp             <span class="p">|</span> <span class="o">{</span><span class="m">115</span>,115,115,115<span class="o">}</span>
-zahrada_pp_r           <span class="p">|</span> <span class="o">{</span><span class="m">17</span>.16,17.22,17.32,17.24<span class="o">}</span>
-zahrada_v              <span class="p">|</span> <span class="o">{</span><span class="m">77381</span>,77381,77353,77353<span class="o">}</span>
-zahrada_v_avg          <span class="p">|</span> <span class="o">{</span><span class="m">673</span>,673,673,673<span class="o">}</span>
-zahrada_v_r            <span class="p">|</span> <span class="o">{</span><span class="m">2</span>.06,2.06,2.06,2.06<span class="o">}</span>
-zastavena_plocha_pp    <span class="p">|</span> <span class="o">{</span><span class="m">173</span>,173,168,168<span class="o">}</span>
-zastavena_plocha_pp_r  <span class="p">|</span> <span class="o">{</span><span class="m">25</span>.82,25.90,25.30,25.19<span class="o">}</span>
-zastavena_plocha_v     <span class="p">|</span> <span class="o">{</span><span class="m">69240</span>,69240,69269,69269<span class="o">}</span>
-zastavena_plocha_v_avg <span class="p">|</span> <span class="o">{</span><span class="m">400</span>,400,412,412<span class="o">}</span>
-zastavena_plocha_v_r   <span class="p">|</span> <span class="o">{</span><span class="m">1</span>.84,1.84,1.84,1.84<span class="o">}</span>
-</pre></div>
-
-
-<p>Several stats were calculated for each land use category (vinice &rarr; vineyard, ovocny_sad &rarr; orchard,&nbsp;&#8230;):</p>
-<ul>
-<li><code>v_r</code> suffix stands for land use area&nbsp;ratio</li>
-<li><code>pp_r</code> suffix stands for land use parcel count&nbsp;ratio</li>
-<li><code>v_avg</code> stands for average parcel&nbsp;area</li>
-</ul>
-<p>All statistical columns are kept as PostgreSQL <code>ARRAY</code>s, ordered by dates (very handy for the future d3.js viz by the&nbsp;way).</p>
-<blockquote>
-<p>Note that since the <code>FULL OUTER JOIN</code> is needed in the next step, SQLite can&#8217;t be used. Pity&nbsp;though.</p>
-</blockquote>
-<p>The whole transformation bash script is the&nbsp;plain:</p>
-<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
-
-psql -qAt --no-psqlrc -f transform.sql <span class="p">|</span> psql -qAt --no-psqlrc
-</pre></div>
-
-
-<p>The <code>transform.sql</code> file is used to build the dynamic <span class="caps">SQL</span> query, which - once built - is piped to another <code>psql</code> command. I admit, pipes are super&nbsp;awesome.</p>
-<div class="highlight"><pre><span></span><span class="k">WITH</span> <span class="n">tables</span> <span class="k">AS</span> <span class="p">(</span>
-<span class="c1">-- FULL OUTER JOIN all the data_YYYYMMDD tables</span>
-<span class="k">SELECT</span>
-    <span class="k">table_name</span><span class="p">,</span>
-    <span class="n">table_schema</span><span class="p">,</span>
-    <span class="s1">&#39;d&#39;</span> <span class="o">||</span> <span class="n">id</span> <span class="n">tbl</span><span class="p">,</span>
-    <span class="k">CASE</span> <span class="k">WHEN</span> <span class="n">id</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="k">THEN</span> <span class="n">table_schema</span> <span class="o">||</span> <span class="s1">&#39;.&#39;</span> <span class="o">||</span> <span class="k">table_name</span> <span class="o">||</span> <span class="s1">&#39; d&#39;</span> <span class="o">||</span> <span class="n">id</span>
-        <span class="k">ELSE</span> <span class="s1">&#39;FULL OUTER JOIN &#39;</span> <span class="o">||</span> <span class="n">table_schema</span> <span class="o">||</span> <span class="s1">&#39;.&#39;</span> <span class="o">||</span> <span class="k">table_name</span> <span class="o">||</span> <span class="s1">&#39; d&#39;</span> <span class="o">||</span> <span class="n">id</span> <span class="o">||</span> <span class="s1">&#39; ON (d1.ku_kod = d&#39;</span> <span class="o">||</span> <span class="n">id</span> <span class="o">||</span> <span class="s1">&#39;.ku_kod)&#39;</span>
-    <span class="k">END</span> <span class="n">tbl_join</span>
-<span class="k">FROM</span> <span class="p">(</span>
-    <span class="k">SELECT</span>
-        <span class="k">table_name</span><span class="p">,</span>
-        <span class="n">table_schema</span><span class="p">,</span>
-        <span class="n">row_number</span><span class="p">()</span> <span class="n">OVER</span> <span class="p">(</span><span class="k">ORDER</span> <span class="k">BY</span> <span class="k">table_name</span><span class="p">)</span> <span class="n">id</span>
-    <span class="k">FROM</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">tables</span>
-    <span class="k">WHERE</span> <span class="k">table_name</span> <span class="k">LIKE</span> <span class="s1">&#39;data_%&#39;</span>
-        <span class="k">AND</span> <span class="n">table_type</span> <span class="o">=</span> <span class="s1">&#39;BASE TABLE&#39;</span>
-        <span class="k">AND</span> <span class="n">table_schema</span> <span class="o">=</span> <span class="s1">&#39;public&#39;</span>
-<span class="p">)</span> <span class="n">a</span>
-<span class="p">)</span>
-<span class="c1">-- create data table with the correct values order for each statistical column</span>
-<span class="c1">-- note that the whole process would crash if d1.ku_kod would be NULL -&gt; @todo fix me</span>
-<span class="k">SELECT</span> <span class="s1">&#39;DROP TABLE IF EXISTS data;</span>
-<span class="s1">    CREATE TABLE data AS</span>
-<span class="s1">    SELECT d1.ku_kod, d1.ku_nazev,&#39;</span>
-<span class="k">UNION</span> <span class="k">ALL</span>
-<span class="k">SELECT</span>
-    <span class="n">array_to_string</span><span class="p">(</span><span class="n">array_agg</span><span class="p">(</span><span class="n">r</span><span class="p">),</span> <span class="s1">&#39;, &#39;</span><span class="p">)</span> <span class="n">r</span>
-<span class="k">FROM</span> <span class="p">(</span>
-    <span class="k">SELECT</span>
-    <span class="s1">&#39;ARRAY[&#39;</span> <span class="o">||</span> <span class="n">array_to_string</span><span class="p">(</span><span class="n">array_agg</span><span class="p">(</span><span class="n">tables</span><span class="p">.</span><span class="n">tbl</span> <span class="o">||</span> <span class="s1">&#39;.&#39;</span> <span class="o">||</span> <span class="n">columns</span><span class="p">.</span><span class="k">column_name</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">tables</span><span class="p">.</span><span class="k">table_name</span><span class="p">),</span> <span class="s1">&#39;, &#39;</span><span class="p">)</span> <span class="o">||</span> <span class="s1">&#39;]&#39;</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span> <span class="n">columns</span><span class="p">.</span><span class="k">column_name</span> <span class="n">r</span>
-    <span class="k">FROM</span> <span class="n">tables</span>
-    <span class="k">JOIN</span> <span class="p">(</span>
-    <span class="k">SELECT</span>
-        <span class="n">table_schema</span><span class="p">,</span>
-        <span class="k">table_name</span><span class="p">,</span>
-        <span class="k">column_name</span>
-    <span class="k">FROM</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">columns</span>
-    <span class="k">WHERE</span> <span class="k">column_name</span> <span class="k">NOT</span> <span class="k">LIKE</span> <span class="s1">&#39;ku_%&#39;</span>
-    <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">ordinal_position</span>
-    <span class="p">)</span> <span class="n">columns</span>
-    <span class="k">ON</span> <span class="p">(</span><span class="n">tables</span><span class="p">.</span><span class="k">table_name</span> <span class="o">=</span> <span class="n">columns</span><span class="p">.</span><span class="k">table_name</span> <span class="k">AND</span> <span class="n">columns</span><span class="p">.</span><span class="n">table_schema</span> <span class="o">=</span> <span class="n">tables</span><span class="p">.</span><span class="n">table_schema</span><span class="p">)</span>
-    <span class="k">GROUP</span> <span class="k">BY</span> <span class="n">columns</span><span class="p">.</span><span class="k">column_name</span>
-<span class="p">)</span> <span class="n">a</span>
-<span class="k">UNION</span> <span class="k">ALL</span>
-<span class="k">SELECT</span> <span class="s1">&#39;FROM&#39;</span>
-<span class="k">UNION</span> <span class="k">ALL</span>
-<span class="k">SELECT</span> <span class="n">tbl_join</span> <span class="k">FROM</span> <span class="n">tables</span><span class="p">;</span>
-</pre></div>
-
-
-<p><code>psql -qAt --no-psqlrc -f transform.sql</code> builds the actual query from the query above, <code>| psql -qAt --no-psqlrc</code> sends it to the database again. This part was really fun to&nbsp;implement!</p>
-<p>I&#8217;m still considering to store diff values instead of absolute values in those <code>ARRAY</code>s - that would save some serious&nbsp;bandwidth!</p>
-<h2>Load</h2>
-<p>See <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">III</span>)</a>.</p>
         </section>
         </div>
     </div>
