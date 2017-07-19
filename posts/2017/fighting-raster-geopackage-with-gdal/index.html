@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+          <title>Michal Zimmermann | Fighting Raster GeoPackage with GDAL</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+
+
+
+    <meta name="tags" content="bash" />
+    <meta name="tags" content="gdal" />
+    <meta property="og:image" content="https://www.zimmi.cz/posts/assets/fighting-raster-geopackage-with-gdal/gauss.png" />
+  <meta property="og:title" content="Fighting Raster GeoPackage with GDAL" />
+  <meta property="og:description" content="As I’m still running Ubuntu 16.04 based Linux Mint, I have no access to GDAL 2.x repositories (except for ubuntugis, that I really don’t like to use). Provided with a GeoPackage raster file recently, I had to find a way to load it into QGIS, somehow...." />
+  <meta property="og:url" content="https://www.zimmi.cz/posts/2017/fighting-raster-geopackage-with-gdal/" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?d5d1e141">
+<!-- Start of Async Drift Code -->
+<script>
+    !function () {
+        var t;
+        if (t = window.driftt = window.drift = window.driftt || [], !t.init) return t.invoked ? void (window.console && console.error && console.error("Drift snippet included twice.")) : (t.invoked = !0,
+            t.methods = ["identify", "config", "track", "reset", "debug", "show", "ping", "page", "hide", "off", "on"],
+            t.factory = function (e) {
+                return function () {
+                    var n;
+                    return n = Array.prototype.slice.call(arguments), n.unshift(e), t.push(n), t;
+                };
+            }, t.methods.forEach(function (e) {
+                t[e] = t.factory(e);
+            }), t.load = function (t) {
+                var e, n, o, i;
+                e = 3e5, i = Math.ceil(new Date() / e) * e, o = document.createElement("script"),
+                    o.type = "text/javascript", o.async = !0, o.crossorigin = "anonymous", o.src = "https://js.driftt.com/include/" + i + "/" + t + ".js",
+                    n = document.getElementsByTagName("script")[0], n.parentNode.insertBefore(o, n);
+            });
+    }();
+    drift.SNIPPET_VERSION = '0.3.1';
+    drift.load('caacyauy5t6b');
+
+</script>
+<!-- End of Async Drift Code --></head>
+
+<body id="index" class="home">
+    <nav class="top-bar card-1" data-topbar role="navigation">
+        <ul class="title-area">
+            <li class="name">
+                <h1><a href="/posts">Home</a></h1>
+            </li>
+     <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+            <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+        </ul>
+        <section class="top-bar-section">
+    <!-- Right Nav Section -->
+            <ul class="right">
+                <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+                <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+                <li><a href="https://www.zimmi.cz/posts/feed.xml">RSS feed</a></li>
+            </ul>
+        </section>
+    </nav>
+        <div class="row">
+          <div class="large-12 columns header">
+            <h1><a href="/posts">Michal Zimmermann</a> <small>Pieces of knowledge from the world of GIS.</small></h1>
+          </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns">
+<div class="panel card card-1">
+    <div class="post-name">
+        <h1><a href="https://www.zimmi.cz/posts/2017/fighting-raster-geopackage-with-gdal/" rel="bookmark" title="Permalink to Fighting Raster GeoPackage with GDAL">Fighting Raster GeoPackage with <span class="caps">GDAL</span></a></h1>
+        <small>Written on Jul 19, 2017
+    and marked as
+    <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>,     <a href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    | <a href="https://www.zimmi.cz/posts/category/gis.html">GIS</a>
+    </small>
+    <section>
+        <p>As I&#8217;m still running Ubuntu 16.04 based Linux Mint, I have no access to <span class="caps">GDAL</span> 2.x repositories (except for ubuntugis, that I really don&#8217;t like to use). Provided with a GeoPackage raster file recently, I had to find a way to load it into <span class="caps">QGIS</span>, somehow. The solution is simple: Docker with&nbsp;gdal_translate.</p>
+<h2>Preparing the Docker&nbsp;container</h2>
+<p>I like using Docker for experiments that might leave the <span class="caps">OS</span> in an <em>unexpected</em> state (which is exactly what happens to me with ubuntugis repository whenever I use it. That&#8217;s why I don&#8217;t anymore.). A very simple Dockerfile keeps the troubles away from&nbsp;you.</p>
+<div class="highlight"><pre><span></span>FROM ubuntu:17.04
+RUN apt update
+RUN apt install -y gdal-bin
+</pre></div>
+
+
+<p><code>cd</code> into the folder and build the image with <code>docker build -t gdal .</code>. Once ready, summon the daemon, run the container, mount the GeoPackage file to the container directory and you&#8217;re ready to&nbsp;rock.</p>
+<div class="highlight"><pre><span></span>docker run -v /path/to/geopackage:/home/ -it gdal
+</pre></div>
+
+
+<h2>Raster GeoPackage to GeoTiff&nbsp;translation</h2>
+<p>With the container running, the raster GeoPackage to GeoTiff translation can be done easily with <code>gdal_translate</code>. Note I chose to cut the source file into tiles, because the gdal_translate was choking about the resulting&nbsp;size.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="nv">SIZE</span><span class="o">=</span><span class="m">10000</span>
+<span class="nv">ULX</span><span class="o">=</span>-630000
+<span class="nv">ULY</span><span class="o">=</span>-1135450
+<span class="nv">LRX</span><span class="o">=</span>-560000
+<span class="nv">LRY</span><span class="o">=</span>-1172479
+<span class="nv">COUNTER_X</span><span class="o">=</span><span class="m">0</span>
+<span class="nv">COUNTER_Y</span><span class="o">=</span><span class="m">0</span>
+
+<span class="k">while</span> <span class="o">[[</span> <span class="nv">$ULX</span> -lt <span class="nv">$LRX</span> <span class="o">]]</span>
+<span class="k">do</span>
+    <span class="k">while</span> <span class="o">[[</span> <span class="nv">$ULY</span> -gt <span class="nv">$LRY</span> <span class="o">]]</span>
+    <span class="k">do</span>
+        <span class="nb">echo</span> <span class="nv">$ULX</span>, <span class="k">$((</span><span class="nv">$ULX</span><span class="o">+</span><span class="nv">$SIZE</span><span class="k">))</span>, <span class="nv">$ULY</span>, <span class="k">$((</span><span class="nv">$ULY</span><span class="o">-</span><span class="nv">$SIZE</span><span class="k">))</span>
+
+        gdal_translate <span class="se">\</span>
+            -co <span class="nv">TILED</span><span class="o">=</span>YES <span class="se">\</span>
+            -co <span class="nv">COMPRESS</span><span class="o">=</span>DEFLATE <span class="se">\</span>
+            -co <span class="nv">TFW</span><span class="o">=</span>YES <span class="se">\</span>
+            -co <span class="nv">NUM_THREADS</span><span class="o">=</span>ALL_CPUS <span class="se">\</span>
+            -a_nodata <span class="m">0</span> <span class="se">\</span>
+            -of GTiff <span class="se">\</span>
+            -projwin <span class="nv">$ULX</span>, <span class="nv">$ULY</span>, <span class="k">$((</span><span class="nv">$ULX</span><span class="o">+</span><span class="nv">$SIZE</span><span class="k">))</span>, <span class="k">$((</span><span class="nv">$ULY</span><span class="o">-</span><span class="nv">$SIZE</span><span class="k">))</span> <span class="se">\</span>
+            -projwin_srs EPSG:5514 <span class="se">\</span>
+            data/detected.gpkg data/detected_<span class="si">${</span><span class="nv">COUNTER_X</span><span class="si">}</span>_<span class="si">${</span><span class="nv">COUNTER_Y</span><span class="si">}</span>.tiff
+
+        <span class="nv">ULY</span><span class="o">=</span><span class="k">$((</span><span class="nv">$ULY</span><span class="o">-</span><span class="nv">$SIZE</span><span class="k">))</span>
+        <span class="nv">COUNTER_Y</span><span class="o">=</span><span class="k">$((</span>COUNTER_Y+1<span class="k">))</span>
+    <span class="k">done</span>
+    <span class="nv">ULX</span><span class="o">=</span><span class="k">$((</span><span class="nv">$ULX</span><span class="o">+</span><span class="nv">$SIZE</span><span class="k">))</span>
+    <span class="nv">ULY</span><span class="o">=</span>-1135450
+    <span class="nv">COUNTER_X</span><span class="o">=</span><span class="k">$((</span>COUNTER_X+1<span class="k">))</span>
+<span class="k">done</span>
+</pre></div>
+
+
+<h2>Final Touch: Raster to&nbsp;Vector</h2>
+<p>After the GeoTiff is written to hard drive, <a href="https://www.zimmi.cz/posts/2015/how-to-use-queue-with-rsync/">inotifywait</a> can be used to generate overviews. And with ease of calling <code>gdal_polygonize.py</code> on each of GeoTiffs&hellip;vector layer, at you&nbsp;service.</p>
+    </section>
+    </div>
+<div class="neighbors">
+    <h3>More reading</h3>
+    <ul>
+        <li>
+            <a href="https://www.zimmi.cz/posts/2017/mapping-north-america-with-qgis-tips-and-tricks">
+                 Mapping North America with <span class="caps">QGIS</span>: Tips and&nbsp;Tricks
+            </a>
+        </li>
+         <li>
+             <a href="https://www.zimmi.cz/posts/2017/mapping-north-america-with-qgis-tips-and-tricks">
+                 Mapping North America with <span class="caps">QGIS</span>: Tips and&nbsp;Tricks
+             </a>
+         </li>
+        </li>
+    </ul>
+</div></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns footer">
+                <footer>
+                    <address>
+                    Written by <a href="http://www.zimmi.cz">Michal Zimmermann</a>.
+                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                    which takes great advantage of <a href="http://python.org">Python</a>.
+                    </address><!-- /#about -->
+                </footer><!-- /#contentinfo -->
+            </div>
+        </div>
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-43432739-2']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+<script src="https://www.zimmi.cz/posts/theme/js/packed.js?8bee1467"></script>
+<script>
+$(document).foundation();
+</script>
+</body>
+</html>

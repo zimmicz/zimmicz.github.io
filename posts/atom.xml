@@ -1,5 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Michal Zimmermann</title><link href="https://www.zimmi.cz/posts/" rel="alternate"></link><link href="https://www.zimmi.cz/posts/atom.xml" rel="self"></link><id>https://www.zimmi.cz/posts/</id><updated>2017-05-21T15:30:00+02:00</updated><entry><title>Mapping North America with QGIS: Tips and Tricks</title><link href="https://www.zimmi.cz/posts/2017/mapping-north-america-with-qgis-tips-and-tricks" rel="alternate"></link><published>2017-05-21T15:30:00+02:00</published><updated>2017-05-21T15:30:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-05-21:/posts/2017/mapping-north-america-with-qgis-tips-and-tricks</id><summary type="html">&lt;p&gt;Recently I&amp;#8217;ve bought a book called &lt;em&gt;Maps&lt;/em&gt; by Aleksandra Mizielinska and Daniel Mizielinski to my nephew. The book&amp;#8217;s absolutely wonderful and made me want to try crafting a map with similar looks. I don&amp;#8217;t do maps much at &lt;a href="https://clevermaps.cz"&gt;CleverMaps&lt;/a&gt;, so this was a great opportunity to find …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Recently I&amp;#8217;ve bought a book called &lt;em&gt;Maps&lt;/em&gt; by Aleksandra Mizielinska and Daniel Mizielinski to my nephew. The book&amp;#8217;s absolutely wonderful and made me want to try crafting a map with similar looks. I don&amp;#8217;t do maps much at &lt;a href="https://clevermaps.cz"&gt;CleverMaps&lt;/a&gt;, so this was a great opportunity to find out what new features became available during the last months of &lt;span class="caps"&gt;QGIS&lt;/span&gt;&amp;nbsp;development.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Michal Zimmermann</title><link href="https://www.zimmi.cz/posts/" rel="alternate"></link><link href="https://www.zimmi.cz/posts/atom.xml" rel="self"></link><id>https://www.zimmi.cz/posts/</id><updated>2017-07-19T13:30:00+02:00</updated><entry><title>Fighting Raster GeoPackage with GDAL</title><link href="https://www.zimmi.cz/posts/2017/fighting-raster-geopackage-with-gdal/" rel="alternate"></link><published>2017-07-19T13:30:00+02:00</published><updated>2017-07-19T13:30:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-07-19:/posts/2017/fighting-raster-geopackage-with-gdal/</id><summary type="html">&lt;p&gt;As I&amp;#8217;m still running Ubuntu 16.04 based Linux Mint, I have no access to &lt;span class="caps"&gt;GDAL&lt;/span&gt; 2.x repositories (except for ubuntugis, that I really don&amp;#8217;t like to use). Provided with a GeoPackage raster file recently, I had to find a way to load it into &lt;span class="caps"&gt;QGIS&lt;/span&gt;, somehow …&lt;/p&gt;</summary><content type="html">&lt;p&gt;As I&amp;#8217;m still running Ubuntu 16.04 based Linux Mint, I have no access to &lt;span class="caps"&gt;GDAL&lt;/span&gt; 2.x repositories (except for ubuntugis, that I really don&amp;#8217;t like to use). Provided with a GeoPackage raster file recently, I had to find a way to load it into &lt;span class="caps"&gt;QGIS&lt;/span&gt;, somehow. The solution is simple: Docker with&amp;nbsp;gdal_translate.&lt;/p&gt;
+&lt;h2&gt;Preparing the Docker&amp;nbsp;container&lt;/h2&gt;
+&lt;p&gt;I like using Docker for experiments that might leave the &lt;span class="caps"&gt;OS&lt;/span&gt; in an &lt;em&gt;unexpected&lt;/em&gt; state (which is exactly what happens to me with ubuntugis repository whenever I use it. That&amp;#8217;s why I don&amp;#8217;t anymore.). A very simple Dockerfile keeps the troubles away from&amp;nbsp;you.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;FROM ubuntu:17.04
+RUN apt update
+RUN apt install -y gdal-bin
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;cd&lt;/code&gt; into the folder and build the image with &lt;code&gt;docker build -t gdal .&lt;/code&gt;. Once ready, summon the daemon, run the container, mount the GeoPackage file to the container directory and you&amp;#8217;re ready to&amp;nbsp;rock.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;docker run -v /path/to/geopackage:/home/ -it gdal
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Raster GeoPackage to GeoTiff&amp;nbsp;translation&lt;/h2&gt;
+&lt;p&gt;With the container running, the raster GeoPackage to GeoTiff translation can be done easily with &lt;code&gt;gdal_translate&lt;/code&gt;. Note I chose to cut the source file into tiles, because the gdal_translate was choking about the resulting&amp;nbsp;size.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class="nv"&gt;SIZE&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;10000&lt;/span&gt;
+&lt;span class="nv"&gt;ULX&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;-630000
+&lt;span class="nv"&gt;ULY&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;-1135450
+&lt;span class="nv"&gt;LRX&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;-560000
+&lt;span class="nv"&gt;LRY&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;-1172479
+&lt;span class="nv"&gt;COUNTER_X&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;
+&lt;span class="nv"&gt;COUNTER_Y&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;
+
+&lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; &lt;span class="nv"&gt;$ULX&lt;/span&gt; -lt &lt;span class="nv"&gt;$LRX&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;
+&lt;span class="k"&gt;do&lt;/span&gt;
+    &lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; &lt;span class="nv"&gt;$ULY&lt;/span&gt; -gt &lt;span class="nv"&gt;$LRY&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;
+    &lt;span class="k"&gt;do&lt;/span&gt;
+        &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="nv"&gt;$ULX&lt;/span&gt;, &lt;span class="k"&gt;$((&lt;/span&gt;&lt;span class="nv"&gt;$ULX&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="nv"&gt;$SIZE&lt;/span&gt;&lt;span class="k"&gt;))&lt;/span&gt;, &lt;span class="nv"&gt;$ULY&lt;/span&gt;, &lt;span class="k"&gt;$((&lt;/span&gt;&lt;span class="nv"&gt;$ULY&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;$SIZE&lt;/span&gt;&lt;span class="k"&gt;))&lt;/span&gt;
+
+        gdal_translate &lt;span class="se"&gt;\&lt;/span&gt;
+            -co &lt;span class="nv"&gt;TILED&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;YES &lt;span class="se"&gt;\&lt;/span&gt;
+            -co &lt;span class="nv"&gt;COMPRESS&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;DEFLATE &lt;span class="se"&gt;\&lt;/span&gt;
+            -co &lt;span class="nv"&gt;TFW&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;YES &lt;span class="se"&gt;\&lt;/span&gt;
+            -co &lt;span class="nv"&gt;NUM_THREADS&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;ALL_CPUS &lt;span class="se"&gt;\&lt;/span&gt;
+            -a_nodata &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+            -of GTiff &lt;span class="se"&gt;\&lt;/span&gt;
+            -projwin &lt;span class="nv"&gt;$ULX&lt;/span&gt;, &lt;span class="nv"&gt;$ULY&lt;/span&gt;, &lt;span class="k"&gt;$((&lt;/span&gt;&lt;span class="nv"&gt;$ULX&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="nv"&gt;$SIZE&lt;/span&gt;&lt;span class="k"&gt;))&lt;/span&gt;, &lt;span class="k"&gt;$((&lt;/span&gt;&lt;span class="nv"&gt;$ULY&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;$SIZE&lt;/span&gt;&lt;span class="k"&gt;))&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+            -projwin_srs EPSG:5514 &lt;span class="se"&gt;\&lt;/span&gt;
+            data/detected.gpkg data/detected_&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;COUNTER_X&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;_&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;COUNTER_Y&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;.tiff
+
+        &lt;span class="nv"&gt;ULY&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$((&lt;/span&gt;&lt;span class="nv"&gt;$ULY&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;$SIZE&lt;/span&gt;&lt;span class="k"&gt;))&lt;/span&gt;
+        &lt;span class="nv"&gt;COUNTER_Y&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$((&lt;/span&gt;COUNTER_Y+1&lt;span class="k"&gt;))&lt;/span&gt;
+    &lt;span class="k"&gt;done&lt;/span&gt;
+    &lt;span class="nv"&gt;ULX&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$((&lt;/span&gt;&lt;span class="nv"&gt;$ULX&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="nv"&gt;$SIZE&lt;/span&gt;&lt;span class="k"&gt;))&lt;/span&gt;
+    &lt;span class="nv"&gt;ULY&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;-1135450
+    &lt;span class="nv"&gt;COUNTER_X&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$((&lt;/span&gt;COUNTER_X+1&lt;span class="k"&gt;))&lt;/span&gt;
+&lt;span class="k"&gt;done&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Final Touch: Raster to&amp;nbsp;Vector&lt;/h2&gt;
+&lt;p&gt;After the GeoTiff is written to hard drive, &lt;a href="https://www.zimmi.cz/posts/2015/how-to-use-queue-with-rsync/"&gt;inotifywait&lt;/a&gt; can be used to generate overviews. And with ease of calling &lt;code&gt;gdal_polygonize.py&lt;/code&gt; on each of GeoTiffs&amp;hellip;vector layer, at you&amp;nbsp;service.&lt;/p&gt;</content><category term="bash"></category><category term="gdal"></category></entry><entry><title>Mapping North America with QGIS: Tips and Tricks</title><link href="https://www.zimmi.cz/posts/2017/mapping-north-america-with-qgis-tips-and-tricks" rel="alternate"></link><published>2017-05-21T15:30:00+02:00</published><updated>2017-05-21T15:30:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-05-21:/posts/2017/mapping-north-america-with-qgis-tips-and-tricks</id><summary type="html">&lt;p&gt;Recently I&amp;#8217;ve bought a book called &lt;em&gt;Maps&lt;/em&gt; by Aleksandra Mizielinska and Daniel Mizielinski to my nephew. The book&amp;#8217;s absolutely wonderful and made me want to try crafting a map with similar looks. I don&amp;#8217;t do maps much at &lt;a href="https://clevermaps.cz"&gt;CleverMaps&lt;/a&gt;, so this was a great opportunity to find …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Recently I&amp;#8217;ve bought a book called &lt;em&gt;Maps&lt;/em&gt; by Aleksandra Mizielinska and Daniel Mizielinski to my nephew. The book&amp;#8217;s absolutely wonderful and made me want to try crafting a map with similar looks. I don&amp;#8217;t do maps much at &lt;a href="https://clevermaps.cz"&gt;CleverMaps&lt;/a&gt;, so this was a great opportunity to find out what new features became available during the last months of &lt;span class="caps"&gt;QGIS&lt;/span&gt;&amp;nbsp;development.&lt;/p&gt;
 &lt;h2&gt;Result&lt;/h2&gt;
 &lt;p&gt;A map of North America in scale of 1:22,000,000 featuring the biggest lakes, rivers, mountain ranges and basic administrative units for the North American countries. I aimed for visually appealing overview map rather than perfectly correct topographic&amp;nbsp;one.&lt;/p&gt;
 &lt;div class="text-center"&gt;&lt;a href="https://www.zimmi.cz/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/map.png" title="Click for the full size (3 MB)"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/map.min.png"/&gt;&lt;/a&gt;&lt;/div&gt;

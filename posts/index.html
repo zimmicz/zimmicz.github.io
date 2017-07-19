@@ -61,6 +61,72 @@
 
     <div class="panel card card-1">
         <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2017/fighting-raster-geopackage-with-gdal/" rel="bookmark" title="Permalink to Fighting Raster GeoPackage with GDAL">Fighting Raster GeoPackage with <span class="caps">GDAL</span></a></h1>
+            <small>Written on Jul 19, 2017
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>,         <a href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>        | <a href="https://www.zimmi.cz/posts/category/gis.html">GIS</a>
+        </small>
+        <section>
+            <p>As I&#8217;m still running Ubuntu 16.04 based Linux Mint, I have no access to <span class="caps">GDAL</span> 2.x repositories (except for ubuntugis, that I really don&#8217;t like to use). Provided with a GeoPackage raster file recently, I had to find a way to load it into <span class="caps">QGIS</span>, somehow. The solution is simple: Docker with&nbsp;gdal_translate.</p>
+<h2>Preparing the Docker&nbsp;container</h2>
+<p>I like using Docker for experiments that might leave the <span class="caps">OS</span> in an <em>unexpected</em> state (which is exactly what happens to me with ubuntugis repository whenever I use it. That&#8217;s why I don&#8217;t anymore.). A very simple Dockerfile keeps the troubles away from&nbsp;you.</p>
+<div class="highlight"><pre><span></span>FROM ubuntu:17.04
+RUN apt update
+RUN apt install -y gdal-bin
+</pre></div>
+
+
+<p><code>cd</code> into the folder and build the image with <code>docker build -t gdal .</code>. Once ready, summon the daemon, run the container, mount the GeoPackage file to the container directory and you&#8217;re ready to&nbsp;rock.</p>
+<div class="highlight"><pre><span></span>docker run -v /path/to/geopackage:/home/ -it gdal
+</pre></div>
+
+
+<h2>Raster GeoPackage to GeoTiff&nbsp;translation</h2>
+<p>With the container running, the raster GeoPackage to GeoTiff translation can be done easily with <code>gdal_translate</code>. Note I chose to cut the source file into tiles, because the gdal_translate was choking about the resulting&nbsp;size.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="nv">SIZE</span><span class="o">=</span><span class="m">10000</span>
+<span class="nv">ULX</span><span class="o">=</span>-630000
+<span class="nv">ULY</span><span class="o">=</span>-1135450
+<span class="nv">LRX</span><span class="o">=</span>-560000
+<span class="nv">LRY</span><span class="o">=</span>-1172479
+<span class="nv">COUNTER_X</span><span class="o">=</span><span class="m">0</span>
+<span class="nv">COUNTER_Y</span><span class="o">=</span><span class="m">0</span>
+
+<span class="k">while</span> <span class="o">[[</span> <span class="nv">$ULX</span> -lt <span class="nv">$LRX</span> <span class="o">]]</span>
+<span class="k">do</span>
+    <span class="k">while</span> <span class="o">[[</span> <span class="nv">$ULY</span> -gt <span class="nv">$LRY</span> <span class="o">]]</span>
+    <span class="k">do</span>
+        <span class="nb">echo</span> <span class="nv">$ULX</span>, <span class="k">$((</span><span class="nv">$ULX</span><span class="o">+</span><span class="nv">$SIZE</span><span class="k">))</span>, <span class="nv">$ULY</span>, <span class="k">$((</span><span class="nv">$ULY</span><span class="o">-</span><span class="nv">$SIZE</span><span class="k">))</span>
+
+        gdal_translate <span class="se">\</span>
+            -co <span class="nv">TILED</span><span class="o">=</span>YES <span class="se">\</span>
+            -co <span class="nv">COMPRESS</span><span class="o">=</span>DEFLATE <span class="se">\</span>
+            -co <span class="nv">TFW</span><span class="o">=</span>YES <span class="se">\</span>
+            -co <span class="nv">NUM_THREADS</span><span class="o">=</span>ALL_CPUS <span class="se">\</span>
+            -a_nodata <span class="m">0</span> <span class="se">\</span>
+            -of GTiff <span class="se">\</span>
+            -projwin <span class="nv">$ULX</span>, <span class="nv">$ULY</span>, <span class="k">$((</span><span class="nv">$ULX</span><span class="o">+</span><span class="nv">$SIZE</span><span class="k">))</span>, <span class="k">$((</span><span class="nv">$ULY</span><span class="o">-</span><span class="nv">$SIZE</span><span class="k">))</span> <span class="se">\</span>
+            -projwin_srs EPSG:5514 <span class="se">\</span>
+            data/detected.gpkg data/detected_<span class="si">${</span><span class="nv">COUNTER_X</span><span class="si">}</span>_<span class="si">${</span><span class="nv">COUNTER_Y</span><span class="si">}</span>.tiff
+
+        <span class="nv">ULY</span><span class="o">=</span><span class="k">$((</span><span class="nv">$ULY</span><span class="o">-</span><span class="nv">$SIZE</span><span class="k">))</span>
+        <span class="nv">COUNTER_Y</span><span class="o">=</span><span class="k">$((</span>COUNTER_Y+1<span class="k">))</span>
+    <span class="k">done</span>
+    <span class="nv">ULX</span><span class="o">=</span><span class="k">$((</span><span class="nv">$ULX</span><span class="o">+</span><span class="nv">$SIZE</span><span class="k">))</span>
+    <span class="nv">ULY</span><span class="o">=</span>-1135450
+    <span class="nv">COUNTER_X</span><span class="o">=</span><span class="k">$((</span>COUNTER_X+1<span class="k">))</span>
+<span class="k">done</span>
+</pre></div>
+
+
+<h2>Final Touch: Raster to&nbsp;Vector</h2>
+<p>After the GeoTiff is written to hard drive, <a href="https://www.zimmi.cz/posts/2015/how-to-use-queue-with-rsync/">inotifywait</a> can be used to generate overviews. And with ease of calling <code>gdal_polygonize.py</code> on each of GeoTiffs&hellip;vector layer, at you&nbsp;service.</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
             <h1><a href="https://www.zimmi.cz/posts/2017/mapping-north-america-with-qgis-tips-and-tricks" rel="bookmark" title="Permalink to Mapping North America with QGIS: Tips and Tricks">Mapping North America with <span class="caps">QGIS</span>: Tips and&nbsp;Tricks</a></h1>
             <small>Written on May 21, 2017
         and marked as
@@ -752,62 +818,6 @@ Running this script will delete the old cluster<span class="err">&#39;</span>s d
 
 <span class="c1">-- SELECT how_many(&#39;test&#39;, &#39;t&#39;); -- returns number 2</span>
 </pre></div>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2016/plotting-the-czech-cadastre-land-use-with-d3-data-viz-part-iv/" rel="bookmark" title="Permalink to Plotting the Czech Cadastre Land Use with d3: Data Viz (part IV)">Plotting the Czech Cadastre Land Use with d3: Data Viz (part <span class="caps">IV</span>)</a></h1>
-            <small>Written on Nov 20, 2016
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/d3.html">d3</a>,         <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>,         <a href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>        | <a href="https://www.zimmi.cz/posts/category/data.html">data</a>
-        </small>
-        <section>
-            <p>This post is the fourth part of the series summarizing the process of visualizing land use data with bash, PostgreSQL and d3.js. Read other&nbsp;parts:</p>
-<ol>
-<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part&nbsp;I)</a></li>
-<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></li>
-<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/">Plotting the Czech Cadastre Land Use with d3: Data Load (part <span class="caps">III</span>)</a></li>
-</ol>
-<h2>Data&nbsp;vizualization</h2>
-<p>Those of you who&#8217;ve been following this series know all the data are set and ready to be used. The rest of you, <em>shame on you by the way</em>, can go through the above posts to catch&nbsp;up.</p>
-<p>The result is available at <a href="https://www.zimmi.cz/kn-landuse-monitor">https://www.zimmi.cz/kn-landuse-monitor</a> and works like the gif&nbsp;below.</p>
-<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/plotting-the-czech-cadastre-land-use-with-d3-part-iv/screen.gif" /></div>
-
-<h3>Features</h3>
-<ul>
-<li>land use data for 13,093 cadastral areas between 2015/01/01 and&nbsp;2016/10/01</li>
-<li>relative area and parcel count per land use&nbsp;type</li>
-<li>similar cadastres based on land use relative area&nbsp;values</li>
-<li>time series plots for various charachteristics (including agricultural land area and parcel&nbsp;count)</li>
-</ul>
-<h3>Todos</h3>
-<ul>
-<li>time series chart titles&nbsp;onmouseover</li>
-<li>barchart titles&nbsp;onmouseover</li>
-<li>absolute values chart&nbsp;(?)</li>
-<li><code>fetch API</code> polyfill</li>
-<li>Firefox seems to be&nbsp;broken</li>
-</ul>
-<h3>Technologies</h3>
-<p>I implemented <a href="https://github.com/zimmicz/kn-landuse-monitor/tree/f0af50d44d6aac11adb6cdb0c7c67a97d7db1df3">the whole app with vanilla JavaScript</a>. The app resided in the <code>Monitor</code> variable, had several modules that were communicating via custom events with each&nbsp;other.</p>
-<p>So far, so good. Once the app was production-ready, I stumbled upon <a href="https://vuejs.org">vue.js</a>, which is by miles the best JavaScript framework experience I&#8217;ve had so far. Reinventing the app once again was the matter of two days (thanks to <a href="https://github.com/vuejs-templates/webpack">this amazing setup</a> - hot reload&nbsp;included).</p>
-<p>Thus, the current version of the app is based&nbsp;on:</p>
-<h4>vue.js</h4>
-<p>Thanks to the easy-to-understand system of components, properties and methods, learning curve is really steep. The app is now divided into several components (Search, Dashboard with child components for charts and similar cadastres&nbsp;list).</p>
-<h4>vuex</h4>
-<p><a href="https://vuex.vuejs.org/en/">Vuex</a>, probably inspired by Flux or Redux, is the <em>&#8220;state management pattern + library&#8221;</em>, the single source of truth for your apps. That&#8217;s pretty much it: there&#8217;s only one place in your app (called the <code>store</code>), where you go to put or get your data. Not necessarily every single piece of data, just those pieces used across several components. It plays really nice with the&nbsp;vue.js.</p>
-<h4>D3.js</h4>
-<p>Tried it before, <a href="https://d3js.org">D3.js</a> was really hard to grasp. And it still is, I guess. At the same time, it&#8217;s damn good at plotting the data. Yet, being a bit less low-level would be&nbsp;great.</p>
-<h4>Dexie</h4>
-<p>I hate writing servers for my pet projects. The server means no Github Pages. Thus, I decided to load the whole dataset with <code>fetch API</code>  from the external <span class="caps">JSON</span> file. Loading the 13K objects &times; 30 properties &times; array with 8 items in each didn&#8217;t seem like the best idea ever, so&hellip; Here comes <a href="http://dexie.org">Dexie</a>, a <code>IndexedDB API</code> wrapper that makes it easy on you (unlike the <code>IndexedDB API</code> itself, which doesn&#8217;t even let you find out whether the database you&#8217;re creating already exists.&nbsp;Seriously?).</p>
-<p>Dexie loads the initial dataset into the IndexedDB storage and reads it every time user comes back without loading the <span class="caps">JSON</span> file again. On data change, the fresh file will be loaded, the database flushed and the new data written. <a href="https://github.com/zimmicz/kn-landuse-monitor/blob/master/src/stores/actions.js">Behold</a>; I hate the way it&#8217;s&nbsp;written.</p>
-<h4>Flex</h4>
-<p>Used <code>flex</code> for the first time, I&#8217;m not sure I understand how it actually works though. <span class="caps">CSS</span> feels more complicated every time I need&nbsp;it.</p>
-<p><small>Bottom line: I use localStorage to keep track of the database existence.</small></p>
-<h3>Resume</h3>
-<p>Two pet projects completed in one month definitely means the winter is here! Looking forward to using more&nbsp;vue.js.</p>
         </section>
         </div>
     </div>
