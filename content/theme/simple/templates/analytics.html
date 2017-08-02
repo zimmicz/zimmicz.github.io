@@ -25,22 +25,20 @@
     })();
     </script>
 {% endif %}
-{% if PIWIK_URL and PIWIK_SITE_ID %}
-    <script type="text/javascript">
-    {% if PIWIK_SSL_URL %}
-        var pkBaseURL = "{{ PIWIK_SSL_URL }}";
-    {% else %}
-        var pkBaseURL = "{{ PIWIK_URL }}";
-    {% endif %}
-    var _paq = _paq || [];
-    _paq.push(["trackPageView"]);
-    _paq.push(["enableLinkTracking"]);
-    (function() {
-        var u=(("https:" == document.location.protocol) ? "https" : "http")+"://"+pkBaseURL+"/";
-        _paq.push(["setTrackerUrl", u+"piwik.php"]);
-        _paq.push(["setSiteId", "{{ PIWIK_SITE_ID }}"]);
-        var d=document, g=d.createElement("script"), s=d.getElementsByTagName("script")[0]; g.type="text/javascript";
-        g.defer=true; g.async=true; g.src=u+"piwik.js"; s.parentNode.insertBefore(g,s);
-    })();
-    </script>
+{% if PIWIK %}
+<!-- Piwik -->
+<script type="text/javascript">
+  var _paq = _paq || [];
+  /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="//piwik-zimmi.rhcloud.com/analytics/";
+    _paq.push(['setTrackerUrl', u+'piwik.php']);
+    _paq.push(['setSiteId', '1']);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<!-- End Piwik Code -->
 {% endif %}
