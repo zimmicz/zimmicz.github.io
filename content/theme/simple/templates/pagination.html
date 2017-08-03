@@ -2,21 +2,13 @@
     {% if DEFAULT_PAGINATION %}
     <div class="large-6 columns">
         {% if articles_page.has_previous() %}
-            <a href="{{ SITEURL }}/{{ articles_previous_page.url }}" class="button card card-1">&laquo; Previous page</a>
+            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Previous page']);" href="{{ SITEURL }}/{{ articles_previous_page.url }}" class="button card card-1">&laquo; Previous page</a>
         {% endif %}
     </div>
     <div class="large-6 columns">
         {% if articles_page.has_next() %}
-            <a href="{{ SITEURL }}/{{ articles_next_page.url }}" class="button card card-1">Next page &raquo;</a>
+            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Next page']);" href="{{ SITEURL }}/{{ articles_next_page.url }}" class="button card card-1">Next page &raquo;</a>
         {% endif %}
     </div>
-    <!-- <p class="paginator">
-        {% if articles_page.has_previous() %}
-            <a href="{{ SITEURL }}/{{ articles_previous_page.url }}" class="button card card-1">&laquo; Previous page</a>
-        {% endif %}
-        {% if articles_page.has_next() %}
-            <a href="{{ SITEURL }}/{{ articles_next_page.url }}" class="button card card-1">Next page &raquo;</a>
-        {% endif %}
-    </p> -->
     {% endif %}
 </div>
