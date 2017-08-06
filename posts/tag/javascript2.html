@@ -62,6 +62,96 @@
 
     <div class="panel card card-1">
         <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2015/twitter-rest-api-data-mining-on-openshift-part-i/" rel="bookmark" title="Permalink to Twitter REST API Data Mining on OpenShift (Part I)">Twitter <span class="caps">REST</span> <span class="caps">API</span> Data Mining on OpenShift (Part&nbsp;I)</a></h1>
+            <small>Written on Nov 6, 2015
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>,         <a href="https://www.zimmi.cz/posts/tag/openshift.html">openshift</a>,         <a href="https://www.zimmi.cz/posts/tag/twitter.html">twitter</a>        | <a href="https://www.zimmi.cz/posts/category/development.html">development</a>
+        </small>
+        <section>
+            <p>More than a year ago I wrote about <a href="http://www.zimmi.cz/posts/2014/analyzing-twitter-languages-with-streaming-api/">analyzing Twitter languages with Streaming <span class="caps">API</span></a>. Back then I kept my laptop running for a week to download data. Not a comfortable way, especially if you decide to get more data. One year uptime doesn&#8217;t sound like anything you want to be part of. <a href="https://www.openshift.com/">OpenShift</a> by Red Hat seems to be almost perfect replacement.&nbsp;Almost.</p>
+<h2>OpenShift&nbsp;setup</h2>
+<p>I started with Node.js application running on one small gear. Once running, you can easily <code>git push</code> the code to your OpenShift repo and login via <span class="caps">SSH</span>. I quickly found simple copy-pasting my local solution wasn&#8217;t going to work. and fixed it with some minor tweaks. That&#8217;s where the fun&nbsp;begins&#8230;</p>
+<blockquote>
+<p>I based the downloader on Node.js a year ago. Until now I still don&#8217;t get how that piece of software works. Frankly, I don&#8217;t really care as long as it&nbsp;works.</p>
+</blockquote>
+<h3>Pitfalls</h3>
+<p>If your application doesn&#8217;t generate any traffic, <strong>OpenShift turns it off</strong>. It wakes up once someone visits again. I had no idea about that and spent some time trying to stop that behavior. Obviously, I could have scheduled a cron job on my laptop pinging it every now and then. Luckily, OpenShift can run cron jobs itself. All you need is to embed a cron cartridge into the running application (and install a bunch of ruby dependencies&nbsp;beforehand).</p>
+<div class="highlight"><pre><span></span>rhc cartridge add cron-1.4 -a app-name
+</pre></div>
+
+
+<p>Then create <code>.openshift/cron/{hourly,daily,weekly,monthly}</code> folder in the git repository and put your script running a simple curl command into one of&nbsp;those.</p>
+<div class="highlight"><pre><span></span>curl http://social-zimmi.rhcloud.com &gt; /dev/null
+</pre></div>
+
+
+<p>Another problem was just around the corner. Once in a while, the app stopped writing data to the database without saying a word. What helped was restarting it - the only automatic way to do so being a <code>git push</code> command. Sadly, I haven&#8217;t found a way to restart the app from within itself; it probably can&#8217;t be&nbsp;done.</p>
+<p>When you <code>git push</code>, the gear stops, builds, deploys and restarts the app. By using hot deployment you can minimize the downtime. Just put the <code>hot_deploy</code> file into <code>.openshift/markers</code> folder.</p>
+<div class="highlight"><pre><span></span>git commit --allow-empty -m <span class="s2">&quot;Restart gear&quot;</span> <span class="o">&amp;&amp;</span> git push
+</pre></div>
+
+
+<p>This solved the problem until I realize that <strong>every restart deleted all the data</strong> collected so far. If your data are to stay safe and sound, <strong>save them in <code>process.env.OPENSHIFT_DATA_DIR</code></strong> (which is <code>app-root/data</code>).</p>
+<h3>Anacron to the&nbsp;rescue</h3>
+<p>How do you push an empty commit once a day? With cron of course. Even better, <strong>anacron</strong>.</p>
+<div class="highlight"><pre><span></span>mkdir ~/.anacron
+<span class="nb">cd</span> ~/.anacron
+mkdir cron.daily cron.weekly cron.monthly spool etc
+
+cat <span class="s">&lt;&lt;EOT &gt; ~/.anacron/etc/anacrontab</span>
+
+<span class="s">SHELL=/bin/sh</span>
+<span class="s">PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/$HOME/bin</span>
+<span class="s">HOME=$HOME</span>
+<span class="s">LOGNAME=$USER</span>
+
+<span class="s">1 5  daily-cron nice run-parts --report $HOME/.anacron/cron.daily</span>
+<span class="s">7 10 weekly-cron nice run-parts --report $HOME/.anacron/cron.weekly</span>
+<span class="s">@monthly 15 monthly-cron nice run-parts --report $HOME/.anacron/cron.monthly</span>
+
+<span class="s">EOT</span>
+
+cat <span class="s">&lt;&lt;EOT &gt;&gt; ~/.zprofile # I use zsh shell</span>
+<span class="s">rm -f $HOME/.anacron/anacron.log</span>
+<span class="s">/usr/sbin/anacron -t /home/zimmi/.anacron/etc/anacrontab -S /home/zimmi/.anacron/spool &amp;&gt; /home/zimmi/.anacron/anacron.log</span>
+
+<span class="s">EOT</span>
+</pre></div>
+
+
+<p>Anacron is to laptop what cron is to 24/7 running server. It just runs automatic jobs when the laptop is running. If it&#8217;s not and the job should be run, it runs it once the <span class="caps">OS</span> boots. Brilliant&nbsp;idea.</p>
+<p>It runs the following code for me to keep the app writing data to the&nbsp;database.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+<span class="nv">workdir</span><span class="o">=</span><span class="s1">&#39;/home/zimmi/documents/zimmi/dizertace/social&#39;</span>
+<span class="nv">logfile</span><span class="o">=</span><span class="nv">$workdir</span>/restart-gear.log
+date &gt; <span class="nv">$logfile</span>
+
+<span class="o">{</span> 
+<span class="nv">HOME</span><span class="o">=</span>/home/zimmi
+<span class="nb">cd</span> <span class="nv">$workdir</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
+git merge origin/master <span class="o">&amp;&amp;</span> <span class="se">\</span>
+git commit --allow-empty -m <span class="s2">&quot;Restart gear&quot;</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
+git push <span class="o">&amp;&amp;</span> <span class="se">\</span>
+<span class="nb">echo</span> <span class="s2">&quot;Success&quot;</span> <span class="p">;</span> 
+<span class="o">}</span> &gt;&gt; <span class="nv">$logfile</span> <span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span>
+</pre></div>
+
+
+<p><strong><span class="caps">UPDATE</span>:</strong> Spent a long time debugging the &#8220;Permission denied (publickey).&#8221;-like errors. What seems to help&nbsp;is:</p>
+<ol>
+<li>Use id_rsa instead of any other <span class="caps">SSH</span>&nbsp;key</li>
+<li>Put a new entry into the <code>~/.ssh/config</code> file</li>
+</ol>
+<p>I don&#8217;t know which one did the magic&nbsp;though.</p>
+<p>I&#8217;ve been harvesting Twitter for a month with about 10-15K tweets a day (only interested in the Czech Republic). 
+<sup>1</sup>&frasl;<sub>6</sub> to <sup>1</sup>&frasl;<sub>5</sub> of them is located with latitude and longitude. More on this next&nbsp;time.</p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
             <h1><a href="https://www.zimmi.cz/posts/2015/leaflet-with-custom-crs-epsg5514/" rel="bookmark" title="Permalink to Leaflet With Custom CRS (EPSG:5514)">Leaflet With Custom <span class="caps">CRS</span> (<span class="caps">EPSG</span>:5514)</a></h1>
             <small>Written on Jan 15, 2015
         and marked as

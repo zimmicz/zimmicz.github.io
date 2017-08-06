@@ -1,5 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Michal Zimmermann</title><link href="https://www.zimmi.cz/posts/" rel="alternate"></link><link href="https://www.zimmi.cz/posts/atom.xml" rel="self"></link><id>https://www.zimmi.cz/posts/</id><updated>2017-07-19T13:30:00+02:00</updated><entry><title>Fighting Raster GeoPackage with GDAL</title><link href="https://www.zimmi.cz/posts/2017/fighting-raster-geopackage-with-gdal/" rel="alternate"></link><published>2017-07-19T13:30:00+02:00</published><updated>2017-07-19T13:30:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-07-19:/posts/2017/fighting-raster-geopackage-with-gdal/</id><summary type="html">&lt;p&gt;As I&amp;#8217;m still running Ubuntu 16.04 based Linux Mint, I have no access to &lt;span class="caps"&gt;GDAL&lt;/span&gt; 2.x repositories (except for ubuntugis, that I really don&amp;#8217;t like to use). Provided with a GeoPackage raster file recently, I had to find a way to load it into &lt;span class="caps"&gt;QGIS&lt;/span&gt;, somehow …&lt;/p&gt;</summary><content type="html">&lt;p&gt;As I&amp;#8217;m still running Ubuntu 16.04 based Linux Mint, I have no access to &lt;span class="caps"&gt;GDAL&lt;/span&gt; 2.x repositories (except for ubuntugis, that I really don&amp;#8217;t like to use). Provided with a GeoPackage raster file recently, I had to find a way to load it into &lt;span class="caps"&gt;QGIS&lt;/span&gt;, somehow. The solution is simple: Docker with&amp;nbsp;gdal_translate.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Michal Zimmermann</title><link href="https://www.zimmi.cz/posts/" rel="alternate"></link><link href="https://www.zimmi.cz/posts/atom.xml" rel="self"></link><id>https://www.zimmi.cz/posts/</id><updated>2017-08-06T18:00:00+02:00</updated><entry><title>PostGIS as a Mapbox Vector Tiles generator</title><link href="https://www.zimmi.cz/posts/2017/postgis-as-a-mapbox-vector-tiles-generator/" rel="alternate"></link><published>2017-08-06T18:00:00+02:00</published><updated>2017-08-06T18:00:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-08-06:/posts/2017/postgis-as-a-mapbox-vector-tiles-generator/</id><summary type="html">&lt;p&gt;&lt;a href="http://postgis.net/2017/08/05/postgis-2.4.0alpha/"&gt;PostGIS 2.4.0&lt;/a&gt; was released recently bringing the possibilities to generate &lt;strong&gt;Mapbox Vector Tiles&lt;/strong&gt; without any third party tools. I got a shot at it with Node.js and docker. Even if it&amp;#8217;s not as straightforward as solely using &lt;a href="https://postgis.net/docs/manual-dev/ST_AsMVT.html"&gt;ST_AsMVT&lt;/a&gt;, it still looks pretty&amp;nbsp;great.&lt;/p&gt;
+&lt;h2&gt;Docker&amp;nbsp;container&lt;/h2&gt;
+&lt;p&gt;There …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://postgis.net/2017/08/05/postgis-2.4.0alpha/"&gt;PostGIS 2.4.0&lt;/a&gt; was released recently bringing the possibilities to generate &lt;strong&gt;Mapbox Vector Tiles&lt;/strong&gt; without any third party tools. I got a shot at it with Node.js and docker. Even if it&amp;#8217;s not as straightforward as solely using &lt;a href="https://postgis.net/docs/manual-dev/ST_AsMVT.html"&gt;ST_AsMVT&lt;/a&gt;, it still looks pretty&amp;nbsp;great.&lt;/p&gt;
+&lt;h2&gt;Docker&amp;nbsp;container&lt;/h2&gt;
+&lt;p&gt;There are no Ubuntu or Debian based PostGIS 2.4.0 packages as far as I know. As installation from source (especially considering &lt;span class="caps"&gt;GIS&lt;/span&gt; software) is always a bit risky, I prefer using Docker to stay away from trouble. The image is based on Ubuntu 17.04, has PostgreSQL 9.6 and PostGIS 2.4.0 installed. It exposes port 5432 to the host, so you can access the database from the outside the&amp;nbsp;container.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;FROM ubuntu:17.04
+RUN apt update
+RUN apt install -y wget less systemd
+RUN touch /etc/apt/sources.list.d/pgdg.list
+RUN &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;deb http://apt.postgresql.org/pub/repos/apt/ zesty-pgdg main&amp;quot;&lt;/span&gt; &amp;gt; /etc/apt/sources.list.d/pgdg.list
+RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc &lt;span class="p"&gt;|&lt;/span&gt; apt-key add -
+RUN apt update
+RUN apt -y install postgresql-9.6 postgresql-server-dev-9.6
+
+USER postgres
+RUN /usr/lib/postgresql/9.6/bin/pg_ctl -D /var/lib/postgresql/9.6/main -l /tmp/logfile start
+
+USER root
+RUN &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;host all  all    0.0.0.0/0  trust&amp;quot;&lt;/span&gt; &amp;gt;&amp;gt; /etc/postgresql/9.6/main/pg_hba.conf &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;listen_addresses=&amp;#39;*&amp;#39;&amp;quot;&lt;/span&gt; &amp;gt;&amp;gt; /etc/postgresql/9.6/main/postgresql.conf
+
+
+EXPOSE &lt;span class="m"&gt;5432&lt;/span&gt;
+RUN apt install -y netcat build-essential libxml2 libxml2-dev libgeos-3.5.1 libgdal-dev gdal-bin libgdal20 libgeos-dev libprotobuf-c1 libprotobuf-c-dev libprotobuf-dev protobuf-compiler protobuf-c-compiler
+RUN wget http://download.osgeo.org/postgis/source/postgis-2.4.0alpha.tar.gz
+RUN tar -xvzf postgis-2.4.0alpha.tar.gz
+RUN &lt;span class="nb"&gt;cd&lt;/span&gt; postgis-2.4.0alpha &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; ./configure &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; make &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; make install
+
+USER postgres
+RUN service postgresql start &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; psql -c &lt;span class="s2"&gt;&amp;quot;CREATE EXTENSION postgis&amp;quot;&lt;/span&gt;
+
+USER root
+COPY start.postgis.sh /start.postgis.sh
+RUN chmod &lt;span class="m"&gt;0755&lt;/span&gt; /start.postgis.sh
+
+CMD &lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/start.postgis.sh&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;start.postgis.sh&lt;/code&gt; file starts the database server and keeps it running&amp;nbsp;forever.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
+
+&lt;span class="nv"&gt;DATADIR&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/var/lib/postgresql/9.6/main&amp;quot;&lt;/span&gt;
+&lt;span class="nv"&gt;CONF&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/etc/postgresql/9.6/main/postgresql.conf&amp;quot;&lt;/span&gt;
+&lt;span class="nv"&gt;POSTGRES&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/usr/lib/postgresql/9.6/bin/postgres&amp;quot;&lt;/span&gt;
+
+su postgres sh -c &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$POSTGRES&lt;/span&gt;&lt;span class="s2"&gt; -D &lt;/span&gt;&lt;span class="nv"&gt;$DATADIR&lt;/span&gt;&lt;span class="s2"&gt; -c config_file=&lt;/span&gt;&lt;span class="nv"&gt;$CONF&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;&amp;amp;&lt;/span&gt;
+&lt;span class="k"&gt;until&lt;/span&gt; nc -z localhost &lt;span class="m"&gt;5432&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;do&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; ...
+    sleep &lt;span class="m"&gt;5&lt;/span&gt;
+&lt;span class="k"&gt;done&lt;/span&gt;
+sleep &lt;span class="m"&gt;5&lt;/span&gt; &lt;span class="c1"&gt;# just for sure&lt;/span&gt;
+su - postgres -c &lt;span class="s2"&gt;&amp;quot;psql -c \&amp;quot;CREATE EXTENSION IF NOT EXISTS postgis\&amp;quot;&amp;quot;&lt;/span&gt;
+&lt;span class="nb"&gt;echo&lt;/span&gt; database up and running
+
+&lt;span class="nb"&gt;wait&lt;/span&gt; &lt;span class="nv"&gt;$!&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Data&lt;/h2&gt;
+&lt;p&gt;I got a cadastre area dataset of the Czech Republic for testing, which contains ~ 13,000 polygons. The geometries should come in Web Mercator a.k.a. &lt;span class="caps"&gt;EPSG&lt;/span&gt;:3857 to work with &lt;a href="https://www.mapbox.com/vector-tiles/specification/"&gt;&lt;span class="caps"&gt;MVT&lt;/span&gt;&lt;/a&gt;.&lt;/p&gt;
+&lt;h2&gt;Vector&amp;nbsp;tiles&lt;/h2&gt;
+&lt;p&gt;I got a bit confused by the docs of &lt;a href="https://postgis.net/docs/manual-dev/ST_AsMVT.html"&gt;ST_AsMVT&lt;/a&gt; and &lt;a href="https://postgis.net/docs/manual-dev/ST_AsMVTGeom.html"&gt;ST_AsMVTGeom&lt;/a&gt;. Especially the latter one took me a few hours to get it right. What is essential (I guess) about Mapbox Vector Tiles is that you have to abstract from the real world coordinates and start thinking inside the tile coordinates. What PostGIS does with &lt;code&gt;ST_AsMVTGeom&lt;/code&gt; (and what any other &lt;span class="caps"&gt;MVT&lt;/span&gt; implemenation should do for you) is that it takes real world coordinates and put them inside a&amp;nbsp;tile.&lt;/p&gt;
+&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/postgis-as-a-mapbox-vector-tiles-generator/mvt.gif"/&gt;&lt;/div&gt;
+
+&lt;p&gt;To make this work, you need to know every bounding box of every tile on every zoom level in a Web Mercator projection. Or you can use &lt;a href="https://github.com/mapbox/postgis-vt-util/blob/master/src/TileBBox.sql"&gt;TileBBox procedure by Mapbox&lt;/a&gt;, if you&amp;nbsp;wish.&lt;/p&gt;
+&lt;p&gt;The &lt;span class="caps"&gt;SQL&lt;/span&gt; query itself is pretty simple (this comes from an express route I&amp;#8217;ll be discussing&amp;nbsp;shortly).&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt; &lt;span class="n"&gt;ST_AsMVT&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;cadastre&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;4096&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;geom&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;q&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="k"&gt;SELECT&lt;/span&gt;
+        &lt;span class="n"&gt;code&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="n"&gt;ST_AsMVTGeom&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+            &lt;span class="n"&gt;geom&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+            &lt;span class="n"&gt;TileBBox&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="err"&gt;${&lt;/span&gt;&lt;span class="n"&gt;req&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;params&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;z&lt;/span&gt;&lt;span class="err"&gt;}&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="err"&gt;${&lt;/span&gt;&lt;span class="n"&gt;req&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;params&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="err"&gt;}&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="err"&gt;${&lt;/span&gt;&lt;span class="n"&gt;req&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;params&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="err"&gt;}&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;3857&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+            &lt;span class="mi"&gt;4096&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+            &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+            &lt;span class="k"&gt;false&lt;/span&gt;
+        &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;geom&lt;/span&gt;
+    &lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="n"&gt;cadastre_area&lt;/span&gt;
+    &lt;span class="k"&gt;WHERE&lt;/span&gt; &lt;span class="n"&gt;ST_Intersects&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;geom&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt; &lt;span class="n"&gt;ST_Transform&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ST_MakeEnvelope&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="mi"&gt;3857&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;q&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;When filled with proper arguments instead of placeholders, it returns a&amp;nbsp;bytea.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="se"&gt;\x&lt;/span&gt;1aa5dbd0070a047465737412e216120400000101180322d7160987913f8db38e01aa59160e2a010412012a0624060e001410420a1a00203b0a3914190e15085912010a0f0c0f06370804080a0e0e0234090e0
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This can be consumed by a Leaflet map using &lt;a href="https://github.com/Leaflet/Leaflet.VectorGrid"&gt;Leaflet.VectorGrid plugin&lt;/a&gt;. To keep it short, the frontend code actually boils down to three lines of&amp;nbsp;code.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;url&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;http://localhost:3000/mvt/{x}/{y}/{z}&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;cadastre&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;L&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;vectorGrid&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;protobuf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;url&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="nx"&gt;map&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;addLayer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;cadastre&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;a href="https://gist.github.com/zimmicz/9e78d9888ab73abc7e87553b77999bc8"&gt;server &lt;span class="caps"&gt;MVP&lt;/span&gt; is available&lt;/a&gt; as a GitHub&amp;nbsp;gist.&lt;/p&gt;</content><category term="docker"></category><category term="postgis"></category><category term="javascript"></category></entry><entry><title>Fighting Raster GeoPackage with GDAL</title><link href="https://www.zimmi.cz/posts/2017/fighting-raster-geopackage-with-gdal/" rel="alternate"></link><published>2017-07-19T13:30:00+02:00</published><updated>2017-07-19T13:30:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-07-19:/posts/2017/fighting-raster-geopackage-with-gdal/</id><summary type="html">&lt;p&gt;As I&amp;#8217;m still running Ubuntu 16.04 based Linux Mint, I have no access to &lt;span class="caps"&gt;GDAL&lt;/span&gt; 2.x repositories (except for ubuntugis, that I really don&amp;#8217;t like to use). Provided with a GeoPackage raster file recently, I had to find a way to load it into &lt;span class="caps"&gt;QGIS&lt;/span&gt;, somehow …&lt;/p&gt;</summary><content type="html">&lt;p&gt;As I&amp;#8217;m still running Ubuntu 16.04 based Linux Mint, I have no access to &lt;span class="caps"&gt;GDAL&lt;/span&gt; 2.x repositories (except for ubuntugis, that I really don&amp;#8217;t like to use). Provided with a GeoPackage raster file recently, I had to find a way to load it into &lt;span class="caps"&gt;QGIS&lt;/span&gt;, somehow. The solution is simple: Docker with&amp;nbsp;gdal_translate.&lt;/p&gt;
 &lt;h2&gt;Preparing the Docker&amp;nbsp;container&lt;/h2&gt;
 &lt;p&gt;I like using Docker for experiments that might leave the &lt;span class="caps"&gt;OS&lt;/span&gt; in an &lt;em&gt;unexpected&lt;/em&gt; state (which is exactly what happens to me with ubuntugis repository whenever I use it. That&amp;#8217;s why I don&amp;#8217;t anymore.). A very simple Dockerfile keeps the troubles away from&amp;nbsp;you.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;FROM ubuntu:17.04
