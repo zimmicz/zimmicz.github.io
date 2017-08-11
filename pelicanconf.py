@@ -6,7 +6,7 @@ AUTHOR = u'Michal Zimmermann'
 SITENAME = u'Michal Zimmermann'
 SITESUBTITLE = u'Pieces of knowledge from the world of GIS.'
 SITEURL = ''
-
+OUTPUT_PATH = 'posts/'
 PATH = 'content'
 THEME = 'content/theme/simple'
 TIMEZONE = 'Europe/Prague'

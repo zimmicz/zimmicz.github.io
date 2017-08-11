@@ -61,6 +61,338 @@
 
     <div class="panel card card-1">
         <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2017/postgresql-development-history-revealed-with-postgresql/" rel="bookmark" title="Permalink to PostgreSQL Development History Revealed with PostgreSQL">PostgreSQL Development History Revealed with&nbsp;PostgreSQL</a></h1>
+            <small>Written on Aug 9, 2017
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/python.html">python</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
+        </small>
+        <section>
+            <p>I spend a lot of time reading <a href="https://www.postgresql.org/docs/manuals/">PostgreSQL docs</a>. It occurred to me just a few weeks ago that those versioned manuals are great opportunity to get an insight into PostgreSQL development history. Using PostgreSQL, of&nbsp;course.</p>
+<h2><span class="caps">TOP</span> 5 functions with the most verbose docs in each&nbsp;version</h2>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span>
+    <span class="k">version</span><span class="p">,</span>
+    <span class="n">string_agg</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="s1">&#39; | &#39;</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">letter_count</span> <span class="k">DESC</span><span class="p">)</span>
+<span class="k">FROM</span> <span class="p">(</span>
+    <span class="k">SELECT</span>
+        <span class="k">version</span><span class="p">,</span>
+        <span class="n">func</span><span class="p">,</span>
+        <span class="n">letter_count</span><span class="p">,</span>
+        <span class="n">row_number</span><span class="p">()</span> <span class="n">OVER</span> <span class="p">(</span><span class="n">PARTITION</span> <span class="k">BY</span> <span class="k">version</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">letter_count</span> <span class="k">DESC</span><span class="p">)</span>
+    <span class="k">FROM</span> <span class="n">postgresql_development</span><span class="p">.</span><span class="k">data</span>
+<span class="p">)</span> <span class="n">a</span>
+<span class="k">WHERE</span> <span class="n">row_number</span> <span class="o">&lt;=</span> <span class="mi">10</span>
+<span class="k">GROUP</span> <span class="k">BY</span> <span class="k">version</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="k">version</span> <span class="k">DESC</span>
+</pre></div>
+
+
+<p>Seems like a huge comeback for <code>CREATE TABLE</code>.</p>
+<table>
+<thead>
+<tr>
+<th><span class="caps">VERSION</span></th>
+<th>1st</th>
+<th>2nd</th>
+<th>3rd</th>
+<th>4th</th>
+<th>5th</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10.0</td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">SELECT</span></td>
+</tr>
+<tr>
+<td>9.6</td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">SELECT</span></td>
+</tr>
+<tr>
+<td>9.5</td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">SELECT</span></td>
+</tr>
+<tr>
+<td>9.4</td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">SELECT</span></td>
+</tr>
+<tr>
+<td>9.3</td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">DEFAULT</span> <span class="caps">PRIVILEGES</span></td>
+</tr>
+<tr>
+<td>9.2</td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">DEFAULT</span> <span class="caps">PRIVILEGES</span></td>
+</tr>
+<tr>
+<td>9.1</td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">DEFAULT</span> <span class="caps">PRIVILEGES</span></td>
+</tr>
+<tr>
+<td>9.0</td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">DEFAULT</span> <span class="caps">PRIVILEGES</span></td>
+</tr>
+<tr>
+<td>8.4</td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">SELECT</span></td>
+</tr>
+<tr>
+<td>8.3</td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">COMMENT</span></td>
+</tr>
+<tr>
+<td>8.2</td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">SELECT</span></td>
+</tr>
+<tr>
+<td>8.1</td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">SELECT</span></td>
+</tr>
+<tr>
+<td>8</td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">SELECT</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+</tr>
+<tr>
+<td>7.4</td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">SELECT</span></td>
+</tr>
+<tr>
+<td>7.3</td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">SELECT</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">GRANT</span></td>
+</tr>
+<tr>
+<td>7.2</td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">SELECT</span> <span class="caps">INTO</span></td>
+<td><span class="caps">SELECT</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TYPE</span></td>
+</tr>
+<tr>
+<td>7.1</td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">SELECT</span> <span class="caps">INTO</span></td>
+<td><span class="caps">SELECT</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TYPE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+</tr>
+<tr>
+<td>7.0</td>
+<td><span class="caps">SELECT</span></td>
+<td><span class="caps">SELECT</span> <span class="caps">INTO</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TYPE</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">COMMENT</span></td>
+</tr>
+</tbody>
+</table>
+<h2>Number of functions available in each&nbsp;version</h2>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span>
+    <span class="k">version</span><span class="p">,</span>
+    <span class="k">count</span><span class="p">(</span><span class="n">func</span><span class="p">),</span>
+    <span class="k">sum</span><span class="p">(</span><span class="n">letter_count</span><span class="p">)</span>
+<span class="k">FROM</span> <span class="n">postgresql_development</span><span class="p">.</span><span class="k">data</span>
+<span class="k">GROUP</span> <span class="k">BY</span> <span class="k">version</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="k">version</span><span class="p">;</span>
+</pre></div>
+
+
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/postgresql-development-history-revealed-with-postgresql/plot1.png"/></div>
+
+<h2>The most verbose docs in each&nbsp;version</h2>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="k">DISTINCT</span> <span class="k">ON</span> <span class="p">(</span><span class="k">version</span><span class="p">)</span>
+    <span class="k">version</span><span class="p">,</span>
+    <span class="n">func</span><span class="p">,</span>
+    <span class="n">letter_count</span>
+<span class="k">FROM</span> <span class="n">postgresql_development</span><span class="p">.</span><span class="k">data</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="k">version</span><span class="p">,</span> <span class="n">letter_count</span> <span class="k">DESC</span><span class="p">;</span>
+</pre></div>
+
+
+<p>Poor <code>REVOKE</code>, the defeated&nbsp;champion.</p>
+<div class="text-center">
+    <table style="margin-left:auto; margin-right: auto">
+    <thead>
+    <tr>
+    <th><span class="caps"><span class="caps">VERSION</span></span></th>
+    <th><span class="caps"><span class="caps">FUNCTION</span></span></th>
+    <th><span class="caps"><span class="caps">LETTER</span></span> <span class="caps"><span class="caps">COUNT</span></span></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td>10</td>
+    <td><span class="caps"><span class="caps">CREATE</span></span> <span class="caps"><span class="caps">TABLE</span></span></td>
+    <td>3142</td>
+    </tr>
+    <tr>
+    <td>9.6</td>
+    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
+    <td>2856</td>
+    </tr>
+    <tr>
+    <td>9.5</td>
+    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
+    <td>2856</td>
+    </tr>
+    <tr>
+    <td>9.4</td>
+    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
+    <td>2856</td>
+    </tr>
+    <tr>
+    <td>9.3</td>
+    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
+    <td>2856</td>
+    </tr>
+    <tr>
+    <td>9.2</td>
+    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
+    <td>2856</td>
+    </tr>
+    <tr>
+    <td>9.1</td>
+    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
+    <td>2508</td>
+    </tr>
+    <tr>
+    <td>9</td>
+    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
+    <td>2502</td>
+    </tr>
+    <tr>
+    <td>8.4</td>
+    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
+    <td>2105</td>
+    </tr>
+    <tr>
+    <td>8.3</td>
+    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
+    <td>1485</td>
+    </tr>
+    <tr>
+    <td>8.2</td>
+    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
+    <td>1527</td>
+    </tr>
+    <tr>
+    <td>8.1</td>
+    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
+    <td>1312</td>
+    </tr>
+    <tr>
+    <td>8</td>
+    <td><span class="caps"><span class="caps">CREATE</span></span> <span class="caps"><span class="caps">TABLE</span></span></td>
+    <td>1251</td>
+    </tr>
+    <tr>
+    <td>7.4</td>
+    <td><span class="caps"><span class="caps">CREATE</span></span> <span class="caps"><span class="caps">TABLE</span></span></td>
+    <td>1075</td>
+    </tr>
+    <tr>
+    <td>7.3</td>
+    <td><span class="caps"><span class="caps">CREATE</span></span> <span class="caps"><span class="caps">TABLE</span></span></td>
+    <td>929</td>
+    </tr>
+    <tr>
+    <td>7.2</td>
+    <td><span class="caps"><span class="caps">CREATE</span></span> <span class="caps"><span class="caps">TABLE</span></span></td>
+    <td>929</td>
+    </tr>
+    <tr>
+    <td>7.1</td>
+    <td><span class="caps"><span class="caps">CREATE</span></span> <span class="caps"><span class="caps">TABLE</span></span></td>
+    <td>871</td>
+    </tr>
+    <tr>
+    <td>7</td>
+    <td><span class="caps"><span class="caps">SELECT</span></span></td>
+    <td>450</td>
+    </tr>
+    </tbody>
+    </table>
+</div>
+
+<h2><span class="caps">CREATE</span> <span class="caps">TABLE</span> docs&nbsp;evolution</h2>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span>
+    <span class="k">version</span><span class="p">,</span>
+    <span class="n">letter_count</span>
+<span class="k">FROM</span> <span class="n">postgresql_development</span><span class="p">.</span><span class="k">data</span>
+<span class="k">WHERE</span> <span class="n">func</span> <span class="o">=</span> <span class="s1">&#39;CREATE TABLE&#39;</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="n">func</span><span class="p">,</span> <span class="k">version</span><span class="p">;</span>
+</pre></div>
+
+
+<p>Something&#8217;s going on in an upcoming 10.0&nbsp;version.</p>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/postgresql-development-history-revealed-with-postgresql/plot2.png"/></div>
+
+<p>All the data was obtained with the following Python script and processed inside the PostgreSQL database. Plots done with <a href="http://bokeh.pydata.org/en/latest/">Bokeh</a>, though I probably wouldn&#8217;t use it again, the docs site is absurdly sluggish and the info is just all over the&nbsp;place.</p>
+<script src="https://gist.github.com/zimmicz/f69a5ce5d3cf3a220e171553c35e0391.js"></script>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
             <h1><a href="https://www.zimmi.cz/posts/2017/postgis-as-a-mapbox-vector-tiles-generator/" rel="bookmark" title="Permalink to PostGIS as a Mapbox Vector Tiles generator">PostGIS as a Mapbox Vector Tiles&nbsp;generator</a></h1>
             <small>Written on Aug 6, 2017
         and marked as
@@ -828,81 +1160,6 @@ Running this script will delete the old cluster<span class="err">&#39;</span>s d
 
 
 <p>Brilliant.</p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2017/subdivide-and-conquer-effective-spatial-indexes-in-postgis/" rel="bookmark" title="Permalink to Subdivide and Conquer: Effective Spatial Indexes in PostGIS">Subdivide and Conquer: Effective Spatial Indexes in&nbsp;PostGIS</a></h1>
-            <small>Written on Jan 10, 2017
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
-        </small>
-        <section>
-            <p>Spatial indexes are absolutely crucial part of any spatial database and - as I tend to say quite often - only a fool would try to query spatial data without building spatial indexes&nbsp;beforehand.</p>
-<p>Spatial indexes are based on bounding box comparisons, which are generally very fast. Yet, there are situations when spatial indexes don&#8217;t help much (or they don&#8217;t help as much as they could, if you&nbsp;wish).</p>
-<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/subdivide-and-conquer-effective-spatial-indexes-in-postgis/index.svg" /></div>
-
-<p>Bounding box comparisons are effective with lots of small bounding boxes rather then few large ones. Why? See the picture above. The curved line (imagine it&#8217;s a pipeline for example) clearly demonstrates when the spatial index/bounding box comparison might fall short of what you&#8217;d&nbsp;expect.</p>
-<p>Once the bounding box gets really big, it intersects so many other geometries&#8217; bounding boxes that the whole comparison starts to slow&nbsp;down.</p>
-<p>Luckily, PostGIS 2.2 introduced a <a href="http://postgis.net/docs/ST_Subdivide.html">ST_Subdivide</a> function that can lend a helping hand in&nbsp;here.</p>
-<p>Until today, we delivered the parcel geometries into our <a href="https://www.symap.cz">real estate acquisition process system</a> with the following query, that takes all the geometries from the <code>req_geom</code> table (pipelines, remember?) and intersects them with cadastral parcels. The second part of the query adds those parcels that haven&#8217;t been digitalized and were created manually by one of my&nbsp;workmates.</p>
-<div class="highlight"><pre><span></span><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">requested_parcels</span> <span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">par_id</span><span class="p">)</span>
-<span class="k">SELECT</span>
-    <span class="n">reqs</span><span class="p">.</span><span class="n">uid</span><span class="p">,</span>
-    <span class="n">b</span><span class="p">.</span><span class="n">id</span> <span class="n">par_id</span>
- <span class="k">FROM</span>
-    <span class="n">running_requests</span> <span class="n">reqs</span>
- <span class="k">JOIN</span>
-    <span class="n">req_geom</span> <span class="n">a</span> <span class="k">ON</span> <span class="p">(</span><span class="n">reqs</span><span class="p">.</span><span class="n">uid</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">uid</span><span class="p">)</span>
- <span class="k">JOIN</span>
-    <span class="n">pargeo</span> <span class="n">b</span> <span class="k">ON</span> <span class="p">(</span><span class="n">ST_Intersects</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span>
- <span class="k">UNION</span>
- <span class="k">SELECT</span>
-    <span class="n">reqs</span><span class="p">.</span><span class="n">uid</span><span class="p">,</span>
-    <span class="n">a</span><span class="p">.</span><span class="n">idpar</span><span class="p">::</span><span class="nb">numeric</span>
- <span class="k">FROM</span>
-    <span class="n">running_requests</span> <span class="n">reqs</span>
- <span class="k">JOIN</span>
-     <span class="n">req_man</span> <span class="n">a</span> <span class="k">ON</span> <span class="p">(</span><span class="n">reqs</span><span class="p">.</span><span class="n">uid</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">uid</span><span class="p">);</span>
-</pre></div>
-
-
-<p>It&#8217;s a perfectly standard query that intersects several request geometries with ~20M parcels, nothing really fancy. Except that it takes 25 minutes to finish. Why? Pipelines,&nbsp;remember?</p>
-<p>Yet, the query below takes only 30 seconds to finish (that&#8217;s a huge time saver considering that the whole process used to take ~40 minutes)! Why? Because the <code>ST_Subdivide</code> effectively shrinks the <code>req_geom</code> geometries until they have 50 vertices each at most. Such small geometries are perfect input for the bounding box comparison. Remember to call <code>DISTINCT</code> when using <code>ST_Subdivide</code>, you&#8217;d probably get duplicate parcel ids&nbsp;otherwise.</p>
-<p>I also replaced the <code>UNION</code> with the <a href="https://www.zimmi.cz/posts/2015/postgresql-in-vs-exists/"><code>WHERE NOT EXISTS</code></a> expression, as it&#8217;s reasonable to assume that numeric ids comparison will be&nbsp;faster.</p>
-<div class="highlight"><pre><span></span><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">requested_parcels</span> <span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">par_id</span><span class="p">)</span>
-<span class="k">SELECT</span> <span class="k">DISTINCT</span>
-    <span class="n">reqs</span><span class="p">.</span><span class="n">uid</span><span class="p">,</span>
-    <span class="n">b</span><span class="p">.</span><span class="n">id</span> <span class="n">par_id</span>
- <span class="k">FROM</span>
-    <span class="n">running_requests</span> <span class="n">reqs</span>
- <span class="k">JOIN</span>
-    <span class="p">(</span>
-        <span class="k">SELECT</span>
-            <span class="n">uid</span><span class="p">,</span>
-            <span class="n">ST_Subdivide</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span> <span class="n">geom</span>
-        <span class="k">FROM</span>
-            <span class="n">req_geom</span>
-     <span class="p">)</span> <span class="n">a</span> <span class="k">ON</span> <span class="p">(</span><span class="n">reqs</span><span class="p">.</span><span class="n">uid</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">uid</span><span class="p">)</span>
- <span class="k">JOIN</span>
-     <span class="n">pargeo</span> <span class="n">b</span> <span class="k">ON</span> <span class="p">(</span><span class="n">ST_Intersects</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">geom</span><span class="p">));</span>
-
- <span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">requested_parcels</span> <span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">par_id</span><span class="p">)</span>
- <span class="k">SELECT</span>
-     <span class="n">reqs</span><span class="p">.</span><span class="n">uid</span><span class="p">,</span>
-     <span class="n">a</span><span class="p">.</span><span class="n">idpar</span><span class="p">::</span><span class="nb">numeric</span>
- <span class="k">FROM</span>
-     <span class="n">running_requests</span> <span class="n">reqs</span>
- <span class="k">JOIN</span>
-     <span class="n">req_man</span> <span class="n">a</span> <span class="k">ON</span> <span class="p">(</span><span class="n">reqs</span><span class="p">.</span><span class="n">uid</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">uid</span><span class="p">)</span>
- <span class="k">WHERE</span> <span class="k">NOT</span> <span class="k">EXISTS</span> <span class="p">(</span>
-     <span class="k">SELECT</span> <span class="mi">1</span>
-     <span class="k">FROM</span> <span class="n">pozadovane_parcely</span> <span class="n">pp</span>
-     <span class="k">WHERE</span> <span class="n">pp</span><span class="p">.</span><span class="n">par_id</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">idpar</span>
-  <span class="p">);</span>
-</pre></div>
         </section>
         </div>
     </div>

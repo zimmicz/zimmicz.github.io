@@ -61,6 +61,92 @@
 
     <div class="panel card card-1">
         <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2015/twitter-rest-api-data-mining-on-openshift-part-ii/" rel="bookmark" title="Permalink to Twitter REST API Data Mining on OpenShift (Part II)">Twitter <span class="caps">REST</span> <span class="caps">API</span> Data Mining on OpenShift (Part <span class="caps">II</span>)</a></h1>
+            <small>Written on Dec 6, 2015
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>,         <a href="https://www.zimmi.cz/posts/tag/openshift.html">openshift</a>,         <a href="https://www.zimmi.cz/posts/tag/twitter.html">twitter</a>        | <a href="https://www.zimmi.cz/posts/category/development.html">development</a>
+        </small>
+        <section>
+            <p>Last time I described <a href="https://www.zimmi.cz/posts/2015/twitter-rest-api-data-mining-on-openshift-part-i/">the setup of my OpenShift Twitter crawler</a> and let it running and downloading data. It&#8217;s been more than two months since I started and I got interesting amount of data. I also made a simple <span class="caps">ETL</span> process to load it into my local PostGIS database, which I&#8217;d like to cover in this&nbsp;post.</p>
+<h2>Extract&nbsp;data</h2>
+<p>Each day is written to the separate sqlite file with a name like <code>tw_day_D_M_YYYY</code>. <code>Bash</code> is used to gzip all the files before downloading them from&nbsp;OpenShift.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+ssh openshift <span class="s">&lt;&lt; EOF</span>
+<span class="s">    cd app-root/data</span>
+<span class="s">    tar czf twitter.tar.gz *.db</span>
+<span class="s">EOF</span>
+
+scp openshift:/var/lib/openshift/55e487587628e1280b0000a9/app-root/data/twitter.tar.gz ./data
+<span class="nb">cd</span> data <span class="o">&amp;&amp;</span>
+tar -xzf twitter.tar.gz <span class="o">&amp;&amp;</span>
+<span class="nb">cd</span> -
+
+<span class="nb">echo</span> <span class="s2">&quot;Extract done&quot;</span>
+</pre></div>
+
+
+<h2>Transform&nbsp;data</h2>
+<p>The transformation part operates on downloaded files and merges them into one big <span class="caps">CSV</span> file. That&#8217;s pretty straightforward. Note that&#8217;s quite simple with sqlite flags, some <code>sed</code> and <code>tail</code> commands.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+rm -rf ./data/csv
+mkdir ./data/csv
+
+<span class="k">for</span> db in ./data/*.db<span class="p">;</span> <span class="k">do</span>
+    <span class="nv">FILENAME</span><span class="o">=</span><span class="k">$(</span>basename <span class="nv">$db</span><span class="k">)</span>
+    <span class="nv">DBNAME</span><span class="o">=</span><span class="si">${</span><span class="nv">FILENAME</span><span class="p">%%.db</span><span class="si">}</span>
+    <span class="nv">CSVNAME</span><span class="o">=</span><span class="nv">$DBNAME</span>.csv
+    <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$DBNAME</span><span class="s2"> to csv...&quot;</span>
+    sqlite3 -header -csv <span class="nv">$db</span> <span class="s2">&quot;select * from </span><span class="nv">$DBNAME</span><span class="s2">;&quot;</span> &gt; ./data/csv/<span class="nv">$CSVNAME</span>
+<span class="k">done</span>
+
+<span class="nb">cd</span> ./data/csv
+touch tweets.csv
+<span class="nb">echo</span> <span class="k">$(</span>sed -n 1p <span class="k">$(</span>ls -d -1 *.csv <span class="p">|</span> head -n <span class="m">1</span><span class="k">))</span> &gt; tweets.csv <span class="c1"># get column names</span>
+
+<span class="k">for</span> csv in tw_*.csv<span class="p">;</span> <span class="k">do</span>
+    <span class="nb">echo</span> <span class="nv">$csv</span>
+    tail -n +2 <span class="nv">$csv</span> &gt;&gt; tweets.csv <span class="c1"># get all lines without the first one</span>
+<span class="k">done</span>
+</pre></div>
+
+
+<h2>Load&nbsp;data</h2>
+<p>In the last step, the data is loaded with <span class="caps">SQL</span> <code>\copy</code> command.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+<span class="nb">export</span> <span class="nv">PG_USE_COPY</span><span class="o">=</span>YES
+
+<span class="nv">DATABASE</span><span class="o">=</span>mzi_dizertace
+<span class="nv">SCHEMA</span><span class="o">=</span>dizertace
+<span class="nv">TABLE</span><span class="o">=</span>tweets
+
+psql <span class="nv">$DATABASE</span> <span class="s">&lt;&lt; EOF</span>
+<span class="s">    DROP TABLE IF EXISTS $SCHEMA.$TABLE;</span>
+<span class="s">    CREATE UNLOGGED TABLE $SCHEMA.$TABLE (id text, author text, author_id text, tweet text, created_at text, lon float, lat float, lang text);</span>
+<span class="s">    \copy $SCHEMA.$TABLE FROM &#39;data/csv/tweets.csv&#39; CSV HEADER DELIMITER &#39;,&#39;</span>
+<span class="s">    ALTER TABLE $SCHEMA.$TABLE ADD COLUMN wkb_geometry geometry(POINT, 4326);</span>
+<span class="s">    UPDATE $SCHEMA.$TABLE SET wkb_geometry = ST_SetSRID(ST_MakePoint(lon, lat), 4326);</span>
+<span class="s">    CREATE INDEX ${TABLE}_geom_idx ON $SCHEMA.$TABLE USING gist(wkb_geometry);</span>
+<span class="s">    COMMIT;</span>
+<span class="s">EOF</span>
+</pre></div>
+
+
+<h2>First&nbsp;statistics</h2>
+<p>Some interesting charts and numbers&nbsp;follow.</p>
+<p class="text-center"><img title="Top 100 Twitter users in the Czech Republic" src="https://www.zimmi.cz/posts/assets/twitter-rest-api-data-mining-on-openshift-part-ii/authors.png" class="img-responsive centered"></p>
+
+<p class="text-center"><img title="When people tweet in the Czech Republic" src="https://www.zimmi.cz/posts/assets/twitter-rest-api-data-mining-on-openshift-part-ii/hours.png" class="img-responsive centered"></p>
+
+<p class="text-center"><img title="Languages on Twitter in the Czech Republic" src="https://www.zimmi.cz/posts/assets/twitter-rest-api-data-mining-on-openshift-part-ii/languages.png" class="img-responsive centered"></p>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
             <h1><a href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-iii/" rel="bookmark" title="Permalink to PostGIS Case Study: Vozejkmap Open Data (Part III)">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">III</span>)</a></h1>
             <small>Written on Nov 14, 2015
         and marked as
@@ -843,39 +929,6 @@ gdalwarp -dstalpha -s_srs <span class="s1">&#39;EPSG:5514&#39;</span> -t_srs <sp
 <li>The outer <code>WHERE</code> clause throws away all the points closer than 500 meters. Remember, we already got only those not further than 2,000 meters from the previous&nbsp;step.</li>
 </ol>
 <p>It took PostGIS 1060545,590 ms (~ 17 minutes) on my Quad-Core Intel® Core™ i5-4210M <span class="caps">CPU</span> @ 2.60GHz, 4 <span class="caps">GB</span> <span class="caps">RAM</span>, 500 <span class="caps">GB</span> <span class="caps">SSD</span> hard drive, PostgreSQL 9.3 and PostGIS 2.1 with two point datasets having 4M and 300K rows,&nbsp;respectively.</p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2015/qgis-tips-for-collaborative-mapping/" rel="bookmark" title="Permalink to QGIS Tips For Collaborative Mapping"><span class="caps">QGIS</span> Tips For Collaborative&nbsp;Mapping</a></h1>
-            <small>Written on Jul 21, 2015
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>        | <a href="https://www.zimmi.cz/posts/category/tools.html">Tools</a>
-        </small>
-        <section>
-            <p>Right now I&#8217;m setting up a project aimed at crop evaluation over ortophotos, <span class="caps">HR</span> and <span class="caps">VHR</span> imagery. All the steps of evaluation will be done in <span class="caps">QGIS</span> with PostGIS used for data storage and&nbsp;post-processing.</p>
-<p>In the initial phase, fifteen <span class="caps">GIS</span> operators will be using <span class="caps">QGIS</span> to reshape geometries and fill attribute data accordingly. Fifteen are not so many, but it is enough to be a possible source of errors. Luckily, there are many things you can do with <span class="caps">QGIS</span> to prevent people from making&nbsp;mistakes.</p>
-<h2><span class="caps">QGIS</span> project&nbsp;file</h2>
-<p><span class="caps">QGIS</span> project, the .qgs file, is a pure <span class="caps">XML</span> and, unlike <span class="caps">ESRI</span>&#8217;s .mxd, can be edited with any text editor. That&#8217;s great advantage when you need to prepare one project for many different operators. My project has to load some database layers that should be different for different operators that have different database&nbsp;accounts.</p>
-<p>How do you do that? It&#8217;s enough to create a project using your own credentials and then replace them with <code>USERNAME</code> and <code>PASSWORD</code> strings as seen below. What happens when the user loads the&nbsp;project?</p>
-<div class="highlight"><pre><span></span><span class="nt">&lt;datasource&gt;</span>dbname=&#39;database&#39; host=host port=5432 user=&#39;USERNAME&#39; password=&#39;PASSWORD&#39; sslmode=require key=&#39;qgis_id&#39; srid=5514 type=POLYGON table=&quot;schema&quot;.&quot;table&quot; (wkb_geometry) sql=<span class="nt">&lt;/datasource&gt;</span>
-</pre></div>
-
-
-<p>A popup window will be shown asking him/her to handle bad layers, as <span class="caps">QGIS</span> will not be able to connect to the layer. When he/she fills in right credentials (just once), the layer will be loaded. Don&#8217;t forget to <strong>use a table name that doesn&#8217;t exist</strong>, <span class="caps">QGIS</span> will use the credentials stored with PostGIS connection otherwise and won&#8217;t ask for them. <em>I don&#8217;t like this&nbsp;behaviour.</em></p>
-<p>Using this multiple times for each user-specific layer is a great time&nbsp;saver.</p>
-<h2>Adjust attribute table to fit your&nbsp;needs</h2>
-<p><span class="caps">QGIS</span> attribute table has so many settings you probably don&#8217;t use on daily basis and yet they might be invaluable in such project. All of them are available from layer properties under the Fields&nbsp;tab.</p>
-<p class='text-center'><img src="https://www.zimmi.cz/posts/assets/qgis-tips-for-collaborative-mapping/hidden.png" width=50% class="img-responsive centered"></p>
-
-<p>Sadly, our PostGIS layers are very wide in terms of column count. Not all of the columns are to be edited or even seen by operators, so it might be a good idea to hide them by setting their Edit Widget to Hidden. Those that should be seen, but not edited, might be set as not editable by unchecking that&nbsp;option.</p>
-<p>Lots of our attributes use enumerations provided by our project partner as <span class="caps">CSV</span> files. We use them in <span class="caps">QGIS</span> as value maps, so operators don&#8217;t have to type them manually - we both make their work easier and eliminate mistakes they&nbsp;made.</p>
-<p class='text-center'><img src="https://www.zimmi.cz/posts/assets/qgis-tips-for-collaborative-mapping/valuemap.png" width=50% class="img-responsive centered"></p>
-
-<p>Note <span class="caps">QGIS</span> swallows the first row of the given <span class="caps">CSV</span> file as if it was a header. Don&#8217;t forget about this when creating your own enumerations. Once set, operators will see a friendly combo box instead of a hostile blank input in the attribute&nbsp;table.</p>
-<p>These are just small adjustments that can make a big difference in your <span class="caps">QGIS</span>&nbsp;workflow.</p>
         </section>
         </div>
     </div>
