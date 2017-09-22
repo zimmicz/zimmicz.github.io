@@ -1,5 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Michal Zimmermann</title><link href="https://www.zimmi.cz/posts/" rel="alternate"></link><link href="https://www.zimmi.cz/posts/atom.xml" rel="self"></link><id>https://www.zimmi.cz/posts/</id><updated>2017-08-09T19:00:00+02:00</updated><entry><title>PostgreSQL Development History Revealed with PostgreSQL</title><link href="https://www.zimmi.cz/posts/2017/postgresql-development-history-revealed-with-postgresql/" rel="alternate"></link><published>2017-08-09T19:00:00+02:00</published><updated>2017-08-09T19:00:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-08-09:/posts/2017/postgresql-development-history-revealed-with-postgresql/</id><summary type="html">&lt;p&gt;I spend a lot of time reading &lt;a href="https://www.postgresql.org/docs/manuals/"&gt;PostgreSQL docs&lt;/a&gt;. It occurred to me just a few weeks ago that those versioned manuals are great opportunity to get an insight into PostgreSQL development history. Using PostgreSQL, of&amp;nbsp;course.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Michal Zimmermann</title><link href="https://www.zimmi.cz/posts/" rel="alternate"></link><link href="https://www.zimmi.cz/posts/atom.xml" rel="self"></link><id>https://www.zimmi.cz/posts/</id><updated>2017-09-22T20:30:00+02:00</updated><entry><title>PostgreSQL Dollar Quoting inside Bash Heredoc</title><link href="https://www.zimmi.cz/posts/2017/postgresql-dollar-quoting-inside-bash-heredoc/" rel="alternate"></link><published>2017-09-22T20:30:00+02:00</published><updated>2017-09-22T20:30:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-09-22:/posts/2017/postgresql-dollar-quoting-inside-bash-heredoc/</id><summary type="html">&lt;p&gt;Yesterday I spent two very unpleasant hours debugging the weirdest &lt;span class="caps"&gt;SQL&lt;/span&gt; error I&amp;#8217;ve seen in my life, running the below query (simplified for this&amp;nbsp;post).&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;psql&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;qAt&lt;/span&gt; &lt;span class="c1"&gt;--no-psqlrc &amp;lt;&amp;lt;BACKUP&lt;/span&gt;
+&lt;span class="k"&gt;DO&lt;/span&gt;
+&lt;span class="err"&gt;$$&lt;/span&gt;
+&lt;span class="k"&gt;DECLARE&lt;/span&gt; &lt;span class="n"&gt;r&lt;/span&gt; &lt;span class="n"&gt;record&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;BEGIN&lt;/span&gt;
+  &lt;span class="n"&gt;RAISE&lt;/span&gt; &lt;span class="n"&gt;INFO&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;%&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;info&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;END&lt;/span&gt;
+&lt;span class="err"&gt;$$&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="n"&gt;BACKUP&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Running this in your terminal will result in a nasty …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Yesterday I spent two very unpleasant hours debugging the weirdest &lt;span class="caps"&gt;SQL&lt;/span&gt; error I&amp;#8217;ve seen in my life, running the below query (simplified for this&amp;nbsp;post).&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;psql&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;qAt&lt;/span&gt; &lt;span class="c1"&gt;--no-psqlrc &amp;lt;&amp;lt;BACKUP&lt;/span&gt;
+&lt;span class="k"&gt;DO&lt;/span&gt;
+&lt;span class="err"&gt;$$&lt;/span&gt;
+&lt;span class="k"&gt;DECLARE&lt;/span&gt; &lt;span class="n"&gt;r&lt;/span&gt; &lt;span class="n"&gt;record&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;BEGIN&lt;/span&gt;
+  &lt;span class="n"&gt;RAISE&lt;/span&gt; &lt;span class="n"&gt;INFO&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;%&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;info&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;END&lt;/span&gt;
+&lt;span class="err"&gt;$$&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="n"&gt;BACKUP&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Running this in your terminal will result in a nasty syntax&amp;nbsp;error.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;ERROR:  syntax error at or near &lt;span class="s2"&gt;&amp;quot;1111&amp;quot;&lt;/span&gt;
+LINE &lt;span class="m"&gt;2&lt;/span&gt;: &lt;span class="m"&gt;1111&lt;/span&gt;
+        ^
+ERROR:  syntax error at or near &lt;span class="s2"&gt;&amp;quot;RAISE&amp;quot;&lt;/span&gt;
+LINE &lt;span class="m"&gt;2&lt;/span&gt;:   RAISE INFO &lt;span class="s1"&gt;&amp;#39;%&amp;#39;&lt;/span&gt;, &lt;span class="s1"&gt;&amp;#39;info&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+          ^
+ERROR:  syntax error at or near &lt;span class="s2"&gt;&amp;quot;1111&amp;quot;&lt;/span&gt;
+LINE &lt;span class="m"&gt;2&lt;/span&gt;: &lt;span class="m"&gt;1111&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;You stare on the screen for a while, absolutely sure that number &lt;code&gt;1111&lt;/code&gt; is nowhere close to the data you work with. You try again. Another error. You save the code into a file and try again. It works. What the &lt;em&gt;heck&lt;/em&gt;? You try again using the bash heredoc. Another&amp;nbsp;failure.&lt;/p&gt;
+&lt;p&gt;The minute you realize &lt;code&gt;$$&lt;/code&gt; is being substituted with the &lt;span class="caps"&gt;ID&lt;/span&gt; of the current process, you feel like the dumbest person on Earth. Yet the happiest one at the same&amp;nbsp;time.&lt;/p&gt;
+&lt;p&gt;The solution is&amp;nbsp;trivial.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;psql&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;qAt&lt;/span&gt; &lt;span class="c1"&gt;--no-psqlrc &amp;lt;&amp;lt;BACKUP&lt;/span&gt;
+&lt;span class="k"&gt;DO&lt;/span&gt;
+&lt;span class="err"&gt;\$\$&lt;/span&gt;
+&lt;span class="k"&gt;DECLARE&lt;/span&gt; &lt;span class="n"&gt;r&lt;/span&gt; &lt;span class="n"&gt;record&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;BEGIN&lt;/span&gt;
+  &lt;span class="n"&gt;RAISE&lt;/span&gt; &lt;span class="n"&gt;INFO&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;%&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;info&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;END&lt;/span&gt;
+&lt;span class="err"&gt;\$\$&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="n"&gt;BACKUP&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</content><category term="sql"></category><category term="postgresql"></category><category term="bash"></category></entry><entry><title>PostgreSQL Development History Revealed with PostgreSQL</title><link href="https://www.zimmi.cz/posts/2017/postgresql-development-history-revealed-with-postgresql/" rel="alternate"></link><published>2017-08-09T19:00:00+02:00</published><updated>2017-08-09T19:00:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-08-09:/posts/2017/postgresql-development-history-revealed-with-postgresql/</id><summary type="html">&lt;p&gt;I spend a lot of time reading &lt;a href="https://www.postgresql.org/docs/manuals/"&gt;PostgreSQL docs&lt;/a&gt;. It occurred to me just a few weeks ago that those versioned manuals are great opportunity to get an insight into PostgreSQL development history. Using PostgreSQL, of&amp;nbsp;course.&lt;/p&gt;
 &lt;h2&gt;&lt;span class="caps"&gt;TOP&lt;/span&gt; 5 functions with the most verbose docs in each&amp;nbsp;version&lt;/h2&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt;
     &lt;span class="k"&gt;version …&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;I spend a lot of time reading &lt;a href="https://www.postgresql.org/docs/manuals/"&gt;PostgreSQL docs&lt;/a&gt;. It occurred to me just a few weeks ago that those versioned manuals are great opportunity to get an insight into PostgreSQL development history. Using PostgreSQL, of&amp;nbsp;course.&lt;/p&gt;

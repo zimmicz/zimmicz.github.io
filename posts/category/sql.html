@@ -62,6 +62,56 @@
 
     <div class="panel card card-1">
         <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2017/postgresql-dollar-quoting-inside-bash-heredoc/" rel="bookmark" title="Permalink to PostgreSQL Dollar Quoting inside Bash Heredoc">PostgreSQL Dollar Quoting inside Bash&nbsp;Heredoc</a></h1>
+            <small>Written on Sep 22, 2017
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
+        </small>
+        <section>
+            <p>Yesterday I spent two very unpleasant hours debugging the weirdest <span class="caps">SQL</span> error I&#8217;ve seen in my life, running the below query (simplified for this&nbsp;post).</p>
+<div class="highlight"><pre><span></span><span class="n">psql</span> <span class="o">-</span><span class="n">qAt</span> <span class="c1">--no-psqlrc &lt;&lt;BACKUP</span>
+<span class="k">DO</span>
+<span class="err">$$</span>
+<span class="k">DECLARE</span> <span class="n">r</span> <span class="n">record</span><span class="p">;</span>
+<span class="k">BEGIN</span>
+  <span class="n">RAISE</span> <span class="n">INFO</span> <span class="s1">&#39;%&#39;</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">;</span>
+<span class="k">END</span>
+<span class="err">$$</span><span class="p">;</span>
+<span class="n">BACKUP</span>
+</pre></div>
+
+
+<p>Running this in your terminal will result in a nasty syntax&nbsp;error.</p>
+<div class="highlight"><pre><span></span>ERROR:  syntax error at or near <span class="s2">&quot;1111&quot;</span>
+LINE <span class="m">2</span>: <span class="m">1111</span>
+        ^
+ERROR:  syntax error at or near <span class="s2">&quot;RAISE&quot;</span>
+LINE <span class="m">2</span>:   RAISE INFO <span class="s1">&#39;%&#39;</span>, <span class="s1">&#39;info&#39;</span><span class="p">;</span>
+          ^
+ERROR:  syntax error at or near <span class="s2">&quot;1111&quot;</span>
+LINE <span class="m">2</span>: <span class="m">1111</span><span class="p">;</span>
+</pre></div>
+
+
+<p>You stare on the screen for a while, absolutely sure that number <code>1111</code> is nowhere close to the data you work with. You try again. Another error. You save the code into a file and try again. It works. What the <em>heck</em>? You try again using the bash heredoc. Another&nbsp;failure.</p>
+<p>The minute you realize <code>$$</code> is being substituted with the <span class="caps">ID</span> of the current process, you feel like the dumbest person on Earth. Yet the happiest one at the same&nbsp;time.</p>
+<p>The solution is&nbsp;trivial.</p>
+<div class="highlight"><pre><span></span><span class="n">psql</span> <span class="o">-</span><span class="n">qAt</span> <span class="c1">--no-psqlrc &lt;&lt;BACKUP</span>
+<span class="k">DO</span>
+<span class="err">\$\$</span>
+<span class="k">DECLARE</span> <span class="n">r</span> <span class="n">record</span><span class="p">;</span>
+<span class="k">BEGIN</span>
+  <span class="n">RAISE</span> <span class="n">INFO</span> <span class="s1">&#39;%&#39;</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">;</span>
+<span class="k">END</span>
+<span class="err">\$\$</span><span class="p">;</span>
+<span class="n">BACKUP</span>
+</pre></div>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
             <h1><a href="https://www.zimmi.cz/posts/2017/postgresql-development-history-revealed-with-postgresql/" rel="bookmark" title="Permalink to PostgreSQL Development History Revealed with PostgreSQL">PostgreSQL Development History Revealed with&nbsp;PostgreSQL</a></h1>
             <small>Written on Aug 9, 2017
         and marked as
@@ -1014,82 +1064,6 @@ Running this script will delete the old cluster<span class="err">&#39;</span>s d
 
 <div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">ST_PolygonFromCentroid</span><span class="p">(</span><span class="n">ST_SetSRID</span><span class="p">(</span><span class="n">ST_MakePoint</span><span class="p">(</span><span class="mi">13</span><span class="p">.</span><span class="mi">912</span><span class="p">,</span><span class="mi">50</span><span class="p">.</span><span class="mi">633</span><span class="p">),</span><span class="mi">4326</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 </pre></div>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2016/finding-polygons-lying-across-other-polygons-with-postgis/" rel="bookmark" title="Permalink to Finding Polygons Lying across Other Polygons with PostGIS">Finding Polygons Lying across Other Polygons with&nbsp;PostGIS</a></h1>
-            <small>Written on Aug 5, 2016
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
-        </small>
-        <section>
-            <p>Doing overlays (<code>ST_Intersection()</code>) in PostGIS based on spatial relationships (<code>ST_Intersects()</code>, <code>ST_Contains()</code>, &hellip;) is so easy it is not something you get particularly excited&nbsp;about.</p>
-<p>Today I faced a bit more interesting task: <strong>given two polygon layers, get me all the polygons from layer A such that they lie across the polygons from layer B and&hellip; a picture worth a thousand words,&nbsp;right?</strong></p>
-<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/finding-polygons-lying-across-other-polygons-with-postgis/polygons.svg" /></div>
-
-<p>I hope you got the idea, it is fairly&nbsp;simple:</p>
-<ol>
-<li>Intersect A (red, blue) with B&nbsp;(green)</li>
-<li>Subtract the result of previous from layer&nbsp;A</li>
-<li>Combine results from steps 1 and&nbsp;2</li>
-<li>Keep polygon only if its id occurs more than twice (that means it went straight through the layer&nbsp;B)</li>
-<li>Profit!</li>
-</ol>
-<!-- codeblock -->
-
-<div class="highlight"><pre><span></span><span class="k">WITH</span> <span class="n">overlays</span> <span class="k">AS</span> <span class="p">(</span>
-<span class="cm">/* nothing fancy here */</span>
-    <span class="k">SELECT</span>
-        <span class="n">A</span><span class="p">.</span><span class="n">ogc_fid</span> <span class="n">a_id</span><span class="p">,</span>
-        <span class="n">B</span><span class="p">.</span><span class="n">ogc_fid</span> <span class="n">b_id</span><span class="p">,</span>
-        <span class="n">ST_Intersection</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">B</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">geom</span><span class="p">,</span>
-        <span class="n">ST_Area</span><span class="p">(</span><span class="n">ST_Intersection</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">B</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">area_shared</span>
-    <span class="k">FROM</span> <span class="n">A</span>
-    <span class="k">JOIN</span> <span class="n">B</span> <span class="k">ON</span> <span class="p">(</span><span class="n">ST_Intersects</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">B</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span>
-<span class="p">),</span>
-<span class="n">diffs</span> <span class="k">AS</span> <span class="p">(</span>
-<span class="cm">/* note this is a 1:1 relationship in ST_Difference */</span>
-<span class="cm">/* a little hack is needed to prevent PostGIS from returning its usual difference mess */</span>
-    <span class="k">SELECT</span>
-        <span class="n">o</span><span class="p">.</span><span class="n">a_id</span><span class="p">,</span>
-        <span class="n">o</span><span class="p">.</span><span class="n">b_id</span><span class="p">,</span>
-        <span class="p">(</span><span class="n">ST_Dump</span><span class="p">(</span><span class="n">ST_Difference</span><span class="p">(</span><span class="n">ST_Buffer</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="o">-</span><span class="mi">0</span><span class="p">.</span><span class="mi">0001</span><span class="p">),</span> <span class="n">o</span><span class="p">.</span><span class="n">geom</span><span class="p">))).</span><span class="n">geom</span><span class="p">,</span> <span class="c1">-- ugly hack</span>
-        <span class="n">o</span><span class="p">.</span><span class="n">area_shared</span>
-    <span class="k">FROM</span> <span class="n">overlays</span> <span class="n">o</span>
-    <span class="k">JOIN</span> <span class="n">A</span> <span class="k">ON</span> <span class="p">(</span><span class="n">o</span><span class="p">.</span><span class="n">a_id</span> <span class="o">=</span> <span class="n">A</span><span class="p">.</span><span class="n">id</span><span class="p">)</span>
-<span class="p">),</span>
-
-<span class="n">merged</span> <span class="k">AS</span> <span class="p">(</span>
-<span class="cm">/* put those two result sets together */</span>
-    <span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">overlays</span>
-    <span class="k">UNION</span> <span class="k">ALL</span>
-    <span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">diffs</span>
-<span class="p">),</span>
-
-<span class="n">merged_reduced</span> <span class="k">AS</span> <span class="p">(</span>
-<span class="cm">/* get only those A polygons that consist of three parts at least for each intersection with B polygon */</span>
-  <span class="k">SELECT</span>
-    <span class="n">m</span><span class="p">.</span><span class="o">*</span>
-  <span class="k">FROM</span> <span class="n">merged</span> <span class="n">m</span>
-  <span class="k">JOIN</span> <span class="p">(</span>
-    <span class="k">SELECT</span>
-      <span class="n">a_id</span><span class="p">,</span>
-      <span class="n">b_id</span>
-    <span class="k">FROM</span> <span class="n">merged</span>
-    <span class="k">GROUP</span> <span class="k">BY</span> <span class="n">a_id</span><span class="p">,</span> <span class="n">b_id</span>
-    <span class="k">HAVING</span> <span class="k">COUNT</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span>
-  <span class="p">)</span> <span class="n">a</span> <span class="k">ON</span> <span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">a_id</span> <span class="o">=</span> <span class="n">m</span><span class="p">.</span><span class="n">a_id</span> <span class="k">AND</span> <span class="n">a</span><span class="p">.</span><span class="n">b_id</span> <span class="o">=</span> <span class="n">m</span><span class="p">.</span><span class="n">b_id</span><span class="p">)</span>
-<span class="p">)</span>
-<span class="cm">/* do as you wish with the result */</span>
-<span class="k">SELECT</span> <span class="o">*</span>
-<span class="k">FROM</span> <span class="n">merged_reduced</span><span class="p">;</span>
-</pre></div>
-
-
-<p>In my case, centerlines of layer B were also included and their length inside each intersection was used to divide the area of the smallest part with. It was fun,&nbsp;actually.</p>
         </section>
         </div>
     </div>

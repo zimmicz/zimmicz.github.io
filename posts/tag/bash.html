@@ -62,6 +62,56 @@
 
     <div class="panel card card-1">
         <div class="post-name">
+            <h1><a href="https://www.zimmi.cz/posts/2017/postgresql-dollar-quoting-inside-bash-heredoc/" rel="bookmark" title="Permalink to PostgreSQL Dollar Quoting inside Bash Heredoc">PostgreSQL Dollar Quoting inside Bash&nbsp;Heredoc</a></h1>
+            <small>Written on Sep 22, 2017
+        and marked as
+        <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
+        </small>
+        <section>
+            <p>Yesterday I spent two very unpleasant hours debugging the weirdest <span class="caps">SQL</span> error I&#8217;ve seen in my life, running the below query (simplified for this&nbsp;post).</p>
+<div class="highlight"><pre><span></span><span class="n">psql</span> <span class="o">-</span><span class="n">qAt</span> <span class="c1">--no-psqlrc &lt;&lt;BACKUP</span>
+<span class="k">DO</span>
+<span class="err">$$</span>
+<span class="k">DECLARE</span> <span class="n">r</span> <span class="n">record</span><span class="p">;</span>
+<span class="k">BEGIN</span>
+  <span class="n">RAISE</span> <span class="n">INFO</span> <span class="s1">&#39;%&#39;</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">;</span>
+<span class="k">END</span>
+<span class="err">$$</span><span class="p">;</span>
+<span class="n">BACKUP</span>
+</pre></div>
+
+
+<p>Running this in your terminal will result in a nasty syntax&nbsp;error.</p>
+<div class="highlight"><pre><span></span>ERROR:  syntax error at or near <span class="s2">&quot;1111&quot;</span>
+LINE <span class="m">2</span>: <span class="m">1111</span>
+        ^
+ERROR:  syntax error at or near <span class="s2">&quot;RAISE&quot;</span>
+LINE <span class="m">2</span>:   RAISE INFO <span class="s1">&#39;%&#39;</span>, <span class="s1">&#39;info&#39;</span><span class="p">;</span>
+          ^
+ERROR:  syntax error at or near <span class="s2">&quot;1111&quot;</span>
+LINE <span class="m">2</span>: <span class="m">1111</span><span class="p">;</span>
+</pre></div>
+
+
+<p>You stare on the screen for a while, absolutely sure that number <code>1111</code> is nowhere close to the data you work with. You try again. Another error. You save the code into a file and try again. It works. What the <em>heck</em>? You try again using the bash heredoc. Another&nbsp;failure.</p>
+<p>The minute you realize <code>$$</code> is being substituted with the <span class="caps">ID</span> of the current process, you feel like the dumbest person on Earth. Yet the happiest one at the same&nbsp;time.</p>
+<p>The solution is&nbsp;trivial.</p>
+<div class="highlight"><pre><span></span><span class="n">psql</span> <span class="o">-</span><span class="n">qAt</span> <span class="c1">--no-psqlrc &lt;&lt;BACKUP</span>
+<span class="k">DO</span>
+<span class="err">\$\$</span>
+<span class="k">DECLARE</span> <span class="n">r</span> <span class="n">record</span><span class="p">;</span>
+<span class="k">BEGIN</span>
+  <span class="n">RAISE</span> <span class="n">INFO</span> <span class="s1">&#39;%&#39;</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">;</span>
+<span class="k">END</span>
+<span class="err">\$\$</span><span class="p">;</span>
+<span class="n">BACKUP</span>
+</pre></div>
+        </section>
+        </div>
+    </div>
+
+    <div class="panel card card-1">
+        <div class="post-name">
             <h1><a href="https://www.zimmi.cz/posts/2017/fighting-raster-geopackage-with-gdal/" rel="bookmark" title="Permalink to Fighting Raster GeoPackage with GDAL">Fighting Raster GeoPackage with <span class="caps">GDAL</span></a></h1>
             <small>Written on Jul 19, 2017
         and marked as
