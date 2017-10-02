@@ -4,71 +4,32 @@
         <title>Michal Zimmermann | category: automation</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
-        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?d5d1e141">
-<!-- Start of Async Drift Code -->
-<script>
-    !function () {
-        var t;
-        if (t = window.driftt = window.drift = window.driftt || [], !t.init) return t.invoked ? void (window.console && console.error && console.error("Drift snippet included twice.")) : (t.invoked = !0,
-            t.methods = ["identify", "config", "track", "reset", "debug", "show", "ping", "page", "hide", "off", "on"],
-            t.factory = function (e) {
-                return function () {
-                    var n;
-                    return n = Array.prototype.slice.call(arguments), n.unshift(e), t.push(n), t;
-                };
-            }, t.methods.forEach(function (e) {
-                t[e] = t.factory(e);
-            }), t.load = function (t) {
-                var e, n, o, i;
-                e = 3e5, i = Math.ceil(new Date() / e) * e, o = document.createElement("script"),
-                    o.type = "text/javascript", o.async = !0, o.crossorigin = "anonymous", o.src = "https://js.driftt.com/include/" + i + "/" + t + ".js",
-                    n = document.getElementsByTagName("script")[0], n.parentNode.insertBefore(o, n);
-            });
-    }();
-    drift.SNIPPET_VERSION = '0.3.1';
-    drift.load('caacyauy5t6b');
-
-</script>
-<!-- End of Async Drift Code --></head>
-
-<body id="index" class="home">
-    <nav class="top-bar card-1" data-topbar role="navigation">
-        <ul class="title-area">
-            <li class="name">
-                <h1><a href="/posts">Home</a></h1>
-            </li>
-     <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
-            <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+        <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
+        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="/theme/webassets-external/e17ffd2049da5254bb4b3183ea73c922_normalize.css">
+        <link rel="stylesheet" href="/theme/webassets-external/35f123b951b653f7b2d441b35b63d32a_github.css">
+        <link rel="stylesheet" href="/theme/webassets-external/310a2979488959b3c24d4edd2e18b50d_screen.css">
+</head>
+<body>
+    <nav role="navigation">
+        <ul>
+            <li><a href="/categories">Categories</a></li>
+            <li><a href="/tags">Tags</a></li>
+            <li><a href="/feed.xml">Subscribe to RSS feed</a></li>
         </ul>
-        <section class="top-bar-section">
-    <!-- Right Nav Section -->
-            <ul class="right">
-                <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
-                <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
-                <li><a href="https://www.zimmi.cz/posts/feed.xml">RSS feed</a></li>
-            </ul>
-        </section>
     </nav>
-        <div class="row">
-          <div class="large-12 columns header">
-            <h1><a href="/posts">Michal Zimmermann</a> <small>Pieces of knowledge from the world of GIS.</small></h1>
-          </div>
-        </div>
-        <div class="row">
-            <div class="large-12 columns">
+    <header>
+        <h1><a href="/posts">Michal Zimmermann<small>Pieces of knowledge from the world of GIS.</small></a></h1>
+    </header>
+    <main>
 <h2 class="text-center">Articles in the automation category</h2>
 
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2016/ogrinfo-output-formatting/" rel="bookmark" title="Permalink to Ogrinfo Output Formatting">Ogrinfo Output&nbsp;Formatting</a></h1>
-            <small>Written on Oct 21, 2016
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>        | <a href="https://www.zimmi.cz/posts/category/automation.html">automation</a>
-        </small>
-        <section>
-            <p>Today my workmate asked if there was a way to see an attribute table other than importing spatial data into a PostGIS database. I told him about <span class="caps">QGIS</span> and while talking about other <span class="caps">GIS</span> stuff, I started thinking about <em>pipes</em> and how awesome it would be to actually format the output of the <code>ogrinfo</code> command.</p>
+<article>
+    <h1><a href="/posts/2016/ogrinfo-output-formatting/" rel="bookmark" title="Permalink to Ogrinfo Output Formatting">Ogrinfo Output&nbsp;Formatting</a></h1>
+    Written on Oct 21, 2016
+    and marked as
+    <a href="/tag/gdal.html">gdal</a>    | <a href="/category/automation.html">automation</a>
+    <p>Today my workmate asked if there was a way to see an attribute table other than importing spatial data into a PostGIS database. I told him about <span class="caps">QGIS</span> and while talking about other <span class="caps">GIS</span> stuff, I started thinking about <em>pipes</em> and how awesome it would be to actually format the output of the <code>ogrinfo</code> command.</p>
 <p>Here it is. It is just a much longer way to do <code>ogr2ogr -f "CSV" dest source</code>, but sometimes you just have to experiment a&nbsp;bit.</p>
 <div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
 <span class="nv">FILE</span><span class="o">=</span><span class="nv">$1</span>
@@ -96,20 +57,14 @@
 
 
 <p>The result can be piped to other <code>bash</code> functions, such as <code>less</code> or <code>more</code>. I call it <code>ogrinfotable</code>.</p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2016/how-to-convert-dgn-to-tiff-with-gdal/" rel="bookmark" title="Permalink to How to convert DGN to Tiff with GDAL">How to convert <span class="caps">DGN</span> to Tiff with <span class="caps">GDAL</span></a></h1>
-            <small>Written on Feb 21, 2016
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>        | <a href="https://www.zimmi.cz/posts/category/automation.html">automation</a>
-        </small>
-        <section>
-            <p>We have to deal with <span class="caps">DGN</span> drawings quite often at <a href="http://www.clevermaps.cz">CleverMaps</a> - heavily used for infrastructure projects (highways, roads, pipelines), they are a pure nightmare to the <span class="caps">GIS</span> person inside me. Right now, I&#8217;m only capable of converting it into a raster file and serve it with Geoserver. The transformation from <span class="caps">DGN</span> to <span class="caps">PDF</span> to <span class="caps">PNG</span> to Tiff is not something that makes me utterly happy&nbsp;though.</p>
-<p>All you need to do the same is <a href="https://www.zimmi.cz/posts/tag/gdal.html"><span class="caps">GDAL</span></a>, ImageMagick, some <span class="caps">PDF</span> documents created out of <span class="caps">DGN</span> files - something MicroStation can help you with - and their upper left and lower right corner&nbsp;coordinates.</p>
+</article>
+<article>
+    <h1><a href="/posts/2016/how-to-convert-dgn-to-tiff-with-gdal/" rel="bookmark" title="Permalink to How to convert DGN to Tiff with GDAL">How to convert <span class="caps">DGN</span> to Tiff with <span class="caps">GDAL</span></a></h1>
+    Written on Feb 21, 2016
+    and marked as
+    <a href="/tag/gdal.html">gdal</a>    | <a href="/category/automation.html">automation</a>
+    <p>We have to deal with <span class="caps">DGN</span> drawings quite often at <a href="http://www.clevermaps.cz">CleverMaps</a> - heavily used for infrastructure projects (highways, roads, pipelines), they are a pure nightmare to the <span class="caps">GIS</span> person inside me. Right now, I&#8217;m only capable of converting it into a raster file and serve it with Geoserver. The transformation from <span class="caps">DGN</span> to <span class="caps">PDF</span> to <span class="caps">PNG</span> to Tiff is not something that makes me utterly happy&nbsp;though.</p>
+<p>All you need to do the same is <a href="/tag/gdal.html"><span class="caps">GDAL</span></a>, ImageMagick, some <span class="caps">PDF</span> documents created out of <span class="caps">DGN</span> files - something MicroStation can help you with - and their upper left and lower right corner&nbsp;coordinates.</p>
 <div class="highlight"><pre><span></span><span class="c1"># I recommend putting some limits on ImageMagick - it tends to eat up all the resources and quit</span>
 <span class="nb">export</span> <span class="nv">MAGICK_MEMORY_LIMIT</span><span class="o">=</span><span class="m">1512</span>
 <span class="nb">export</span> <span class="nv">MAGICK_MAP_LIMIT</span><span class="o">=</span><span class="m">512</span>
@@ -149,19 +104,13 @@ gdaladdo <span class="si">${</span><span class="nv">OUTPUTPATH</span><span class
 
 
 <p>And you&#8217;re done. The <code>.wld</code> file will be present for each resulting file. I rename it manually to match the name of a GeoTiff - that should be probably done automatically as&nbsp;well.</p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2015/color-relief-shaded-map-using-open-data-with-open-source-software/" rel="bookmark" title="Permalink to Color Relief Shaded Map Using Open Data with Open Source Software">Color Relief Shaded Map Using Open Data with Open Source&nbsp;Software</a></h1>
-            <small>Written on Oct 25, 2015
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>,         <a href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>,         <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>,         <a href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>        | <a href="https://www.zimmi.cz/posts/category/automation.html">automation</a>
-        </small>
-        <section>
-            <p>The Digital Elevation Model over Europe (<span class="caps">EU</span>-<span class="caps">DEM</span>) has been recently released for public usage at <a href="http://land.copernicus.eu/in-situ/eu-dem">Copernicus Land Monitoring Services homepage</a>. Strictly speaking, it is a <strong>digital surface model</strong> coming from weighted average of <span class="caps">SRTM</span> and <span class="caps">ASTER</span> <span class="caps">GDEM</span> with geographic accuracy of 25 m. Data are provided as GeoTIFF files projected in 1 degree by 1 degree tiles (projected to <span class="caps">EPSG</span>:3035), so they correspond to the <span class="caps">SRTM</span> naming&nbsp;convention.</p>
+</article>
+<article>
+    <h1><a href="/posts/2015/color-relief-shaded-map-using-open-data-with-open-source-software/" rel="bookmark" title="Permalink to Color Relief Shaded Map Using Open Data with Open Source Software">Color Relief Shaded Map Using Open Data with Open Source&nbsp;Software</a></h1>
+    Written on Oct 25, 2015
+    and marked as
+    <a href="/tag/bash.html">bash</a>,     <a href="/tag/gdal.html">gdal</a>,     <a href="/tag/linux.html">linux</a>,     <a href="/tag/qgis.html">qgis</a>    | <a href="/category/automation.html">automation</a>
+    <p>The Digital Elevation Model over Europe (<span class="caps">EU</span>-<span class="caps">DEM</span>) has been recently released for public usage at <a href="http://land.copernicus.eu/in-situ/eu-dem">Copernicus Land Monitoring Services homepage</a>. Strictly speaking, it is a <strong>digital surface model</strong> coming from weighted average of <span class="caps">SRTM</span> and <span class="caps">ASTER</span> <span class="caps">GDEM</span> with geographic accuracy of 25 m. Data are provided as GeoTIFF files projected in 1 degree by 1 degree tiles (projected to <span class="caps">EPSG</span>:3035), so they correspond to the <span class="caps">SRTM</span> naming&nbsp;convention.</p>
 <p>If you can&#8217;t see the map to choose the data to download, make sure you&#8217;re not using <span class="caps">HTTPS</span> Everywhere or similar browser&nbsp;plugin.</p>
 <p>I chose <strong>Austria</strong> to play with the&nbsp;data.</p>
 <h2>Obtaining the&nbsp;data</h2>
@@ -179,7 +128,7 @@ unrar dem.rar -d copernicus
 
 
 <p>And here comes the&nbsp;Alps.</p>
-<p class="text-center"><img title="Hillshade" src="https://www.zimmi.cz/posts/assets/color-relief-shaded-map-using-open-data-and-open-source-software/hillshade.png" class="center"></p>
+<p class="text-center"><img title="Hillshade" src="/assets/color-relief-shaded-map-using-open-data-and-open-source-software/hillshade.png" class="center"></p>
 
 <p>To create a color relief you need a ramp of heights with colors. <a href="http://cartographicperspectives.org/index.php/journal/article/viewFile/20/70">&#8220;The Development and Rationale of Cross-blended Hypsometric Tints&#8221;</a> by T. Patterson and B. Jenny is a great read on <strong>hypsometric tints</strong>. They also give advice on what colors to choose in different environments (see the table at the last page of the article). I settled for warm humid color&nbsp;values.</p>
 <table class="center">
@@ -255,7 +204,7 @@ unrar dem.rar -d copernicus
 
 
 <p>And here comes hypsometric&nbsp;tints.</p>
-<p class="text-center"><img title="Color relief" src="https://www.zimmi.cz/posts/assets/color-relief-shaded-map-using-open-data-and-open-source-software/color_relief.png" class="center"></p>
+<p class="text-center"><img title="Color relief" src="/assets/color-relief-shaded-map-using-open-data-and-open-source-software/color_relief.png" class="center"></p>
 
 <p>Add a bit of compression and some overviews to make it smaller and load&nbsp;faster.</p>
 <div class="highlight"><pre><span></span>gdal_translate -of GTiff -co <span class="nv">TILED</span><span class="o">=</span>YES -co <span class="nv">COMPRESS</span><span class="o">=</span>DEFLATE color_relief.tif color_relief.compress.tif
@@ -271,24 +220,18 @@ gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span c
 
 <h2>Map&nbsp;composition</h2>
 <p>I chose Austria for its excessive amount of freely available datasets. What I didn&#8217;t take into consideration was my lack of knowledge when it comes to German (#fail). States come from <a href="http://data.gv.at">data.gv.at</a> and was dissolved from smaller administrative units. State capitals were downloaded from <a href="http://naturalearth.com">naturalearth.com</a>.</p>
-<p class="text-center"><a href="https://www.zimmi.cz/posts/assets/color-relief-shaded-map-using-open-data-and-open-source-software/map.pdf" title="Click for PDF version"><img title="Austria" src="https://www.zimmi.cz/posts/assets/color-relief-shaded-map-using-open-data-and-open-source-software/map.png" class="center"></a></p>
+<p class="text-center"><a href="/assets/color-relief-shaded-map-using-open-data-and-open-source-software/map.pdf" title="Click for PDF version"><img title="Austria" src="/assets/color-relief-shaded-map-using-open-data-and-open-source-software/map.png" class="center"></a></p>
 
 <p>I&#8217;d like to add some more thematic layers in the future. And translate the map to&nbsp;English.</p>
 <h2>Few words on <span class="caps">INSPIRE</span>&nbsp;Geoportal</h2>
 <p><a href="http://inspire-geoportal.ec.europa.eu/"><span class="caps">INSPIRE</span> Geoportal</a> should be the first place you go to search for European spatial data (at last <span class="caps">EU</span> thinks so). I used it to find data for this map and it was a very frustrating experience. It was actually more frustrating than using Austrian open data portal in German. Last news are from May 21, 2015, but the whole site looks and feels like deep 90s or early 2000 at&nbsp;least.</p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2015/how-to-use-queue-with-rsync/" rel="bookmark" title="Permalink to How to Use Queue with Rsync">How to Use Queue with&nbsp;Rsync</a></h1>
-            <small>Written on Oct 1, 2015
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>,         <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>        | <a href="https://www.zimmi.cz/posts/category/automation.html">automation</a>
-        </small>
-        <section>
-            <p>Having more than 120K <span class="caps">5MB</span>+ images that should be moved to the server is a great oportunity for some automatic bash processing. It might be good idea to use <a href="http://www.imagemagick.org/script/index.php">ImageMagick</a> <a href="http://www.imagemagick.org/script/convert.php">convert tool</a> to make images smaller in a simple for loop. <a href="http://www.gnu.org/software/parallel/"><span class="caps">GNU</span> Parallel</a> can significantly increase the performance by running one job per <span class="caps">CPU</span>&nbsp;core.</p>
+</article>
+<article>
+    <h1><a href="/posts/2015/how-to-use-queue-with-rsync/" rel="bookmark" title="Permalink to How to Use Queue with Rsync">How to Use Queue with&nbsp;Rsync</a></h1>
+    Written on Oct 1, 2015
+    and marked as
+    <a href="/tag/linux.html">linux</a>,     <a href="/tag/bash.html">bash</a>    | <a href="/category/automation.html">automation</a>
+    <p>Having more than 120K <span class="caps">5MB</span>+ images that should be moved to the server is a great oportunity for some automatic bash processing. It might be good idea to use <a href="http://www.imagemagick.org/script/index.php">ImageMagick</a> <a href="http://www.imagemagick.org/script/convert.php">convert tool</a> to make images smaller in a simple for loop. <a href="http://www.gnu.org/software/parallel/"><span class="caps">GNU</span> Parallel</a> can significantly increase the performance by running one job per <span class="caps">CPU</span>&nbsp;core.</p>
 <div class="highlight"><pre><span></span>parallel --verbose convert <span class="o">{}</span> -quality <span class="m">40</span>% <span class="o">{}</span> ::: *.jpg
 </pre></div>
 
@@ -306,19 +249,13 @@ gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span c
 
 <p>By default, <code>inotifywait</code> stops after receiving a single event, while <code>-m</code> flag runs it indefinitely. <code>-e</code> flag defines an event to watch for, in my case that&#8217;s a <code>close_write</code> event. The <code>inotifywait</code> output can be piped to <code>rsync</code> that takes care of syncing local files to remote&nbsp;server.</p>
 <p>The last step, as usual, is&nbsp;profit.</p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/" rel="bookmark" title="Permalink to Automated Map Creation With QGIS, PostGIS, Python, SVG and ImageMagick">Automated Map Creation With <span class="caps">QGIS</span>, PostGIS, Python, <span class="caps">SVG</span> and&nbsp;ImageMagick</a></h1>
-            <small>Written on Aug 9, 2015
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>,         <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>,         <a href="https://www.zimmi.cz/posts/tag/python.html">python</a>,         <a href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>,         <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>        | <a href="https://www.zimmi.cz/posts/category/automation.html">automation</a>
-        </small>
-        <section>
-            <p>As mentioned in <a href="https://www.zimmi.cz/posts/2015/qgis-tips-for-collaborative-mapping/"><span class="caps">QGIS</span> Tips For Collaborative Mapping</a> we&#8217;re in the middle of crop evaluation project at <a href="http://www.clevermaps.cz/">CleverMaps</a>.</p>
+</article>
+<article>
+    <h1><a href="/posts/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/" rel="bookmark" title="Permalink to Automated Map Creation With QGIS, PostGIS, Python, SVG and ImageMagick">Automated Map Creation With <span class="caps">QGIS</span>, PostGIS, Python, <span class="caps">SVG</span> and&nbsp;ImageMagick</a></h1>
+    Written on Aug 9, 2015
+    and marked as
+    <a href="/tag/qgis.html">qgis</a>,     <a href="/tag/postgis.html">postgis</a>,     <a href="/tag/python.html">python</a>,     <a href="/tag/svg.html">svg</a>,     <a href="/tag/linux.html">linux</a>    | <a href="/category/automation.html">automation</a>
+    <p>As mentioned in <a href="/posts/2015/qgis-tips-for-collaborative-mapping/"><span class="caps">QGIS</span> Tips For Collaborative Mapping</a> we&#8217;re in the middle of crop evaluation project at <a href="http://www.clevermaps.cz/">CleverMaps</a>.</p>
 <p>With the <span class="caps">QGIS</span> workflow up and running, I&#8217;ve been focused on different <span class="caps">QGIS</span> related task: <strong>automatic map generation</strong> for land blocks that meet certain conditions. The logic behind identifying such land blocks is as&nbsp;follows:</p>
 <ul>
 <li>if the original area and the measured one differ more than 0.5 %&nbsp;or</li>
@@ -335,7 +272,7 @@ gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span c
 <li><span class="caps">HR</span>, <span class="caps">VHR</span>, <span class="caps">NIR</span> imagery, orthophoto - served via <span class="caps">WMS</span></li>
 </ul>
 <p>Labels should be visible only for the featured land block (both for the land parcels and the land block itself. The whole map scales dynamically, showing small land blocks zoomed in and the large ones zoomed&nbsp;out.</p>
-<p class='text-center'><a id="desired-map" title="Desired map" href="https://www.zimmi.cz/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map.jpg"><img title="Desired map" src="https://www.zimmi.cz/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map.jpg" width=70% class="img-responsive centered"></a></p>
+<p class='text-center'><a id="desired-map" title="Desired map" href="/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map.jpg"><img title="Desired map" src="/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map.jpg" width=70% class="img-responsive centered"></a></p>
 
 <p>Every map features additional&nbsp;items:</p>
 <ul>
@@ -378,7 +315,7 @@ gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span c
 <li>fixed scale: sets the scale the same for all the&nbsp;maps</li>
 </ul>
 <p>With these settings, I get a map similar to the one below. Notice two interesting&nbsp;things:</p>
-<p class='text-center'><a title="QGIS map skeleton" href="https://www.zimmi.cz/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map_skeleton.png"><img title="QGIS map skeleton" src="https://www.zimmi.cz/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map_skeleton.png" width=70% class="img-responsive centered"></a></p>
+<p class='text-center'><a title="QGIS map skeleton" href="/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map_skeleton.png"><img title="QGIS map skeleton" src="/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map_skeleton.png" width=70% class="img-responsive centered"></a></p>
 
 <ul>
 <li>Scale uses decimal places, which I find <em>a huge failure</em>. Has anyone ever seen a map with such scale? The worst is there is no easy way to hide these, or at least I didn&#8217;t find&nbsp;one.</li>
@@ -402,7 +339,7 @@ gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span c
 
 
 <p>With this simple expression, I get labels only for those land parcels that are part of the mapped land block. Even the <strong>layer style</strong> can be controlled with atlas feature. Land parcels inside the land block have blue borders, the rest is yellowish, remember? It&#8217;s a piece of cake with rule-based&nbsp;styling.</p>
-<p class='text-center'><a title="Layer style based on atlas feature" href="https://www.zimmi.cz/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/atlas_feature_style.png"><img title="Layer style based on atlas feature" src="https://www.zimmi.cz/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/atlas_feature_style.png" width=70% class="img-responsive centered"></a></p>
+<p class='text-center'><a title="Layer style based on atlas feature" href="/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/atlas_feature_style.png"><img title="Layer style based on atlas feature" src="/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/atlas_feature_style.png" width=70% class="img-responsive centered"></a></p>
 
 <h3>Atlas&nbsp;generation</h3>
 <p>When you&#8217;re set, atlas can be created with a single button. I used <span class="caps">SVG</span> as an output format to easily manipulate the map content afterwards. The resulting maps look like the one in <a href="#desired-map">the first picture</a> without the text in the red rectangle. A Python script appends this to each map&nbsp;afterwards.</p>
@@ -456,276 +393,20 @@ gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span c
 <h2>Conclusion</h2>
 <p>I created pretty efficient semi-automated workflow using several open source technologies that saves me a lot of work. Although <span class="caps">QGIS</span> has some minor pet peeves (scale with decimal places, not showing the entire feature, not substituting variables at times), it definitely makes boring map creation quite amusing. The more I work with big data / on big tasks, the more I find Linux a&nbsp;must-have.</p>
 <p>The whole process was done with <span class="caps">QGIS</span> 2.10, PostGIS 2.1, PostgreSQL 9.3, Python 2.7, ImageMagick&nbsp;6.7.</p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2015/clip-raster-with-vector-using-gdal/" rel="bookmark" title="Permalink to Clip Raster With Vector Using GDAL">Clip Raster With Vector Using <span class="caps">GDAL</span></a></h1>
-            <small>Written on Jul 21, 2015
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>,         <a href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>        | <a href="https://www.zimmi.cz/posts/category/automation.html">automation</a>
-        </small>
-        <section>
-            <p>Recently I needed to clip several raster files with polygonal layer of municipalities. A solution to this task is pretty straightforward using <a href="http://gdal.org/"><span class="caps">GDAL</span></a> and a bit of Bash and <span class="caps">QGIS</span> thrown&nbsp;in.</p>
-<p>The necessary steps&nbsp;are:</p>
-<ol>
-<li>Put each polygon to a separate file. This can be done easily with <code>Vector - Data Management Tools - Split Vector Layer</code> in <span class="caps">QGIS</span>. The solution below assumes that each shapefile has the same basename as the raster&nbsp;file.</li>
-<li>These polygons are stored in the <code>obce</code> subfolder relative to the folder with&nbsp;rasters.</li>
-<li>An <code>output</code> folder exists that is used for&#8230; output,&nbsp;yes.</li>
-<li>Rasters are saved with output alpha band for nodata (<code>-dstalpha</code> flag).</li>
-<li>The script takes one argument - raster&nbsp;name.</li>
-<li>Profit!</li>
-</ol>
-<div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env bash</span>
-
-<span class="nv">OBEC</span><span class="o">=</span><span class="nv">$1</span>
-<span class="nv">BASE</span><span class="o">=</span><span class="k">$(</span>basename <span class="nv">$OBEC</span> _jpeg.tif<span class="k">)</span>
-<span class="nb">echo</span> <span class="nv">$BASE</span>
-<span class="nv">EXTENT</span><span class="o">=</span><span class="k">$(</span>ogrinfo -so obce/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.shp <span class="nv">$BASE</span> <span class="p">|</span> grep Extent <span class="se">\</span>
-<span class="p">|</span> sed <span class="s1">&#39;s/Extent: //g&#39;</span> <span class="p">|</span> sed <span class="s1">&#39;s/(//g&#39;</span> <span class="p">|</span> sed <span class="s1">&#39;s/)//g&#39;</span> <span class="se">\</span>
-<span class="p">|</span> sed <span class="s1">&#39;s/ - /, /g&#39;</span><span class="k">)</span>
-<span class="nv">EXTENT</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span> <span class="nv">$EXTENT</span> <span class="p">|</span> awk -F <span class="s1">&#39;,&#39;</span> <span class="s1">&#39;{print $1 &quot; &quot; $4 &quot; &quot; $3 &quot; &quot; $2}&#39;</span><span class="k">)</span>
-gdal_translate -projwin <span class="nv">$EXTENT</span> -of GTiff <span class="nv">$OBEC</span> output/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.tif
-gdalwarp -dstalpha -s_srs <span class="s1">&#39;EPSG:5514&#39;</span> -t_srs <span class="s1">&#39;EPSG:5514&#39;</span> <span class="se">\</span>
-    -co <span class="nv">COMPRESS</span><span class="o">=</span>JPEG <span class="se">\</span>
-    -co <span class="nv">TILED</span><span class="o">=</span>YES -<span class="se">\</span>
-    of GTiff <span class="se">\</span>
-    -cutline obce/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.shp <span class="se">\</span>
-    output/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.tif output/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.final.tif
-</pre></div>
-
-
-<p>Note that if <code>gdalwarp</code> doesn&#8217;t recognize an <span class="caps">EPSG</span> code (which is the case for my country national grid), you might pass it as a <span class="caps">PROJ</span>.4&nbsp;string.</p>
-<p>According to the point 5 in the above list, the script needs to be run in a&nbsp;loop:</p>
-<div class="highlight"><pre><span></span><span class="k">for</span> f in *_jpeg.tif<span class="p">;</span>
-    <span class="k">do</span> the_script_above.sh <span class="nv">$f</span>
-<span class="p">;</span><span class="k">done</span>
-</pre></div>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2015/grass-big-buffers-made-easy/" rel="bookmark" title="Permalink to GRASS: Big Buffers Made Easy"><span class="caps">GRASS</span>: Big Buffers Made&nbsp;Easy</a></h1>
-            <small>Written on Apr 20, 2015
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/grass.html">grass</a>        | <a href="https://www.zimmi.cz/posts/category/automation.html">automation</a>
-        </small>
-        <section>
-            <p>Recently I&#8217;ve written about <a href="/2015/postgis-buffers-intersections-differences-and-collections/">struggling with fairly complex geometries in PostGIS</a>. Lesson learned from the last time was to use more smaller geometries instead of several really huge. You can obtain the small ones from the big by <a href="/2015/postgis-rectangular-grid-creation/">cutting it with a grid</a>.</p>
-<p>A supervisor of a project I&#8217;ve been working on came up with a task that totally buried the previous process in a blink of an eye: <strong>Give me the buffer (diffed with original geometries) that is smoothed on the outer bounds so there are no edges shorter than 10 cm.</strong> I sighed. Then, I cursed. Then, I gave it a try with PostGIS. Achieving this goal involves these&nbsp;steps:</p>
-<ul>
-<li>Dissolve intersecting&nbsp;buffers</li>
-<li>Run some kind of generalization algorithm that is not defined in&nbsp;PostGIS</li>
-<li>Diff original&nbsp;geometries</li>
-<li>Cut buffer with grid so it works <del>faster</del> not so slow for the next&nbsp;steps</li>
-</ul>
-<p>Two of those four are rather problematic with PostGIS: line smoothing and diffing the original geometries (I didn&#8217;t get to the last one, so it might be 3 of 4 as&nbsp;well).</p>
-<h2>Hello, I&#8217;m <span class="caps">GRASS</span></h2>
-<p>I haven&#8217;t used <span class="caps">GRASS</span> for ages and even back then I didn&#8217;t get to know it much, but it saved the day for me this&nbsp;time.</p>
-<div class="highlight"><pre><span></span>grass -text path/to/mapset -c
-
-v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&quot;PG:host=localhost dbname=db user=postgres password=postgres&quot;</span> <span class="nv">output</span><span class="o">=</span>ilot_050 <span class="nv">layer</span><span class="o">=</span>ilot_2015_050 <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
-<span class="c1"># turn the snapping off, I don&#39;t want the input changed in any way, even though it is not topologically valid</span>
-v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&quot;PG:host=localhost dbname=db user=postgres password=postgres&quot;</span> <span class="nv">output</span><span class="o">=</span>lollipops_050 <span class="nv">layer</span><span class="o">=</span>lollipops.lollipops_2015_050_tmp <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
-v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&quot;PG:host=localhost dbname=db user=postgres password=postgres&quot;</span> <span class="nv">output</span><span class="o">=</span>holes_050 <span class="nv">layer</span><span class="o">=</span>phase_3.holes_050 <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
-v.db.addcolumn <span class="nv">map</span><span class="o">=</span>ilot_050 <span class="nv">columns</span><span class="o">=</span><span class="s2">&quot;id_0 int&quot;</span>
-v.db.update <span class="nv">map</span><span class="o">=</span>ilot_050 <span class="nv">column</span><span class="o">=</span>id_0 <span class="nv">value</span><span class="o">=</span><span class="m">1</span>
-
-<span class="c1"># dissolve didn&#39;t work without a column specified, dunno why</span>
-v.dissolve <span class="nv">input</span><span class="o">=</span>ilot_050 <span class="nv">column</span><span class="o">=</span>id_0 <span class="nv">output</span><span class="o">=</span>ilot_050_dissolve --overwrite
-v.buffer <span class="nv">input</span><span class="o">=</span>ilot_050_dissolve <span class="nv">output</span><span class="o">=</span>ilot_050_buffer <span class="nv">distance</span><span class="o">=</span><span class="m">20</span> --overwrite
-
-<span class="c1"># v.out and v.in routine used just because I didn&#39;t get the way attributes work in GRASS, would do it differently next time</span>
-v.out.ogr <span class="nv">input</span><span class="o">=</span>ilot_050_buffer <span class="nv">output</span><span class="o">=</span>ilot_050_buffer <span class="nv">format</span><span class="o">=</span>ESRI_Shapefile --overwrite
-v.in.ogr <span class="nv">input</span><span class="o">=</span>ilot_050_buffer <span class="nv">output</span><span class="o">=</span>ilot_050_buffer <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
-v.overlay <span class="nv">ainput</span><span class="o">=</span>ilot_050_buffer <span class="nv">binput</span><span class="o">=</span>holes_050 <span class="nv">operator</span><span class="o">=</span>or <span class="nv">output</span><span class="o">=</span>combined_050_01 <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
-
-<span class="c1"># tried v.patch to combine the three layers, it gave some strange results in the final overlay</span>
-v.overlay <span class="nv">ainput</span><span class="o">=</span>combined_050_01 <span class="nv">binput</span><span class="o">=</span>lollipops_050 <span class="nv">operator</span><span class="o">=</span>or <span class="nv">output</span><span class="o">=</span>combined_050_02 <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
-v.out.ogr <span class="nv">input</span><span class="o">=</span>combined_050_02 <span class="nv">output</span><span class="o">=</span>combined_050 <span class="nv">format</span><span class="o">=</span>ESRI_Shapefile --overwrite
-v.in.ogr <span class="nv">input</span><span class="o">=</span>combined_050 <span class="nv">output</span><span class="o">=</span>combined_050_in <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
-v.db.addcolumn <span class="nv">map</span><span class="o">=</span>combined_050_in <span class="nv">columns</span><span class="o">=</span><span class="s2">&quot;id_1 int&quot;</span>
-v.db.update <span class="nv">map</span><span class="o">=</span>combined_050_in <span class="nv">column</span><span class="o">=</span>id_1 <span class="nv">value</span><span class="o">=</span><span class="m">1</span>
-v.dissolve <span class="nv">input</span><span class="o">=</span>combined_050_in <span class="nv">column</span><span class="o">=</span>id_1 <span class="nv">output</span><span class="o">=</span>combined_050_dissolve --overwrite
-
-<span class="c1"># get rid of &lt; 10cm edges</span>
-v.generalize <span class="nv">input</span><span class="o">=</span>combined_050_dissolve <span class="nv">output</span><span class="o">=</span>combined_050_gen <span class="nv">method</span><span class="o">=</span>reduction <span class="nv">threshold</span><span class="o">=</span><span class="m">0</span>.1 --overwrite
-v.out.ogr <span class="nv">input</span><span class="o">=</span>combined_050_gen <span class="nv">output</span><span class="o">=</span>combined_050_gen <span class="nv">format</span><span class="o">=</span>ESRI_Shapefile --overwrite
-v.in.ogr <span class="nv">input</span><span class="o">=</span>combined_050_gen <span class="nv">output</span><span class="o">=</span>combined_050_gen <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
-v.overlay <span class="nv">ainput</span><span class="o">=</span>combined_050_gen <span class="nv">binput</span><span class="o">=</span>ilot_050 <span class="nv">operator</span><span class="o">=</span>not <span class="nv">snap</span><span class="o">=</span>1e-05 --overwrite <span class="nv">output</span><span class="o">=</span>ilot_050_diff
-v.out.postgis <span class="nv">input</span><span class="o">=</span>ilot_050_diff <span class="nv">output</span><span class="o">=</span><span class="s2">&quot;PG:dbname=db user=postgres password=postgres&quot;</span> <span class="nv">output_layer</span><span class="o">=</span>onf3.buffer_050_diff <span class="nv">options</span><span class="o">=</span><span class="s2">&quot;GEOMETRY_NAME=wkb_geometry,SRID=2154&quot;</span> --overwrite
-v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&quot;PG:host=localhost dbname=ign user=postgres password=postgres&quot;</span> <span class="nv">output</span><span class="o">=</span>buffer_050 <span class="nv">layer</span><span class="o">=</span>onf3.buffer_050_diff <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
-v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&quot;PG:host=localhost dbname=ign user=postgres password=postgres&quot;</span> <span class="nv">output</span><span class="o">=</span>grid <span class="nv">layer</span><span class="o">=</span>grid <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
-v.db.connect -d <span class="nv">map</span><span class="o">=</span>buffer_050
-
-<span class="c1"># instead of v.out and v.in routine</span>
-db.connect <span class="nv">driver</span><span class="o">=</span>sqlite <span class="nv">database</span><span class="o">=</span><span class="s1">&#39;$GISDBASE/$LOCATION_NAME/$MAPSET/sqlite.db&#39;</span>
-v.db.addtable <span class="nv">map</span><span class="o">=</span>buffer_050
-v.overlay <span class="nv">ainput</span><span class="o">=</span>buffer_050 <span class="nv">binput</span><span class="o">=</span>grid <span class="nv">operator</span><span class="o">=</span>and <span class="nv">output</span><span class="o">=</span>buffer_050_grid <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
-v.out.postgis <span class="nv">input</span><span class="o">=</span>buffer_050_grid <span class="nv">output</span><span class="o">=</span><span class="s2">&quot;PG:dbname=ign user=postgres password=postgres&quot;</span> <span class="nv">output_layer</span><span class="o">=</span>onf3.buffer_050_diff_grid <span class="nv">options</span><span class="o">=</span><span class="s2">&quot;GEOMETRY_NAME=wkb_geometry,SRID=2154&quot;</span> --overwrite
-</pre></div>
-
-
-<p><strong>It is damn fast</strong> compared to PostGIS. It can be automated. It can be parametrized. It is robust. It is&nbsp;great!</p>
-<h2>Lesson&nbsp;learned</h2>
-<ul>
-<li>You cannot smooth lines by deleting edges shorter than <code>n</code> in PostGIS. At least I haven&#8217;t found the way to do so without defining your own procedure. You can with <span class="caps">GRASS</span>.</li>
-<li><span class="caps">GRASS</span> reduction algorithm always keep first and last node untouched. Thus, if they&#8217;re closer than <code>n</code>, they&#8217;ll stay even if you&#8217;d like to have them&nbsp;deleted.</li>
-<li>Getting to grips with <span class="caps">GRASS</span> attribute data is rather hard after using shapefiles all your <span class="caps">GIS</span>&nbsp;life.</li>
-<li>It is great to exploit synergy of different <span class="caps">GIS</span> tools used for what they&#8217;re best&nbsp;at.</li>
-</ul>
-<p>The more I work with big data, the more I get used to not seeing them. That&#8217;s kind of a twist after crafting maps at&nbsp;university.</p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2015/wms-download-for-future-offline-use/" rel="bookmark" title="Permalink to WMS Download For Future Offline Use"><span class="caps">WMS</span> Download For Future Offline&nbsp;Use</a></h1>
-            <small>Written on Mar 15, 2015
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/ogc.html">ogc</a>,         <a href="https://www.zimmi.cz/posts/tag/python.html">python</a>,         <a href="https://www.zimmi.cz/posts/tag/wms.html">wms</a>        | <a href="https://www.zimmi.cz/posts/category/automation.html">automation</a>
-        </small>
-        <section>
-            <p>Using <span class="caps">WMS</span> in real time might easily become pain in the ass due to low connection speed or slow server response. Downloading images beforehand seems to be a reasonable choice both to avoid any slowdowns and to improve user experience when working with <span class="caps">WMS</span>&nbsp;layers.</p>
-<p><a href="https://geopython.github.io/OWSLib/">OWSLib</a> is a great tool to help you get images from <span class="caps">WMS</span> server. Code and some comments&nbsp;follow.</p>
-<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">random</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">owslib.wms</span> <span class="kn">import</span> <span class="n">WebMapService</span>
-
-<span class="n">BOTTOM_LEFT</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">679363</span><span class="p">,</span><span class="o">-</span><span class="mi">1120688</span><span class="p">)</span>
-<span class="n">TOP_RIGHT</span>   <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">565171</span><span class="p">,</span><span class="o">-</span><span class="mi">1042703</span><span class="p">)</span>
-<span class="n">SRS_WIDTH</span>   <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="o">-</span><span class="mi">639084</span> <span class="o">-</span> <span class="o">-</span><span class="mi">638825</span><span class="p">)</span> <span class="c1"># tile width in units of crs =&gt; 259 m</span>
-<span class="n">SRS_HEIGHT</span>  <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="o">-</span><span class="mi">1070426</span> <span class="o">-</span> <span class="o">-</span><span class="mi">1070273</span><span class="p">)</span> <span class="c1"># tile height in units of crs =&gt; 153 m</span>
-<span class="n">PX_WIDTH</span>    <span class="o">=</span> <span class="mi">977</span>
-<span class="n">PX_HEIGHT</span>   <span class="o">=</span> <span class="mi">578</span>
-
-<span class="n">FORMAT</span>      <span class="o">=</span> <span class="s1">&#39;image/png&#39;</span>
-<span class="n">LAYERS</span>      <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;KN&#39;</span><span class="p">,</span> <span class="s1">&#39;RST_PK&#39;</span><span class="p">]</span>
-<span class="n">SIZE</span>        <span class="o">=</span> <span class="p">(</span><span class="n">PX_WIDTH</span><span class="p">,</span> <span class="n">PX_HEIGHT</span><span class="p">)</span>
-<span class="n">SRS</span>         <span class="o">=</span> <span class="s1">&#39;EPSG:5514&#39;</span>
-<span class="n">STYLES</span>      <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">]</span>
-<span class="n">TRANSPARENT</span> <span class="o">=</span> <span class="bp">True</span>
-
-<span class="n">DIRECTORY</span> <span class="o">=</span> <span class="s1">&#39;tiles/&#39;</span>
-<span class="n">SLEEP</span>     <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">20</span><span class="p">)</span> <span class="c1"># seconds</span>
-
-<span class="n">dx</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="n">BOTTOM_LEFT</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">TOP_RIGHT</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="c1"># area width in units of crs</span>
-<span class="n">dy</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="n">BOTTOM_LEFT</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">TOP_RIGHT</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="c1"># area height in units of crs</span>
-
-<span class="n">cols</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">dx</span> <span class="o">/</span> <span class="n">SRS_WIDTH</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
-<span class="n">rows</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">dy</span> <span class="o">/</span> <span class="n">SRS_HEIGHT</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
-
-<span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
-
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;world_file.pngw&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">wld_template</span><span class="p">:</span>
-    <span class="n">tmpl</span> <span class="o">=</span> <span class="n">wld_template</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-
-<span class="n">wms</span> <span class="o">=</span> <span class="n">WebMapService</span><span class="p">(</span><span class="s1">&#39;http://services.cuzk.cz/wms/wms.asp&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.1.1&#39;</span><span class="p">)</span>
-
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">rows</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">DIRECTORY</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)):</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">DIRECTORY</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
-
-    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">cols</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">DIRECTORY</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;/kn_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span><span class="p">):</span>
-            <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="k">continue</span>
-
-        <span class="n">bbox</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">i</span> <span class="o">*</span> <span class="n">SRS_WIDTH</span> <span class="o">+</span> <span class="n">BOTTOM_LEFT</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-            <span class="n">j</span> <span class="o">*</span> <span class="n">SRS_HEIGHT</span> <span class="o">+</span> <span class="n">BOTTOM_LEFT</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-            <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">SRS_WIDTH</span> <span class="o">+</span> <span class="n">BOTTOM_LEFT</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-            <span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">SRS_HEIGHT</span> <span class="o">+</span> <span class="n">BOTTOM_LEFT</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="p">)</span>
-
-        <span class="n">img</span> <span class="o">=</span> <span class="n">wms</span><span class="o">.</span><span class="n">getmap</span><span class="p">(</span>
-            <span class="n">layers</span><span class="o">=</span><span class="n">LAYERS</span><span class="p">,</span>
-            <span class="n">styles</span><span class="o">=</span><span class="n">STYLES</span><span class="p">,</span>
-            <span class="n">srs</span><span class="o">=</span><span class="n">SRS</span><span class="p">,</span>
-            <span class="n">bbox</span><span class="o">=</span><span class="n">bbox</span><span class="p">,</span>
-            <span class="n">size</span><span class="o">=</span><span class="n">SIZE</span><span class="p">,</span>
-            <span class="n">format</span><span class="o">=</span><span class="n">FORMAT</span><span class="p">,</span>
-            <span class="n">transparent</span><span class="o">=</span><span class="n">TRANSPARENT</span>
-        <span class="p">)</span>
-
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">DIRECTORY</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;/kn_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">png</span><span class="p">:</span>
-            <span class="n">png</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
-
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">DIRECTORY</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/kn_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.pngw&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">wld_file</span><span class="p">:</span>
-            <span class="n">wld_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">tmpl</span><span class="p">)</span>
-            <span class="n">wld_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="n">SRS_WIDTH</span> <span class="o">+</span> <span class="n">BOTTOM_LEFT</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
-            <span class="n">wld_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">((</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">SRS_HEIGHT</span> <span class="o">+</span> <span class="n">BOTTOM_LEFT</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-
-        <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="k">print</span> <span class="nb">str</span><span class="p">(</span><span class="n">counter</span><span class="p">),</span> <span class="s1">&#39; out of &#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">rows</span> <span class="o">*</span> <span class="n">cols</span><span class="p">)</span>
-        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">SLEEP</span><span class="p">)</span>
-</pre></div>
-
-
-<p>First, always make sure <strong>you are not violating terms of use</strong> defined by service provider. If you are not, here are the necessary&nbsp;steps:</p>
-<ol>
-<li>Define your area of interest with bottom left and top right&nbsp;coordinates.</li>
-<li>Calculate width of single image both in pixels and units of <span class="caps">CRS</span> to get the rightsized image. Note that there may be image size restrictions defined by provider (2048 &times; 2048 px is usually the biggest you can&nbsp;get).</li>
-<li>Define template <a href="https://en.wikipedia.org/wiki/World_file">world file</a> for referencing images. OWSLib doesn&#8217;t provide world files to saved images, these have to be created by you. I recommend to use a template file for creating real world&nbsp;files.</li>
-<li>Be nice! Don&#8217;t overload the service. I use <code>time.sleep()</code> for&nbsp;this.</li>
-<li>Profit.</li>
-</ol>
-<p>The trouble with <span class="caps">WMS</span> is that you can&#8217;t set an arbitrary scale you want to obtain images in (e.g. 1:1 000). It&#8217;s fairly easy to get all values needed to imitate this behavior&nbsp;though.</p>
-<p>Using <a href="http://qgis.org"><span class="caps">QGIS</span></a> you&nbsp;can:</p>
-<ol>
-<li>Get bounding box of area you&#8217;re interested&nbsp;in.</li>
-<li>Save current view as an image (together with the world file!) and use it as a specimen for your own world&nbsp;files.</li>
-<li>Derive image width (<span class="caps">CRS</span>, pixels) from the saved image, thus getting the same zoom level you were using in <span class="caps">QGIS</span>.</li>
-</ol>
-<p>Code given is not bulletproof, it will fail on any network error. However, if you restart it after such a crash, it checks for existing files and starts with the first missing, so you don&#8217;t have to download all the tiles&nbsp;again.</p>
-        </section>
-        </div>
-    </div>
-
+</article>
 <div class="pagination row">
     <div class="large-6 columns">
     </div>
     <div class="large-6 columns">
+            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Next page']);" href="/category/automation2.html" class="button card card-1">Next page &raquo;</a>
     </div>
-</div>            </div>
-        </div>
-        <div class="row">
-            <div class="large-12 columns footer">
-                <footer>
-                    <address>
-                    Written by <a href="http://www.zimmi.cz">Michal Zimmermann</a>.
-                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
-                    which takes great advantage of <a href="http://python.org">Python</a>.
-                    </address><!-- /#about -->
-                </footer><!-- /#contentinfo -->
-            </div>
-        </div>
-<!-- Piwik -->
-<script type="text/javascript">
-  var _paq = _paq || [];
-  /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-  _paq.push(['enableHeartBeatTimer']);
-  _paq.push(['trackPageView']);
-  _paq.push(['enableLinkTracking']);
-  (function() {
-    var u="//piwik-zimmi.rhcloud.com/analytics/";
-    _paq.push(['setTrackerUrl', u+'piwik.php']);
-    _paq.push(['setSiteId', '1']);
-    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
-  })();
-</script>
-<!-- End Piwik Code -->
-<script src="https://www.zimmi.cz/posts/theme/js/packed.js?8bee1467"></script>
-<script>
-$(document).foundation();
-</script>
+</div>    </main>
+    <footer>
+        Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
+        Proudly powered by <a href="//getpelican.com/">Pelican</a>,
+        which takes great advantage of <a href="//python.org">Python</a>.
+    </footer>
+<script src="/theme/webassets-external/5acf220afe81b3dd00333bbb93fbaa41_jquery.js"></script>
+<script src="/theme/webassets-external/b80143a60770d5aa122a039a2b889970_foundation.min.js"></script>
 </body>
 </html>

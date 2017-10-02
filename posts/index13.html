@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+        <title>Michal Zimmermann | Pieces of knowledge from the world of GIS.</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
+        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="/theme/webassets-external/e17ffd2049da5254bb4b3183ea73c922_normalize.css">
+        <link rel="stylesheet" href="/theme/webassets-external/35f123b951b653f7b2d441b35b63d32a_github.css">
+        <link rel="stylesheet" href="/theme/webassets-external/310a2979488959b3c24d4edd2e18b50d_screen.css">
+</head>
+<body>
+    <nav role="navigation">
+        <ul>
+            <li><a href="/categories">Categories</a></li>
+            <li><a href="/tags">Tags</a></li>
+            <li><a href="/feed.xml">Subscribe to RSS feed</a></li>
+        </ul>
+    </nav>
+    <header>
+        <h1><a href="/posts">Michal Zimmermann<small>Pieces of knowledge from the world of GIS.</small></a></h1>
+    </header>
+    <main>
+
+<article>
+    <h1><a href="/posts/2014/postgresql-remote-access/" rel="bookmark" title="Permalink to PostgreSQL Remote Access">PostgreSQL Remote&nbsp;Access</a></h1>
+    Written on Sep 17, 2014
+    and marked as
+    <a href="/tag/postgresql.html">postgresql</a>,     <a href="/tag/linux.html">linux</a>    | <a href="/category/development.html">development</a>
+    <p>PostgreSQL is set to listen only to connections coming from localhost by default. I guess that&#8217;s fine as far as you don&#8217;t need access to the database from anywhere else (like your work network). If you do, you need to log via <span class="caps">SSH</span> or use some online database management tool (go for <a href="http://adminer.org">Adminer</a> and forget about anything called php[pg|my]admin). Or you can set it up to access connections from other&nbsp;locations.</p>
+<p>You need&nbsp;to:</p>
+<ol>
+<li>set <code>listen_addresses</code> to <code>*</code> in your postgres.conf. That does not mean anyone can connect to your database, that means that the server will listen to connections coming from any available <span class="caps">IP</span>&nbsp;interface.</li>
+<li>insert new entry into pg_hba.conf looking like this: <code>host database user xxx.xxx.xxx.xxx md5</code>. Now we&#8217;re saying we only want connections coming from <span class="caps">IP</span> <code>xxx.xxx.xxx.xxx</code> accepted.</li>
+<li>
+<p>Add rule allowing the database server access to iptables. Number 5 says it will be the fifth rule in the order. It must come before the final <span class="caps">REJECT</span> <span class="caps">ALL</span> rule if&nbsp;present.</p>
+<p><code>iptables -I INPUT 5 -p tcp --dport 5432 -s xxx.xxx.xxx.xxx -j ACCEPT</code>
+4. Just to be sure noone else is able to connect, reject all on port&nbsp;5432.</p>
+<p><code>iptables -I INPUT 6 -p tcp --dport 5432 -j REJECT</code></p>
+</li>
+</ol>
+<p>You&#8217;re set to remotely connect to your database&nbsp;server.</p>
+</article>
+<article>
+    <h1><a href="/posts/2014/switch-latitude-and-longitude-with-regular-expression/" rel="bookmark" title="Permalink to Switch Latitude And Longitude With Regular Expression">Switch Latitude And Longitude With Regular&nbsp;Expression</a></h1>
+    Written on Sep 14, 2014
+    and marked as
+    <a href="/tag/sublime.html">sublime</a>,     <a href="/tag/regex.html">regex</a>    | <a href="/category/development.html">development</a>
+    <p>It happens that you receive a file with longitude and latitude just in the opposite order that you would like to have. It&#8217;s fairly easy to switch those without loading it into Excel or Calc and doing <code>Ctrl + C</code> and <code>Ctrl + V</code> on&nbsp;columns.</p>
+<p>If you have a file with tabular data that looks like&nbsp;this:</p>
+<div class="highlight"><pre><span></span> 50.52, 60.15
+ 70.96, 80.1
+-55.23, 62.03
+</pre></div>
+
+
+<p>You can use Sublime Text to switch the&nbsp;values:</p>
+<ol>
+<li>Press <code>Ctrl + H</code></li>
+<li>Copy <code>(\-?\d+\.?\d+),?[\t ]*(\-?\d+\.?\d+)$</code> to <em>Find What</em>&nbsp;input</li>
+<li>Copy <code>$2,$1</code> to <em>Replace With</em>&nbsp;input</li>
+</ol>
+<p>Hit <em>Replace All</em> button and you&#8217;re&nbsp;done.</p>
+</article>
+<article>
+    <h1><a href="/posts/2014/connecting-to-secured-arcgis-server-layer-with-openlayers-3/" rel="bookmark" title="Permalink to Connecting To Secured ArcGIS Server Layer With OpenLayers 3">Connecting To Secured ArcGIS Server Layer With OpenLayers&nbsp;3</a></h1>
+    Written on Sep 12, 2014
+    and marked as
+    <a href="/tag/javascript.html">javascript</a>,     <a href="/tag/openlayers.html">openlayers</a>,     <a href="/tag/ogc.html">ogc</a>    | <a href="/category/web-maps.html">web maps</a>
+    <p>I was made to use ArcGIS Server with <a href="http://openlayers.org">Openlayers 3</a> just recently as one of the projects I&#8217;ve been working on demands such different tools to work&nbsp;together.</p>
+<p><strong>tl;dr: I hate&nbsp;Esri.</strong></p>
+<p>I found myself in need to access secured layers published via <span class="caps">WMS</span> on ArcGIS Server using username and password I was given, so here&#8217;s a little how-to for anyone who would have to do the&nbsp;same.</p>
+<p>Let&#8217;s start with a simple ol.layer.Image and pretend this is the secured layer we&#8217;re looking&nbsp;for:</p>
+<div class="highlight"><pre><span></span>var layer = new ol.layer.Image({
+    extent: extent,
+    source: new ol.source.ImageWMS(/** @type {olx.source.ImageWMSOptions} */ ({
+        url: url,
+        params: {
+            &#39;LAYERS&#39;: &#39;layer&#39;,
+            &#39;CRS&#39;: &#39;EPSG:3857&#39;,
+        }
+    }))
+});
+</pre></div>
+
+
+<p>We need to retrieve the token, so we define a&nbsp;function:</p>
+<div class="highlight"><pre><span></span><span class="kd">function</span> <span class="nx">retrieveToken</span><span class="p">(</span><span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">req</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">XMLHttpRequest</span><span class="p">;</span>
+
+    <span class="nx">req</span><span class="p">.</span><span class="nx">onload</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">status</span> <span class="o">==</span> <span class="s2">&quot;200&quot;</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kd">var</span> <span class="nx">response</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">responseText</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">contents</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">callback</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">contents</span><span class="p">);</span> <span class="c1">// response contents is where the token is stored</span>
+        <span class="p">}</span>
+    <span class="p">};</span>
+    <span class="nx">req</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="s2">&quot;http://server.address/arcgis/tokens/?request=getToken&amp;username=username&amp;password=password&amp;expiration=60&quot;</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+    <span class="nx">req</span><span class="p">.</span><span class="nx">send</span><span class="p">()</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>I pass a parameter called <code>callback</code> - that&#8217;s a very important step, otherwise you would not be able to retrieve the token when you actually need it (<span class="caps">AJAX</span> stands for asynchronous). Now you just pass the token to the layer params like&nbsp;this:</p>
+<div class="highlight"><pre><span></span>retrieveToken(function(token) {
+    layer.getSource().updateParams({
+        token: token
+    })
+}
+</pre></div>
+
+
+<p>When you open Firebug and inspect Network tab, you should find <code>token</code> <span class="caps">URL</span> parameter passed along with <span class="caps">WMS</span> <code>GetMap</code> request.</p>
+<p>Few&nbsp;sidenotes:</p>
+<ol>
+<li>Although you might be logged in ArcGIS Server via web interface, you might need to pass the <code>token</code>  <span class="caps">URL</span> param when trying to access Capabilities document. Don&#8217;t know why&nbsp;though.</li>
+<li>You should probably take care of calling the <code>retrieveToken()</code> in shorter interval than the token expiration is set to. Otherwise you might end up with invalid&nbsp;token.</li>
+<li>You need to hide the username and password from anonymous users (I guess that&#8217;s only possible with server side implementation of selective JavaScript&nbsp;loading).</li>
+</ol>
+</article>
+<article>
+    <h1><a href="/posts/2014/blogging-on-docker-piecrust-to-the-rescue/" rel="bookmark" title="Permalink to Blogging On Docker: Piecrust To The Rescue">Blogging On Docker: Piecrust To The&nbsp;Rescue</a></h1>
+    Written on Sep 11, 2014
+    and marked as
+    <a href="/tag/docker.html">docker</a>,     <a href="/tag/linux.html">linux</a>    | <a href="/category/development.html">development</a>
+    <p>I love blogging. I hate blogging systems. I hate content management systems. I just want to blog. That&#8217;s what <a href="http://bolt80.com/piecrust/">PieCrust</a> is all about - it lets you&nbsp;blog.</p>
+<p>It is powerful static website generator perfect for my needs (and for yours as well?). Blogging with PieCrust is really a piece of&nbsp;cake:</p>
+<ol>
+<li>prepare&nbsp;post</li>
+<li>serve&nbsp;site</li>
+<li>bake&nbsp;site</li>
+<li>send it off to the&nbsp;public</li>
+</ol>
+<p>I love having clean <span class="caps">OS</span>. That&#8217;s what <a href="http://docker.com">Docker</a> is all about - for me. Running PieCrust on Docker is really easy, it does not clutter your <span class="caps">PC</span> and it just&nbsp;works.</p>
+<p>If you ever want to use PieCrust on Docker, why don&#8217;t you start with this code?
+    <span class="caps">FROM</span>&nbsp;centos:centos6</p>
+<div class="highlight"><pre><span></span><span class="nt">RUN</span> <span class="nt">rpm</span> <span class="nt">-Uvh</span> <span class="nt">http</span><span class="o">://</span><span class="nt">mirror</span><span class="p">.</span><span class="nc">webtatic</span><span class="p">.</span><span class="nc">com</span><span class="o">/</span><span class="nt">yum</span><span class="o">/</span><span class="nt">el6</span><span class="o">/</span><span class="nt">latest</span><span class="p">.</span><span class="nc">rpm</span>
+<span class="nt">RUN</span> <span class="nt">rpm</span> <span class="nt">-Uvh</span> <span class="nt">http</span><span class="o">://</span><span class="nt">download</span><span class="p">.</span><span class="nc">fedoraproject</span><span class="p">.</span><span class="nc">org</span><span class="o">/</span><span class="nt">pub</span><span class="o">/</span><span class="nt">epel</span><span class="o">/</span><span class="nt">6</span><span class="o">/</span><span class="nt">x86_64</span><span class="o">/</span><span class="nt">epel-release-6-8</span><span class="p">.</span><span class="nc">noarch</span><span class="p">.</span><span class="nc">rpm</span>
+<span class="nt">RUN</span> <span class="nt">rpm</span> <span class="nt">-Uvh</span> <span class="nt">http</span><span class="o">://</span><span class="nt">rpms</span><span class="p">.</span><span class="nc">famillecollet</span><span class="p">.</span><span class="nc">com</span><span class="o">/</span><span class="nt">enterprise</span><span class="o">/</span><span class="nt">remi-release-6</span><span class="p">.</span><span class="nc">rpm</span>
+
+<span class="nt">RUN</span> <span class="nt">yum</span> <span class="nt">--enablerepo</span><span class="o">=</span><span class="nt">remi</span><span class="o">,</span><span class="nt">remi-php55</span> <span class="nt">install</span> <span class="nt">-y</span> <span class="nt">php</span> <span class="nt">php-mbstring</span> <span class="nt">php-opcache</span> <span class="nt">php-cli</span> <span class="nt">php-pear</span> <span class="nt">php-common</span> <span class="o">&amp;&amp;</span> <span class="nt">yum</span> <span class="nt">clean</span> <span class="nt">all</span>
+<span class="nt">RUN</span> <span class="nt">php</span> <span class="nt">-r</span> <span class="s2">&quot;readfile(&#39;https://getcomposer.org/installer&#39;);&quot;</span> <span class="o">|</span> <span class="nt">php</span>
+<span class="nt">RUN</span> <span class="nt">echo</span> <span class="s2">&quot;date.timezone = Europe/Prague&quot;</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="nt">etc</span><span class="o">/</span><span class="nt">php</span><span class="p">.</span><span class="nc">ini</span>
+<span class="nt">RUN</span> <span class="nt">mv</span> <span class="nt">composer</span><span class="p">.</span><span class="nc">phar</span> <span class="o">/</span><span class="nt">usr</span><span class="o">/</span><span class="nt">bin</span><span class="o">/</span><span class="nt">composer</span>
+<span class="nt">RUN</span> <span class="nt">php</span> <span class="nt">-r</span> <span class="s2">&quot;eval(&#39;?&gt;&#39;.file_get_contents(&#39;http://backend.bolt80.com/piecrust/install&#39;));&quot;</span>
+<span class="nt">RUN</span> <span class="nt">mv</span> <span class="nt">piecrust</span><span class="p">.</span><span class="nc">phar</span> <span class="o">/</span><span class="nt">usr</span><span class="o">/</span><span class="nt">bin</span><span class="o">/</span><span class="nt">chef</span>
+
+<span class="nt">CMD</span> <span class="cp">[</span><span class="s2">&quot;/bin/bash&quot;</span><span class="cp">]</span>
+</pre></div>
+
+
+<p>Running <code>sudo docker build --tag=piecrust .</code> will result in having docker container ready to run. Just run <code>sudo docker run -it -p 8080:8080 -v /host_piecrust_path/:/container_path piecrust /bin/bash</code> in terminal. While in container terminal, run <code>chef serve -n -p 8080 -a 0.0.0.0</code> and visit <a href="http://localhost:8080">http://localhost:8080</a>. You should see your PieCrust site up and&nbsp;running.</p>
+<p>The last command tells chef to serve your site on port 8080 (which should be free unless you&#8217;re running Tomcat or something like that) and make it listen on every available network interface. If you used 127.0.0.1 instead, you would never reach your site from outside the&nbsp;container.</p>
+<p>See?&nbsp;Easy.</p>
+</article>
+<article>
+    <h1><a href="/posts/2014/wmts-few-things-i-want-to-remember/" rel="bookmark" title="Permalink to WMTS: Few Things I Want To Remember"><span class="caps">WMTS</span>: Few Things I Want To&nbsp;Remember</a></h1>
+    Written on Sep 10, 2014
+    and marked as
+    <a href="/tag/ogc.html">ogc</a>,     <a href="/tag/wmts.html">wmts</a>    | <a href="/category/web-maps.html">web maps</a>
+    <ul>
+<li>Used to serve prepared rectangular tiles; this means you are limited by web server speed rather than map server&nbsp;speed</li>
+<li>Several ways to retrieve tiles are defined: <span class="caps">KVP</span> and <span class="caps">REST</span> are mandatory, <span class="caps">SOAP</span> is&nbsp;optional</li>
+<li>Does not allow layer combination; additional tile matrix would have to be&nbsp;created</li>
+<li>GetCapabilities, GetTile and GetFeatureInfo requests are&nbsp;defined</li>
+<li><strong>tile</strong></li>
+<li>rectangular representation of&nbsp;space</li>
+<li>defined by tile and row&nbsp;indices</li>
+<li><strong>tile&nbsp;matrix</strong></li>
+<li>set of tiles for a given&nbsp;scale</li>
+<li><em>defined with:</em><ul>
+<li>tile size derived from standardized pixel size (0.28 &times; 0.28&nbsp;mm)</li>
+<li>tile width and tile height&nbsp;(px)</li>
+<li>left upper corner&nbsp;coordinates</li>
+<li>matrix width and height as number of&nbsp;tiles</li>
+</ul>
+</li>
+<li><strong>tile matrix&nbsp;set</strong></li>
+<li>set of tile matrices for different&nbsp;scales</li>
+</ul>
+<h3>Total count of tile&nbsp;matrices</h3>
+<p><em><code>nTileMatrices × nTiledStyles × nTiledFormats (if no dimensions are defined)</code></em></p>
+<h3>Total count of tiles in a tile&nbsp;matrix</h3>
+<p><em><code>matrixWidth × matrixHeight</code></em></p>
+<h3>Other&nbsp;equations</h3>
+<ul>
+<li><code>pixelSpan = scaleDenominator × 0.28 10<sup>3</sup> / metersPerUnit(crs);</code></li>
+<li><code>tileSpanX = tileWidth × pixelSpan;</code></li>
+<li><code>tileSpanY = tileHeight × pixelSpan;</code></li>
+<li><code>tileMatrixMaxX = tileMatrixMinX + tileSpanX × matrixWidth;</code></li>
+<li><code>tileMatrixMinY = tileMatrixMaxY - tileSpanY × matrixHeight;</code></li>
+</ul>
+<p><img src="/assets/wmts-few-things-i-want-to-remember/wmts.png" title="WMTS tiling schema" class="img-responsive centered"></p>
+</article>
+<div class="pagination row">
+    <div class="large-6 columns">
+            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Previous page']);" href="/index12.html" class="button card card-1">&laquo; Previous page</a>
+    </div>
+    <div class="large-6 columns">
+            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Next page']);" href="/index14.html" class="button card card-1">Next page &raquo;</a>
+    </div>
+</div>    </main>
+    <footer>
+        Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
+        Proudly powered by <a href="//getpelican.com/">Pelican</a>,
+        which takes great advantage of <a href="//python.org">Python</a>.
+    </footer>
+<script src="/theme/webassets-external/5acf220afe81b3dd00333bbb93fbaa41_jquery.js"></script>
+<script src="/theme/webassets-external/b80143a60770d5aa122a039a2b889970_foundation.min.js"></script>
+</body>
+</html>

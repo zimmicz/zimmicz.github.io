@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+        <title>Michal Zimmermann | Pieces of knowledge from the world of GIS.</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
+        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="/theme/webassets-external/e17ffd2049da5254bb4b3183ea73c922_normalize.css">
+        <link rel="stylesheet" href="/theme/webassets-external/35f123b951b653f7b2d441b35b63d32a_github.css">
+        <link rel="stylesheet" href="/theme/webassets-external/310a2979488959b3c24d4edd2e18b50d_screen.css">
+</head>
+<body>
+    <nav role="navigation">
+        <ul>
+            <li><a href="/categories">Categories</a></li>
+            <li><a href="/tags">Tags</a></li>
+            <li><a href="/feed.xml">Subscribe to RSS feed</a></li>
+        </ul>
+    </nav>
+    <header>
+        <h1><a href="/posts">Michal Zimmermann<small>Pieces of knowledge from the world of GIS.</small></a></h1>
+    </header>
+    <main>
+
+<article>
+    <h1><a href="/posts/2015/filtering-points-by-distance-in-postgis/" rel="bookmark" title="Permalink to Filtering points by distance in PostGIS">Filtering points by distance in&nbsp;PostGIS</a></h1>
+    Written on Jul 21, 2015
+    and marked as
+    <a href="/tag/postgis.html">postgis</a>    | <a href="/category/sql.html">SQL</a>
+    <p>Filtering really big (millions of rows) point datasets by distance might get catchy when solved with wrong PostGIS functions. Without spatial indexes PostGIS would take ages to finish such&nbsp;task.</p>
+<p><a href="https://gis.stackexchange.com/questions/148184/why-the-execution-of-a-query-is-very-slow-using-postgis">Someone over StackExchange asked</a> why the next query had been running for 15 hours (!) with no&nbsp;result:</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span>
+    <span class="n">a</span><span class="p">.</span><span class="n">gid</span><span class="p">,</span>
+    <span class="n">b</span><span class="p">.</span><span class="n">gid</span><span class="p">,</span>
+    <span class="n">ST_Distance</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span><span class="n">b</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span>
+<span class="k">FROM</span>
+    <span class="n">shp1</span> <span class="n">a</span><span class="p">,</span>
+    <span class="n">shp2</span> <span class="n">b</span>
+<span class="k">WHERE</span>
+    <span class="n">ST_Intersects</span><span class="p">(</span>
+        <span class="n">ST_Difference</span><span class="p">(</span>
+            <span class="n">ST_Buffer</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span><span class="mi">2000</span><span class="p">),</span>
+            <span class="n">ST_Buffer</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span><span class="mi">500</span><span class="p">)</span>
+        <span class="p">),</span>
+        <span class="n">b</span><span class="p">.</span><span class="n">geom</span>
+    <span class="p">)</span> <span class="k">AND</span>
+    <span class="k">abs</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">value</span> <span class="o">-</span> <span class="n">b</span><span class="p">.</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">400</span>
+</pre></div>
+
+
+<p>The answer is quite simple: because it was using wrong functions. Let&#8217;s&nbsp;see:</p>
+<ol>
+<li><code>ST_Distance()</code> does not use spatial index, it&#8217;s a simple mathematical calculation, it&#8217;s expensive and it can be replaced by spatial operator for point&nbsp;datasets.</li>
+<li><code>ST_Buffer()</code> will definitely take time to build polygons around points. And it&#8217;s being run&nbsp;twice!</li>
+<li><code>ST_Difference()</code> needs more time to compare the buffers and return just the portion of space they don&#8217;t share. Isn&#8217;t it a huge waste to create buffers and then throw them&nbsp;away?</li>
+<li><code>ST_Intersects()</code> finally checks whether the point should be included in the&nbsp;result.</li>
+</ol>
+<p>That was a great challenge to test my knowledge of how PostGIS works and here&#8217;s my shot at&nbsp;it:</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="p">(</span>
+    <span class="k">SELECT</span>
+        <span class="n">a</span><span class="p">.</span><span class="n">gid</span><span class="p">,</span>
+        <span class="n">b</span><span class="p">.</span><span class="n">gid</span><span class="p">,</span>
+        <span class="n">a</span><span class="p">.</span><span class="n">geom</span> <span class="o">&lt;-&gt;</span> <span class="n">b</span><span class="p">.</span><span class="n">geom</span> <span class="n">distance</span>
+    <span class="k">FROM</span>
+        <span class="n">shp1</span> <span class="n">a</span><span class="p">,</span> <span class="n">shp2</span> <span class="n">b</span>
+    <span class="k">WHERE</span>
+        <span class="k">abs</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">value</span> <span class="o">-</span> <span class="n">b</span><span class="p">.</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">400</span> <span class="k">AND</span>
+        <span class="n">ST_DWithin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="mi">2000</span><span class="p">)</span>
+    <span class="p">)</span> <span class="n">sq</span>
+<span class="k">WHERE</span>
+    <span class="n">distance</span> <span class="o">&gt;</span> <span class="mi">500</span><span class="p">;</span>
+</pre></div>
+
+
+<ol>
+<li>I use <a href="http://postgis.net/docs/geometry_distance_centroid.html"><code>&lt;-&gt;</code></a>, a.k.a geometry distance centroid instead of <code>ST_Distance()</code>. It takes advantage of spatial indexes, thus it&#8217;s fast. And it&#8217;s perfectly fine to use it with point dataset, because the centroid of a bounding box of a point is? That point, exactly. <strong>Spatial indexes have to be built&nbsp;beforehand.</strong></li>
+<li>Buffers are not necessary to check whether a geometry lies in a certain distance from another one. That&#8217;s what <code>ST_Dwithin()</code> was made for. With the inner <code>WHERE</code> clause I get all the points lying at most 2,000 meters from the current, having the absolute value difference bigger than 400. <code>ST_Dwithin()</code> will make use of any spatial index available, unlike <code>ST_Distance()</code>.</li>
+<li>The outer <code>WHERE</code> clause throws away all the points closer than 500 meters. Remember, we already got only those not further than 2,000 meters from the previous&nbsp;step.</li>
+</ol>
+<p>It took PostGIS 1060545,590 ms (~ 17 minutes) on my Quad-Core Intel® Core™ i5-4210M <span class="caps">CPU</span> @ 2.60GHz, 4 <span class="caps">GB</span> <span class="caps">RAM</span>, 500 <span class="caps">GB</span> <span class="caps">SSD</span> hard drive, PostgreSQL 9.3 and PostGIS 2.1 with two point datasets having 4M and 300K rows,&nbsp;respectively.</p>
+</article>
+<article>
+    <h1><a href="/posts/2015/qgis-tips-for-collaborative-mapping/" rel="bookmark" title="Permalink to QGIS Tips For Collaborative Mapping"><span class="caps">QGIS</span> Tips For Collaborative&nbsp;Mapping</a></h1>
+    Written on Jul 21, 2015
+    and marked as
+    <a href="/tag/qgis.html">qgis</a>    | <a href="/category/tools.html">Tools</a>
+    <p>Right now I&#8217;m setting up a project aimed at crop evaluation over ortophotos, <span class="caps">HR</span> and <span class="caps">VHR</span> imagery. All the steps of evaluation will be done in <span class="caps">QGIS</span> with PostGIS used for data storage and&nbsp;post-processing.</p>
+<p>In the initial phase, fifteen <span class="caps">GIS</span> operators will be using <span class="caps">QGIS</span> to reshape geometries and fill attribute data accordingly. Fifteen are not so many, but it is enough to be a possible source of errors. Luckily, there are many things you can do with <span class="caps">QGIS</span> to prevent people from making&nbsp;mistakes.</p>
+<h2><span class="caps">QGIS</span> project&nbsp;file</h2>
+<p><span class="caps">QGIS</span> project, the .qgs file, is a pure <span class="caps">XML</span> and, unlike <span class="caps">ESRI</span>&#8217;s .mxd, can be edited with any text editor. That&#8217;s great advantage when you need to prepare one project for many different operators. My project has to load some database layers that should be different for different operators that have different database&nbsp;accounts.</p>
+<p>How do you do that? It&#8217;s enough to create a project using your own credentials and then replace them with <code>USERNAME</code> and <code>PASSWORD</code> strings as seen below. What happens when the user loads the&nbsp;project?</p>
+<div class="highlight"><pre><span></span><span class="nt">&lt;datasource&gt;</span>dbname=&#39;database&#39; host=host port=5432 user=&#39;USERNAME&#39; password=&#39;PASSWORD&#39; sslmode=require key=&#39;qgis_id&#39; srid=5514 type=POLYGON table=&quot;schema&quot;.&quot;table&quot; (wkb_geometry) sql=<span class="nt">&lt;/datasource&gt;</span>
+</pre></div>
+
+
+<p>A popup window will be shown asking him/her to handle bad layers, as <span class="caps">QGIS</span> will not be able to connect to the layer. When he/she fills in right credentials (just once), the layer will be loaded. Don&#8217;t forget to <strong>use a table name that doesn&#8217;t exist</strong>, <span class="caps">QGIS</span> will use the credentials stored with PostGIS connection otherwise and won&#8217;t ask for them. <em>I don&#8217;t like this&nbsp;behaviour.</em></p>
+<p>Using this multiple times for each user-specific layer is a great time&nbsp;saver.</p>
+<h2>Adjust attribute table to fit your&nbsp;needs</h2>
+<p><span class="caps">QGIS</span> attribute table has so many settings you probably don&#8217;t use on daily basis and yet they might be invaluable in such project. All of them are available from layer properties under the Fields&nbsp;tab.</p>
+<p class='text-center'><img src="/assets/qgis-tips-for-collaborative-mapping/hidden.png" width=50% class="img-responsive centered"></p>
+
+<p>Sadly, our PostGIS layers are very wide in terms of column count. Not all of the columns are to be edited or even seen by operators, so it might be a good idea to hide them by setting their Edit Widget to Hidden. Those that should be seen, but not edited, might be set as not editable by unchecking that&nbsp;option.</p>
+<p>Lots of our attributes use enumerations provided by our project partner as <span class="caps">CSV</span> files. We use them in <span class="caps">QGIS</span> as value maps, so operators don&#8217;t have to type them manually - we both make their work easier and eliminate mistakes they&nbsp;made.</p>
+<p class='text-center'><img src="/assets/qgis-tips-for-collaborative-mapping/valuemap.png" width=50% class="img-responsive centered"></p>
+
+<p>Note <span class="caps">QGIS</span> swallows the first row of the given <span class="caps">CSV</span> file as if it was a header. Don&#8217;t forget about this when creating your own enumerations. Once set, operators will see a friendly combo box instead of a hostile blank input in the attribute&nbsp;table.</p>
+<p>These are just small adjustments that can make a big difference in your <span class="caps">QGIS</span>&nbsp;workflow.</p>
+</article>
+<article>
+    <h1><a href="/posts/2015/ssh-grass-processing-status-check/" rel="bookmark" title="Permalink to SSH GRASS Processing Status Check"><span class="caps">SSH</span> <span class="caps">GRASS</span> Processing Status&nbsp;Check</a></h1>
+    Written on Jul 21, 2015
+    and marked as
+    <a href="/tag/bash.html">bash</a>,     <a href="/tag/linux.html">linux</a>    | <a href="/category/development.html">development</a>
+    <p>I&#8217;ve been running some <span class="caps">GRASS</span>/PostGIS computations on a remote server that were taking hours to finish. Once in a while I checked for their state by issuing <code>tail log_XX.log</code> from my laptop to see if they were ready yet. It suddenly became pretty annoying to check five different logs every ten&nbsp;minutes.</p>
+<p>Instead of waiting and checking the logs, I thought it would be great to automate this. And it would be awesome if checking was fun. So I wrote a simple routine that takes log number as an argument (every process logs to a separate logfile) and checks it every minute until it says <em>done</em>. Right after that <code>notify-send</code> gives me a neat popup and Queen starts playing their <em>We are the champions</em> thanks to <code>mpg123</code>.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env bash</span>
+<span class="nv">item</span><span class="o">=</span><span class="nv">$1</span>
+
+<span class="k">while</span> true<span class="p">;</span> <span class="k">do</span>
+    <span class="nb">echo</span> <span class="s2">&quot;############ </span><span class="si">${</span><span class="nv">item</span><span class="si">}</span><span class="s2"> ############&quot;</span>
+    <span class="nv">x</span><span class="o">=</span><span class="k">$(</span>ssh user@remote.server <span class="s2">&quot;tail -n 30 path/to/my/log_</span><span class="si">${</span><span class="nv">item</span><span class="si">}</span><span class="s2">.log&quot;</span><span class="k">)</span>
+
+    <span class="k">if</span> <span class="o">[[</span> <span class="nv">$x</span> <span class="o">==</span> *<span class="s2">&quot;done&quot;</span>* <span class="o">]]</span>
+        <span class="k">then</span>
+            notify-send -u critical <span class="s2">&quot;Finally </span><span class="si">${</span><span class="nv">item</span><span class="si">}</span><span class="s2">&quot;</span>
+            mpg123 -n <span class="m">250</span> ~/Music/queen-we_are_the_champions.mp3
+            <span class="nb">exit</span>
+        <span class="k">else</span> <span class="nb">echo</span> <span class="s2">&quot;Not yet&quot;</span>
+    <span class="k">fi</span>
+    sleep <span class="m">60</span>
+<span class="k">done</span>
+</pre></div>
+
+
+<p>What seemed to be really frustrating makes me happy right now. Unless Freddie starts singing in the middle of the&nbsp;night.</p>
+</article>
+<article>
+    <h1><a href="/posts/2015/animating-svg-maps-with-smil/" rel="bookmark" title="Permalink to Animating SVG Maps With SMIL">Animating <span class="caps">SVG</span> Maps With <span class="caps">SMIL</span></a></h1>
+    Written on Apr 29, 2015
+    and marked as
+    <a href="/tag/svg.html">svg</a>,     <a href="/tag/smil.html">smil</a>    | <a href="/category/web-maps.html">web maps</a>
+    <p>Using <span class="caps">SVG</span> to build web maps have both pros and cons and to be honest I don&#8217;t know any <em>serious</em> map/<span class="caps">GIS</span> project built on top of <span class="caps">SVG</span>. However, as a part of my job at university, I was forced to use both <span class="caps">SVG</span> and <span class="caps">SMIL</span> to produce animated web map (see the small version below or the big one at <a href="https://zimmicz.github.io/svg-smil-airplanes/map.svg">GitHub</a>) and I&#8217;d like to share my&nbsp;findings.</p>
+<p><object width="400" data="https://zimmicz.github.io/svg-smil-airplanes/map.svg" type="image/svg+xml"></object></p>
+<h2>Data&nbsp;preprocessing</h2>
+<p>I chose <a href="http://www.naturalearthdata.com/">Natural Earth dataset</a> both for basemap and thematic&nbsp;layer:</p>
+<ul>
+<li>countries polygon layer for&nbsp;basemap</li>
+<li>airports point layer for thematic&nbsp;layer</li>
+</ul>
+<p>I decided that animation should go like&nbsp;this:</p>
+<ol>
+<li>Load basemap and Vaclav Havel airport (<span class="caps">PRG</span>).</li>
+<li>Animate destinations one by one. They are revealed in order of their distance from <span class="caps">PRG</span>.</li>
+<li>Animate&nbsp;airways.</li>
+<li>Once airways are animated, animate airplanes along their path from <span class="caps">PRG</span> to their destination in order of their time of&nbsp;departure.</li>
+<li>Profit.</li>
+</ol>
+<p>My goal was to create an animation of all departures from Vaclav Havel airport during one day. These data can be obtained at <a href="http://www.flightstats.com/">FlightStats</a>, I didn&#8217;t find a way make this process automatic though. <a href="http://openflights.org/">OpenFlights</a> might be better source&nbsp;then.</p>
+<h2><span class="caps">SVG</span>&nbsp;creation</h2>
+<p><a href="http://kartograph.org/">Kartograph</a> is a great tool both for <span class="caps">SVG</span> generation and scripting. What a pity it&#8217;s probably a dead project according to the last commit date. After installing Python part of library used to create <span class="caps">SVG</span> files out of vector geometries, it can be run with something like&nbsp;this:</p>
+<div class="highlight"><pre><span></span>kartograph --output map.svg --pretty-print --style style.css config.json
+</pre></div>
+
+
+<p>Pretty self-explanatory, let&#8217;s have a look at config&nbsp;file:</p>
+<div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;layers&quot;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;countries&quot;</span><span class="o">:</span> <span class="p">{</span>
+            <span class="s2">&quot;src&quot;</span><span class="o">:</span> <span class="s2">&quot;ne_50m_admin_0_countries/ne_50m_admin_0_countries.shp&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;attributes&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;airports&quot;</span><span class="o">:</span> <span class="p">{</span>
+            <span class="s2">&quot;src&quot;</span><span class="o">:</span> <span class="s2">&quot;ne_10m_airports/ne_10m_airports_prg.shp&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;attributes&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;abbrev&quot;</span><span class="p">]</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;travels&quot;</span><span class="o">:</span> <span class="p">{</span>
+            <span class="s2">&quot;src&quot;</span><span class="o">:</span> <span class="s2">&quot;ne_10m_airports/travels.shp&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;attributes&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;distance&quot;</span><span class="p">]</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;grid&quot;</span><span class="o">:</span> <span class="p">{</span>
+            <span class="s2">&quot;special&quot;</span><span class="o">:</span> <span class="s2">&quot;graticule&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;latitudes&quot;</span><span class="o">:</span> <span class="mi">10</span><span class="p">,</span>
+            <span class="s2">&quot;longitudes&quot;</span><span class="o">:</span> <span class="mi">10</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;proj&quot;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="s2">&quot;satellite&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;lon0&quot;</span><span class="o">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">&quot;lat0&quot;</span><span class="o">:</span> <span class="mf">48.0</span><span class="p">,</span>
+        <span class="s2">&quot;dist&quot;</span><span class="o">:</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="s2">&quot;up&quot;</span><span class="o">:</span> <span class="mi">15</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;bounds&quot;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;mode&quot;</span><span class="o">:</span> <span class="s2">&quot;bbox&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;data&quot;</span><span class="o">:</span> <span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span>
+        <span class="s2">&quot;padding&quot;</span><span class="o">:</span> <span class="mi">1</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;export&quot;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;round&quot;</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">&quot;width&quot;</span><span class="o">:</span> <span class="mi">1000</span><span class="p">,</span>
+        <span class="s2">&quot;ratio&quot;</span><span class="o">:</span> <span class="mi">1</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>It is possible to adjust map settings in many different ways. The most&nbsp;important/interesting:</p>
+<ul>
+<li>Choose what attributes you want to have exported from source file with <code>attributes</code> key for every layer. They&#8217;ll be available as <code>data-</code> attribute of <span class="caps">SVG</span>&nbsp;elements.</li>
+<li>It comes with Grid generation packed in! Really great. Sea generation works for some projections&nbsp;only.</li>
+<li>Set the projections you want to use with additional&nbsp;settings.</li>
+<li><code>bounds</code> settings should - according to the docs - use layer extent as well, I couldn&#8217;t make it work though. Use <code>[-180, -90, 180, 90]</code> as a workaround to get the whole world. Don&#8217;t forget to set <code>padding</code>, so your map doesn&#8217;t get clipped on&nbsp;edges.</li>
+<li><code>export</code>ing coordinates rounded to one decimal place makes your <span class="caps">SVG</span> a lot&nbsp;smaller.</li>
+</ul>
+<p>You can change <span class="caps">SVG</span> look with simple <span class="caps">CSS</span>, just be sure to use layer names as <span class="caps">CSS</span>&nbsp;ids:</p>
+<div class="highlight"><pre><span></span><span class="p">#</span><span class="nn">airports</span> <span class="p">{</span>
+    <span class="n">fill</span><span class="p">:</span> <span class="mh">#CC0000</span><span class="p">;</span>
+    <span class="n">fill-opacity</span><span class="p">:</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">stroke</span><span class="p">:</span> <span class="mh">#660000</span><span class="p">;</span>
+    <span class="n">stroke-opacity</span><span class="p">:</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">#</span><span class="nn">countries</span> <span class="p">{</span>
+    <span class="n">fill</span><span class="p">:</span> <span class="mh">#e6deb4</span><span class="p">;</span>
+    <span class="n">stroke</span><span class="p">:</span> <span class="mh">#a59f81</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">#</span><span class="nn">grid</span> <span class="p">{</span>
+    <span class="n">stroke</span><span class="p">:</span> <span class="mh">#d0d0d0</span><span class="p">;</span>
+    <span class="n">stroke-width</span><span class="p">:</span> <span class="mf">.3</span><span class="kt">px</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">#</span><span class="nn">travels</span> <span class="p">{</span>
+    <span class="n">stroke</span><span class="p">:</span> <span class="mh">#1f78b4</span><span class="p">;</span>
+    <span class="n">stroke-opacity</span><span class="p">:</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">stroke-dasharray</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<h2>Data adjustment <span class="amp">&amp;</span>&nbsp;animation</h2>
+<p><strong><span class="caps">SMIL</span></strong> is a <span class="caps">XML</span> based language for multimedia representation. It comes ready for timing, animation, visual transitions etc. I guess it might be considered easier to read for a web development beginner. Once you start using it, you immediately realize it suffers from the same disease like <span class="caps">XML</span> does: it is so&nbsp;wordy!</p>
+<p>Let&#8217;s get back to my example. To animate airports one by one, let&#8217;s give them unique ids, so they look something&nbsp;like:</p>
+<div class="highlight"><pre><span></span><span class="nt">&lt;circle</span> <span class="na">id=</span><span class="s">&quot;brs&quot;</span> <span class="na">stroke-opacity=</span><span class="s">&quot;0&quot;</span> <span class="na">fill-opacity=</span><span class="s">&quot;0&quot;</span> <span class="na">cx=</span><span class="s">&quot;476.597304864&quot;</span> <span class="na">cy=</span><span class="s">&quot;539.487783171&quot;</span> <span class="na">data-abbrev=</span><span class="s">&quot;BRS&quot;</span> <span class="na">data-name=</span><span class="s">&quot;Bristol Int&#39;l&quot;</span> <span class="na">r=</span><span class="s">&quot;3&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+
+
+<p>That&#8217;s something you do by hand as kartograph doesn&#8217;t give ids to <span class="caps">SVG</span> elements. Once you&#8217;re done with that, you can run <span class="caps">SMIL</span> animation. If you look closer at the final map, you&#8217;ll notice there are three properties animated for each airport: fill opacity, stroke opacity and radius. Each property needs to use separate <span class="caps">SMIL</span> <code>&lt;animate /&gt;</code>, which might look like the one&nbsp;below:</p>
+<div class="highlight"><pre><span></span><span class="nt">&lt;animate</span> <span class="na">attributeName=</span><span class="s">&quot;fill-opacity&quot;</span>
+    <span class="na">id=</span><span class="s">&quot;kos_ani_fo&quot;</span>
+    <span class="na">from=</span><span class="s">&quot;0&quot;</span>
+    <span class="na">to=</span><span class="s">&quot;1&quot;</span>
+    <span class="na">begin=</span><span class="s">&quot;osr_ani.end&quot;</span>
+    <span class="na">dur=</span><span class="s">&quot;0.25s&quot;</span>
+    <span class="na">fill=</span><span class="s">&quot;freeze&quot;</span>
+    <span class="na">xlink:href=</span><span class="s">&quot;#kos&quot;</span>
+<span class="nt">/&gt;</span>
+<span class="nt">&lt;animate</span> <span class="na">attributeName=</span><span class="s">&quot;stroke-opacity&quot;</span>
+    <span class="na">id=</span><span class="s">&quot;kos_ani_so&quot;</span>
+    <span class="na">from=</span><span class="s">&quot;0&quot;</span>
+    <span class="na">to=</span><span class="s">&quot;1&quot;</span>
+    <span class="na">begin=</span><span class="s">&quot;osr_ani.end&quot;</span>
+    <span class="na">dur=</span><span class="s">&quot;0.25s&quot;</span>
+    <span class="na">fill=</span><span class="s">&quot;freeze&quot;</span>
+    <span class="na">xlink:href=</span><span class="s">&quot;#kos&quot;</span>
+<span class="nt">/&gt;</span>
+<span class="nt">&lt;animate</span> <span class="na">attributeName=</span><span class="s">&quot;r&quot;</span>
+    <span class="na">id=</span><span class="s">&quot;kos_ani_r&quot;</span>
+    <span class="na">from=</span><span class="s">&quot;10px&quot;</span>
+    <span class="na">to=</span><span class="s">&quot;3px&quot;</span>
+    <span class="na">begin=</span><span class="s">&quot;osr_ani.end&quot;</span>
+    <span class="na">dur=</span><span class="s">&quot;0.25s&quot;</span>
+    <span class="na">xlink:href=</span><span class="s">&quot;#kos&quot;</span>
+<span class="nt">/&gt;</span>
+</pre></div>
+
+
+<p>I guess you get the idea how long this would take for more airports. Make sure to notice that <span class="caps">SMIL</span> can start animation based on another animation&#8217;s end (<code>osr_ani.end</code>) - that&#8217;s pretty&nbsp;neat.</p>
+<p>Airways animation works almost the same. First, add unique id to each&nbsp;airway:</p>
+<div class="highlight"><pre><span></span><span class="nt">&lt;path</span> <span class="na">d=</span><span class="s">&quot;M550.9,562.9L568.0,495.0 &quot;</span> <span class="na">id=</span><span class="s">&quot;travel-arn&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+
+
+<p>Second, start animation after all the airports are visible on the map. Notice the initial definition of <code>d</code> attribute - it&#8217;s a line with zero&nbsp;length.</p>
+<div class="highlight"><pre><span></span><span class="nt">&lt;animate</span> <span class="na">attributeName=</span><span class="s">&quot;d&quot;</span>
+    <span class="na">id=</span><span class="s">&quot;path_ani&quot;</span>
+    <span class="na">from=</span><span class="s">&quot;M550.9,562.9L550.9,562.9&quot;</span>
+    <span class="na">to=</span><span class="s">&quot;M550.9,562.9L568.0,495.0&quot;</span>
+    <span class="na">begin=</span><span class="s">&quot;icn_ani_r.end&quot;</span>
+    <span class="na">dur=</span><span class="s">&quot;3s&quot;</span>
+    <span class="na">xlink:href=</span><span class="s">&quot;#travel-arn&quot;</span>
+<span class="nt">/&gt;</span>
+</pre></div>
+
+
+<p>Once airways animation has finished, let airplanes fly around the globe with a simple JavaScript&nbsp;function:</p>
+<div class="highlight"><pre><span></span><span class="c">/**</span>
+<span class="c"> * @param  number coef  scale radius by number of flights to the given destination</span>
+<span class="c"> * @param  string flight_id</span>
+<span class="c"> */</span>
+<span class="nt">var</span> <span class="nt">circle</span> <span class="o">=</span> <span class="nt">function</span><span class="o">(</span><span class="nt">coef</span><span class="o">,</span> <span class="nt">flight_id</span><span class="o">,</span> <span class="nt">timeshift</span><span class="o">)</span> <span class="p">{</span>
+    <span class="err">var</span> <span class="err">svgns</span> <span class="err">=</span> <span class="err">&quot;</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="o">.</span><span class="n">w3</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="mi">2000</span><span class="o">/</span><span class="n">svg</span><span class="s2">&quot;;</span>
+<span class="s2">    var svgDocument =document;</span>
+<span class="s2">    var motion = svgDocument.createElementNS(svgns,&quot;</span><span class="n">animateMotion</span><span class="s2">&quot;);</span>
+<span class="s2">    var animation = svgDocument.createElementNS(svgns,&quot;</span><span class="n">animate</span><span class="s2">&quot;);</span>
+<span class="s2">    var shape  = svgDocument.createElementNS(svgns, &quot;</span><span class="kc">circle</span><span class="s2">&quot;);</span>
+<span class="s2">    var time = 15 + timeshift;</span>
+<span class="s2">    var dur = document.getElementById(flight_id).getAttributeNS(null, &quot;</span><span class="n">data-dist</span><span class="s2">&quot;)/100;</span>
+<span class="s2">    motion.setAttribute(&quot;</span><span class="n">begin</span><span class="s2">&quot;, time + &quot;</span><span class="n">s</span><span class="s2">&quot;);</span>
+<span class="s2">    motion.setAttribute(&quot;</span><span class="n">dur</span><span class="s2">&quot;, dur + &quot;</span><span class="n">s</span><span class="s2">&quot;);</span>
+<span class="s2">    motion.setAttribute(&quot;</span><span class="n">path</span><span class="s2">&quot;, document.getElementById(flight_id).getAttributeNS(null, &quot;</span><span class="n">d</span><span class="s2">&quot;));</span>
+<span class="s2">    motion.setAttribute(&quot;</span><span class="n">xlink</span><span class="o">:</span><span class="n">href</span><span class="s2">&quot;, &quot;</span><span class="err">#</span><span class="s2">&quot; + flight_id);</span>
+<span class="s2">    motion.setAttribute(&quot;</span><span class="n">id</span><span class="s2">&quot;, flight_id + &quot;</span><span class="n">_motion</span><span class="s2">&quot;);</span>
+
+<span class="s2">    animation.setAttribute(&quot;</span><span class="n">attributeName</span><span class="s2">&quot;, &quot;</span><span class="k">opacity</span><span class="s2">&quot;);</span>
+<span class="s2">    animation.setAttribute(&quot;</span><span class="n">from</span><span class="s2">&quot;, &quot;</span><span class="mi">1</span><span class="s2">&quot;);</span>
+<span class="s2">    animation.setAttribute(&quot;</span><span class="kc">to</span><span class="s2">&quot;, &quot;</span><span class="mi">0</span><span class="s2">&quot;);</span>
+<span class="s2">    animation.setAttribute(&quot;</span><span class="n">begin</span><span class="s2">&quot;, time + dur + &quot;</span><span class="n">s</span><span class="s2">&quot;);</span>
+<span class="s2">    animation.setAttribute(&quot;</span><span class="n">dur</span><span class="s2">&quot;, &quot;</span><span class="mf">0.1</span><span class="kt">s</span><span class="s2">&quot;);</span>
+<span class="s2">    animation.setAttribute(&quot;</span><span class="kc">fill</span><span class="s2">&quot;, &quot;</span><span class="n">freeze</span><span class="s2">&quot;);</span>
+
+
+<span class="s2">    shape.setAttributeNS(null, &quot;</span><span class="n">r</span><span class="s2">&quot;,  1*coef);</span>
+<span class="s2">    shape.setAttributeNS(null, &quot;</span><span class="kc">fill</span><span class="s2">&quot;, &quot;</span><span class="mi">1</span><span class="n">f78b4</span><span class="s2">&quot;);</span>
+<span class="s2">    shape.setAttributeNS(null, &quot;</span><span class="n">stroke</span><span class="s2">&quot;, &quot;</span><span class="mi">1</span><span class="n">f78b4</span><span class="s2">&quot;);</span>
+<span class="s2">    shape.setAttribute(&quot;</span><span class="n">id</span><span class="s2">&quot;, &quot;</span><span class="n">airplane-</span><span class="s2">&quot; + flight_id);</span>
+<span class="s2">    shape.appendChild(motion);</span>
+<span class="s2">    shape.appendChild(animation);</span>
+
+<span class="s2">    document.getElementById(&quot;</span><span class="n">airplanes</span><span class="err">&quot;</span><span class="p">)</span><span class="o">.</span><span class="nf">appendChild</span><span class="p">(</span><span class="n">shape</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p><span class="caps">SMIL</span> with <span class="caps">SVG</span> seems to be interesting option for web map animation, a bit lengthy though. Syncing animations can easily become pain in the ass (<a href="https://stackoverflow.com/questions/29897355/svg-smil-animatemotion-only-triggers-once/">see StackOverflow thread</a>). Never call your function <code>animate</code> - there is namesake function defined in <a href="https://w3c.github.io/web-animations/">Web Animations <span class="caps">API</span></a> that makes animation crash in Chrome. <code>&lt;animateMotion /&gt;</code> is a great tool to animate elements along&nbsp;path.</p>
+</article>
+<article>
+    <h1><a href="/posts/2015/grass-big-buffers-made-easy/" rel="bookmark" title="Permalink to GRASS: Big Buffers Made Easy"><span class="caps">GRASS</span>: Big Buffers Made&nbsp;Easy</a></h1>
+    Written on Apr 20, 2015
+    and marked as
+    <a href="/tag/grass.html">grass</a>    | <a href="/category/automation.html">automation</a>
+    <p>Recently I&#8217;ve written about <a href="/2015/postgis-buffers-intersections-differences-and-collections/">struggling with fairly complex geometries in PostGIS</a>. Lesson learned from the last time was to use more smaller geometries instead of several really huge. You can obtain the small ones from the big by <a href="/2015/postgis-rectangular-grid-creation/">cutting it with a grid</a>.</p>
+<p>A supervisor of a project I&#8217;ve been working on came up with a task that totally buried the previous process in a blink of an eye: <strong>Give me the buffer (diffed with original geometries) that is smoothed on the outer bounds so there are no edges shorter than 10 cm.</strong> I sighed. Then, I cursed. Then, I gave it a try with PostGIS. Achieving this goal involves these&nbsp;steps:</p>
+<ul>
+<li>Dissolve intersecting&nbsp;buffers</li>
+<li>Run some kind of generalization algorithm that is not defined in&nbsp;PostGIS</li>
+<li>Diff original&nbsp;geometries</li>
+<li>Cut buffer with grid so it works <del>faster</del> not so slow for the next&nbsp;steps</li>
+</ul>
+<p>Two of those four are rather problematic with PostGIS: line smoothing and diffing the original geometries (I didn&#8217;t get to the last one, so it might be 3 of 4 as&nbsp;well).</p>
+<h2>Hello, I&#8217;m <span class="caps">GRASS</span></h2>
+<p>I haven&#8217;t used <span class="caps">GRASS</span> for ages and even back then I didn&#8217;t get to know it much, but it saved the day for me this&nbsp;time.</p>
+<div class="highlight"><pre><span></span>grass -text path/to/mapset -c
+
+v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&quot;PG:host=localhost dbname=db user=postgres password=postgres&quot;</span> <span class="nv">output</span><span class="o">=</span>ilot_050 <span class="nv">layer</span><span class="o">=</span>ilot_2015_050 <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
+<span class="c1"># turn the snapping off, I don&#39;t want the input changed in any way, even though it is not topologically valid</span>
+v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&quot;PG:host=localhost dbname=db user=postgres password=postgres&quot;</span> <span class="nv">output</span><span class="o">=</span>lollipops_050 <span class="nv">layer</span><span class="o">=</span>lollipops.lollipops_2015_050_tmp <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
+v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&quot;PG:host=localhost dbname=db user=postgres password=postgres&quot;</span> <span class="nv">output</span><span class="o">=</span>holes_050 <span class="nv">layer</span><span class="o">=</span>phase_3.holes_050 <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
+v.db.addcolumn <span class="nv">map</span><span class="o">=</span>ilot_050 <span class="nv">columns</span><span class="o">=</span><span class="s2">&quot;id_0 int&quot;</span>
+v.db.update <span class="nv">map</span><span class="o">=</span>ilot_050 <span class="nv">column</span><span class="o">=</span>id_0 <span class="nv">value</span><span class="o">=</span><span class="m">1</span>
+
+<span class="c1"># dissolve didn&#39;t work without a column specified, dunno why</span>
+v.dissolve <span class="nv">input</span><span class="o">=</span>ilot_050 <span class="nv">column</span><span class="o">=</span>id_0 <span class="nv">output</span><span class="o">=</span>ilot_050_dissolve --overwrite
+v.buffer <span class="nv">input</span><span class="o">=</span>ilot_050_dissolve <span class="nv">output</span><span class="o">=</span>ilot_050_buffer <span class="nv">distance</span><span class="o">=</span><span class="m">20</span> --overwrite
+
+<span class="c1"># v.out and v.in routine used just because I didn&#39;t get the way attributes work in GRASS, would do it differently next time</span>
+v.out.ogr <span class="nv">input</span><span class="o">=</span>ilot_050_buffer <span class="nv">output</span><span class="o">=</span>ilot_050_buffer <span class="nv">format</span><span class="o">=</span>ESRI_Shapefile --overwrite
+v.in.ogr <span class="nv">input</span><span class="o">=</span>ilot_050_buffer <span class="nv">output</span><span class="o">=</span>ilot_050_buffer <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
+v.overlay <span class="nv">ainput</span><span class="o">=</span>ilot_050_buffer <span class="nv">binput</span><span class="o">=</span>holes_050 <span class="nv">operator</span><span class="o">=</span>or <span class="nv">output</span><span class="o">=</span>combined_050_01 <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
+
+<span class="c1"># tried v.patch to combine the three layers, it gave some strange results in the final overlay</span>
+v.overlay <span class="nv">ainput</span><span class="o">=</span>combined_050_01 <span class="nv">binput</span><span class="o">=</span>lollipops_050 <span class="nv">operator</span><span class="o">=</span>or <span class="nv">output</span><span class="o">=</span>combined_050_02 <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
+v.out.ogr <span class="nv">input</span><span class="o">=</span>combined_050_02 <span class="nv">output</span><span class="o">=</span>combined_050 <span class="nv">format</span><span class="o">=</span>ESRI_Shapefile --overwrite
+v.in.ogr <span class="nv">input</span><span class="o">=</span>combined_050 <span class="nv">output</span><span class="o">=</span>combined_050_in <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
+v.db.addcolumn <span class="nv">map</span><span class="o">=</span>combined_050_in <span class="nv">columns</span><span class="o">=</span><span class="s2">&quot;id_1 int&quot;</span>
+v.db.update <span class="nv">map</span><span class="o">=</span>combined_050_in <span class="nv">column</span><span class="o">=</span>id_1 <span class="nv">value</span><span class="o">=</span><span class="m">1</span>
+v.dissolve <span class="nv">input</span><span class="o">=</span>combined_050_in <span class="nv">column</span><span class="o">=</span>id_1 <span class="nv">output</span><span class="o">=</span>combined_050_dissolve --overwrite
+
+<span class="c1"># get rid of &lt; 10cm edges</span>
+v.generalize <span class="nv">input</span><span class="o">=</span>combined_050_dissolve <span class="nv">output</span><span class="o">=</span>combined_050_gen <span class="nv">method</span><span class="o">=</span>reduction <span class="nv">threshold</span><span class="o">=</span><span class="m">0</span>.1 --overwrite
+v.out.ogr <span class="nv">input</span><span class="o">=</span>combined_050_gen <span class="nv">output</span><span class="o">=</span>combined_050_gen <span class="nv">format</span><span class="o">=</span>ESRI_Shapefile --overwrite
+v.in.ogr <span class="nv">input</span><span class="o">=</span>combined_050_gen <span class="nv">output</span><span class="o">=</span>combined_050_gen <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
+v.overlay <span class="nv">ainput</span><span class="o">=</span>combined_050_gen <span class="nv">binput</span><span class="o">=</span>ilot_050 <span class="nv">operator</span><span class="o">=</span>not <span class="nv">snap</span><span class="o">=</span>1e-05 --overwrite <span class="nv">output</span><span class="o">=</span>ilot_050_diff
+v.out.postgis <span class="nv">input</span><span class="o">=</span>ilot_050_diff <span class="nv">output</span><span class="o">=</span><span class="s2">&quot;PG:dbname=db user=postgres password=postgres&quot;</span> <span class="nv">output_layer</span><span class="o">=</span>onf3.buffer_050_diff <span class="nv">options</span><span class="o">=</span><span class="s2">&quot;GEOMETRY_NAME=wkb_geometry,SRID=2154&quot;</span> --overwrite
+v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&quot;PG:host=localhost dbname=ign user=postgres password=postgres&quot;</span> <span class="nv">output</span><span class="o">=</span>buffer_050 <span class="nv">layer</span><span class="o">=</span>onf3.buffer_050_diff <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
+v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&quot;PG:host=localhost dbname=ign user=postgres password=postgres&quot;</span> <span class="nv">output</span><span class="o">=</span>grid <span class="nv">layer</span><span class="o">=</span>grid <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
+v.db.connect -d <span class="nv">map</span><span class="o">=</span>buffer_050
+
+<span class="c1"># instead of v.out and v.in routine</span>
+db.connect <span class="nv">driver</span><span class="o">=</span>sqlite <span class="nv">database</span><span class="o">=</span><span class="s1">&#39;$GISDBASE/$LOCATION_NAME/$MAPSET/sqlite.db&#39;</span>
+v.db.addtable <span class="nv">map</span><span class="o">=</span>buffer_050
+v.overlay <span class="nv">ainput</span><span class="o">=</span>buffer_050 <span class="nv">binput</span><span class="o">=</span>grid <span class="nv">operator</span><span class="o">=</span>and <span class="nv">output</span><span class="o">=</span>buffer_050_grid <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
+v.out.postgis <span class="nv">input</span><span class="o">=</span>buffer_050_grid <span class="nv">output</span><span class="o">=</span><span class="s2">&quot;PG:dbname=ign user=postgres password=postgres&quot;</span> <span class="nv">output_layer</span><span class="o">=</span>onf3.buffer_050_diff_grid <span class="nv">options</span><span class="o">=</span><span class="s2">&quot;GEOMETRY_NAME=wkb_geometry,SRID=2154&quot;</span> --overwrite
+</pre></div>
+
+
+<p><strong>It is damn fast</strong> compared to PostGIS. It can be automated. It can be parametrized. It is robust. It is&nbsp;great!</p>
+<h2>Lesson&nbsp;learned</h2>
+<ul>
+<li>You cannot smooth lines by deleting edges shorter than <code>n</code> in PostGIS. At least I haven&#8217;t found the way to do so without defining your own procedure. You can with <span class="caps">GRASS</span>.</li>
+<li><span class="caps">GRASS</span> reduction algorithm always keep first and last node untouched. Thus, if they&#8217;re closer than <code>n</code>, they&#8217;ll stay even if you&#8217;d like to have them&nbsp;deleted.</li>
+<li>Getting to grips with <span class="caps">GRASS</span> attribute data is rather hard after using shapefiles all your <span class="caps">GIS</span>&nbsp;life.</li>
+<li>It is great to exploit synergy of different <span class="caps">GIS</span> tools used for what they&#8217;re best&nbsp;at.</li>
+</ul>
+<p>The more I work with big data, the more I get used to not seeing them. That&#8217;s kind of a twist after crafting maps at&nbsp;university.</p>
+</article>
+<div class="pagination row">
+    <div class="large-6 columns">
+            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Previous page']);" href="/index8.html" class="button card card-1">&laquo; Previous page</a>
+    </div>
+    <div class="large-6 columns">
+            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Next page']);" href="/index10.html" class="button card card-1">Next page &raquo;</a>
+    </div>
+</div>    </main>
+    <footer>
+        Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
+        Proudly powered by <a href="//getpelican.com/">Pelican</a>,
+        which takes great advantage of <a href="//python.org">Python</a>.
+    </footer>
+<script src="/theme/webassets-external/5acf220afe81b3dd00333bbb93fbaa41_jquery.js"></script>
+<script src="/theme/webassets-external/b80143a60770d5aa122a039a2b889970_foundation.min.js"></script>
+</body>
+</html>

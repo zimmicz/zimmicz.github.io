@@ -4,637 +4,381 @@
         <title>Michal Zimmermann | Pieces of knowledge from the world of GIS.</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
-        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?d5d1e141">
-<!-- Start of Async Drift Code -->
-<script>
-    !function () {
-        var t;
-        if (t = window.driftt = window.drift = window.driftt || [], !t.init) return t.invoked ? void (window.console && console.error && console.error("Drift snippet included twice.")) : (t.invoked = !0,
-            t.methods = ["identify", "config", "track", "reset", "debug", "show", "ping", "page", "hide", "off", "on"],
-            t.factory = function (e) {
-                return function () {
-                    var n;
-                    return n = Array.prototype.slice.call(arguments), n.unshift(e), t.push(n), t;
-                };
-            }, t.methods.forEach(function (e) {
-                t[e] = t.factory(e);
-            }), t.load = function (t) {
-                var e, n, o, i;
-                e = 3e5, i = Math.ceil(new Date() / e) * e, o = document.createElement("script"),
-                    o.type = "text/javascript", o.async = !0, o.crossorigin = "anonymous", o.src = "https://js.driftt.com/include/" + i + "/" + t + ".js",
-                    n = document.getElementsByTagName("script")[0], n.parentNode.insertBefore(o, n);
-            });
-    }();
-    drift.SNIPPET_VERSION = '0.3.1';
-    drift.load('caacyauy5t6b');
-
-</script>
-<!-- End of Async Drift Code --></head>
-
-<body id="index" class="home">
-    <nav class="top-bar card-1" data-topbar role="navigation">
-        <ul class="title-area">
-            <li class="name">
-                <h1><a href="/posts">Home</a></h1>
-            </li>
-     <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
-            <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+        <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
+        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="/theme/webassets-external/e17ffd2049da5254bb4b3183ea73c922_normalize.css">
+        <link rel="stylesheet" href="/theme/webassets-external/35f123b951b653f7b2d441b35b63d32a_github.css">
+        <link rel="stylesheet" href="/theme/webassets-external/310a2979488959b3c24d4edd2e18b50d_screen.css">
+</head>
+<body>
+    <nav role="navigation">
+        <ul>
+            <li><a href="/categories">Categories</a></li>
+            <li><a href="/tags">Tags</a></li>
+            <li><a href="/feed.xml">Subscribe to RSS feed</a></li>
         </ul>
-        <section class="top-bar-section">
-    <!-- Right Nav Section -->
-            <ul class="right">
-                <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
-                <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
-                <li><a href="https://www.zimmi.cz/posts/feed.xml">RSS feed</a></li>
-            </ul>
-        </section>
     </nav>
-        <div class="row">
-          <div class="large-12 columns header">
-            <h1><a href="/posts">Michal Zimmermann</a> <small>Pieces of knowledge from the world of GIS.</small></h1>
-          </div>
-        </div>
-        <div class="row">
-            <div class="large-12 columns">
+    <header>
+        <h1><a href="/posts">Michal Zimmermann<small>Pieces of knowledge from the world of GIS.</small></a></h1>
+    </header>
+    <main>
 
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2014/postgresql-remote-access/" rel="bookmark" title="Permalink to PostgreSQL Remote Access">PostgreSQL Remote&nbsp;Access</a></h1>
-            <small>Written on Sep 17, 2014
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>        | <a href="https://www.zimmi.cz/posts/category/development.html">development</a>
-        </small>
-        <section>
-            <p>PostgreSQL is set to listen only to connections coming from localhost by default. I guess that&#8217;s fine as far as you don&#8217;t need access to the database from anywhere else (like your work network). If you do, you need to log via <span class="caps">SSH</span> or use some online database management tool (go for <a href="http://adminer.org">Adminer</a> and forget about anything called php[pg|my]admin). Or you can set it up to access connections from other&nbsp;locations.</p>
-<p>You need&nbsp;to:</p>
-<ol>
-<li>set <code>listen_addresses</code> to <code>*</code> in your postgres.conf. That does not mean anyone can connect to your database, that means that the server will listen to connections coming from any available <span class="caps">IP</span>&nbsp;interface.</li>
-<li>insert new entry into pg_hba.conf looking like this: <code>host database user xxx.xxx.xxx.xxx md5</code>. Now we&#8217;re saying we only want connections coming from <span class="caps">IP</span> <code>xxx.xxx.xxx.xxx</code> accepted.</li>
-<li>
-<p>Add rule allowing the database server access to iptables. Number 5 says it will be the fifth rule in the order. It must come before the final <span class="caps">REJECT</span> <span class="caps">ALL</span> rule if&nbsp;present.</p>
-<p><code>iptables -I INPUT 5 -p tcp --dport 5432 -s xxx.xxx.xxx.xxx -j ACCEPT</code>
-4. Just to be sure noone else is able to connect, reject all on port&nbsp;5432.</p>
-<p><code>iptables -I INPUT 6 -p tcp --dport 5432 -j REJECT</code></p>
-</li>
-</ol>
-<p>You&#8217;re set to remotely connect to your database&nbsp;server.</p>
-        </section>
-        </div>
-    </div>
+<article>
+    <h1><a href="/posts/2015/liftago-open-dataset-infographics/" rel="bookmark" title="Permalink to Liftago Open Dataset Infographics">Liftago Open Dataset&nbsp;Infographics</a></h1>
+    Written on Dec 21, 2015
+    and marked as
+    <a href="/tag/python.html">python</a>,     <a href="/tag/postgis.html">postgis</a>,     <a href="/tag/svg.html">svg</a>,     <a href="/tag/visualization.html">visualization</a>    | <a href="/category/data.html">data</a>
+    <p><a href="https://www.liftago.com/cs">Liftago</a> (the Czech analogy of Uber) has recently <a href="http://try.liftago.com/info-wants-to-be-free/">released a sample of its data</a> covering four weeks of driver/pasenger&nbsp;interactions.</p>
+<p>Have a look at my infographics created with PostGIS, Inkscape, Python and&nbsp;pygal.</p>
+<p class="text-center"><a href="/assets/liftago-open-dataset-infographics/liftago.pdf"><img title="Liftago infographics" src="/assets/liftago-open-dataset-infographics/liftago.png" class="img-responsive centered"></a></p>
+</article>
+<article>
+    <h1><a href="/posts/2015/twitter-rest-api-data-mining-on-openshift-part-ii/" rel="bookmark" title="Permalink to Twitter REST API Data Mining on OpenShift (Part II)">Twitter <span class="caps">REST</span> <span class="caps">API</span> Data Mining on OpenShift (Part <span class="caps">II</span>)</a></h1>
+    Written on Dec 6, 2015
+    and marked as
+    <a href="/tag/javascript.html">javascript</a>,     <a href="/tag/openshift.html">openshift</a>,     <a href="/tag/twitter.html">twitter</a>    | <a href="/category/development.html">development</a>
+    <p>Last time I described <a href="/posts/2015/twitter-rest-api-data-mining-on-openshift-part-i/">the setup of my OpenShift Twitter crawler</a> and let it running and downloading data. It&#8217;s been more than two months since I started and I got interesting amount of data. I also made a simple <span class="caps">ETL</span> process to load it into my local PostGIS database, which I&#8217;d like to cover in this&nbsp;post.</p>
+<h2>Extract&nbsp;data</h2>
+<p>Each day is written to the separate sqlite file with a name like <code>tw_day_D_M_YYYY</code>. <code>Bash</code> is used to gzip all the files before downloading them from&nbsp;OpenShift.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
 
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2014/switch-latitude-and-longitude-with-regular-expression/" rel="bookmark" title="Permalink to Switch Latitude And Longitude With Regular Expression">Switch Latitude And Longitude With Regular&nbsp;Expression</a></h1>
-            <small>Written on Sep 14, 2014
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/sublime.html">sublime</a>,         <a href="https://www.zimmi.cz/posts/tag/regex.html">regex</a>        | <a href="https://www.zimmi.cz/posts/category/development.html">development</a>
-        </small>
-        <section>
-            <p>It happens that you receive a file with longitude and latitude just in the opposite order that you would like to have. It&#8217;s fairly easy to switch those without loading it into Excel or Calc and doing <code>Ctrl + C</code> and <code>Ctrl + V</code> on&nbsp;columns.</p>
-<p>If you have a file with tabular data that looks like&nbsp;this:</p>
-<div class="highlight"><pre><span></span> 50.52, 60.15
- 70.96, 80.1
--55.23, 62.03
+ssh openshift <span class="s">&lt;&lt; EOF</span>
+<span class="s">    cd app-root/data</span>
+<span class="s">    tar czf twitter.tar.gz *.db</span>
+<span class="s">EOF</span>
+
+scp openshift:/var/lib/openshift/55e487587628e1280b0000a9/app-root/data/twitter.tar.gz ./data
+<span class="nb">cd</span> data <span class="o">&amp;&amp;</span>
+tar -xzf twitter.tar.gz <span class="o">&amp;&amp;</span>
+<span class="nb">cd</span> -
+
+<span class="nb">echo</span> <span class="s2">&quot;Extract done&quot;</span>
 </pre></div>
 
 
-<p>You can use Sublime Text to switch the&nbsp;values:</p>
-<ol>
-<li>Press <code>Ctrl + H</code></li>
-<li>Copy <code>(\-?\d+\.?\d+),?[\t ]*(\-?\d+\.?\d+)$</code> to <em>Find What</em>&nbsp;input</li>
-<li>Copy <code>$2,$1</code> to <em>Replace With</em>&nbsp;input</li>
-</ol>
-<p>Hit <em>Replace All</em> button and you&#8217;re&nbsp;done.</p>
-        </section>
-        </div>
-    </div>
+<h2>Transform&nbsp;data</h2>
+<p>The transformation part operates on downloaded files and merges them into one big <span class="caps">CSV</span> file. That&#8217;s pretty straightforward. Note that&#8217;s quite simple with sqlite flags, some <code>sed</code> and <code>tail</code> commands.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
 
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2014/connecting-to-secured-arcgis-server-layer-with-openlayers-3/" rel="bookmark" title="Permalink to Connecting To Secured ArcGIS Server Layer With OpenLayers 3">Connecting To Secured ArcGIS Server Layer With OpenLayers&nbsp;3</a></h1>
-            <small>Written on Sep 12, 2014
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>,         <a href="https://www.zimmi.cz/posts/tag/openlayers.html">openlayers</a>,         <a href="https://www.zimmi.cz/posts/tag/ogc.html">ogc</a>        | <a href="https://www.zimmi.cz/posts/category/web-maps.html">web maps</a>
-        </small>
-        <section>
-            <p>I was made to use ArcGIS Server with <a href="http://openlayers.org">Openlayers 3</a> just recently as one of the projects I&#8217;ve been working on demands such different tools to work&nbsp;together.</p>
-<p><strong>tl;dr: I hate&nbsp;Esri.</strong></p>
-<p>I found myself in need to access secured layers published via <span class="caps">WMS</span> on ArcGIS Server using username and password I was given, so here&#8217;s a little how-to for anyone who would have to do the&nbsp;same.</p>
-<p>Let&#8217;s start with a simple ol.layer.Image and pretend this is the secured layer we&#8217;re looking&nbsp;for:</p>
-<div class="highlight"><pre><span></span>var layer = new ol.layer.Image({
-    extent: extent,
-    source: new ol.source.ImageWMS(/** @type {olx.source.ImageWMSOptions} */ ({
-        url: url,
-        params: {
-            &#39;LAYERS&#39;: &#39;layer&#39;,
-            &#39;CRS&#39;: &#39;EPSG:3857&#39;,
-        }
-    }))
-});
+rm -rf ./data/csv
+mkdir ./data/csv
+
+<span class="k">for</span> db in ./data/*.db<span class="p">;</span> <span class="k">do</span>
+    <span class="nv">FILENAME</span><span class="o">=</span><span class="k">$(</span>basename <span class="nv">$db</span><span class="k">)</span>
+    <span class="nv">DBNAME</span><span class="o">=</span><span class="si">${</span><span class="nv">FILENAME</span><span class="p">%%.db</span><span class="si">}</span>
+    <span class="nv">CSVNAME</span><span class="o">=</span><span class="nv">$DBNAME</span>.csv
+    <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$DBNAME</span><span class="s2"> to csv...&quot;</span>
+    sqlite3 -header -csv <span class="nv">$db</span> <span class="s2">&quot;select * from </span><span class="nv">$DBNAME</span><span class="s2">;&quot;</span> &gt; ./data/csv/<span class="nv">$CSVNAME</span>
+<span class="k">done</span>
+
+<span class="nb">cd</span> ./data/csv
+touch tweets.csv
+<span class="nb">echo</span> <span class="k">$(</span>sed -n 1p <span class="k">$(</span>ls -d -1 *.csv <span class="p">|</span> head -n <span class="m">1</span><span class="k">))</span> &gt; tweets.csv <span class="c1"># get column names</span>
+
+<span class="k">for</span> csv in tw_*.csv<span class="p">;</span> <span class="k">do</span>
+    <span class="nb">echo</span> <span class="nv">$csv</span>
+    tail -n +2 <span class="nv">$csv</span> &gt;&gt; tweets.csv <span class="c1"># get all lines without the first one</span>
+<span class="k">done</span>
 </pre></div>
 
 
-<p>We need to retrieve the token, so we define a&nbsp;function:</p>
-<div class="highlight"><pre><span></span><span class="kd">function</span> <span class="nx">retrieveToken</span><span class="p">(</span><span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">req</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">XMLHttpRequest</span><span class="p">;</span>
+<h2>Load&nbsp;data</h2>
+<p>In the last step, the data is loaded with <span class="caps">SQL</span> <code>\copy</code> command.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
 
-    <span class="nx">req</span><span class="p">.</span><span class="nx">onload</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">status</span> <span class="o">==</span> <span class="s2">&quot;200&quot;</span><span class="p">)</span> <span class="p">{</span>
-            <span class="kd">var</span> <span class="nx">response</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">responseText</span><span class="p">);</span>
-            <span class="k">if</span> <span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">contents</span><span class="p">)</span> <span class="p">{</span>
-                <span class="nx">callback</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">contents</span><span class="p">);</span> <span class="c1">// response contents is where the token is stored</span>
-        <span class="p">}</span>
-    <span class="p">};</span>
-    <span class="nx">req</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="s2">&quot;http://server.address/arcgis/tokens/?request=getToken&amp;username=username&amp;password=password&amp;expiration=60&quot;</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
-    <span class="nx">req</span><span class="p">.</span><span class="nx">send</span><span class="p">()</span>
+<span class="nb">export</span> <span class="nv">PG_USE_COPY</span><span class="o">=</span>YES
+
+<span class="nv">DATABASE</span><span class="o">=</span>mzi_dizertace
+<span class="nv">SCHEMA</span><span class="o">=</span>dizertace
+<span class="nv">TABLE</span><span class="o">=</span>tweets
+
+psql <span class="nv">$DATABASE</span> <span class="s">&lt;&lt; EOF</span>
+<span class="s">    DROP TABLE IF EXISTS $SCHEMA.$TABLE;</span>
+<span class="s">    CREATE UNLOGGED TABLE $SCHEMA.$TABLE (id text, author text, author_id text, tweet text, created_at text, lon float, lat float, lang text);</span>
+<span class="s">    \copy $SCHEMA.$TABLE FROM &#39;data/csv/tweets.csv&#39; CSV HEADER DELIMITER &#39;,&#39;</span>
+<span class="s">    ALTER TABLE $SCHEMA.$TABLE ADD COLUMN wkb_geometry geometry(POINT, 4326);</span>
+<span class="s">    UPDATE $SCHEMA.$TABLE SET wkb_geometry = ST_SetSRID(ST_MakePoint(lon, lat), 4326);</span>
+<span class="s">    CREATE INDEX ${TABLE}_geom_idx ON $SCHEMA.$TABLE USING gist(wkb_geometry);</span>
+<span class="s">    COMMIT;</span>
+<span class="s">EOF</span>
+</pre></div>
+
+
+<h2>First&nbsp;statistics</h2>
+<p>Some interesting charts and numbers&nbsp;follow.</p>
+<p class="text-center"><img title="Top 100 Twitter users in the Czech Republic" src="/assets/twitter-rest-api-data-mining-on-openshift-part-ii/authors.png" class="img-responsive centered"></p>
+
+<p class="text-center"><img title="When people tweet in the Czech Republic" src="/assets/twitter-rest-api-data-mining-on-openshift-part-ii/hours.png" class="img-responsive centered"></p>
+
+<p class="text-center"><img title="Languages on Twitter in the Czech Republic" src="/assets/twitter-rest-api-data-mining-on-openshift-part-ii/languages.png" class="img-responsive centered"></p>
+</article>
+<article>
+    <h1><a href="/posts/2015/postgis-case-study-vozejkmap-open-data-part-iii/" rel="bookmark" title="Permalink to PostGIS Case Study: Vozejkmap Open Data (Part III)">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">III</span>)</a></h1>
+    Written on Nov 14, 2015
+    and marked as
+    <a href="/tag/postgresql.html">postgresql</a>,     <a href="/tag/postgis.html">postgis</a>,     <a href="/tag/leaflet.html">leaflet</a>,     <a href="/tag/javascript.html">javascript</a>    | <a href="/category/web-maps.html">web maps</a>
+    <p>After a while I got back to my <a href="/posts/2014/postgis-case-study-vozejkmap-open-data-part-i/">PostGIS open data</a> <a href="/posts/2015/postgis-case-study-vozejkmap-open-data-part-ii/">case study</a>. Last time I left it with clustering implemented, looking forward to incorporate <a href="http://turfjs.org">Turf.js</a> in the future. <em>And the future is now.</em> <a href="https://github.com/zimmicz/vozejkmap-to-postgis">The code is still available on&nbsp;GitHub.</a></p>
+<h2>Subgroup&nbsp;clustering</h2>
+<p>Vozejkmap data is categorized based on the place type (banks, parking lots, pubs, &hellip;). One of the core features of map showing such data should be the easy way to turn these categories on and&nbsp;off.</p>
+<p>As far as I know, it&#8217;s not trivial to do this with the standard Leaflet library. Extending <code>L.control.layers</code> and implement its <code>addOverlay</code>, <code>removeOverlay</code> methods on your own might be the way to add needed behavior. Fortunately, there&#8217;s an easier option thanks to <a href="https://github.com/ghybs/Leaflet.FeatureGroup.SubGroup">Leaflet.FeatureGroup.SubGroup</a> that can handle such use case and is really straightforward. See the code&nbsp;below.</p>
+<div class="highlight"><pre><span></span><span class="nx">cluster</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">markerClusterGroup</span><span class="p">({</span>
+    <span class="nx">chunkedLoading</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nx">chunkInterval</span><span class="o">:</span> <span class="mi">500</span>
+<span class="p">});</span>
+
+<span class="nx">cluster</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
+
+<span class="p">...</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">category</span> <span class="k">in</span> <span class="nx">categories</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// just use L.featureGroup.subGroup instead of L.layerGroup or L.featureGroup</span>
+    <span class="nx">overlays</span><span class="p">[</span><span class="nx">my</span><span class="p">.</span><span class="nx">Style</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="nx">category</span><span class="p">).</span><span class="nx">type</span><span class="p">]</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">featureGroup</span><span class="p">.</span><span class="nx">subGroup</span><span class="p">(</span><span class="nx">cluster</span><span class="p">,</span> <span class="nx">categories</span><span class="p">[</span><span class="nx">category</span><span class="p">]);</span>
 <span class="p">}</span>
+
+<span class="nx">mapkey</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">control</span><span class="p">.</span><span class="nx">layers</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">overlays</span><span class="p">).</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
 </pre></div>
 
 
-<p>I pass a parameter called <code>callback</code> - that&#8217;s a very important step, otherwise you would not be able to retrieve the token when you actually need it (<span class="caps">AJAX</span> stands for asynchronous). Now you just pass the token to the layer params like&nbsp;this:</p>
-<div class="highlight"><pre><span></span>retrieveToken(function(token) {
-    layer.getSource().updateParams({
-        token: token
-    })
-}
+<p>With this piece of code you get a map key with checkboxes for all the categories, yet they&#8217;re still kept in the single cluster on the map.&nbsp;Brilliant!</p>
+<p><img src="/assets/postgis-case-study-vozejkmap-open-data-part-iii/map.png" title="vozejkmap.cz data map" class="img-responsive centered"></p>
+<h2>Using Turf.js for&nbsp;analysis</h2>
+<p>Turf is one of those libraries I get amazed easily with, spending a week trying to find a use case, finally putting it aside with <em>&#8220;I&#8217;ll get back to it later&#8221;</em>. I usually don&#8217;t. This time it&#8217;s&nbsp;different.</p>
+<p>I use Turf to get the nearest neighbor for any marker on click. My first try ended up with the same marker being the result as it was a member of a feature collection passed to <code>turf.nearest()</code> method. After snooping around the docs I found <code>turf.remove()</code> method that can filter GeoJSON based on key-value&nbsp;pair.</p>
+<p>Another handy function is <code>turf.distance()</code> that gives you distance between two points. The code below adds an information about the nearest point and its distance into the&nbsp;popup.</p>
+<div class="highlight"><pre><span></span><span class="c1">// data is a geojson feature collection</span>
+<span class="nx">json</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">geoJson</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span> <span class="p">{</span>
+    <span class="nx">onEachFeature</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">feature</span><span class="p">,</span> <span class="nx">layer</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">layer</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;click&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kd">var</span> <span class="nx">nearest</span> <span class="o">=</span> <span class="nx">turf</span><span class="p">.</span><span class="nx">nearest</span><span class="p">(</span><span class="nx">layer</span><span class="p">.</span><span class="nx">toGeoJSON</span><span class="p">(),</span> <span class="nx">turf</span><span class="p">.</span><span class="nx">remove</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="nx">feature</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">title</span><span class="p">)),</span>
+                <span class="nx">distance</span> <span class="o">=</span> <span class="nx">turf</span><span class="p">.</span><span class="nx">distance</span><span class="p">(</span><span class="nx">layer</span><span class="p">.</span><span class="nx">toGeoJSON</span><span class="p">(),</span> <span class="nx">nearest</span><span class="p">,</span> <span class="s2">&quot;kilometers&quot;</span><span class="p">).</span><span class="nx">toPrecision</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+                <span class="nx">popup</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">popup</span><span class="p">({</span><span class="nx">offset</span><span class="o">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">35</span><span class="p">]}).</span><span class="nx">setLatLng</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">latlng</span><span class="p">),</span>
+                <span class="nx">content</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">Util</span><span class="p">.</span><span class="nx">template</span><span class="p">(</span>
+                    <span class="s2">&quot;&lt;h1&gt;{title}&lt;/h1&gt;&lt;p&gt;{description}&lt;/p&gt; \</span>
+<span class="s2">                    &lt;p&gt;Nejbližší bod: {nearest} je {distance} km daleko.&lt;/p&gt;&quot;</span><span class="p">,</span> <span class="p">{</span>
+                    <span class="nx">title</span><span class="o">:</span> <span class="nx">feature</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">title</span><span class="p">,</span>
+                    <span class="nx">description</span><span class="o">:</span> <span class="nx">feature</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">description</span><span class="p">,</span>
+                    <span class="nx">nearest</span><span class="o">:</span> <span class="nx">nearest</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">title</span><span class="p">,</span>
+                    <span class="nx">distance</span><span class="o">:</span> <span class="nx">distance</span>
+                <span class="p">});</span>
+
+            <span class="nx">popup</span><span class="p">.</span><span class="nx">setContent</span><span class="p">(</span><span class="nx">content</span><span class="p">);</span>
+            <span class="nx">popup</span><span class="p">.</span><span class="nx">openOn</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
+
+            <span class="p">...</span>
 </pre></div>
 
 
-<p>When you open Firebug and inspect Network tab, you should find <code>token</code> <span class="caps">URL</span> parameter passed along with <span class="caps">WMS</span> <code>GetMap</code> request.</p>
-<p>Few&nbsp;sidenotes:</p>
-<ol>
-<li>Although you might be logged in ArcGIS Server via web interface, you might need to pass the <code>token</code>  <span class="caps">URL</span> param when trying to access Capabilities document. Don&#8217;t know why&nbsp;though.</li>
-<li>You should probably take care of calling the <code>retrieveToken()</code> in shorter interval than the token expiration is set to. Otherwise you might end up with invalid&nbsp;token.</li>
-<li>You need to hide the username and password from anonymous users (I guess that&#8217;s only possible with server side implementation of selective JavaScript&nbsp;loading).</li>
-</ol>
-        </section>
-        </div>
-    </div>
+<p>From what I&#8217;ve tried so far, Turf seems to be incredibly fast and easy to use. I&#8217;ll try to find the nearest point for any of the categories, that could take Turf some&nbsp;time.</p>
+<h2>Update</h2>
+<p>Turf is blazing fast! I&#8217;ve implemented nearest point for each of the categories and it gets done in a blink of an eye. Some screenshots below. Geolocation implemented as&nbsp;well.</p>
+<p><img src="/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen1.png" title="vozejkmap.cz data map" class="img-responsive centered"> You can locate the point&nbsp;easily.</p>
 
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2014/blogging-on-docker-piecrust-to-the-rescue/" rel="bookmark" title="Permalink to Blogging On Docker: Piecrust To The Rescue">Blogging On Docker: Piecrust To The&nbsp;Rescue</a></h1>
-            <small>Written on Sep 11, 2014
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/docker.html">docker</a>,         <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>        | <a href="https://www.zimmi.cz/posts/category/development.html">development</a>
-        </small>
-        <section>
-            <p>I love blogging. I hate blogging systems. I hate content management systems. I just want to blog. That&#8217;s what <a href="http://bolt80.com/piecrust/">PieCrust</a> is all about - it lets you&nbsp;blog.</p>
-<p>It is powerful static website generator perfect for my needs (and for yours as well?). Blogging with PieCrust is really a piece of&nbsp;cake:</p>
-<ol>
-<li>prepare&nbsp;post</li>
-<li>serve&nbsp;site</li>
-<li>bake&nbsp;site</li>
-<li>send it off to the&nbsp;public</li>
-</ol>
-<p>I love having clean <span class="caps">OS</span>. That&#8217;s what <a href="http://docker.com">Docker</a> is all about - for me. Running PieCrust on Docker is really easy, it does not clutter your <span class="caps">PC</span> and it just&nbsp;works.</p>
-<p>If you ever want to use PieCrust on Docker, why don&#8217;t you start with this code?
-    <span class="caps">FROM</span>&nbsp;centos:centos6</p>
-<div class="highlight"><pre><span></span><span class="nt">RUN</span> <span class="nt">rpm</span> <span class="nt">-Uvh</span> <span class="nt">http</span><span class="o">://</span><span class="nt">mirror</span><span class="p">.</span><span class="nc">webtatic</span><span class="p">.</span><span class="nc">com</span><span class="o">/</span><span class="nt">yum</span><span class="o">/</span><span class="nt">el6</span><span class="o">/</span><span class="nt">latest</span><span class="p">.</span><span class="nc">rpm</span>
-<span class="nt">RUN</span> <span class="nt">rpm</span> <span class="nt">-Uvh</span> <span class="nt">http</span><span class="o">://</span><span class="nt">download</span><span class="p">.</span><span class="nc">fedoraproject</span><span class="p">.</span><span class="nc">org</span><span class="o">/</span><span class="nt">pub</span><span class="o">/</span><span class="nt">epel</span><span class="o">/</span><span class="nt">6</span><span class="o">/</span><span class="nt">x86_64</span><span class="o">/</span><span class="nt">epel-release-6-8</span><span class="p">.</span><span class="nc">noarch</span><span class="p">.</span><span class="nc">rpm</span>
-<span class="nt">RUN</span> <span class="nt">rpm</span> <span class="nt">-Uvh</span> <span class="nt">http</span><span class="o">://</span><span class="nt">rpms</span><span class="p">.</span><span class="nc">famillecollet</span><span class="p">.</span><span class="nc">com</span><span class="o">/</span><span class="nt">enterprise</span><span class="o">/</span><span class="nt">remi-release-6</span><span class="p">.</span><span class="nc">rpm</span>
+<p><img src="/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen2.png" title="vozejkmap.cz data map" class="img-responsive centered"> You can hide the&nbsp;infobox.</p>
 
-<span class="nt">RUN</span> <span class="nt">yum</span> <span class="nt">--enablerepo</span><span class="o">=</span><span class="nt">remi</span><span class="o">,</span><span class="nt">remi-php55</span> <span class="nt">install</span> <span class="nt">-y</span> <span class="nt">php</span> <span class="nt">php-mbstring</span> <span class="nt">php-opcache</span> <span class="nt">php-cli</span> <span class="nt">php-pear</span> <span class="nt">php-common</span> <span class="o">&amp;&amp;</span> <span class="nt">yum</span> <span class="nt">clean</span> <span class="nt">all</span>
-<span class="nt">RUN</span> <span class="nt">php</span> <span class="nt">-r</span> <span class="s2">&quot;readfile(&#39;https://getcomposer.org/installer&#39;);&quot;</span> <span class="o">|</span> <span class="nt">php</span>
-<span class="nt">RUN</span> <span class="nt">echo</span> <span class="s2">&quot;date.timezone = Europe/Prague&quot;</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="nt">etc</span><span class="o">/</span><span class="nt">php</span><span class="p">.</span><span class="nc">ini</span>
-<span class="nt">RUN</span> <span class="nt">mv</span> <span class="nt">composer</span><span class="p">.</span><span class="nc">phar</span> <span class="o">/</span><span class="nt">usr</span><span class="o">/</span><span class="nt">bin</span><span class="o">/</span><span class="nt">composer</span>
-<span class="nt">RUN</span> <span class="nt">php</span> <span class="nt">-r</span> <span class="s2">&quot;eval(&#39;?&gt;&#39;.file_get_contents(&#39;http://backend.bolt80.com/piecrust/install&#39;));&quot;</span>
-<span class="nt">RUN</span> <span class="nt">mv</span> <span class="nt">piecrust</span><span class="p">.</span><span class="nc">phar</span> <span class="o">/</span><span class="nt">usr</span><span class="o">/</span><span class="nt">bin</span><span class="o">/</span><span class="nt">chef</span>
-
-<span class="nt">CMD</span> <span class="cp">[</span><span class="s2">&quot;/bin/bash&quot;</span><span class="cp">]</span>
+<p><img src="/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen3.png" title="vozejkmap.cz data map" class="img-responsive centered">You can jump to any of the nearest&nbsp;places.</p>
+</article>
+<article>
+    <h1><a href="/posts/2015/twitter-rest-api-data-mining-on-openshift-part-i/" rel="bookmark" title="Permalink to Twitter REST API Data Mining on OpenShift (Part I)">Twitter <span class="caps">REST</span> <span class="caps">API</span> Data Mining on OpenShift (Part&nbsp;I)</a></h1>
+    Written on Nov 6, 2015
+    and marked as
+    <a href="/tag/javascript.html">javascript</a>,     <a href="/tag/openshift.html">openshift</a>,     <a href="/tag/twitter.html">twitter</a>    | <a href="/category/development.html">development</a>
+    <p>More than a year ago I wrote about <a href="http://www.zimmi.cz/posts/2014/analyzing-twitter-languages-with-streaming-api/">analyzing Twitter languages with Streaming <span class="caps">API</span></a>. Back then I kept my laptop running for a week to download data. Not a comfortable way, especially if you decide to get more data. One year uptime doesn&#8217;t sound like anything you want to be part of. <a href="https://www.openshift.com/">OpenShift</a> by Red Hat seems to be almost perfect replacement.&nbsp;Almost.</p>
+<h2>OpenShift&nbsp;setup</h2>
+<p>I started with Node.js application running on one small gear. Once running, you can easily <code>git push</code> the code to your OpenShift repo and login via <span class="caps">SSH</span>. I quickly found simple copy-pasting my local solution wasn&#8217;t going to work. and fixed it with some minor tweaks. That&#8217;s where the fun&nbsp;begins&#8230;</p>
+<blockquote>
+<p>I based the downloader on Node.js a year ago. Until now I still don&#8217;t get how that piece of software works. Frankly, I don&#8217;t really care as long as it&nbsp;works.</p>
+</blockquote>
+<h3>Pitfalls</h3>
+<p>If your application doesn&#8217;t generate any traffic, <strong>OpenShift turns it off</strong>. It wakes up once someone visits again. I had no idea about that and spent some time trying to stop that behavior. Obviously, I could have scheduled a cron job on my laptop pinging it every now and then. Luckily, OpenShift can run cron jobs itself. All you need is to embed a cron cartridge into the running application (and install a bunch of ruby dependencies&nbsp;beforehand).</p>
+<div class="highlight"><pre><span></span>rhc cartridge add cron-1.4 -a app-name
 </pre></div>
 
 
-<p>Running <code>sudo docker build --tag=piecrust .</code> will result in having docker container ready to run. Just run <code>sudo docker run -it -p 8080:8080 -v /host_piecrust_path/:/container_path piecrust /bin/bash</code> in terminal. While in container terminal, run <code>chef serve -n -p 8080 -a 0.0.0.0</code> and visit <a href="http://localhost:8080">http://localhost:8080</a>. You should see your PieCrust site up and&nbsp;running.</p>
-<p>The last command tells chef to serve your site on port 8080 (which should be free unless you&#8217;re running Tomcat or something like that) and make it listen on every available network interface. If you used 127.0.0.1 instead, you would never reach your site from outside the&nbsp;container.</p>
-<p>See?&nbsp;Easy.</p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2014/wmts-few-things-i-want-to-remember/" rel="bookmark" title="Permalink to WMTS: Few Things I Want To Remember"><span class="caps">WMTS</span>: Few Things I Want To&nbsp;Remember</a></h1>
-            <small>Written on Sep 10, 2014
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/ogc.html">ogc</a>,         <a href="https://www.zimmi.cz/posts/tag/wmts.html">wmts</a>        | <a href="https://www.zimmi.cz/posts/category/web-maps.html">web maps</a>
-        </small>
-        <section>
-            <ul>
-<li>Used to serve prepared rectangular tiles; this means you are limited by web server speed rather than map server&nbsp;speed</li>
-<li>Several ways to retrieve tiles are defined: <span class="caps">KVP</span> and <span class="caps">REST</span> are mandatory, <span class="caps">SOAP</span> is&nbsp;optional</li>
-<li>Does not allow layer combination; additional tile matrix would have to be&nbsp;created</li>
-<li>GetCapabilities, GetTile and GetFeatureInfo requests are&nbsp;defined</li>
-<li><strong>tile</strong></li>
-<li>rectangular representation of&nbsp;space</li>
-<li>defined by tile and row&nbsp;indices</li>
-<li><strong>tile&nbsp;matrix</strong></li>
-<li>set of tiles for a given&nbsp;scale</li>
-<li><em>defined with:</em><ul>
-<li>tile size derived from standardized pixel size (0.28 &times; 0.28&nbsp;mm)</li>
-<li>tile width and tile height&nbsp;(px)</li>
-<li>left upper corner&nbsp;coordinates</li>
-<li>matrix width and height as number of&nbsp;tiles</li>
-</ul>
-</li>
-<li><strong>tile matrix&nbsp;set</strong></li>
-<li>set of tile matrices for different&nbsp;scales</li>
-</ul>
-<h3>Total count of tile&nbsp;matrices</h3>
-<p><em><code>nTileMatrices × nTiledStyles × nTiledFormats (if no dimensions are defined)</code></em></p>
-<h3>Total count of tiles in a tile&nbsp;matrix</h3>
-<p><em><code>matrixWidth × matrixHeight</code></em></p>
-<h3>Other&nbsp;equations</h3>
-<ul>
-<li><code>pixelSpan = scaleDenominator × 0.28 10<sup>3</sup> / metersPerUnit(crs);</code></li>
-<li><code>tileSpanX = tileWidth × pixelSpan;</code></li>
-<li><code>tileSpanY = tileHeight × pixelSpan;</code></li>
-<li><code>tileMatrixMaxX = tileMatrixMinX + tileSpanX × matrixWidth;</code></li>
-<li><code>tileMatrixMinY = tileMatrixMaxY - tileSpanY × matrixHeight;</code></li>
-</ul>
-<p><img src="https://www.zimmi.cz/posts/assets/wmts-few-things-i-want-to-remember/wmts.png" title="WMTS tiling schema" class="img-responsive centered"></p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2014/degrees-to-decimal-with-javascript/" rel="bookmark" title="Permalink to Degrees To Decimal With Javascript">Degrees To Decimal With&nbsp;Javascript</a></h1>
-            <small>Written on Sep 9, 2014
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>        | <a href="https://www.zimmi.cz/posts/category/development.html">development</a>
-        </small>
-        <section>
-            <p>I have found a nice way to get decimal value from degrees of longitude and latitude&nbsp;recently:</p>
-<div class="highlight"><pre><span></span><span class="kd">function</span> <span class="nx">format</span><span class="p">(</span><span class="nx">coords</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">decimal</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="nx">output</span>  <span class="o">=</span> <span class="p">[],</span>
-        <span class="nx">coords</span>  <span class="o">=</span> <span class="nx">coords</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;  &#39;</span><span class="p">);</span> <span class="c1">// it might be &lt;br&gt; as well</span>
-
-    <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">coords</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kd">var</span> <span class="nx">c</span> <span class="o">=</span> <span class="nx">coords</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">);</span>
-
-        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">j</span> <span class="o">&lt;</span> <span class="nx">c</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">j</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-            <span class="nx">decimal</span> <span class="o">+=</span> <span class="nx">c</span><span class="p">[</span><span class="nx">j</span><span class="p">]</span> <span class="o">/</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="nx">j</span><span class="p">);</span>
-        <span class="p">}</span>
-
-        <span class="nx">output</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nb">parseFloat</span><span class="p">(</span><span class="nx">decimal</span><span class="p">).</span><span class="nx">toFixed</span><span class="p">(</span><span class="mi">5</span><span class="p">));</span>
-        <span class="nx">decimal</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="nx">prompt</span><span class="p">(</span><span class="s1">&#39;Souřadnice bodu&#39;</span><span class="p">,</span> <span class="nx">output</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="p">));</span>
-<span class="p">}</span>
+<p>Then create <code>.openshift/cron/{hourly,daily,weekly,monthly}</code> folder in the git repository and put your script running a simple curl command into one of&nbsp;those.</p>
+<div class="highlight"><pre><span></span>curl http://social-zimmi.rhcloud.com &gt; /dev/null
 </pre></div>
 
 
-<p>When you call <code>format("DD° MM' SS'  DD° MM' SS'");</code> you&#8217;ll get decimal value in return (or <code>prompt</code> to be accurate). What I like the most about this solution is the usage of Math.pow(). I think it is a neat way to transform the values as you need to divide parts of latitude or longitude by 60<sup>0</sup>, 60<sup>1</sup> and 60<sup>2</sup> respectively.</p>
-<p>There is definitely a googol of different solutions to this task, I just liked the simplicity of this&nbsp;one.</p>
-        </section>
-        </div>
-    </div>
+<p>Another problem was just around the corner. Once in a while, the app stopped writing data to the database without saying a word. What helped was restarting it - the only automatic way to do so being a <code>git push</code> command. Sadly, I haven&#8217;t found a way to restart the app from within itself; it probably can&#8217;t be&nbsp;done.</p>
+<p>When you <code>git push</code>, the gear stops, builds, deploys and restarts the app. By using hot deployment you can minimize the downtime. Just put the <code>hot_deploy</code> file into <code>.openshift/markers</code> folder.</p>
+<div class="highlight"><pre><span></span>git commit --allow-empty -m <span class="s2">&quot;Restart gear&quot;</span> <span class="o">&amp;&amp;</span> git push
+</pre></div>
 
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2014/geoserver-printing-with-mapfish/" rel="bookmark" title="Permalink to Geoserver Printing With Mapfish">Geoserver Printing With&nbsp;Mapfish</a></h1>
-            <small>Written on Sep 2, 2014
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/geoserver.html">geoserver</a>        | <a href="https://www.zimmi.cz/posts/category/development.html">development</a>
-        </small>
-        <section>
-            <p>Printing a web map requires a lot more than doing <code>Ctrl + P</code>. <a href="http://mapfish.org/">MapFish</a> seems to be the best option to use with Geoserver, and it comes <a href="http://docs.geoserver.org/stable/en/user/community/printing/">ready as an extension</a>. If you installed the module properly, you should be seeing general info at <a href="http://localhost:8080/geoserver/pdf/info.json">http://localhost:8080/geoserver/pdf/info.json</a>. You&#8217;ll find a <code>config.yaml</code> in <code>data_dir/printing</code>.</p>
 
-<p>MapFish lets you access three different&nbsp;points:</p>
+<p>This solved the problem until I realize that <strong>every restart deleted all the data</strong> collected so far. If your data are to stay safe and sound, <strong>save them in <code>process.env.OPENSHIFT_DATA_DIR</code></strong> (which is <code>app-root/data</code>).</p>
+<h3>Anacron to the&nbsp;rescue</h3>
+<p>How do you push an empty commit once a day? With cron of course. Even better, <strong>anacron</strong>.</p>
+<div class="highlight"><pre><span></span>mkdir ~/.anacron
+<span class="nb">cd</span> ~/.anacron
+mkdir cron.daily cron.weekly cron.monthly spool etc
 
+cat <span class="s">&lt;&lt;EOT &gt; ~/.anacron/etc/anacrontab</span>
+
+<span class="s">SHELL=/bin/sh</span>
+<span class="s">PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/$HOME/bin</span>
+<span class="s">HOME=$HOME</span>
+<span class="s">LOGNAME=$USER</span>
+
+<span class="s">1 5  daily-cron nice run-parts --report $HOME/.anacron/cron.daily</span>
+<span class="s">7 10 weekly-cron nice run-parts --report $HOME/.anacron/cron.weekly</span>
+<span class="s">@monthly 15 monthly-cron nice run-parts --report $HOME/.anacron/cron.monthly</span>
+
+<span class="s">EOT</span>
+
+cat <span class="s">&lt;&lt;EOT &gt;&gt; ~/.zprofile # I use zsh shell</span>
+<span class="s">rm -f $HOME/.anacron/anacron.log</span>
+<span class="s">/usr/sbin/anacron -t /home/zimmi/.anacron/etc/anacrontab -S /home/zimmi/.anacron/spool &amp;&gt; /home/zimmi/.anacron/anacron.log</span>
+
+<span class="s">EOT</span>
+</pre></div>
+
+
+<p>Anacron is to laptop what cron is to 24/7 running server. It just runs automatic jobs when the laptop is running. If it&#8217;s not and the job should be run, it runs it once the <span class="caps">OS</span> boots. Brilliant&nbsp;idea.</p>
+<p>It runs the following code for me to keep the app writing data to the&nbsp;database.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+<span class="nv">workdir</span><span class="o">=</span><span class="s1">&#39;/home/zimmi/documents/zimmi/dizertace/social&#39;</span>
+<span class="nv">logfile</span><span class="o">=</span><span class="nv">$workdir</span>/restart-gear.log
+date &gt; <span class="nv">$logfile</span>
+
+<span class="o">{</span> 
+<span class="nv">HOME</span><span class="o">=</span>/home/zimmi
+<span class="nb">cd</span> <span class="nv">$workdir</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
+git merge origin/master <span class="o">&amp;&amp;</span> <span class="se">\</span>
+git commit --allow-empty -m <span class="s2">&quot;Restart gear&quot;</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
+git push <span class="o">&amp;&amp;</span> <span class="se">\</span>
+<span class="nb">echo</span> <span class="s2">&quot;Success&quot;</span> <span class="p">;</span> 
+<span class="o">}</span> &gt;&gt; <span class="nv">$logfile</span> <span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span>
+</pre></div>
+
+
+<p><strong><span class="caps">UPDATE</span>:</strong> Spent a long time debugging the &#8220;Permission denied (publickey).&#8221;-like errors. What seems to help&nbsp;is:</p>
 <ol>
-<li><code>info.json</code> that returns current config as defined in config.yaml&nbsp;file</li>
-<li><code>print.pdf</code> that actually prints the map as defined in the <code>spec</code> <span class="caps">GET</span>&nbsp;argument</li>
-<li><code>create.json</code> that returns a <span class="caps">JSON</span> object with an <span class="caps">URL</span> of the printed&nbsp;map</li>
+<li>Use id_rsa instead of any other <span class="caps">SSH</span>&nbsp;key</li>
+<li>Put a new entry into the <code>~/.ssh/config</code> file</li>
 </ol>
-
-<p>Remember, if you&#8217;re displaying a lot of layers in the map and all of them should be printed, you need to pass it as a <span class="caps">POST</span> argument when calling <code>print.pdf</code> or <code>create.json</code>, otherwise you&#8217;ll be getting an error complaining about the <span class="caps">GET</span> request&nbsp;length.</p>
-
-<p>The <code>config.yaml</code> file is where you define settings for the print module. You definitely want to define <code>dpis</code> (we&#8217;re using 90, 200 and 300 <span class="caps">DPI</span>), <code>scales</code> (they probably need to be hardcoded, I didn&#8217;t succeed trying any arbitrary scale) and <code>layouts</code> (we&#8217;re using A4 to A0 both portrait and&nbsp;landscape).</p>
-
-<p>However, defining the page size might get tricky as MapFish does not use standardized sizes defined in cm, in or any other unit. I&#8217;ve experimenting and doing some maths and here&#8217;s what I came up with for portrait&nbsp;layouts.</p>
-
-<table class="table-centered">
-    <tr>
-        <th>A0</th>
-        <th>A1</th>
-        <th>A2</th>
-        <th>A3</th>
-        <th>A4</th>
-    </tr>
-    <tr>
-        <td>2382&times;3361</td>
-        <td>1683&times;2380</td>
-        <td>1190&times;1680</td>
-        <td>840&times;1180</td>
-        <td>595&times;832</td>
-    </tr>
-</table>
-
-<p><em>The bigger paper you use, the smaller <span class="caps">DPI</span> is available</em>, that&#8217;s what I found out messing around with MapFish settings. This means that we&#8217;re using 200 <span class="caps">DPI</span> top for A2 layout and 90 <span class="caps">DPI</span> for A1 and A0 layout,&nbsp;respectively.</p>
-
-<p>JQuery takes care of sending <span class="caps">POST</span> request and fetching the response. <a href="http://www.edpp.cz/poli_mapa-povodnoveho-planu-mesta/">See it in action</a> (Choose <em>Nástroje</em> and <em>Tisknout</em> for&nbsp;printing).</p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2014/analyzing-twitter-languages-with-streaming-api/" rel="bookmark" title="Permalink to Analyzing Twitter Languages With Streaming API">Analyzing Twitter Languages With Streaming <span class="caps">API</span></a></h1>
-            <small>Written on Sep 2, 2014
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>,         <a href="https://www.zimmi.cz/posts/tag/leaflet.html">leaflet</a>,         <a href="https://www.zimmi.cz/posts/tag/twitter.html">twitter</a>        | <a href="https://www.zimmi.cz/posts/category/development.html">development</a>
-        </small>
-        <section>
-            <p>I am writing a diploma thesis focused on extracting spatial data from social networks. I have been working mainly with Twitter <span class="caps">API</span> and results I have got so far look really promising. This post was written as a reaction to many retweets I got when I shared one of my visualizations. It aims to make it clear how to connect to Twitter Streaming <span class="caps">API</span> using <a href="http://nodejs.org/">node.js</a>, <a href="http://leafletjs.com/">Leaflet</a> and <a href="http://sqlite.org/">SQLite</a> and retrieve tweets to analyze them&nbsp;later.</p>
-
-<p>If you have any further questions after reading this paper, feel free to contact me via <a href="https://twitter.com/zimmicz">Twitter</a> or <a href="mailto:zimmicz@gmail.com">e-mail</a>. I must say right here <strong>that the code will be shared as well as the map</strong>, but there are still some bugs/features I would like to&nbsp;remove/add.</p>
-
-<p><small>On a side note: I have been studying cartography and <span class="caps">GIS</span> for the last five years at Masaryk University in Brno, Czech Republic. I am mostly interested in ways computers can make data handling easier. I&nbsp;like to code in Python.</small></p>
-
-<h3>Using Twitter Streaming <span class="caps">API</span></h3>
-
-<p>As you probably know, Twitter offers three different&nbsp;APIs:</p>
-
-<ul>
-<li><span class="caps">REST</span> <span class="caps">API</span> which is obviously RESTful. You can access almost every piece of information on Twitter with this one: tweets, users, places, retweets,&nbsp;followers&#8230;</li>
-<li>Search <span class="caps">API</span> used for getting search results. You can customize these by sending parameters with your&nbsp;requests.</li>
-<li><strong>Streaming <span class="caps">API</span></strong> which I am going to tell you about. It is really different, as (again, obviously) it keeps streaming tweets from the time you connect to the server. This means, once the connection is made, it has to stay open as long as you want tweets coming to you. The important thing here is that you get real time tweets delivered to you via this <abbr title="Twitter only delivers a sample of tweets, not the whole traffic.">stream</abbr>, which implies you cannot use this <span class="caps">API</span> to get tweets already&nbsp;tweeted.</li>
-</ul>
-
-<p><strong>To sum it up: You get a small sample of tweets in a real time as long as the connection to the server stays&nbsp;open.</strong></p>
-
-<h3>What you&nbsp;need</h3>
-
-<p>To use any of the Twitter APIs, you need to authenticate you (or your app) against Twitter via OAuth protocol. To be able to do so, you need a Twitter account, because only then you can <a href="https://dev.twitter.com/">create apps</a>, obtain access tokens and get authenticated for <span class="caps">API</span>&nbsp;use.</p>
-
-<p>And then, obviously, you need something to connect to server with. I chose <strong>node.js</strong> because it seemed as a good tool to keep connection alive. I have also been interested in this technology for the couple of months but never really had a task to use it&nbsp;for.</p>
-
-<p>The good thing about node.js is that it comes with lots of handy libraries. You get <strong>socket.io</strong> for streaming, <strong>ntwitter</strong> for using Twitter <span class="caps">API</span> and <strong>sqlite3</strong> for working with SQLite&nbsp;databases.</p>
-
-<p>You need something to store the data in also. As mentioned, I picked SQLite for this task. It is lightweight, does not need server nor configuration to run, just what I was looking for. Seems we are set to go,&nbsp;right?</p>
-
-<h3>Filtering the&nbsp;data</h3>
-
-<p>I guess none of you is interested in obtaining random tweets from around the world, neither was I. I live in the Czech republic and that is the area I want to get tweets from.&nbsp;How?</p>
-
-<p>It is fairly simple, you tell Twitter with the <code>locations</code> parameter of <a href="https://dev.twitter.com/docs/api/1.1/post/statuses/filter"><code>statuses/filter</code></a> resource. This parameter specifies a set of bounding boxes to&nbsp;track.</p>
-
-<p><strong>To sum it up: you connect to the server and tell it you just want to get tweets from the area you specified with the <code>locations</code> parameter. The server understands and keeps you&nbsp;posted.</strong></p>
-
-<h4>Is it that&nbsp;simple?</h4>
-
-<p>No. Twitter decides whether to post you the tweet or not according to what the value of coordinates field is. It goes like&nbsp;this:</p>
-
-<ol>
-<li>If the <code>coordinates</code> field is not empty, it gets tested against the bounding box. If it matches, it is sent to the&nbsp;stream.</li>
-<li>If the <code>coordinates</code> field is empty, but the <code>place</code> field is not, it is the <code>place</code> field that gets checked. If if it by any extent intersects the bounding box, it is sent to the&nbsp;stream.</li>
-<li>If both of the fields are empty, nothing is&nbsp;sent.</li>
-</ol>
-
-<p>I decided to throw away the tweets with the empty <code>coordinates</code> field, because the accuracy of the value specified in the place field can be generally considered very low and insufficient for my purposes. You still need to account for position inaccuracies of users&#8217; devices though, however that is not something that we can deal with. <em>Let us just assume that geotagged tweets are&nbsp;accurate.</em></p>
-
-<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/analyzing-twitter-languages-with-streaming-api/cr.png" width="50%" height="50%" title="Geotagged tweets" class="img-rounded"><p><strong>Figure:</strong> Twitter seems not to be very accurate when matching tweets against bounding&nbsp;box.</p></div>
-
-<p>Although, as you can see in the picture, they are not. Or they are, but Twitter is not good at telling so. Besides that, none of the countries in the world is shaped like a rectangle and we would need to clip the data anyway. That is where SQLite comes in, because I have been saving incoming tweets right into the&nbsp;database.</p>
-
-<p>If you use any <span class="caps">GUI</span> manager (sqlitebrowser for Linux is just fine), you can easily export your data to the <span class="caps">CSV</span> file, load it into <span class="caps">QGIS</span>, clip it with Natural Earth countries shapefile and save them to the GeoJSON file. It is just a matter of few JavaScript lines of code to put GeoJSON on a Leaflet&nbsp;map.</p>
-
-<h3>Displaying the&nbsp;data</h3>
-
-<p>Once a GeoJSON file is ready, it can be used for making an appealing viz to get a sense of what may be called &#8220;nationalities spatial patterns&#8221;. The <code>lang</code> field (stored in the database, remember?) of every tweet is used to colour the marker accordingly. Its value represents a two-letter language code as specified in <span class="caps">ISO</span> 639-1&nbsp;document.</p>
-
-<p>However, as those codes are guessed by Twitter&#8217;s language algorithms, they are prone to error. There are actually three scenarios we might be&nbsp;facing:</p>
-
-<ol>
-<li>User tweets in the same language as used in the Twitter&nbsp;account.</li>
-<li>User tweets in his/her mother language, but has set different Twitter account&nbsp;language.</li>
-<li>User does not tweet in his/her mother language, but has it set as a Twitter account&nbsp;language.</li>
-</ol>
-
-<p>We basically have to deal with 2) and 3), because 1) means we can be pretty sure what nationality the user is. Sadly though, I have not found an easy way to tell which one of these two we came across, thus which language settings should be prioritized. I made an arbitrary decision to prioritize the language the tweet was written in, based on assumption that <strong>the most of the users tweet in their mother language</strong>. No matter what you do, the data is still going to be biased by automatically generated tweets, especially ones sent by Foursquare saying &#8220;I&#8217;m at @WhateverBarItIs (http://someurl.co)&#8221;. It works fine for the strange languages like Russian and Arabic&nbsp;though.</p>
-
-<p>From Jan 2 to Jan 4 this year 5,090 tweets were collected. Leaflet is becoming a little sluggish without clustering turned on displaying all of them. Plans are to let the collection run until Jan 7 and then put all the tweets on the map. I guess that might be around 10,000 geotagged tweets by that&nbsp;time.</p>
-
-<p>I am definitely willing to share the <abbr title="Do not expect much, it was my first time with node.js">code</abbr> and the final viz. Meanwhile, you can have a look at the screenshot on picture [*]. I have already implemented nationality switch (legend items are clickable) and I would like to add a day/night switch to see whether there are any differences between the peoples&#8217;&nbsp;behaviour. </p>
-
-<div class="text-center"><img width="60%" height="60%" src="https://www.zimmi.cz/posts/assets/analyzing-twitter-languages-with-streaming-api/screenshot.png" title="Final geoviz using Leaflet" class="img-rounded"><p><strong>Figure:</strong> Final map screenshot. A legend is used to turn nationalities on and off. You are looking at Prague by the&nbsp;way.</p></div>
-
-<p>Obviously the most tweets were sent from the most populated places, e.g. Prague, Brno,&nbsp;Ostrava. </p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2014/going-3d-with-space-time-cube/" rel="bookmark" title="Permalink to Going 3D With Space Time Cube">Going 3D With Space Time&nbsp;Cube</a></h1>
-            <small>Written on Sep 2, 2014
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/python.html">python</a>,         <a href="https://www.zimmi.cz/posts/tag/twitter.html">twitter</a>        | <a href="https://www.zimmi.cz/posts/category/development.html">development</a>
-        </small>
-        <section>
-            <p>Seeing <a href="http://anitagraser.com/2012/08/05/space-time-cubes-exploring-twitter-streams-3/">Anita&#8217;s space-time cube</a> back in 2013 was a moment of <em>woooow</em> for me. I&#8217;ve been interested in unusual ways of displaying data ever since I started studying <span class="caps">GIS</span> and this one was just great. <em>How the hell did she make it?!</em>, I thought back&nbsp;then.</p>
-
-<p>And I asked her, we had a little e-mail conversation and that was it. I got busy and had to postpone my attemps to create that viz until I dove into my diploma thesis. So&hellip;here you&nbsp;go.</p>
-
-<h3>Recipe</h3>
-
-<p>What you need&nbsp;is:</p>
-
-<ul>
-<li><strong><a href="https://github.com/jdf/processing.py">processing.py</a></strong> which is a Python port of <a href="http://processing.org/">processing</a>&nbsp;environment.</li>
-<li>A <strong>basemap</strong> that fits the extent you are about to show in the viz. I recommend <span class="caps">QGIS</span> for obtaining an&nbsp;image.</li>
-<li>A <strong><span class="caps">JSON</span> file</strong> with tweets you got via <a href="/2014/analyzing-twitter-languages-with-streaming-api/">Twitter <span class="caps">REST</span> <span class="caps">API</span></a> (yes, the viz was made to display&nbsp;tweets).</li>
-<li>A <strong>python script</strong> I&nbsp;wrote.</li>
-</ul>
-
-<h3>How to make it&nbsp;delicious</h3>
-
-<p>First things first, you need to add a <code>timestamp</code> property to tweets you want to show (with the following Python code). <code>created_at</code> param is a datetime string like <code>Sat Jun 22 21:30:42 +0000 2013</code> of every tweet in a loop. As a result you get a number of seconds since&nbsp;1.1.1970. </p>
-
-<pre><code>def string_to_timestamp(created_at):
-    """Return the timestamp from created_at object."""
-    locale.setlocale(locale.LC_TIME, 'en_US.utf8')
-    created_at = created_at.split(' ')
-    created_at[1] = str(strptime(created_at[1], '%b').tm_mon)
-    timestamp = strptime(' '.join(created_at[i] for i in [1,2,3,5]), '%m %d %H:%M:%S %Y') # returns Month Day Time Year
-    return mktime(timestamp)
-</code></pre>
-
-<p>As you probably guess, the <code>timestamp</code> property is the one we&#8217;re gonna display on the vertical axis. <strong>You definitely want the tweets to be sorted chronologically in your <span class="caps">JSON</span>&nbsp;file!</strong></p>
-
-<pre><code>#!/usr/bin/python
-# -*- coding: utf-8 -*-
-#avconv -i frame-%04d.png -r 25 -b 65536k  video.mp4
-
-from peasy import PeasyCam
-import json
-
-basemap = None
-tweets = []
-angle = 0
-
-def setup():
-    global basemap
-    global tweets
-
-    size(1010, 605, P3D)
-
-    data = loadJSONArray('./tweets.json')
-    count = data.size()
-
-    last = data.getJSONObject(data.size()-1).getFloat('timestamp')
-    first = data.getJSONObject(0).getFloat('timestamp')
-
-    for i in range(0, count):
-        lon = data.getJSONObject(i).getJSONObject('coordinates').getJSONArray('coordinates').getFloat(0)
-        lat = data.getJSONObject(i).getJSONObject('coordinates').getJSONArray('coordinates').getFloat(1)
-        time = data.getJSONObject(i).getFloat('timestamp')
-
-        x = map(lon, -19.68624620368202116, 58.92453879754536672, 0, width)
-        y = map(time, first, last, 0, 500)
-        z = map(lat, 16.59971950210866964, 63.68835804244784526, 0, height)
-
-        tweets.append({'x': x, 'y': y, 'z': z})
-
-    basemap = loadImage('basemap.png')
-
-    cam = PeasyCam(this,53,100,-25,700)
-    cam.setMinimumDistance(1)
-    cam.setMaximumDistance(1500)
-
-def draw():
-    global basemap
-    global tweets
-    global angle
-
-    background(0)
-
-    # Uncomment to rotate the cube
-    """if angle &lt; 360:
-        rotateY(radians(angle))
-        angle += 1
-    else:
-        angle = 360 - angle"""
-
-    # box definition
-    stroke(150,150,150)
-    strokeWeight(.5)
-    noFill()
-    box(1010,500,605)
-
-
-    # basemap definition
-    translate(-505,250,-302.5)
-    rotateX(HALF_PI)
-    image(basemap,0,0)
-
-    for i in range(0, len(tweets)):
-        strokeWeight(.5)
-        stroke(255,255,255)
-        line(tweets[i].get('x'), height-tweets[i].get('z'), tweets[i].get('y'), tweets[i].get('x'), height-tweets[i].get('z'), 0)
-
-        strokeWeight(5)
-        stroke(255,0,0)
-        point(tweets[i].get('x'), height-tweets[i].get('z'), tweets[i].get('y'))
-
-        strokeWeight(2)
-        stroke(255,255,255)
-        point(tweets[i].get('x'), height-tweets[i].get('z'), 0)
-        lrp = map(i, 0, len(tweets), 0, 1)
-        frm = color(255,0,0)
-        to = color(0,0,255)
-        if i &lt; len(tweets)-1:
-            strokeWeight(1)
-            stroke(lerpColor(frm,to,lrp))
-            line(tweets[i].get('x'), height-tweets[i].get('z'), tweets[i].get('y'), tweets[i+1].get('x'), height-tweets[i+1].get('z'), tweets[i+1].get('y'))
-
-    # Uncomment to capture the screens
-    """if frameCount &gt; 360:
-        noLoop()
-    else:
-        saveFrame('screens/frame-####.png')"""
-</code></pre>
-
-<p>You should be most interested in these&nbsp;lines:</p>
-
-<pre><code>x = map(lon, -19.68624620368202116, 58.92453879754536672, 0, width)
-y = map(time, first, last, 0, 500)
-z = map(lat, 16.59971950210866964, 63.68835804244784526, 0, height)
-</code></pre>
-
-<p><img src="http://www.processing.org/tutorials/p3d/imgs/coordinatesystem.png" title="Processing coordinate system" class="img-rounded pull-left">They define how coordinates inside the cube should be computed. As you see, <code>x</code> is the result of mapping longitudinal extent of our area to the width of cube, the same happens to <code>z</code> and latitude, and to <code>y</code> (but here we map time, not&nbsp;coordinates).</p>
-
-<p>The bounding box used in those computations is the bounding box of the basemap. Interesting thing about Processing and its 3D environment is how it defines the beginning of the coordinate system. As you can see on the left, it might be slighty different from what you could expect. That&#8217;s what you need to be careful&nbsp;about.</p>
-
-<h3>How does it&nbsp;look</h3>
-
-<iframe width="420" height="315" src="//www.youtube.com/embed/4jl6-qOiSAE?rel=0" frameborder="0" allowfullscreen></iframe>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2014/leaflet-coordinates-control/" rel="bookmark" title="Permalink to Leaflet Coordinates Control">Leaflet Coordinates&nbsp;Control</a></h1>
-            <small>Written on Sep 2, 2014
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/leaflet.html">leaflet</a>,         <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>        | <a href="https://www.zimmi.cz/posts/category/development.html">development</a>
-        </small>
-        <section>
-            <p>I&#8217;ve made a <a href="https://github.com/zimmicz/Leaflet-Coordinates-Control">simple Leaflet control</a> that displays coordinates when user clicks the map. It is possible to copy them out by clicking the&nbsp;control.</p>
-
-<p><a href="http://zimmicz.github.io/Leaflet-Coordinates-Control/">See GitHub for&nbsp;demo.</a></p>
-
-<p>You can find it in a <a href="http://leafletjs.com/plugins">list of Leaflet plugins</a> as well (Controls and Interaction section). My first contribution to the open source world&nbsp;ever.</p>
-        </section>
-        </div>
-    </div>
-
+<p>I don&#8217;t know which one did the magic&nbsp;though.</p>
+<p>I&#8217;ve been harvesting Twitter for a month with about 10-15K tweets a day (only interested in the Czech Republic). 
+<sup>1</sup>&frasl;<sub>6</sub> to <sup>1</sup>&frasl;<sub>5</sub> of them is located with latitude and longitude. More on this next&nbsp;time.</p>
+</article>
+<article>
+    <h1><a href="/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/" rel="bookmark" title="Permalink to Installing PostGIS 2.2 with SFCGAL on Ubuntu-based OS">Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span></a></h1>
+    Written on Oct 29, 2015
+    and marked as
+    <a href="/tag/postgresql.html">postgresql</a>,     <a href="/tag/postgis.html">postgis</a>,     <a href="/tag/linux.html">linux</a>    | <a href="/category/development.html">development</a>
+    <p>I&#8217;ve seen a bunch of questions on <span class="caps">GIS</span> StackExchange recently related to <a href="http://sfcgal.org/"><span class="caps">SFCGAL</span></a> extension for <a href="http://postgis.net">PostGIS 2.2</a>. Great news are it can be installed with one simple query <code>CREATE EXTENSION postgis_sfcgal</code>. Not so great news are you have to compile it from source for Ubuntu-based <span class="caps">OS</span> (14.04) as recent versions of required packages are not available in the&nbsp;repositories.</p>
+<p>I tested my solution on elementary <span class="caps">OS</span> 0.3.1 based on Ubuntu 14.04. <strong>And it works!</strong> It installs PostgreSQL 9.4 from repositories together with <span class="caps">GDAL</span> and <span class="caps">GEOS</span> and some other libs PostGIS depends on. PostGIS itself, <span class="caps">CGAL</span>, Boost, <span class="caps">MPFR</span> and <span class="caps">GMP</span> are built from&nbsp;source.</p>
+<p>Here comes the code (commented where&nbsp;needed).</p>
+<div class="highlight"><pre><span></span>sudo -i
+<span class="nb">echo</span> <span class="s2">&quot;deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main&quot;</span> <span class="p">|</span> tee -a /etc/apt/sources.list
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc <span class="p">|</span> sudo apt-key add -
+apt-get update
+apt-get install -y postgresql-9.4 <span class="se">\</span>
+    postgresql-client-9.4 <span class="se">\</span>
+    postgresql-contrib-9.4 <span class="se">\</span>
+    libpq-dev <span class="se">\</span>
+    postgresql-server-dev-9.4 <span class="se">\</span>
+    build-essential <span class="se">\</span>
+    libgeos-c1 <span class="se">\</span>
+    libgdal-dev <span class="se">\</span>
+    libproj-dev <span class="se">\</span>
+    libjson0-dev <span class="se">\</span>
+    libxml2-dev <span class="se">\</span>
+    libxml2-utils <span class="se">\</span>
+    xsltproc <span class="se">\</span>
+    docbook-xsl <span class="se">\</span>
+    docbook-mathml <span class="se">\</span>
+    cmake <span class="se">\</span>
+    gcc <span class="se">\</span>
+    m4 <span class="se">\</span>
+    icu-devtools
+
+<span class="nb">exit</span> <span class="c1"># leave root otherwise postgis will choke</span>
+
+<span class="nb">cd</span> /tmp
+touch download.txt
+cat <span class="s">&lt;&lt;EOT &gt;&gt; download.txt</span>
+<span class="s">https://gmplib.org/download/gmp/gmp-6.0.0a.tar.bz2</span>
+<span class="s">https://github.com/Oslandia/SFCGAL/archive/v1.2.0.tar.gz</span>
+<span class="s">http://www.mpfr.org/mpfr-current/mpfr-3.1.3.tar.gz</span>
+<span class="s">http://downloads.sourceforge.net/project/boost/boost/1.59.0/boost_1_59_0.tar.gz</span>
+<span class="s">https://github.com/CGAL/cgal/archive/releases/CGAL-4.6.3.tar.gz</span>
+<span class="s">http://download.osgeo.org/postgis/source/postgis-2.2.0.tar.gz</span>
+
+<span class="s">EOT</span>
+
+cat download.txt <span class="p">|</span> xargs -n <span class="m">1</span> -P <span class="m">8</span> wget <span class="c1"># make wget a little bit faster</span>
+
+tar xjf gmp-6.0.0a.tar.bz2
+tar xzf mpfr-3.1.3.tar.gz
+tar xzf v1.2.0.tar.gz
+tar xzf boost_1_59_0.tar.gz
+tar xzf CGAL-4.6.3.tar.gz
+tar xzf postgis-2.2.0.tar.gz
+
+<span class="nv">CORES</span><span class="o">=</span><span class="k">$(</span>nproc<span class="k">)</span>
+
+<span class="k">if</span> <span class="o">[[</span> <span class="nv">$CORES</span> &gt; <span class="m">1</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nv">CORES</span><span class="o">=</span><span class="k">$(</span>expr <span class="nv">$CORES</span> - <span class="m">1</span><span class="k">)</span> <span class="c1"># be nice to your PC</span>
+<span class="k">fi</span>
+
+<span class="nb">cd</span> gmp-6.0.0
+./configure <span class="o">&amp;&amp;</span> make -j <span class="nv">$CORES</span> <span class="o">&amp;&amp;</span> sudo make -j <span class="nv">$CORES</span> install
+
+<span class="nb">cd</span> ..
+<span class="nb">cd</span> mpfr-3.1.3
+./configure <span class="o">&amp;&amp;</span> make -j <span class="nv">$CORES</span> <span class="o">&amp;&amp;</span> sudo make -j <span class="nv">$CORES</span> install
+
+<span class="nb">cd</span> ..
+<span class="nb">cd</span> boost_1_59_0
+./bootstrap.sh --prefix<span class="o">=</span>/usr/local --with-libraries<span class="o">=</span>all <span class="o">&amp;&amp;</span> sudo ./b2 install <span class="c1"># there might be some warnings along the way, don&#39;t panic</span>
+<span class="nb">echo</span> <span class="s2">&quot;/usr/local/lib&quot;</span> <span class="p">|</span> sudo tee /etc/ld.so.conf.d/boost.conf
+sudo ldconfig
+
+<span class="nb">cd</span> ..
+<span class="nb">cd</span> cgal-releases-CGAL-4.6.3
+cmake . <span class="o">&amp;&amp;</span> make -j <span class="nv">$CORES</span> <span class="o">&amp;&amp;</span> sudo make -j <span class="nv">$CORES</span> install
+
+<span class="nb">cd</span> ..
+<span class="nb">cd</span> SFCGAL-1.2.0/
+cmake . <span class="o">&amp;&amp;</span> make -j <span class="nv">$CORES</span> <span class="o">&amp;&amp;</span> sudo make -j <span class="nv">$CORES</span> install
+
+<span class="nb">cd</span> ..
+<span class="nb">cd</span> postgis-2.2.0
+./configure <span class="se">\</span>
+    --with-geosconfig<span class="o">=</span>/usr/bin/geos-config <span class="se">\</span>
+    --with-xml2config<span class="o">=</span>/usr/bin/xml2-config <span class="se">\</span>
+    --with-projdir<span class="o">=</span>/usr/share/proj <span class="se">\</span>
+    --with-libiconv<span class="o">=</span>/usr/bin <span class="se">\</span>
+    --with-jsondir<span class="o">=</span>/usr/include/json <span class="se">\</span>
+    --with-gdalconfig<span class="o">=</span>/usr/bin/gdal-config <span class="se">\</span>
+    --with-raster <span class="se">\</span>
+    --with-topology <span class="se">\</span>
+    --with-sfcgal<span class="o">=</span>/usr/local/bin/sfcgal-config <span class="o">&amp;&amp;</span> <span class="se">\</span>
+make <span class="o">&amp;&amp;</span> make cheatsheets <span class="o">&amp;&amp;</span> sudo make install <span class="c1"># deliberately one CPU only</span>
+
+sudo -u postgres psql
+sudo -u postgres createdb spatial_template
+sudo -u postgres psql -d spatial_template -c <span class="s2">&quot;CREATE EXTENSION postgis;&quot;</span>
+sudo -u postgres psql -d spatial_template -c <span class="s2">&quot;CREATE EXTENSION postgis_topology;&quot;</span>
+sudo -u postgres psql -d spatial_template -c <span class="s2">&quot;CREATE EXTENSION postgis_sfcgal;&quot;</span>
+sudo -u postgres psql -d spatial_template -c <span class="s2">&quot;SELECT postgis_full_version();&quot;</span>
+</pre></div>
+</article>
 <div class="pagination row">
     <div class="large-6 columns">
-            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Previous page']);" href="https://www.zimmi.cz/posts/index6.html" class="button card card-1">&laquo; Previous page</a>
+            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Previous page']);" href="/index6.html" class="button card card-1">&laquo; Previous page</a>
     </div>
     <div class="large-6 columns">
-            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Next page']);" href="https://www.zimmi.cz/posts/index8.html" class="button card card-1">Next page &raquo;</a>
+            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Next page']);" href="/index8.html" class="button card card-1">Next page &raquo;</a>
     </div>
-</div>            </div>
-        </div>
-        <div class="row">
-            <div class="large-12 columns footer">
-                <footer>
-                    <address>
-                    Written by <a href="http://www.zimmi.cz">Michal Zimmermann</a>.
-                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
-                    which takes great advantage of <a href="http://python.org">Python</a>.
-                    </address><!-- /#about -->
-                </footer><!-- /#contentinfo -->
-            </div>
-        </div>
-<!-- Piwik -->
-<script type="text/javascript">
-  var _paq = _paq || [];
-  /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-  _paq.push(['enableHeartBeatTimer']);
-  _paq.push(['trackPageView']);
-  _paq.push(['enableLinkTracking']);
-  (function() {
-    var u="//piwik-zimmi.rhcloud.com/analytics/";
-    _paq.push(['setTrackerUrl', u+'piwik.php']);
-    _paq.push(['setSiteId', '1']);
-    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
-  })();
-</script>
-<!-- End Piwik Code -->
-<script src="https://www.zimmi.cz/posts/theme/js/packed.js?8bee1467"></script>
-<script>
-$(document).foundation();
-</script>
+</div>    </main>
+    <footer>
+        Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
+        Proudly powered by <a href="//getpelican.com/">Pelican</a>,
+        which takes great advantage of <a href="//python.org">Python</a>.
+    </footer>
+<script src="/theme/webassets-external/5acf220afe81b3dd00333bbb93fbaa41_jquery.js"></script>
+<script src="/theme/webassets-external/b80143a60770d5aa122a039a2b889970_foundation.min.js"></script>
 </body>
 </html>

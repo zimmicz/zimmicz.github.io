@@ -4,71 +4,32 @@
         <title>Michal Zimmermann | tag: sql</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
-        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?d5d1e141">
-<!-- Start of Async Drift Code -->
-<script>
-    !function () {
-        var t;
-        if (t = window.driftt = window.drift = window.driftt || [], !t.init) return t.invoked ? void (window.console && console.error && console.error("Drift snippet included twice.")) : (t.invoked = !0,
-            t.methods = ["identify", "config", "track", "reset", "debug", "show", "ping", "page", "hide", "off", "on"],
-            t.factory = function (e) {
-                return function () {
-                    var n;
-                    return n = Array.prototype.slice.call(arguments), n.unshift(e), t.push(n), t;
-                };
-            }, t.methods.forEach(function (e) {
-                t[e] = t.factory(e);
-            }), t.load = function (t) {
-                var e, n, o, i;
-                e = 3e5, i = Math.ceil(new Date() / e) * e, o = document.createElement("script"),
-                    o.type = "text/javascript", o.async = !0, o.crossorigin = "anonymous", o.src = "https://js.driftt.com/include/" + i + "/" + t + ".js",
-                    n = document.getElementsByTagName("script")[0], n.parentNode.insertBefore(o, n);
-            });
-    }();
-    drift.SNIPPET_VERSION = '0.3.1';
-    drift.load('caacyauy5t6b');
-
-</script>
-<!-- End of Async Drift Code --></head>
-
-<body id="index" class="home">
-    <nav class="top-bar card-1" data-topbar role="navigation">
-        <ul class="title-area">
-            <li class="name">
-                <h1><a href="/posts">Home</a></h1>
-            </li>
-     <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
-            <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+        <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
+        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="/theme/webassets-external/e17ffd2049da5254bb4b3183ea73c922_normalize.css">
+        <link rel="stylesheet" href="/theme/webassets-external/35f123b951b653f7b2d441b35b63d32a_github.css">
+        <link rel="stylesheet" href="/theme/webassets-external/310a2979488959b3c24d4edd2e18b50d_screen.css">
+</head>
+<body>
+    <nav role="navigation">
+        <ul>
+            <li><a href="/categories">Categories</a></li>
+            <li><a href="/tags">Tags</a></li>
+            <li><a href="/feed.xml">Subscribe to RSS feed</a></li>
         </ul>
-        <section class="top-bar-section">
-    <!-- Right Nav Section -->
-            <ul class="right">
-                <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
-                <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
-                <li><a href="https://www.zimmi.cz/posts/feed.xml">RSS feed</a></li>
-            </ul>
-        </section>
     </nav>
-        <div class="row">
-          <div class="large-12 columns header">
-            <h1><a href="/posts">Michal Zimmermann</a> <small>Pieces of knowledge from the world of GIS.</small></h1>
-          </div>
-        </div>
-        <div class="row">
-            <div class="large-12 columns">
+    <header>
+        <h1><a href="/posts">Michal Zimmermann<small>Pieces of knowledge from the world of GIS.</small></a></h1>
+    </header>
+    <main>
 <h2 class="text-center">Articles tagged with sql tag</h2>
 
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2017/postgresql-dollar-quoting-inside-bash-heredoc/" rel="bookmark" title="Permalink to PostgreSQL Dollar Quoting inside Bash Heredoc">PostgreSQL Dollar Quoting inside Bash&nbsp;Heredoc</a></h1>
-            <small>Written on Sep 22, 2017
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
-        </small>
-        <section>
-            <p>Yesterday I spent two very unpleasant hours debugging the weirdest <span class="caps">SQL</span> error I&#8217;ve seen in my life, running the below query (simplified for this&nbsp;post).</p>
+<article>
+    <h1><a href="/posts/2017/postgresql-dollar-quoting-inside-bash-heredoc/" rel="bookmark" title="Permalink to PostgreSQL Dollar Quoting inside Bash Heredoc">PostgreSQL Dollar Quoting inside Bash&nbsp;Heredoc</a></h1>
+    Written on Sep 22, 2017
+    and marked as
+    <a href="/tag/sql.html">sql</a>,     <a href="/tag/postgresql.html">postgresql</a>,     <a href="/tag/bash.html">bash</a>    | <a href="/category/sql.html">SQL</a>
+    <p>Yesterday I spent two very unpleasant hours debugging the weirdest <span class="caps">SQL</span> error I&#8217;ve seen in my life, running the below query (simplified for this&nbsp;post).</p>
 <div class="highlight"><pre><span></span><span class="n">psql</span> <span class="o">-</span><span class="n">qAt</span> <span class="c1">--no-psqlrc &lt;&lt;BACKUP</span>
 <span class="k">DO</span>
 <span class="err">$$</span>
@@ -106,19 +67,13 @@ LINE <span class="m">2</span>: <span class="m">1111</span><span class="p">;</spa
 <span class="err">\$\$</span><span class="p">;</span>
 <span class="n">BACKUP</span>
 </pre></div>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2017/upgrading-postgresql-95-to-postgresql-96-with-postgis/" rel="bookmark" title="Permalink to Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with PostGIS">Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with&nbsp;PostGIS</a></h1>
-            <small>Written on Mar 1, 2017
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
-        </small>
-        <section>
-            <p>Thanks to <code>pg_upgrade</code> tool the PostgreSQL upgrade on Ubuntu is pretty straightforward. Different PostGIS versions might cause troubles though. This post covers PostgreSQL 9.5, PostGIS 2.2 to PostgreSQL 9.6, PostGIS 2.3&nbsp;migration.</p>
+</article>
+<article>
+    <h1><a href="/posts/2017/upgrading-postgresql-95-to-postgresql-96-with-postgis/" rel="bookmark" title="Permalink to Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with PostGIS">Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with&nbsp;PostGIS</a></h1>
+    Written on Mar 1, 2017
+    and marked as
+    <a href="/tag/sql.html">sql</a>,     <a href="/tag/postgresql.html">postgresql</a>    | <a href="/category/sql.html">SQL</a>
+    <p>Thanks to <code>pg_upgrade</code> tool the PostgreSQL upgrade on Ubuntu is pretty straightforward. Different PostGIS versions might cause troubles though. This post covers PostgreSQL 9.5, PostGIS 2.2 to PostgreSQL 9.6, PostGIS 2.3&nbsp;migration.</p>
 <p>First of all, install the PostgreSQL 9.6 with PostGIS&nbsp;2.3.</p>
 <div class="highlight"><pre><span></span>apt install postgresql-9.6 postgresql-9.6-postgis-2.3
 </pre></div>
@@ -211,19 +166,13 @@ Running this script will delete the old cluster<span class="err">&#39;</span>s d
 
 
 <p>The old cluster can be removed and the new one switched back to port <code>5432</code>. Run <code>/usr/lib/postgresql/9.6/bin/vacuumdb -p 5433 --all --analyze-in-stages</code> to collect&nbsp;statistics.</p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2017/executing-dynamic-sql-query-right-away/" rel="bookmark" title="Permalink to Executing dynamic SQL query right away">Executing dynamic <span class="caps">SQL</span> query right&nbsp;away</a></h1>
-            <small>Written on Feb 28, 2017
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
-        </small>
-        <section>
-            <p>PostgreSQL 9.6 comes with a handy <code>psql</code> command called <code>\gexec</code> that <em>sends the current query input buffer to the server and treats the result as a <span class="caps">SQL</span> statement to be executed</em> (right, whatever). What that means is that instead of doing&nbsp;this</p>
+</article>
+<article>
+    <h1><a href="/posts/2017/executing-dynamic-sql-query-right-away/" rel="bookmark" title="Permalink to Executing dynamic SQL query right away">Executing dynamic <span class="caps">SQL</span> query right&nbsp;away</a></h1>
+    Written on Feb 28, 2017
+    and marked as
+    <a href="/tag/sql.html">sql</a>,     <a href="/tag/postgresql.html">postgresql</a>    | <a href="/category/sql.html">SQL</a>
+    <p>PostgreSQL 9.6 comes with a handy <code>psql</code> command called <code>\gexec</code> that <em>sends the current query input buffer to the server and treats the result as a <span class="caps">SQL</span> statement to be executed</em> (right, whatever). What that means is that instead of doing&nbsp;this</p>
 <div class="highlight"><pre><span></span>psql -c <span class="s2">&quot;SELECT &#39;DROP TABLE &#39; || tablename FROM information_schema.tables WHERE table_name LIKE &#39;%to_be_dropped%&quot;</span> <span class="p">|</span> psql
 </pre></div>
 
@@ -234,21 +183,15 @@ Running this script will delete the old cluster<span class="err">&#39;</span>s d
 
 
 <p>Brilliant.</p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2017/subdivide-and-conquer-effective-spatial-indexes-in-postgis/" rel="bookmark" title="Permalink to Subdivide and Conquer: Effective Spatial Indexes in PostGIS">Subdivide and Conquer: Effective Spatial Indexes in&nbsp;PostGIS</a></h1>
-            <small>Written on Jan 10, 2017
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
-        </small>
-        <section>
-            <p>Spatial indexes are absolutely crucial part of any spatial database and - as I tend to say quite often - only a fool would try to query spatial data without building spatial indexes&nbsp;beforehand.</p>
+</article>
+<article>
+    <h1><a href="/posts/2017/subdivide-and-conquer-effective-spatial-indexes-in-postgis/" rel="bookmark" title="Permalink to Subdivide and Conquer: Effective Spatial Indexes in PostGIS">Subdivide and Conquer: Effective Spatial Indexes in&nbsp;PostGIS</a></h1>
+    Written on Jan 10, 2017
+    and marked as
+    <a href="/tag/sql.html">sql</a>,     <a href="/tag/postgresql.html">postgresql</a>,     <a href="/tag/postgis.html">postgis</a>    | <a href="/category/sql.html">SQL</a>
+    <p>Spatial indexes are absolutely crucial part of any spatial database and - as I tend to say quite often - only a fool would try to query spatial data without building spatial indexes&nbsp;beforehand.</p>
 <p>Spatial indexes are based on bounding box comparisons, which are generally very fast. Yet, there are situations when spatial indexes don&#8217;t help much (or they don&#8217;t help as much as they could, if you&nbsp;wish).</p>
-<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/subdivide-and-conquer-effective-spatial-indexes-in-postgis/index.svg" /></div>
+<div class="text-center"><img src="/assets/subdivide-and-conquer-effective-spatial-indexes-in-postgis/index.svg" /></div>
 
 <p>Bounding box comparisons are effective with lots of small bounding boxes rather then few large ones. Why? See the picture above. The curved line (imagine it&#8217;s a pipeline for example) clearly demonstrates when the spatial index/bounding box comparison might fall short of what you&#8217;d&nbsp;expect.</p>
 <p>Once the bounding box gets really big, it intersects so many other geometries&#8217; bounding boxes that the whole comparison starts to slow&nbsp;down.</p>
@@ -277,7 +220,7 @@ Running this script will delete the old cluster<span class="err">&#39;</span>s d
 
 <p>It&#8217;s a perfectly standard query that intersects several request geometries with ~20M parcels, nothing really fancy. Except that it takes 25 minutes to finish. Why? Pipelines,&nbsp;remember?</p>
 <p>Yet, the query below takes only 30 seconds to finish (that&#8217;s a huge time saver considering that the whole process used to take ~40 minutes)! Why? Because the <code>ST_Subdivide</code> effectively shrinks the <code>req_geom</code> geometries until they have 50 vertices each at most. Such small geometries are perfect input for the bounding box comparison. Remember to call <code>DISTINCT</code> when using <code>ST_Subdivide</code>, you&#8217;d probably get duplicate parcel ids&nbsp;otherwise.</p>
-<p>I also replaced the <code>UNION</code> with the <a href="https://www.zimmi.cz/posts/2015/postgresql-in-vs-exists/"><code>WHERE NOT EXISTS</code></a> expression, as it&#8217;s reasonable to assume that numeric ids comparison will be&nbsp;faster.</p>
+<p>I also replaced the <code>UNION</code> with the <a href="/posts/2015/postgresql-in-vs-exists/"><code>WHERE NOT EXISTS</code></a> expression, as it&#8217;s reasonable to assume that numeric ids comparison will be&nbsp;faster.</p>
 <div class="highlight"><pre><span></span><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">requested_parcels</span> <span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">par_id</span><span class="p">)</span>
 <span class="k">SELECT</span> <span class="k">DISTINCT</span>
     <span class="n">reqs</span><span class="p">.</span><span class="n">uid</span><span class="p">,</span>
@@ -309,19 +252,13 @@ Running this script will delete the old cluster<span class="err">&#39;</span>s d
      <span class="k">WHERE</span> <span class="n">pp</span><span class="p">.</span><span class="n">par_id</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">idpar</span>
   <span class="p">);</span>
 </pre></div>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2016/counting-substring-occurrences-in-postgresql/" rel="bookmark" title="Permalink to Counting substring occurrences in PostgreSQL">Counting substring occurrences in&nbsp;PostgreSQL</a></h1>
-            <small>Written on Dec 19, 2016
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
-        </small>
-        <section>
-            <p>I got to count occurrences of <em>/</em> character today and found out no built-in function exists in PostgreSQL, so here&#8217;s my shot at it. Pretty simple, yet&nbsp;useful.</p>
+</article>
+<article>
+    <h1><a href="/posts/2016/counting-substring-occurrences-in-postgresql/" rel="bookmark" title="Permalink to Counting substring occurrences in PostgreSQL">Counting substring occurrences in&nbsp;PostgreSQL</a></h1>
+    Written on Dec 19, 2016
+    and marked as
+    <a href="/tag/sql.html">sql</a>,     <a href="/tag/postgresql.html">postgresql</a>    | <a href="/category/sql.html">SQL</a>
+    <p>I got to count occurrences of <em>/</em> character today and found out no built-in function exists in PostgreSQL, so here&#8217;s my shot at it. Pretty simple, yet&nbsp;useful.</p>
 <div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">OR</span> <span class="k">REPLACE</span> <span class="k">FUNCTION</span> <span class="n">how_many</span><span class="p">(</span><span class="k">IN</span> <span class="nb">text</span><span class="p">,</span> <span class="k">IN</span> <span class="nb">varchar</span><span class="p">,</span> <span class="k">OUT</span> <span class="nb">integer</span><span class="p">)</span>
 <span class="k">RETURNS</span> <span class="nb">integer</span>
 <span class="k">AS</span>
@@ -333,399 +270,20 @@ Running this script will delete the old cluster<span class="err">&#39;</span>s d
 
 <span class="c1">-- SELECT how_many(&#39;test&#39;, &#39;t&#39;); -- returns number 2</span>
 </pre></div>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-wind-rose/" rel="bookmark" title="Permalink to PostGIS Custom Function to Create Wind Rose">PostGIS Custom Function to Create Wind&nbsp;Rose</a></h1>
-            <small>Written on Sep 1, 2016
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
-        </small>
-        <section>
-            <p>I&#8217;ve come across the <a href="http://gis.stackexchange.com/questions/208797/draw-wind-rose-with-qgis-from-postgis/">beautiful <span class="caps">GIS</span> StackExchange question</a> recently, asking how to draw a <a href="https://en.wikipedia.org/wiki/Wind_rose">wind rose</a> within&nbsp;PostGIS.</p>
-<div class="text-center">
-<img src="http://i.stack.imgur.com/0xAMU.png">
-</div>
-
-<p>It&#8217;s pretty easy to accomplish this with a custom <span class="caps">PLPGSQL</span> procedure below, that takes line geometry, number of sections and radius of the inner circle as&nbsp;parameters.</p>
-<!-- codeblock -->
-
-<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">OR</span> <span class="k">REPLACE</span> <span class="k">FUNCTION</span> <span class="n">ST_WindRose</span><span class="p">(</span>
-    <span class="n">line</span> <span class="n">geometry</span><span class="p">,</span>
-    <span class="n">directions</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">radius</span> <span class="nb">numeric</span>
-<span class="p">)</span>
-<span class="k">RETURNS</span> <span class="k">TABLE</span> <span class="p">(</span>
-    <span class="n">id</span> <span class="nb">integer</span><span class="p">,</span>
-    <span class="n">geom</span> <span class="n">geometry</span><span class="p">(</span><span class="n">LINESTRING</span><span class="p">)</span>
-<span class="p">)</span>
-<span class="k">AS</span> <span class="err">$</span><span class="n">ST_WindRose$</span>
-<span class="k">BEGIN</span>
-    <span class="k">IF</span> <span class="n">directions</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">&lt;&gt;</span> <span class="mi">0</span> <span class="k">THEN</span>
-        <span class="n">RAISE</span> <span class="k">EXCEPTION</span> <span class="s1">&#39;Odd number of directions found, please provide even number of directions instead.&#39;</span><span class="p">;</span>
-    <span class="k">END</span> <span class="k">IF</span><span class="p">;</span>
-
-<span class="k">IF</span> <span class="n">radius</span> <span class="o">&gt;</span> <span class="n">ST_Length</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="k">THEN</span>
-    <span class="n">RAISE</span> <span class="k">EXCEPTION</span> <span class="s1">&#39;Inner circle radius is bigger than the wind rose diameter, please make it smaller.&#39;</span><span class="p">;</span>
-<span class="k">END</span> <span class="k">IF</span><span class="p">;</span>
-
-<span class="k">RETURN</span> <span class="n">QUERY</span>
-<span class="k">WITH</span> <span class="n">rose</span> <span class="k">AS</span> <span class="p">(</span>
-    <span class="k">SELECT</span>
-        <span class="n">ST_Rotate</span><span class="p">(</span><span class="n">_line</span><span class="p">,</span> <span class="n">radians</span><span class="p">(</span><span class="mi">360</span><span class="p">)</span> <span class="o">/</span> <span class="n">directions</span> <span class="o">*</span> <span class="n">dirs</span><span class="p">.</span><span class="n">id</span><span class="p">,</span> <span class="n">ST_Centroid</span><span class="p">(</span><span class="n">_line</span><span class="p">))</span> <span class="n">_line</span>
-    <span class="k">FROM</span> <span class="p">(</span>
-        <span class="k">SELECT</span> <span class="n">line</span> <span class="n">_line</span>
-    <span class="p">)</span> <span class="n">a</span>
-    <span class="k">CROSS</span> <span class="k">JOIN</span> <span class="p">(</span>
-        <span class="k">SELECT</span> <span class="n">generate_series</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">directions</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="n">id</span>
-    <span class="p">)</span> <span class="n">dirs</span>
-<span class="p">)</span>
-<span class="k">SELECT</span>
-    <span class="n">row_number</span><span class="p">()</span> <span class="n">OVER</span> <span class="p">()::</span><span class="nb">integer</span> <span class="n">id</span><span class="p">,</span>
-    <span class="n">_line</span> <span class="n">geom</span>
-<span class="k">FROM</span> <span class="p">(</span>
-    <span class="k">SELECT</span> <span class="n">_line</span> <span class="k">FROM</span> <span class="n">rose</span>
-    <span class="k">UNION</span> <span class="k">ALL</span>
-    <span class="k">SELECT</span> <span class="n">ST_ExteriorRing</span><span class="p">(</span><span class="n">ST_Buffer</span><span class="p">(</span><span class="n">ST_Centroid</span><span class="p">(</span><span class="n">line</span><span class="p">),</span> <span class="n">radius</span><span class="p">,</span> <span class="mi">30</span><span class="p">))</span> <span class="c1">-- inner circle</span>
-    <span class="k">UNION</span> <span class="k">ALL</span>
-    <span class="k">SELECT</span> <span class="n">ST_ExteriorRing</span><span class="p">(</span><span class="n">ST_Buffer</span><span class="p">(</span><span class="n">ST_Centroid</span><span class="p">(</span><span class="n">line</span><span class="p">),</span> <span class="n">ST_Length</span><span class="p">(</span><span class="n">line</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mi">30</span><span class="p">))</span> <span class="c1">-- outer circle</span>
-<span class="p">)</span> <span class="n">a</span><span class="p">;</span>
-<span class="k">END</span>
-<span class="err">$</span><span class="n">ST_WindRose$</span>
-<span class="k">LANGUAGE</span> <span class="n">PLPGSQL</span><span class="p">;</span>
-</pre></div>
-
-
-<p>Wind rose created with this function might look like the one&nbsp;below.</p>
-<div class="text-center">
-<img src="http://i.stack.imgur.com/4OD0J.png">
-</div>
-
-<p>Run it as follows. The <code>line</code> parameter should be a simple straight line made of just two&nbsp;vertices.</p>
-<!-- codeblock -->
-
-<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">ST_WindRose</span><span class="p">(</span><span class="n">ST_MakeLine</span><span class="p">(</span><span class="n">ST_MakePoint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">ST_MakePoint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)),</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mi">01</span><span class="p">);</span>
-</pre></div>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-polygon-from-centroid/" rel="bookmark" title="Permalink to PostGIS Custom Function to Create Polygon from Centroid">PostGIS Custom Function to Create Polygon from&nbsp;Centroid</a></h1>
-            <small>Written on Aug 28, 2016
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
-        </small>
-        <section>
-            <p>Needed to create a polygon from a point defining its size in both axes, here&#8217;s a little syntax sugar to make life&nbsp;easier.</p>
-<!-- codeblock -->
-
-<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">OR</span> <span class="k">REPLACE</span> <span class="k">FUNCTION</span> <span class="n">ST_PolygonFromCentroid</span><span class="p">(</span><span class="n">centroid</span> <span class="n">geometry</span><span class="p">,</span> <span class="n">xsize</span> <span class="nb">numeric</span><span class="p">,</span> <span class="n">ysize</span> <span class="nb">numeric</span><span class="p">)</span>
-<span class="k">RETURNS</span> <span class="n">geometry</span>
-<span class="k">AS</span> <span class="err">$</span><span class="n">ST_PolygonFromCentroid$</span>
-<span class="k">SELECT</span> <span class="n">ST_MakeEnvelope</span><span class="p">(</span>
-    <span class="n">ST_X</span><span class="p">(</span><span class="n">ST_Translate</span><span class="p">(</span><span class="err">$</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="err">$</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="err">$</span><span class="mi">3</span><span class="p">)),</span>
-    <span class="n">ST_Y</span><span class="p">(</span><span class="n">ST_Translate</span><span class="p">(</span><span class="err">$</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="err">$</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="err">$</span><span class="mi">3</span><span class="p">)),</span>
-    <span class="n">ST_X</span><span class="p">(</span><span class="n">ST_Translate</span><span class="p">(</span><span class="err">$</span><span class="mi">1</span><span class="p">,</span> <span class="err">$</span><span class="mi">2</span><span class="p">,</span> <span class="err">$</span><span class="mi">3</span><span class="p">)),</span>
-    <span class="n">ST_Y</span><span class="p">(</span><span class="n">ST_Translate</span><span class="p">(</span><span class="err">$</span><span class="mi">1</span><span class="p">,</span> <span class="err">$</span><span class="mi">2</span><span class="p">,</span> <span class="err">$</span><span class="mi">3</span><span class="p">))</span>
-<span class="p">);</span>
-<span class="err">$</span><span class="n">ST_PolygonFromCentroid$</span>
-<span class="k">LANGUAGE</span> <span class="k">SQL</span><span class="p">;</span>
-</pre></div>
-
-
-<p>Run it&nbsp;as:</p>
-<!-- codeblock -->
-
-<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">ST_PolygonFromCentroid</span><span class="p">(</span><span class="n">ST_SetSRID</span><span class="p">(</span><span class="n">ST_MakePoint</span><span class="p">(</span><span class="mi">13</span><span class="p">.</span><span class="mi">912</span><span class="p">,</span><span class="mi">50</span><span class="p">.</span><span class="mi">633</span><span class="p">),</span><span class="mi">4326</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-</pre></div>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2016/finding-polygons-lying-across-other-polygons-with-postgis/" rel="bookmark" title="Permalink to Finding Polygons Lying across Other Polygons with PostGIS">Finding Polygons Lying across Other Polygons with&nbsp;PostGIS</a></h1>
-            <small>Written on Aug 5, 2016
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
-        </small>
-        <section>
-            <p>Doing overlays (<code>ST_Intersection()</code>) in PostGIS based on spatial relationships (<code>ST_Intersects()</code>, <code>ST_Contains()</code>, &hellip;) is so easy it is not something you get particularly excited&nbsp;about.</p>
-<p>Today I faced a bit more interesting task: <strong>given two polygon layers, get me all the polygons from layer A such that they lie across the polygons from layer B and&hellip; a picture worth a thousand words,&nbsp;right?</strong></p>
-<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/finding-polygons-lying-across-other-polygons-with-postgis/polygons.svg" /></div>
-
-<p>I hope you got the idea, it is fairly&nbsp;simple:</p>
-<ol>
-<li>Intersect A (red, blue) with B&nbsp;(green)</li>
-<li>Subtract the result of previous from layer&nbsp;A</li>
-<li>Combine results from steps 1 and&nbsp;2</li>
-<li>Keep polygon only if its id occurs more than twice (that means it went straight through the layer&nbsp;B)</li>
-<li>Profit!</li>
-</ol>
-<!-- codeblock -->
-
-<div class="highlight"><pre><span></span><span class="k">WITH</span> <span class="n">overlays</span> <span class="k">AS</span> <span class="p">(</span>
-<span class="cm">/* nothing fancy here */</span>
-    <span class="k">SELECT</span>
-        <span class="n">A</span><span class="p">.</span><span class="n">ogc_fid</span> <span class="n">a_id</span><span class="p">,</span>
-        <span class="n">B</span><span class="p">.</span><span class="n">ogc_fid</span> <span class="n">b_id</span><span class="p">,</span>
-        <span class="n">ST_Intersection</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">B</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">geom</span><span class="p">,</span>
-        <span class="n">ST_Area</span><span class="p">(</span><span class="n">ST_Intersection</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">B</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">area_shared</span>
-    <span class="k">FROM</span> <span class="n">A</span>
-    <span class="k">JOIN</span> <span class="n">B</span> <span class="k">ON</span> <span class="p">(</span><span class="n">ST_Intersects</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">B</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span>
-<span class="p">),</span>
-<span class="n">diffs</span> <span class="k">AS</span> <span class="p">(</span>
-<span class="cm">/* note this is a 1:1 relationship in ST_Difference */</span>
-<span class="cm">/* a little hack is needed to prevent PostGIS from returning its usual difference mess */</span>
-    <span class="k">SELECT</span>
-        <span class="n">o</span><span class="p">.</span><span class="n">a_id</span><span class="p">,</span>
-        <span class="n">o</span><span class="p">.</span><span class="n">b_id</span><span class="p">,</span>
-        <span class="p">(</span><span class="n">ST_Dump</span><span class="p">(</span><span class="n">ST_Difference</span><span class="p">(</span><span class="n">ST_Buffer</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="o">-</span><span class="mi">0</span><span class="p">.</span><span class="mi">0001</span><span class="p">),</span> <span class="n">o</span><span class="p">.</span><span class="n">geom</span><span class="p">))).</span><span class="n">geom</span><span class="p">,</span> <span class="c1">-- ugly hack</span>
-        <span class="n">o</span><span class="p">.</span><span class="n">area_shared</span>
-    <span class="k">FROM</span> <span class="n">overlays</span> <span class="n">o</span>
-    <span class="k">JOIN</span> <span class="n">A</span> <span class="k">ON</span> <span class="p">(</span><span class="n">o</span><span class="p">.</span><span class="n">a_id</span> <span class="o">=</span> <span class="n">A</span><span class="p">.</span><span class="n">id</span><span class="p">)</span>
-<span class="p">),</span>
-
-<span class="n">merged</span> <span class="k">AS</span> <span class="p">(</span>
-<span class="cm">/* put those two result sets together */</span>
-    <span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">overlays</span>
-    <span class="k">UNION</span> <span class="k">ALL</span>
-    <span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">diffs</span>
-<span class="p">),</span>
-
-<span class="n">merged_reduced</span> <span class="k">AS</span> <span class="p">(</span>
-<span class="cm">/* get only those A polygons that consist of three parts at least for each intersection with B polygon */</span>
-  <span class="k">SELECT</span>
-    <span class="n">m</span><span class="p">.</span><span class="o">*</span>
-  <span class="k">FROM</span> <span class="n">merged</span> <span class="n">m</span>
-  <span class="k">JOIN</span> <span class="p">(</span>
-    <span class="k">SELECT</span>
-      <span class="n">a_id</span><span class="p">,</span>
-      <span class="n">b_id</span>
-    <span class="k">FROM</span> <span class="n">merged</span>
-    <span class="k">GROUP</span> <span class="k">BY</span> <span class="n">a_id</span><span class="p">,</span> <span class="n">b_id</span>
-    <span class="k">HAVING</span> <span class="k">COUNT</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span>
-  <span class="p">)</span> <span class="n">a</span> <span class="k">ON</span> <span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">a_id</span> <span class="o">=</span> <span class="n">m</span><span class="p">.</span><span class="n">a_id</span> <span class="k">AND</span> <span class="n">a</span><span class="p">.</span><span class="n">b_id</span> <span class="o">=</span> <span class="n">m</span><span class="p">.</span><span class="n">b_id</span><span class="p">)</span>
-<span class="p">)</span>
-<span class="cm">/* do as you wish with the result */</span>
-<span class="k">SELECT</span> <span class="o">*</span>
-<span class="k">FROM</span> <span class="n">merged_reduced</span><span class="p">;</span>
-</pre></div>
-
-
-<p>In my case, centerlines of layer B were also included and their length inside each intersection was used to divide the area of the smallest part with. It was fun,&nbsp;actually.</p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2016/dead-simple-random-points-in-polygons-with-postgis/" rel="bookmark" title="Permalink to Dead Simple Random Points in Polygons with PostGIS">Dead Simple Random Points in Polygons with&nbsp;PostGIS</a></h1>
-            <small>Written on Aug 3, 2016
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
-        </small>
-        <section>
-            <p>Since PostgreSQL 9.3 there has been a handy little keyword called <code>LATERAL</code>, which - combined with <code>JOIN</code> - might rock your <span class="caps">GIS</span> world in a second. To keep it simple, a <code>LATERAL JOIN</code> enables a subquery in the <code>FROM</code> part of a query to reference columns from preceding expressions in the <code>FROM</code> list. What the&nbsp;heck?</p>
-<p>Imagine that not so unusual request to <strong>generate random points in polygons</strong> (something I needed to do today). Do it automatically without your favorite piece of desktop <span class="caps">GIS</span>&nbsp;software.</p>
-<p>It is pretty easy using <code>LATERAL JOIN</code>:</p>
-<div class="highlight"><pre><span></span><span class="k">SELECT</span>
-    <span class="n">a</span><span class="p">.</span><span class="n">id</span><span class="p">,</span>
-    <span class="n">b</span><span class="p">.</span><span class="o">*</span>
-<span class="k">FROM</span> <span class="p">(</span>
-    <span class="k">VALUES</span><span class="p">(</span>
-        <span class="mi">1</span><span class="p">,</span>
-        <span class="n">ST_SetSRID</span><span class="p">(</span>
-            <span class="n">ST_GeomFromText</span><span class="p">(</span>
-                <span class="s1">&#39;POLYGON((0 0, -1 0, -1 -1, 0 -1, 0 0))&#39;</span>
-            <span class="p">),</span>
-        <span class="mi">4326</span><span class="p">)</span>
-    <span class="p">)</span>
-    <span class="k">UNION</span> <span class="k">ALL</span>
-    <span class="k">VALUES</span><span class="p">(</span>
-        <span class="mi">2</span><span class="p">,</span>
-        <span class="n">ST_SetSRID</span><span class="p">(</span>
-            <span class="n">ST_GeomFromText</span><span class="p">(</span>
-                <span class="s1">&#39;POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))&#39;</span>
-            <span class="p">),</span>
-        <span class="mi">4326</span><span class="p">)</span>
-    <span class="p">)</span>
-<span class="p">)</span> <span class="n">a</span><span class="p">(</span><span class="n">id</span><span class="p">,</span> <span class="n">geom</span><span class="p">)</span>
-<span class="k">CROSS</span> <span class="k">JOIN</span> <span class="k">LATERAL</span> <span class="p">(</span>
-    <span class="k">SELECT</span> <span class="n">ST_SetSRID</span><span class="p">(</span><span class="n">ST_MakePoint</span><span class="p">(</span><span class="n">tmp</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">tmp</span><span class="p">.</span><span class="n">y</span><span class="p">),</span> <span class="mi">4326</span><span class="p">)</span> <span class="n">geom</span>
-    <span class="k">FROM</span> <span class="p">(</span>
-        <span class="k">SELECT</span>
-            <span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">ST_XMax</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="o">-</span> <span class="n">ST_XMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span> <span class="o">+</span> <span class="n">ST_XMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">x</span><span class="p">,</span>
-            <span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">ST_YMax</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="o">-</span> <span class="n">ST_YMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span> <span class="o">+</span> <span class="n">ST_YMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">y</span>
-        <span class="k">FROM</span> <span class="n">generate_series</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">)</span>
-    <span class="p">)</span> <span class="n">tmp</span>
-<span class="p">)</span> <span class="n">b</span><span class="p">;</span>
-</pre></div>
-
-
-<p>What actually happened over there? If you want to put points inside polygons, you need&#8230; polygons. We will do just fine with two of them created inside this&nbsp;query:</p>
-<div class="highlight"><pre><span></span><span class="k">VALUES</span><span class="p">(</span>
-    <span class="mi">1</span><span class="p">,</span>
-    <span class="n">ST_SetSRID</span><span class="p">(</span>
-        <span class="n">ST_GeomFromText</span><span class="p">(</span>
-            <span class="s1">&#39;POLYGON((0 0, -1 0, -1 -1, 0 -1, 0 0))&#39;</span>
-        <span class="p">),</span>
-    <span class="mi">4326</span><span class="p">)</span>
-<span class="p">)</span>
-<span class="k">UNION</span> <span class="k">ALL</span>
-<span class="k">VALUES</span><span class="p">(</span>
-    <span class="mi">2</span><span class="p">,</span>
-    <span class="n">ST_SetSRID</span><span class="p">(</span>
-        <span class="n">ST_GeomFromText</span><span class="p">(</span>
-            <span class="s1">&#39;POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))&#39;</span>
-        <span class="p">),</span>
-    <span class="mi">4326</span><span class="p">)</span>
-<span class="p">)</span>
-</pre></div>
-
-
-<p>All the magic happens inside the <code>LATERAL JOIN</code> part of the&nbsp;query:</p>
-<div class="highlight"><pre><span></span><span class="k">CROSS</span> <span class="k">JOIN</span> <span class="k">LATERAL</span> <span class="p">(</span>
-    <span class="k">SELECT</span> <span class="n">ST_SetSRID</span><span class="p">(</span><span class="n">ST_MakePoint</span><span class="p">(</span><span class="n">tmp</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">tmp</span><span class="p">.</span><span class="n">y</span><span class="p">),</span> <span class="mi">4326</span><span class="p">)</span> <span class="n">geom</span>
-    <span class="k">FROM</span> <span class="p">(</span>
-        <span class="k">SELECT</span>
-            <span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">ST_XMax</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="o">-</span> <span class="n">ST_XMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span> <span class="o">+</span> <span class="n">ST_XMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">x</span><span class="p">,</span>
-            <span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">ST_YMax</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="o">-</span> <span class="n">ST_YMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span> <span class="o">+</span> <span class="n">ST_YMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">y</span>
-        <span class="k">FROM</span> <span class="n">generate_series</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">)</span>
-    <span class="p">)</span> <span class="n">tmp</span>
-<span class="p">)</span> <span class="n">b</span><span class="p">;</span>
-</pre></div>
-
-
-<p>The inner <code>SELECT</code> calculates random points based on the extent of the polygon. Note it directly calls <code>a.geom</code>, a value that comes from the previous <code>SELECT</code>! The <code>LATERAL JOIN</code> part is thus run for every row of the previous <code>SELECT</code> statement inside <code>FROM</code> part of the query. This means it will return 201 points for each of the two polygons (run the query inside <span class="caps">QGIS</span> to see the&nbsp;result).</p>
-<p>Note all the points fall inside the polygons by accident, because they are <strong>square</strong>. Otherwise a <code>ST_Contains</code> or <code>ST_Within</code> should be used inside the outermost <code>WHERE</code> query to filter outliers. This part could use some&nbsp;tweaking.</p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2016/looking-for-the-next-row-with-postgresql/" rel="bookmark" title="Permalink to Looking for the Next Row with PostgreSQL">Looking for the Next Row with&nbsp;PostgreSQL</a></h1>
-            <small>Written on Jan 23, 2016
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
-        </small>
-        <section>
-            <h2>Using <span class="caps">JOIN</span>&nbsp;clause</h2>
-<p>All my <span class="caps">GIS</span> life I&#8217;ve been using a simple <code>JOIN</code> clause to find a row with an <code>id = previous_id + 1</code>. In other words, imagine a simple table with no&nbsp;indices:</p>
-<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">test</span> <span class="p">(</span><span class="n">id</span> <span class="nb">integer</span><span class="p">);</span>
-<span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">test</span> <span class="k">SELECT</span> <span class="n">i</span> <span class="k">FROM</span> <span class="n">generate_series</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">10000000</span><span class="p">)</span> <span class="n">i</span><span class="p">;</span>
-</pre></div>
-
-
-<p>Let&#8217;s retrieve next row for each row in that&nbsp;table:</p>
-<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">a</span><span class="p">.</span><span class="n">id</span><span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">id</span>
-<span class="k">FROM</span> <span class="n">test</span> <span class="n">a</span>
-<span class="k">LEFT</span> <span class="k">JOIN</span> <span class="n">test</span> <span class="n">b</span> <span class="k">ON</span> <span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">id</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">=</span> <span class="n">b</span><span class="p">.</span><span class="n">id</span><span class="p">);</span> <span class="c1">-- note the LEFT JOIN is needed to get the last row as well</span>
-</pre></div>
-
-
-<p>Execution plan looks like&nbsp;this:</p>
-<div class="highlight"><pre><span></span><span class="n">Hash</span> <span class="k">Join</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">311087</span><span class="p">.</span><span class="mi">17</span><span class="p">..</span><span class="mi">953199</span><span class="p">.</span><span class="mi">41</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10088363</span> <span class="n">width</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">25440</span><span class="p">.</span><span class="mi">770</span><span class="p">..</span><span class="mi">79591</span><span class="p">.</span><span class="mi">869</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000000</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-   <span class="n">Hash</span> <span class="n">Cond</span><span class="p">:</span> <span class="p">((</span><span class="n">a</span><span class="p">.</span><span class="n">id</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">b</span><span class="p">.</span><span class="n">id</span><span class="p">)</span>
-   <span class="o">-&gt;</span>  <span class="n">Seq</span> <span class="n">Scan</span> <span class="k">on</span> <span class="n">test</span> <span class="n">a</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">00</span><span class="p">..</span><span class="mi">145574</span><span class="p">.</span><span class="mi">63</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10088363</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">588</span><span class="p">..</span><span class="mi">10801</span><span class="p">.</span><span class="mi">584</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-   <span class="o">-&gt;</span>  <span class="n">Hash</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">145574</span><span class="p">.</span><span class="mi">63</span><span class="p">..</span><span class="mi">145574</span><span class="p">.</span><span class="mi">63</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10088363</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">25415</span><span class="p">.</span><span class="mi">282</span><span class="p">..</span><span class="mi">25415</span><span class="p">.</span><span class="mi">282</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-         <span class="n">Buckets</span><span class="p">:</span> <span class="mi">16384</span>  <span class="n">Batches</span><span class="p">:</span> <span class="mi">128</span>  <span class="n">Memory</span> <span class="k">Usage</span><span class="p">:</span> <span class="mi">2778</span><span class="n">kB</span>
-         <span class="o">-&gt;</span>  <span class="n">Seq</span> <span class="n">Scan</span> <span class="k">on</span> <span class="n">test</span> <span class="n">b</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">00</span><span class="p">..</span><span class="mi">145574</span><span class="p">.</span><span class="mi">63</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10088363</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">422</span><span class="p">..</span><span class="mi">11356</span><span class="p">.</span><span class="mi">108</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
- <span class="n">Planning</span> <span class="n">time</span><span class="p">:</span> <span class="mi">0</span><span class="p">.</span><span class="mi">155</span> <span class="n">ms</span>
- <span class="n">Execution</span> <span class="n">time</span><span class="p">:</span> <span class="mi">90134</span><span class="p">.</span><span class="mi">248</span> <span class="n">ms</span>
-</pre></div>
-
-
-<p>If we add an index with <code>CREATE INDEX ON test (id)</code>, the plan&nbsp;changes:</p>
-<div class="highlight"><pre><span></span><span class="n">Merge</span> <span class="k">Join</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">87</span><span class="p">..</span><span class="mi">669369</span><span class="p">.</span><span class="mi">85</span> <span class="k">rows</span><span class="o">=</span><span class="mi">9999844</span> <span class="n">width</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">035</span><span class="p">..</span><span class="mi">56219</span><span class="p">.</span><span class="mi">294</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-   <span class="n">Merge</span> <span class="n">Cond</span><span class="p">:</span> <span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">b</span><span class="p">.</span><span class="n">id</span><span class="p">)</span>
-   <span class="o">-&gt;</span>  <span class="k">Index</span> <span class="k">Only</span> <span class="n">Scan</span> <span class="k">using</span> <span class="n">test_id_idx</span> <span class="k">on</span> <span class="n">test</span> <span class="n">a</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">43</span><span class="p">..</span><span class="mi">259686</span><span class="p">.</span><span class="mi">10</span> <span class="k">rows</span><span class="o">=</span><span class="mi">9999844</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">015</span><span class="p">..</span><span class="mi">11101</span><span class="p">.</span><span class="mi">937</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-         <span class="n">Heap</span> <span class="n">Fetches</span><span class="p">:</span> <span class="mi">0</span>
-   <span class="o">-&gt;</span>  <span class="k">Index</span> <span class="k">Only</span> <span class="n">Scan</span> <span class="k">using</span> <span class="n">test_id_idx</span> <span class="k">on</span> <span class="n">test</span> <span class="n">b</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">43</span><span class="p">..</span><span class="mi">259686</span><span class="p">.</span><span class="mi">10</span> <span class="k">rows</span><span class="o">=</span><span class="mi">9999844</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">012</span><span class="p">..</span><span class="mi">11827</span><span class="p">.</span><span class="mi">895</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-         <span class="n">Heap</span> <span class="n">Fetches</span><span class="p">:</span> <span class="mi">0</span>
- <span class="n">Planning</span> <span class="n">time</span><span class="p">:</span> <span class="mi">0</span><span class="p">.</span><span class="mi">244</span> <span class="n">ms</span>
- <span class="n">Execution</span> <span class="n">time</span><span class="p">:</span> <span class="mi">65973</span><span class="p">.</span><span class="mi">421</span> <span class="n">ms</span>
-</pre></div>
-
-
-<p>Not&nbsp;bad.</p>
-<h2>Using window&nbsp;function</h2>
-<p><a href="http://www.postgresql.org/docs/9.4/static/functions-window.html">Window functions</a> are real fun. They&#8217;re great if you&#8217;re doing counts, sums or ranks by groups. And, to my surprise, they&#8217;re great in finding next rows as&nbsp;well.</p>
-<p>With the same <code>test</code> table, we retrieve next row for each row with the following&nbsp;query:</p>
-<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">id</span><span class="p">,</span> <span class="n">lead</span><span class="p">(</span><span class="n">id</span><span class="p">)</span> <span class="n">OVER</span> <span class="p">(</span><span class="k">ORDER</span> <span class="k">BY</span> <span class="n">id</span><span class="p">)</span>
-<span class="k">FROM</span> <span class="n">test</span><span class="p">.</span><span class="n">test</span><span class="p">;</span>
-</pre></div>
-
-
-<p>How does that score without an index? Better than the <code>JOIN</code> clause.</p>
-<div class="highlight"><pre><span></span><span class="n">WindowAgg</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">1581246</span><span class="p">.</span><span class="mi">90</span><span class="p">..</span><span class="mi">1756294</span><span class="p">.</span><span class="mi">50</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10002720</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">28785</span><span class="p">.</span><span class="mi">388</span><span class="p">..</span><span class="mi">63819</span><span class="p">.</span><span class="mi">071</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-   <span class="o">-&gt;</span>  <span class="n">Sort</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">1581246</span><span class="p">.</span><span class="mi">90</span><span class="p">..</span><span class="mi">1606253</span><span class="p">.</span><span class="mi">70</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10002720</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">28785</span><span class="p">.</span><span class="mi">354</span><span class="p">..</span><span class="mi">40117</span><span class="p">.</span><span class="mi">899</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-         <span class="n">Sort</span> <span class="k">Key</span><span class="p">:</span> <span class="n">id</span>
-         <span class="n">Sort</span> <span class="k">Method</span><span class="p">:</span> <span class="k">external</span> <span class="n">merge</span>  <span class="n">Disk</span><span class="p">:</span> <span class="mi">136848</span><span class="n">kB</span>
-         <span class="o">-&gt;</span>  <span class="n">Seq</span> <span class="n">Scan</span> <span class="k">on</span> <span class="n">test</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">00</span><span class="p">..</span><span class="mi">144718</span><span class="p">.</span><span class="mi">20</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10002720</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">020</span><span class="p">..</span><span class="mi">10797</span><span class="p">.</span><span class="mi">961</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
- <span class="n">Planning</span> <span class="n">time</span><span class="p">:</span> <span class="mi">0</span><span class="p">.</span><span class="mi">242</span> <span class="n">ms</span>
- <span class="n">Execution</span> <span class="n">time</span><span class="p">:</span> <span class="mi">73391</span><span class="p">.</span><span class="mi">024</span> <span class="n">ms</span>
-</pre></div>
-
-
-<p>And it works even better if indexed. It&#8217;s actually ~1,5&times; faster than the <code>JOIN</code> way.</p>
-<div class="highlight"><pre><span></span><span class="n">WindowAgg</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">43</span><span class="p">..</span><span class="mi">409770</span><span class="p">.</span><span class="mi">03</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10002720</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">087</span><span class="p">..</span><span class="mi">35647</span><span class="p">.</span><span class="mi">815</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-   <span class="o">-&gt;</span>  <span class="k">Index</span> <span class="k">Only</span> <span class="n">Scan</span> <span class="k">using</span> <span class="n">test_id_idx</span> <span class="k">on</span> <span class="n">test</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">43</span><span class="p">..</span><span class="mi">259729</span><span class="p">.</span><span class="mi">23</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10002720</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">059</span><span class="p">..</span><span class="mi">11310</span><span class="p">.</span><span class="mi">879</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-         <span class="n">Heap</span> <span class="n">Fetches</span><span class="p">:</span> <span class="mi">0</span>
- <span class="n">Planning</span> <span class="n">time</span><span class="p">:</span> <span class="mi">0</span><span class="p">.</span><span class="mi">247</span> <span class="n">ms</span>
- <span class="n">Execution</span> <span class="n">time</span><span class="p">:</span> <span class="mi">45388</span><span class="p">.</span><span class="mi">202</span> <span class="n">ms</span>
-</pre></div>
-
-
-<p>It reads well and the purpose of such a query is pretty&nbsp;obvious.</p>
-        </section>
-        </div>
-    </div>
-
+</article>
 <div class="pagination row">
     <div class="large-6 columns">
     </div>
     <div class="large-6 columns">
-            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Next page']);" href="https://www.zimmi.cz/posts/tag/sql2.html" class="button card card-1">Next page &raquo;</a>
+            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Next page']);" href="/tag/sql2.html" class="button card card-1">Next page &raquo;</a>
     </div>
-</div>            </div>
-        </div>
-        <div class="row">
-            <div class="large-12 columns footer">
-                <footer>
-                    <address>
-                    Written by <a href="http://www.zimmi.cz">Michal Zimmermann</a>.
-                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
-                    which takes great advantage of <a href="http://python.org">Python</a>.
-                    </address><!-- /#about -->
-                </footer><!-- /#contentinfo -->
-            </div>
-        </div>
-<!-- Piwik -->
-<script type="text/javascript">
-  var _paq = _paq || [];
-  /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-  _paq.push(['enableHeartBeatTimer']);
-  _paq.push(['trackPageView']);
-  _paq.push(['enableLinkTracking']);
-  (function() {
-    var u="//piwik-zimmi.rhcloud.com/analytics/";
-    _paq.push(['setTrackerUrl', u+'piwik.php']);
-    _paq.push(['setSiteId', '1']);
-    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
-  })();
-</script>
-<!-- End Piwik Code -->
-<script src="https://www.zimmi.cz/posts/theme/js/packed.js?8bee1467"></script>
-<script>
-$(document).foundation();
-</script>
+</div>    </main>
+    <footer>
+        Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
+        Proudly powered by <a href="//getpelican.com/">Pelican</a>,
+        which takes great advantage of <a href="//python.org">Python</a>.
+    </footer>
+<script src="/theme/webassets-external/5acf220afe81b3dd00333bbb93fbaa41_jquery.js"></script>
+<script src="/theme/webassets-external/b80143a60770d5aa122a039a2b889970_foundation.min.js"></script>
 </body>
 </html>
