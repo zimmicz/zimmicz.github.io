@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+        <title>Michal Zimmermann - Articles by Michal Zimmermann</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
+        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="/theme/webassets-external/e17ffd2049da5254bb4b3183ea73c922_normalize.css">
+        <link rel="stylesheet" href="/theme/webassets-external/35f123b951b653f7b2d441b35b63d32a_github.css">
+        <link rel="stylesheet" href="/theme/webassets-external/310a2979488959b3c24d4edd2e18b50d_screen.css">
+</head>
+<body>
+    <nav role="navigation">
+        <ul>
+            <li><a href="/categories">Categories</a></li>
+            <li><a href="/tags">Tags</a></li>
+            <li><a href="/feed.xml">Subscribe to RSS feed</a></li>
+        </ul>
+    </nav>
+    <header>
+        <h1><a href="/posts">Michal Zimmermann<small>Pieces of knowledge from the world of GIS.</small></a></h1>
+    </header>
+    <main>
+<h2>Articles by Michal Zimmermann</h2>
+
+<article>
+    <h1><a href="/posts/2014/postgis-spatial-indexing-with-st_intersects/" rel="bookmark" title="Permalink to PostGIS Spatial Indexing With ST_Intersects">PostGIS Spatial Indexing With&nbsp;ST_Intersects</a></h1>
+    Written on Nov 23, 2014
+    and marked as
+    <a href="/tag/postgis.html">postgis</a>    | <a href="/category/sql.html">SQL</a>
+    <p><a href="http://postgis.net/docs/ST_Intersects.html">PostGIS docs</a> clearly states that:
+    &gt; This function call will automatically include a bounding box comparison that will make use of any indexes that are available on the&nbsp;geometries.</p>
+<p>That means (or at least I think so) that you shouldn&#8217;t bother with using <a href="http://postgis.net/docs/reference.html#Operators">operators</a> before calling this&nbsp;function.</p>
+<p><a href="http://slides.com/michalzimmermann">I was preparing</a> my second lecture on PostGIS and I was experimenting a bit and came up with an interesting thing on this&nbsp;matter:</p>
+<p>Let&#8217;s have two <span class="caps">SQL</span> relations, <code>roads</code> and <code>regions</code>. I would like to retrieve every road that intersects a certain region. Spatial indexes were built beforehand on both&nbsp;tables.</p>
+<p>First&nbsp;try:</p>
+<div class="highlight"><pre><span></span>EXPLAIN ANALYZE SELECT roads.* FROM roads
+JOIN regions ON ST_Intersects(roads.geom, regions.geom)
+WHERE regions.&quot;NAZEV&quot; = &#39;Jihomoravský&#39;;`
+</pre></div>
+
+
+<p>And here comes the&nbsp;result:</p>
+<div class="highlight"><pre><span></span>Nested Loop  (cost=4.85..324.26 rows=249 width=214) (actual time=45.102..5101.472 rows=74253 loops=1)
+-&gt;  Seq Scan on regions  (cost=0.00..12.62 rows=1 width=32) (actual time=0.015..0.018 rows=1 loops=1)
+     Filter: ((&quot;NAZEV&quot;)::text = &#39;Jihomoravský&#39;::text)
+     Rows Removed by Filter: 13
+-&gt;  Bitmap Heap Scan on roads  (cost=4.85..311.38 rows=25 width=214) (actual time=45.079..4931.495 rows=74253 loops=1)
+     Recheck Cond: (geom &amp;&amp; regions.geom)
+     Rows Removed by Index Recheck: 154841
+     Filter: _st_intersects(geom, regions.geom)
+     Rows Removed by Filter: 71212
+     -&gt;  Bitmap Index Scan on roads_idx  (cost=0.00..4.85 rows=75 width=0) (actual time=40.142..40.142 rows=145465 loops=1)
+           Index Cond: (geom &amp;&amp; regions.geom)
+Total runtime: 5181.459 ms
+</pre></div>
+
+
+<p>I was pretty satisfied with the result, I kept digging deeper&nbsp;though.</p>
+<p>Second&nbsp;try:</p>
+<div class="highlight"><pre><span></span>EXPLAIN ANALYZE SELECT roads.* FROM roads
+JOIN regions ON roads.geom &amp;&amp; regions.geom
+WHERE regions.&quot;NAZEV&quot; = &#39;Jihomoravský&#39; AND ST_Intersects(roads.geom, regions.geom);
+</pre></div>
+
+
+<p>And the&nbsp;result:</p>
+<div class="highlight"><pre><span></span>Nested Loop  (cost=0.29..21.19 rows=1 width=214) (actual time=3.041..3850.302 rows=74253 loops=1)
+-&gt;  Seq Scan on regions  (cost=0.00..12.62 rows=1 width=32) (actual time=0.021..0.024 rows=1 loops=1)
+     Filter: ((&quot;NAZEV&quot;)::text = &#39;Jihomoravský&#39;::text)
+     Rows Removed by Filter: 13
+-&gt;  Index Scan using roads_idx on roads  (cost=0.29..8.55 rows=1 width=214) (actual time=2.938..3681.432 rows=74253 loops=1)
+     Index Cond: ((geom &amp;&amp; regions.geom) AND (geom &amp;&amp; regions.geom))
+     Filter: _st_intersects(geom, regions.geom)
+     Rows Removed by Filter: 71212
+Total runtime: 3930.270 ms
+</pre></div>
+
+
+<p>Now there&#8217;s a significant difference between total runtimes of both queries and - more important - also a difference between their query plans. The latter is like <strong>20 % faster</strong>.</p>
+<p>I&#8217;m puzzled about this behavior and would appreciate any thoughts on this. Reach me at <a href="http://twitter.com/zimmicz">Twitter</a>, <a href="https://www.linkedin.com/pub/michal-zimmermann/29/8/b30">LinkedIn</a> or e-mail&nbsp;(zimmicz[at]gmail.com).</p>
+</article>
+<article>
+    <h1><a href="/posts/2014/bash-prepend-to-filename/" rel="bookmark" title="Permalink to Bash: Prepend To Filename">Bash: Prepend To&nbsp;Filename</a></h1>
+    Written on Nov 1, 2014
+    and marked as
+    <a href="/tag/linux.html">linux</a>,     <a href="/tag/bash.html">bash</a>    | <a href="/category/development.html">development</a>
+    <div class="highlight"><pre><span></span>for f in *; do mv &quot;$f&quot; &quot;prepend_$f&quot;; done
+</pre></div>
+
+
+<p>Whenever you need to prepend anything to your&nbsp;files.</p>
+</article>
+<article>
+    <h1><a href="/posts/2014/migrating-geoserver-and-checking-for-missing-data/" rel="bookmark" title="Permalink to Migrating Geoserver And Checking For Missing Data">Migrating Geoserver And Checking For Missing&nbsp;Data</a></h1>
+    Written on Oct 29, 2014
+    and marked as
+    <a href="/tag/geoserver.html">geoserver</a>,     <a href="/tag/python.html">python</a>    | <a href="/category/development.html">development</a>
+    <p>I&#8217;ve upgraded a handful of Geoserver installations and it has never been flawless. If you&#8217;re lucky you end up with just <em>some</em> layers missing, if you&#8217;re not, you&#8217;ll miss a bunch of them (together with layergroups, some stores, workspaces might screw up&nbsp;etc.).</p>
+<p>But how do you check for missing data before switching to the newer version? Thanks to the <a href="http://docs.geoserver.org/stable/en/user/rest/api/index.html"><span class="caps">REST</span> <span class="caps">API</span> implemented within Geoserver</a>, it&#8217;s rather&nbsp;easy.</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="kn">from</span> <span class="nn">requests.auth</span> <span class="kn">import</span> <span class="n">HTTPBasicAuth</span>
+
+<span class="n">req</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;http://example.com/geoserver/rest/layers&#39;</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="n">HTTPBasicAuth</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">))</span>
+
+<span class="n">html</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+<span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">link</span> <span class="ow">in</span> <span class="n">html</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">):</span>
+    <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">href</span> <span class="o">=</span> <span class="n">link</span><span class="o">.</span><span class="n">get_text</span><span class="p">()</span>
+    <span class="k">print</span> <span class="n">i</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;list.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">href</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>We needed to migrate ~ 17,000 layers last week, and yes, we could have just shut the door and spend couple of nights checking one after another, if we were the dumbest <span class="caps">GIS</span> company&nbsp;ever.</p>
+<p>As I wanted to make it a bit easier I wrote the simple Python script (see above) that just authenticates against Geoserver and downloads the list of layers. I actually had to do that twice - both old and new instance. A <a href="https://www.diffchecker.com/">simple file comparison</a> followed and I got a list of missing layers in less than two&nbsp;minutes.</p>
+<p>If you do the same to workspaces, stores and layergroups, your chances of not losing some data after the switch are pretty&nbsp;high.</p>
+<p>I guess it&#8217;s reasonable to check your maps by hand as well, but this gives you the picture of the current state of your data real&nbsp;quick.</p>
+</article>
+<article>
+    <h1><a href="/posts/2014/ogr2ogr-unix-x-windows/" rel="bookmark" title="Permalink to ogr2ogr UNIX x Windows">ogr2ogr <span class="caps">UNIX</span> x&nbsp;Windows</a></h1>
+    Written on Sep 23, 2014
+    and marked as
+    <a href="/tag/spatial.html">spatial</a>,     <a href="/tag/linux.html">linux</a>    | <a href="/category/development.html">development</a>
+    <p><span class="caps">GDAL</span> with its ogr2ogr, ogrinfo and many more is one of the best open source tools to do anything to your spatial data. It is a&nbsp;command line tool, which sort of determines it to be used with <span class="caps">UNIX</span> systems, but you might bump into a Windows guy trying to use it as well once in a&nbsp;while.</p>
+<p>Be careful, it behaves differently on different <span class="caps">OS</span>. Let&#8217;s say you do something like this on <span class="caps">UNIX</span>:</p>
+<div class="highlight"><pre><span></span>ogr2ogr -f GeoJSON -where &quot;attribute IN (&#39;value1&#39;, &#39;value2&#39;)&quot; output.json input.json
+</pre></div>
+
+
+<p>What you <abbr title="But you might get expected result as well">might get is a big nothing</abbr>. Executed on Windows it gives you the result you&#8217;ve expected. <em>Aargh</em>, what is that supposed to&nbsp;mean?</p>
+<p>Well, that&#8217;s the ogr2ogr&#8217;s way to tell you: <em>Hello there, you need to switch single quotes for double quotes and vice versa, you dumb!</em> I don&#8217;t know why and I find it really annoying. Just in case you get stuck with ogr2ogr (or probably any other command line tool), try&nbsp;this.</p>
+</article>
+<article>
+    <h1><a href="/posts/2014/notify-when-average-of-10-subsequent-numbers-is-bigger-than-given-value/" rel="bookmark" title="Permalink to Notify When Average of 10 Subsequent Numbers Is Bigger Than Given Value">Notify When Average of 10 Subsequent Numbers Is Bigger Than Given&nbsp;Value</a></h1>
+    Written on Sep 21, 2014
+    and marked as
+    <a href="/tag/php.html">php</a>    | <a href="/category/development.html">development</a>
+    <p>I found an <a href="http://stackoverflow.com/questions/25952380/php-find-a-maximum-average-for-10-subsequent-numbers-in-a-list-of-50-random-numb">interesting question</a> at StackOverflow asking for help finding solution to what I have already mentioned in the title, with <span class="caps">PHP</span>. I gave it a try before reading answers and came up with the following&nbsp;code:</p>
+<div class="highlight"><pre><span></span>$avg  = // value we are looking for
+$size = count($numbers);
+
+for ($i = 0; $i &lt; $size; $i += 1) {
+    if ($i + 9 &lt; 51) {
+        $val += $numbers[$i];
+        for ($j = $i + 1; $j &lt; 10 + $i; $j += 1) {
+            $val += $numbers[$j];
+        }
+        if ($val / 10 &gt;= $avg) { // hit
+            // do something
+        }
+        $val = 0;
+    }
+}
+</pre></div>
+
+
+<p>That was the first that I could think of. And it worked. The answer given by Dave Chen was much more elegant than my solution (although I think it does something a bit different, but that&#8217;s not the point&nbsp;here):</p>
+<div class="highlight"><pre><span></span>$number = 10; //numbers in a set
+$max = 0;
+$index = 0;
+
+$size = sizeof($numbers) - $number;
+for ($i = 0; $i &lt; $size; $i++) {
+    $tmp = array_sum(array_slice($numbers, $i, $number)) / $number;
+    if ($tmp &gt; $max) {
+        $max = $tmp;
+        $index = $i;
+    }
+}
+</pre></div>
+
+
+<p>I made a simple benchmark with <a href="http://php.net/manual/en/function.microtime.php"><code>microtime()</code></a> and found out that my solution (ran 100k times) took about ~12.3 seconds while Dave&#8217;s took only ~7.4 seconds to finish. That makes his code almost twice faster than&nbsp;mine.</p>
+<p><strong>Lesson learned: do not stop&nbsp;learning!</strong></p>
+</article>
+<div class="pagination row">
+    <div class="large-6 columns">
+            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Previous page']);" href="/author/michal-zimmermann11.html" class="button card card-1">&laquo; Previous page</a>
+    </div>
+    <div class="large-6 columns">
+            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Next page']);" href="/author/michal-zimmermann13.html" class="button card card-1">Next page &raquo;</a>
+    </div>
+</div>    </main>
+    <footer>
+        Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
+        Proudly powered by <a href="//getpelican.com/">Pelican</a>,
+        which takes great advantage of <a href="//python.org">Python</a>.
+    </footer>
+<script src="/theme/webassets-external/5acf220afe81b3dd00333bbb93fbaa41_jquery.js"></script>
+<script src="/theme/webassets-external/b80143a60770d5aa122a039a2b889970_foundation.min.js"></script>
+</body>
+</html>

@@ -4,676 +4,532 @@
         <title>Michal Zimmermann - Articles by Michal Zimmermann</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
-        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?d5d1e141">
-<!-- Start of Async Drift Code -->
-<script>
-    !function () {
-        var t;
-        if (t = window.driftt = window.drift = window.driftt || [], !t.init) return t.invoked ? void (window.console && console.error && console.error("Drift snippet included twice.")) : (t.invoked = !0,
-            t.methods = ["identify", "config", "track", "reset", "debug", "show", "ping", "page", "hide", "off", "on"],
-            t.factory = function (e) {
-                return function () {
-                    var n;
-                    return n = Array.prototype.slice.call(arguments), n.unshift(e), t.push(n), t;
-                };
-            }, t.methods.forEach(function (e) {
-                t[e] = t.factory(e);
-            }), t.load = function (t) {
-                var e, n, o, i;
-                e = 3e5, i = Math.ceil(new Date() / e) * e, o = document.createElement("script"),
-                    o.type = "text/javascript", o.async = !0, o.crossorigin = "anonymous", o.src = "https://js.driftt.com/include/" + i + "/" + t + ".js",
-                    n = document.getElementsByTagName("script")[0], n.parentNode.insertBefore(o, n);
-            });
-    }();
-    drift.SNIPPET_VERSION = '0.3.1';
-    drift.load('caacyauy5t6b');
-
-</script>
-<!-- End of Async Drift Code --></head>
-
-<body id="index" class="home">
-    <nav class="top-bar card-1" data-topbar role="navigation">
-        <ul class="title-area">
-            <li class="name">
-                <h1><a href="/posts">Home</a></h1>
-            </li>
-     <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
-            <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+        <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
+        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="/theme/webassets-external/e17ffd2049da5254bb4b3183ea73c922_normalize.css">
+        <link rel="stylesheet" href="/theme/webassets-external/35f123b951b653f7b2d441b35b63d32a_github.css">
+        <link rel="stylesheet" href="/theme/webassets-external/310a2979488959b3c24d4edd2e18b50d_screen.css">
+</head>
+<body>
+    <nav role="navigation">
+        <ul>
+            <li><a href="/categories">Categories</a></li>
+            <li><a href="/tags">Tags</a></li>
+            <li><a href="/feed.xml">Subscribe to RSS feed</a></li>
         </ul>
-        <section class="top-bar-section">
-    <!-- Right Nav Section -->
-            <ul class="right">
-                <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
-                <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
-                <li><a href="https://www.zimmi.cz/posts/feed.xml">RSS feed</a></li>
-            </ul>
-        </section>
     </nav>
-        <div class="row">
-          <div class="large-12 columns header">
-            <h1><a href="/posts">Michal Zimmermann</a> <small>Pieces of knowledge from the world of GIS.</small></h1>
-          </div>
-        </div>
-        <div class="row">
-            <div class="large-12 columns">
+    <header>
+        <h1><a href="/posts">Michal Zimmermann<small>Pieces of knowledge from the world of GIS.</small></a></h1>
+    </header>
+    <main>
 <h2>Articles by Michal Zimmermann</h2>
 
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2017/executing-dynamic-sql-query-right-away/" rel="bookmark" title="Permalink to Executing dynamic SQL query right away">Executing dynamic <span class="caps">SQL</span> query right&nbsp;away</a></h1>
-            <small>Written on Feb 28, 2017
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
-        </small>
-        <section>
-            <p>PostgreSQL 9.6 comes with a handy <code>psql</code> command called <code>\gexec</code> that <em>sends the current query input buffer to the server and treats the result as a <span class="caps">SQL</span> statement to be executed</em> (right, whatever). What that means is that instead of doing&nbsp;this</p>
-<div class="highlight"><pre><span></span>psql -c <span class="s2">&quot;SELECT &#39;DROP TABLE &#39; || tablename FROM information_schema.tables WHERE table_name LIKE &#39;%to_be_dropped%&quot;</span> <span class="p">|</span> psql
+<article>
+    <h1><a href="/posts/2017/wifileaks-wi-fi-networks-dataviz/" rel="bookmark" title="Permalink to Wifileaks Wi-Fi Networks Dataviz">Wifileaks Wi-Fi Networks&nbsp;Dataviz</a></h1>
+    Written on May 2, 2017
+    and marked as
+    <a href="/tag/qgis.html">qgis</a>,     <a href="/tag/visualization.html">visualization</a>    | <a href="/category/gis.html">GIS</a>
+    <p><a href="http://www.wifileaks.cz">Wifileaks</a> is a project by Jakub Čížek aimed to map the Czech wi-fi networks with Android/iOS app. The data gathered by people using the app <a href="http://download.wifileaks.cz/data/wifileaks_raw_170416.tar.gz">is available to download</a> and features ~&nbsp;90,000,000 records, each representing the position of the cellphone when connecting to the network. Just about perfect to craft some&nbsp;maps!</p>
+<div class="text-center"><img src="/assets/wifileaks-wifi-networks-dataviz/cr.png"/></div>
+
+<h2>Using PostgreSQL&nbsp;cstore_fdw</h2>
+<p>I ran out of disk space immediately after loading the dataset into the PostgreSQL database. After fiddling around I remembered that columnar store should be a bit space-friendlier than the old fashioned relational database. Thus, I installed the <a href="https://github.com/citusdata/cstore_fdw">cstore_fdw</a> by Citus Data in just few&nbsp;steps.</p>
+<div class="highlight"><pre><span></span>sudo apt install libprotobuf-c-dev libprotobuf-c1 protobuf-c-compiler postgresql-server-dev-9.6
+git clone git@github.com:citusdata/cstore_fdw.git
+<span class="nv">PATH</span><span class="o">=</span>/usr/bin/:<span class="nv">$PATH</span> make
+<span class="nv">PATH</span><span class="o">=</span>/usr/bin/:<span class="nv">$PATH</span> make install
+
+<span class="c1"># when the cstore_fdw installation finishes, add the following line to your postgresql.conf and restart the database cluster</span>
+<span class="nv">shared_preload_libraries</span> <span class="o">=</span> <span class="s1">&#39;cstore_fdw&#39;</span>
 </pre></div>
 
 
-<p>you&#8217;ll do&nbsp;that</p>
-<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="s1">&#39;DROP TABLE &#39;</span> <span class="o">||</span> <span class="n">tablename</span> <span class="k">FROM</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">tables</span> <span class="k">WHERE</span> <span class="k">table_name</span> <span class="k">LIKE</span> <span class="s1">&#39;%to_be_dropped%&#39;</span><span class="err">\</span><span class="n">gexec</span>
+<p>This makes <a href="/posts/2016/testing-postgresql-ogr-fdw/">another <span class="caps">FDW</span> available</a> to you inside the PostgreSQL. The actual foreign server has to be created before loading the data into a foreign&nbsp;table.</p>
+<div class="highlight"><pre><span></span>cat <span class="s">&lt;&lt;END | psql -qAt --no-psqlrc</span>
+<span class="s">    CREATE SERVER cstore_server FOREIGN DATA WRAPPER cstore_fdw;</span>
+<span class="s">    CREATE SCHEMA data_cstore;</span>
+<span class="s">    CREATE FOREIGN TABLE data_cstore.wifi (</span>
+<span class="s">        id integer,</span>
+<span class="s">        mac text,</span>
+<span class="s">        ssid text,</span>
+<span class="s">        signal_strength numeric,</span>
+<span class="s">        security integer,</span>
+<span class="s">        lat numeric,</span>
+<span class="s">        lon numeric,</span>
+<span class="s">        alt numeric,</span>
+<span class="s">        unixtime bigint,</span>
+<span class="s">        filename text</span>
+<span class="s">    )</span>
+<span class="s">    SERVER cstore_server</span>
+<span class="s">    OPTIONS (compression &#39;pglz&#39;);</span>
+<span class="s">END</span>
 </pre></div>
 
 
-<p>Brilliant.</p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2017/subdivide-and-conquer-effective-spatial-indexes-in-postgis/" rel="bookmark" title="Permalink to Subdivide and Conquer: Effective Spatial Indexes in PostGIS">Subdivide and Conquer: Effective Spatial Indexes in&nbsp;PostGIS</a></h1>
-            <small>Written on Jan 10, 2017
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
-        </small>
-        <section>
-            <p>Spatial indexes are absolutely crucial part of any spatial database and - as I tend to say quite often - only a fool would try to query spatial data without building spatial indexes&nbsp;beforehand.</p>
-<p>Spatial indexes are based on bounding box comparisons, which are generally very fast. Yet, there are situations when spatial indexes don&#8217;t help much (or they don&#8217;t help as much as they could, if you&nbsp;wish).</p>
-<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/subdivide-and-conquer-effective-spatial-indexes-in-postgis/index.svg" /></div>
-
-<p>Bounding box comparisons are effective with lots of small bounding boxes rather then few large ones. Why? See the picture above. The curved line (imagine it&#8217;s a pipeline for example) clearly demonstrates when the spatial index/bounding box comparison might fall short of what you&#8217;d&nbsp;expect.</p>
-<p>Once the bounding box gets really big, it intersects so many other geometries&#8217; bounding boxes that the whole comparison starts to slow&nbsp;down.</p>
-<p>Luckily, PostGIS 2.2 introduced a <a href="http://postgis.net/docs/ST_Subdivide.html">ST_Subdivide</a> function that can lend a helping hand in&nbsp;here.</p>
-<p>Until today, we delivered the parcel geometries into our <a href="https://www.symap.cz">real estate acquisition process system</a> with the following query, that takes all the geometries from the <code>req_geom</code> table (pipelines, remember?) and intersects them with cadastral parcels. The second part of the query adds those parcels that haven&#8217;t been digitalized and were created manually by one of my&nbsp;workmates.</p>
-<div class="highlight"><pre><span></span><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">requested_parcels</span> <span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">par_id</span><span class="p">)</span>
-<span class="k">SELECT</span>
-    <span class="n">reqs</span><span class="p">.</span><span class="n">uid</span><span class="p">,</span>
-    <span class="n">b</span><span class="p">.</span><span class="n">id</span> <span class="n">par_id</span>
- <span class="k">FROM</span>
-    <span class="n">running_requests</span> <span class="n">reqs</span>
- <span class="k">JOIN</span>
-    <span class="n">req_geom</span> <span class="n">a</span> <span class="k">ON</span> <span class="p">(</span><span class="n">reqs</span><span class="p">.</span><span class="n">uid</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">uid</span><span class="p">)</span>
- <span class="k">JOIN</span>
-    <span class="n">pargeo</span> <span class="n">b</span> <span class="k">ON</span> <span class="p">(</span><span class="n">ST_Intersects</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span>
- <span class="k">UNION</span>
- <span class="k">SELECT</span>
-    <span class="n">reqs</span><span class="p">.</span><span class="n">uid</span><span class="p">,</span>
-    <span class="n">a</span><span class="p">.</span><span class="n">idpar</span><span class="p">::</span><span class="nb">numeric</span>
- <span class="k">FROM</span>
-    <span class="n">running_requests</span> <span class="n">reqs</span>
- <span class="k">JOIN</span>
-     <span class="n">req_man</span> <span class="n">a</span> <span class="k">ON</span> <span class="p">(</span><span class="n">reqs</span><span class="p">.</span><span class="n">uid</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">uid</span><span class="p">);</span>
-</pre></div>
-
-
-<p>It&#8217;s a perfectly standard query that intersects several request geometries with ~20M parcels, nothing really fancy. Except that it takes 25 minutes to finish. Why? Pipelines,&nbsp;remember?</p>
-<p>Yet, the query below takes only 30 seconds to finish (that&#8217;s a huge time saver considering that the whole process used to take ~40 minutes)! Why? Because the <code>ST_Subdivide</code> effectively shrinks the <code>req_geom</code> geometries until they have 50 vertices each at most. Such small geometries are perfect input for the bounding box comparison. Remember to call <code>DISTINCT</code> when using <code>ST_Subdivide</code>, you&#8217;d probably get duplicate parcel ids&nbsp;otherwise.</p>
-<p>I also replaced the <code>UNION</code> with the <a href="https://www.zimmi.cz/posts/2015/postgresql-in-vs-exists/"><code>WHERE NOT EXISTS</code></a> expression, as it&#8217;s reasonable to assume that numeric ids comparison will be&nbsp;faster.</p>
-<div class="highlight"><pre><span></span><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">requested_parcels</span> <span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">par_id</span><span class="p">)</span>
-<span class="k">SELECT</span> <span class="k">DISTINCT</span>
-    <span class="n">reqs</span><span class="p">.</span><span class="n">uid</span><span class="p">,</span>
-    <span class="n">b</span><span class="p">.</span><span class="n">id</span> <span class="n">par_id</span>
- <span class="k">FROM</span>
-    <span class="n">running_requests</span> <span class="n">reqs</span>
- <span class="k">JOIN</span>
-    <span class="p">(</span>
-        <span class="k">SELECT</span>
-            <span class="n">uid</span><span class="p">,</span>
-            <span class="n">ST_Subdivide</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span> <span class="n">geom</span>
-        <span class="k">FROM</span>
-            <span class="n">req_geom</span>
-     <span class="p">)</span> <span class="n">a</span> <span class="k">ON</span> <span class="p">(</span><span class="n">reqs</span><span class="p">.</span><span class="n">uid</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">uid</span><span class="p">)</span>
- <span class="k">JOIN</span>
-     <span class="n">pargeo</span> <span class="n">b</span> <span class="k">ON</span> <span class="p">(</span><span class="n">ST_Intersects</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">geom</span><span class="p">));</span>
-
- <span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">requested_parcels</span> <span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">par_id</span><span class="p">)</span>
- <span class="k">SELECT</span>
-     <span class="n">reqs</span><span class="p">.</span><span class="n">uid</span><span class="p">,</span>
-     <span class="n">a</span><span class="p">.</span><span class="n">idpar</span><span class="p">::</span><span class="nb">numeric</span>
- <span class="k">FROM</span>
-     <span class="n">running_requests</span> <span class="n">reqs</span>
- <span class="k">JOIN</span>
-     <span class="n">req_man</span> <span class="n">a</span> <span class="k">ON</span> <span class="p">(</span><span class="n">reqs</span><span class="p">.</span><span class="n">uid</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">uid</span><span class="p">)</span>
- <span class="k">WHERE</span> <span class="k">NOT</span> <span class="k">EXISTS</span> <span class="p">(</span>
-     <span class="k">SELECT</span> <span class="mi">1</span>
-     <span class="k">FROM</span> <span class="n">pozadovane_parcely</span> <span class="n">pp</span>
-     <span class="k">WHERE</span> <span class="n">pp</span><span class="p">.</span><span class="n">par_id</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">idpar</span>
-  <span class="p">);</span>
-</pre></div>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2016/counting-substring-occurrences-in-postgresql/" rel="bookmark" title="Permalink to Counting substring occurrences in PostgreSQL">Counting substring occurrences in&nbsp;PostgreSQL</a></h1>
-            <small>Written on Dec 19, 2016
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
-        </small>
-        <section>
-            <p>I got to count occurrences of <em>/</em> character today and found out no built-in function exists in PostgreSQL, so here&#8217;s my shot at it. Pretty simple, yet&nbsp;useful.</p>
-<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">OR</span> <span class="k">REPLACE</span> <span class="k">FUNCTION</span> <span class="n">how_many</span><span class="p">(</span><span class="k">IN</span> <span class="nb">text</span><span class="p">,</span> <span class="k">IN</span> <span class="nb">varchar</span><span class="p">,</span> <span class="k">OUT</span> <span class="nb">integer</span><span class="p">)</span>
-<span class="k">RETURNS</span> <span class="nb">integer</span>
-<span class="k">AS</span>
-<span class="err">$</span><span class="n">how_many$</span>
-    <span class="k">SELECT</span> <span class="k">length</span><span class="p">(</span><span class="err">$</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="k">length</span><span class="p">(</span><span class="k">replace</span><span class="p">(</span><span class="err">$</span><span class="mi">1</span><span class="p">,</span> <span class="err">$</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">));</span>
-<span class="err">$</span><span class="n">how_many$</span>
-<span class="k">LANGUAGE</span> <span class="k">SQL</span>
-<span class="k">SECURITY</span> <span class="k">DEFINER</span><span class="p">;</span>
-
-<span class="c1">-- SELECT how_many(&#39;test&#39;, &#39;t&#39;); -- returns number 2</span>
-</pre></div>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2016/plotting-the-czech-cadastre-land-use-with-d3-data-viz-part-iv/" rel="bookmark" title="Permalink to Plotting the Czech Cadastre Land Use with d3: Data Viz (part IV)">Plotting the Czech Cadastre Land Use with d3: Data Viz (part <span class="caps">IV</span>)</a></h1>
-            <small>Written on Nov 20, 2016
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/d3.html">d3</a>,         <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>,         <a href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>        | <a href="https://www.zimmi.cz/posts/category/data.html">data</a>
-        </small>
-        <section>
-            <p>This post is the fourth part of the series summarizing the process of visualizing land use data with bash, PostgreSQL and d3.js. Read other&nbsp;parts:</p>
-<ol>
-<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part&nbsp;I)</a></li>
-<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></li>
-<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/">Plotting the Czech Cadastre Land Use with d3: Data Load (part <span class="caps">III</span>)</a></li>
-</ol>
-<h2>Data&nbsp;vizualization</h2>
-<p>Those of you who&#8217;ve been following this series know all the data are set and ready to be used. The rest of you, <em>shame on you by the way</em>, can go through the above posts to catch&nbsp;up.</p>
-<p>The result is available at <a href="https://www.zimmi.cz/kn-landuse-monitor">https://www.zimmi.cz/kn-landuse-monitor</a> and works like the gif&nbsp;below.</p>
-<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/plotting-the-czech-cadastre-land-use-with-d3-part-iv/screen.gif" /></div>
-
-<h3>Features</h3>
+<p>The foreign table <strong>is 3&times; smaller</strong> than it&#8217;s standard counterpart. However, this comes with some&nbsp;costs:</p>
 <ul>
-<li>land use data for 13,093 cadastral areas between 2015/01/01 and&nbsp;2016/10/01</li>
-<li>relative area and parcel count per land use&nbsp;type</li>
-<li>similar cadastres based on land use relative area&nbsp;values</li>
-<li>time series plots for various charachteristics (including agricultural land area and parcel&nbsp;count)</li>
+<li>neither <code>UPDATE</code> nor <code>DELETE</code> can be&nbsp;used</li>
+<li>no <code>CREATE INDEX</code></li>
+<li>no <code>SERIAL</code></li>
 </ul>
-<h3>Todos</h3>
-<ul>
-<li>time series chart titles&nbsp;onmouseover</li>
-<li>barchart titles&nbsp;onmouseover</li>
-<li>absolute values chart&nbsp;(?)</li>
-<li><code>fetch API</code> polyfill</li>
-<li>Firefox seems to be&nbsp;broken</li>
-</ul>
-<h3>Technologies</h3>
-<p>I implemented <a href="https://github.com/zimmicz/kn-landuse-monitor/tree/f0af50d44d6aac11adb6cdb0c7c67a97d7db1df3">the whole app with vanilla JavaScript</a>. The app resided in the <code>Monitor</code> variable, had several modules that were communicating via custom events with each&nbsp;other.</p>
-<p>So far, so good. Once the app was production-ready, I stumbled upon <a href="https://vuejs.org">vue.js</a>, which is by miles the best JavaScript framework experience I&#8217;ve had so far. Reinventing the app once again was the matter of two days (thanks to <a href="https://github.com/vuejs-templates/webpack">this amazing setup</a> - hot reload&nbsp;included).</p>
-<p>Thus, the current version of the app is based&nbsp;on:</p>
-<h4>vue.js</h4>
-<p>Thanks to the easy-to-understand system of components, properties and methods, learning curve is really steep. The app is now divided into several components (Search, Dashboard with child components for charts and similar cadastres&nbsp;list).</p>
-<h4>vuex</h4>
-<p><a href="https://vuex.vuejs.org/en/">Vuex</a>, probably inspired by Flux or Redux, is the <em>&#8220;state management pattern + library&#8221;</em>, the single source of truth for your apps. That&#8217;s pretty much it: there&#8217;s only one place in your app (called the <code>store</code>), where you go to put or get your data. Not necessarily every single piece of data, just those pieces used across several components. It plays really nice with the&nbsp;vue.js.</p>
-<h4>D3.js</h4>
-<p>Tried it before, <a href="https://d3js.org">D3.js</a> was really hard to grasp. And it still is, I guess. At the same time, it&#8217;s damn good at plotting the data. Yet, being a bit less low-level would be&nbsp;great.</p>
-<h4>Dexie</h4>
-<p>I hate writing servers for my pet projects. The server means no Github Pages. Thus, I decided to load the whole dataset with <code>fetch API</code>  from the external <span class="caps">JSON</span> file. Loading the 13K objects &times; 30 properties &times; array with 8 items in each didn&#8217;t seem like the best idea ever, so&hellip; Here comes <a href="http://dexie.org">Dexie</a>, a <code>IndexedDB API</code> wrapper that makes it easy on you (unlike the <code>IndexedDB API</code> itself, which doesn&#8217;t even let you find out whether the database you&#8217;re creating already exists.&nbsp;Seriously?).</p>
-<p>Dexie loads the initial dataset into the IndexedDB storage and reads it every time user comes back without loading the <span class="caps">JSON</span> file again. On data change, the fresh file will be loaded, the database flushed and the new data written. <a href="https://github.com/zimmicz/kn-landuse-monitor/blob/master/src/stores/actions.js">Behold</a>; I hate the way it&#8217;s&nbsp;written.</p>
-<h4>Flex</h4>
-<p>Used <code>flex</code> for the first time, I&#8217;m not sure I understand how it actually works though. <span class="caps">CSS</span> feels more complicated every time I need&nbsp;it.</p>
-<p><small>Bottom line: I use localStorage to keep track of the database existence.</small></p>
-<h3>Resume</h3>
-<p>Two pet projects completed in one month definitely means the winter is here! Looking forward to using more&nbsp;vue.js.</p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/" rel="bookmark" title="Permalink to Plotting the Czech Cadastre Land Use with d3: Data Load (part III)">Plotting the Czech Cadastre Land Use with d3: Data Load (part <span class="caps">III</span>)</a></h1>
-            <small>Written on Nov 15, 2016
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/d3.html">d3</a>,         <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>,         <a href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>        | <a href="https://www.zimmi.cz/posts/category/data.html">data</a>
-        </small>
-        <section>
-            <p>This post is the third part of the series summarizing the process of visualizing landuse data with bash, PostgreSQL and d3.js. Read other&nbsp;parts:</p>
-<ol>
-<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part&nbsp;I)</a></li>
-<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></li>
-<li>you&#8217;re reading it&nbsp;now</li>
-</ol>
-<h2><span class="caps">ETL</span>&nbsp;process</h2>
-<p>Before the d3 viz can be crafted, it&#8217;s necessary&nbsp;to:</p>
-<ol>
-<li>extract <span class="caps">CSV</span> data from the URLs provided via the Atom&nbsp;feed</li>
-<li>transform those data into a relational database, do some&nbsp;math</li>
-<li>load data into a d3.js&nbsp;viz</li>
-<li>profit (as&nbsp;usual)</li>
-</ol>
-<h3>Extract</h3>
-<p>See <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)</a>.</p>
-<h3>Transform</h3>
-<p>See <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a>.</p>
-<h2>Load</h2>
-<p>Thanks to the way I transformed the data, the whole load is done with&nbsp;simple</p>
-<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
-
-touch ./data/data.js
-<span class="nb">echo</span> <span class="s2">&quot;let data =&quot;</span> &gt; ./data/data.js
-
-<span class="o">(</span>
-cat <span class="s">&lt;&lt; EOF | psql -qAt --no-psqlrc</span>
+<p>To overcome these shortcomings I used <code>COPY</code> statement to spit out the slightly modified table and immediately loaded it back&nbsp;in.</p>
+<div class="highlight"><pre><span></span>cat <span class="s">&lt;&lt;END | psql -qAt --no-psqlrc</span>
+<span class="s">COPY (</span>
 <span class="s">    SELECT</span>
-<span class="s">    array_to_json(array_agg(row_to_json(r)))</span>
-<span class="s">    FROM (</span>
-<span class="s">    SELECT *</span>
-<span class="s">    FROM data</span>
-<span class="s">    ) r</span>
-<span class="s">EOF</span>
-<span class="o">)</span> &gt;&gt; ./data/data.js
+<span class="s">        row_number() OVER (),</span>
+<span class="s">        mac,</span>
+<span class="s">        ssid,</span>
+<span class="s">        signal_strength,</span>
+<span class="s">        security,</span>
+<span class="s">        split_part(filename, &#39;_&#39;, 2)::integer,</span>
+<span class="s">        to_timestamp(unixtime),</span>
+<span class="s">        ST_Transform(ST_SetSRID(ST_MakePoint(lon, lat, alt), 4326), 32633)</span>
+<span class="s">    FROM data_cstore.wifi</span>
+<span class="s">    WHERE lon BETWEEN 0 AND 20</span>
+<span class="s">        AND lat BETWEEN 18 AND 84</span>
+<span class="s">) TO &#39;/tmp/wifileaks.db&#39; WITH CSV DELIMITER &#39;;&#39;</span>
+<span class="s">    DROP SCHEMA IF EXISTS data_cstore CASCADE;</span>
+
+<span class="s">DROP SCHEMA data_cstore;</span>
+<span class="s">CREATE SCHEMA data_cstore;</span>
+<span class="s">CREATE FOREIGN TABLE data_cstore.wifi (</span>
+<span class="s">    id integer,</span>
+<span class="s">    mac text,</span>
+<span class="s">    ssid text,</span>
+<span class="s">    signal_strength numeric,</span>
+<span class="s">    security integer,</span>
+<span class="s">    userid integer,</span>
+<span class="s">    unixtime timestamp without time zone,</span>
+<span class="s">    geom geometry(POINTZ, 32633)</span>
+<span class="s">)</span>
+<span class="s">SERVER cstore_server</span>
+<span class="s">OPTIONS (compression &#39;pglz&#39;);</span>
+<span class="s">END</span>
 </pre></div>
 
 
-<p>That&#8217;s the whole <span class="caps">ETL</span> process! Next time, I&#8217;ll cover the d3.js&nbsp;viz.</p>
-        </section>
-        </div>
-    </div>
+<h2>Putting the networks on the&nbsp;map</h2>
+<table>
+    <tr>
+        <td><a href="/assets/wifileaks-wifi-networks-dataviz/brno.png"><img src="/assets/wifileaks-wifi-networks-dataviz/brno.png"></a></td>
+        <td><a href="/assets/wifileaks-wifi-networks-dataviz/praha.png"><img src="/assets/wifileaks-wifi-networks-dataviz/praha.png"></a></td>
+        <td><a href="/assets/wifileaks-wifi-networks-dataviz/olomouc.png"><img src="/assets/wifileaks-wifi-networks-dataviz/olomouc.png"></a></td>
+    </tr>
+    <tr>
+        <td><a href="/assets/wifileaks-wifi-networks-dataviz/plzen.png"><img src="/assets/wifileaks-wifi-networks-dataviz/plzen.png"></a></td>
+        <td><a href="/assets/wifileaks-wifi-networks-dataviz/ostrava.png"><img src="/assets/wifileaks-wifi-networks-dataviz/ostrava.png"></a></td>
+        <td><a href="/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"><img src="/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"></a></td>
+    </tr>
+</table>
 
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii" rel="bookmark" title="Permalink to Plotting the Czech Cadastre Land Use with d3: Data Transformation (part II)">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></h1>
-            <small>Written on Nov 14, 2016
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>,         <a href="https://www.zimmi.cz/posts/tag/d3.html">d3</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>        | <a href="https://www.zimmi.cz/posts/category/data.html">data</a>
-        </small>
-        <section>
-            <p>This post is the second part of the series summarizing the process of visualizing landuse data with bash, PostgreSQL and d3.js. Read other&nbsp;parts:</p>
-<ol>
-<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part&nbsp;I)</a></li>
-<li>you&#8217;re reading it&nbsp;now</li>
-<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">III</span>)</a></li>
-</ol>
-<h2><span class="caps">ETL</span>&nbsp;process</h2>
-<p>Before the d3 viz can be crafted, it&#8217;s necessary&nbsp;to:</p>
-<ol>
-<li>extract <span class="caps">CSV</span> data from the URLs provided via the Atom&nbsp;feed</li>
-<li>transform those data into a relational database, do some&nbsp;math</li>
-<li>load data into a d3.js&nbsp;viz</li>
-<li>profit (as&nbsp;usual)</li>
-</ol>
-<h3>Extract</h3>
-<p>See <a href="{filename}../2016/plotting-czech-cadastre-landuse-with-d3-part-i.md">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)</a>.</p>
-<h3>Transform</h3>
-<p>Last time, I extracted the data from multiple <span class="caps">CSV</span> files to separate PostgreSQL tables named by <code>data_YYYYMMDD</code> pattern. My current goal is to transform it into the one big <code>data</code> table, where each row represents one cadastral area. Here&#8217;s what I&#8217;m trying to&nbsp;achieve:</p>
-<div class="highlight"><pre><span></span>-<span class="o">[</span> RECORD <span class="m">1</span> <span class="o">]</span>----------+----------------------------------
-ku_kod                 <span class="p">|</span> <span class="m">600881</span>
-ku_nazev               <span class="p">|</span> Bantice
-celkova_vymera         <span class="p">|</span> <span class="o">{</span><span class="m">3763255</span>,3763255,3763256,3763256<span class="o">}</span>
-celkovy_pocet_parcel   <span class="p">|</span> <span class="o">{</span><span class="m">670</span>,668,664,667<span class="o">}</span>
-chmelnice_pp           <span class="p">|</span> <span class="o">{</span><span class="m">0</span>,0,0,0<span class="o">}</span>
-chmelnice_pp_r         <span class="p">|</span> <span class="o">{</span><span class="m">0</span>.00,0.00,0.00,0.00<span class="o">}</span>
-chmelnice_v            <span class="p">|</span> <span class="o">{</span><span class="m">0</span>,0,0,0<span class="o">}</span>
-chmelnice_v_avg        <span class="p">|</span> <span class="o">{</span><span class="m">0</span>,0,0,0<span class="o">}</span>
-chmelnice_v_r          <span class="p">|</span> <span class="o">{</span><span class="m">0</span>.00,0.00,0.00,0.00<span class="o">}</span>
-lesni_pozemek_pp       <span class="p">|</span> <span class="o">{</span><span class="m">25</span>,25,25,25<span class="o">}</span>
-lesni_pozemek_pp_r     <span class="p">|</span> <span class="o">{</span><span class="m">3</span>.73,3.74,3.77,3.75<span class="o">}</span>
-lesni_pozemek_v        <span class="p">|</span> <span class="o">{</span><span class="m">83879</span>,83879,83879,83879<span class="o">}</span>
-lesni_pozemek_v_avg    <span class="p">|</span> <span class="o">{</span><span class="m">3355</span>,3355,3355,3355<span class="o">}</span>
-lesni_pozemek_v_r      <span class="p">|</span> <span class="o">{</span><span class="m">2</span>.23,2.23,2.23,2.23<span class="o">}</span>
-orna_puda_pp           <span class="p">|</span> <span class="o">{</span><span class="m">88</span>,88,89,89<span class="o">}</span>
-orna_puda_pp_r         <span class="p">|</span> <span class="o">{</span><span class="m">13</span>.13,13.17,13.40,13.34<span class="o">}</span>
-orna_puda_v            <span class="p">|</span> <span class="o">{</span><span class="m">3066230</span>,3066230,3066230,3066230<span class="o">}</span>
-orna_puda_v_avg        <span class="p">|</span> <span class="o">{</span><span class="m">34844</span>,34844,34452,34452<span class="o">}</span>
-orna_puda_v_r          <span class="p">|</span> <span class="o">{</span><span class="m">81</span>.48,81.48,81.48,81.48<span class="o">}</span>
-ostatni_plocha_pp      <span class="p">|</span> <span class="o">{</span><span class="m">201</span>,199,199,201<span class="o">}</span>
-ostatni_plocha_pp_r    <span class="p">|</span> <span class="o">{</span><span class="m">30</span>.00,29.79,29.97,30.13<span class="o">}</span>
-ostatni_plocha_v       <span class="p">|</span> <span class="o">{</span><span class="m">283468</span>,283468,283468,284562<span class="o">}</span>
-ostatni_plocha_v_avg   <span class="p">|</span> <span class="o">{</span><span class="m">1410</span>,1424,1424,1416<span class="o">}</span>
-ostatni_plocha_v_r     <span class="p">|</span> <span class="o">{</span><span class="m">7</span>.53,7.53,7.53,7.56<span class="o">}</span>
-ovocny_sad_pp          <span class="p">|</span> <span class="o">{</span><span class="m">0</span>,0,0,0<span class="o">}</span>
-ovocny_sad_pp_r        <span class="p">|</span> <span class="o">{</span><span class="m">0</span>.00,0.00,0.00,0.00<span class="o">}</span>
-ovocny_sad_v           <span class="p">|</span> <span class="o">{</span><span class="m">0</span>,0,0,0<span class="o">}</span>
-ovocny_sad_v_avg       <span class="p">|</span> <span class="o">{</span><span class="m">0</span>,0,0,0<span class="o">}</span>
-ovocny_sad_v_r         <span class="p">|</span> <span class="o">{</span><span class="m">0</span>.00,0.00,0.00,0.00<span class="o">}</span>
-ttp_pp                 <span class="p">|</span> <span class="o">{</span><span class="m">44</span>,44,44,45<span class="o">}</span>
-ttp_pp_r               <span class="p">|</span> <span class="o">{</span><span class="m">6</span>.57,6.59,6.63,6.75<span class="o">}</span>
-ttp_v                  <span class="p">|</span> <span class="o">{</span><span class="m">49002</span>,49002,49002,47908<span class="o">}</span>
-ttp_v_avg              <span class="p">|</span> <span class="o">{</span><span class="m">1114</span>,1114,1114,1065<span class="o">}</span>
-ttp_v_r                <span class="p">|</span> <span class="o">{</span><span class="m">1</span>.30,1.30,1.30,1.27<span class="o">}</span>
-vinice_pp              <span class="p">|</span> <span class="o">{</span><span class="m">1</span>,1,1,1<span class="o">}</span>
-vinice_pp_r            <span class="p">|</span> <span class="o">{</span><span class="m">0</span>.15,0.15,0.15,0.15<span class="o">}</span>
-vinice_v               <span class="p">|</span> <span class="o">{</span><span class="m">106178</span>,106178,106178,106178<span class="o">}</span>
-vinice_v_avg           <span class="p">|</span> <span class="o">{</span><span class="m">106178</span>,106178,106178,106178<span class="o">}</span>
-vinice_v_r             <span class="p">|</span> <span class="o">{</span><span class="m">2</span>.82,2.82,2.82,2.82<span class="o">}</span>
-vodni_plocha_pp        <span class="p">|</span> <span class="o">{</span><span class="m">23</span>,23,23,23<span class="o">}</span>
-vodni_plocha_pp_r      <span class="p">|</span> <span class="o">{</span><span class="m">3</span>.43,3.44,3.46,3.45<span class="o">}</span>
-vodni_plocha_v         <span class="p">|</span> <span class="o">{</span><span class="m">27877</span>,27877,27877,27877<span class="o">}</span>
-vodni_plocha_v_avg     <span class="p">|</span> <span class="o">{</span><span class="m">1212</span>,1212,1212,1212<span class="o">}</span>
-vodni_plocha_v_r       <span class="p">|</span> <span class="o">{</span><span class="m">0</span>.74,0.74,0.74,0.74<span class="o">}</span>
-zahrada_pp             <span class="p">|</span> <span class="o">{</span><span class="m">115</span>,115,115,115<span class="o">}</span>
-zahrada_pp_r           <span class="p">|</span> <span class="o">{</span><span class="m">17</span>.16,17.22,17.32,17.24<span class="o">}</span>
-zahrada_v              <span class="p">|</span> <span class="o">{</span><span class="m">77381</span>,77381,77353,77353<span class="o">}</span>
-zahrada_v_avg          <span class="p">|</span> <span class="o">{</span><span class="m">673</span>,673,673,673<span class="o">}</span>
-zahrada_v_r            <span class="p">|</span> <span class="o">{</span><span class="m">2</span>.06,2.06,2.06,2.06<span class="o">}</span>
-zastavena_plocha_pp    <span class="p">|</span> <span class="o">{</span><span class="m">173</span>,173,168,168<span class="o">}</span>
-zastavena_plocha_pp_r  <span class="p">|</span> <span class="o">{</span><span class="m">25</span>.82,25.90,25.30,25.19<span class="o">}</span>
-zastavena_plocha_v     <span class="p">|</span> <span class="o">{</span><span class="m">69240</span>,69240,69269,69269<span class="o">}</span>
-zastavena_plocha_v_avg <span class="p">|</span> <span class="o">{</span><span class="m">400</span>,400,412,412<span class="o">}</span>
-zastavena_plocha_v_r   <span class="p">|</span> <span class="o">{</span><span class="m">1</span>.84,1.84,1.84,1.84<span class="o">}</span>
-</pre></div>
-
-
-<p>Several stats were calculated for each land use category (vinice &rarr; vineyard, ovocny_sad &rarr; orchard,&nbsp;&#8230;):</p>
-<ul>
-<li><code>v_r</code> suffix stands for land use area&nbsp;ratio</li>
-<li><code>pp_r</code> suffix stands for land use parcel count&nbsp;ratio</li>
-<li><code>v_avg</code> stands for average parcel&nbsp;area</li>
-</ul>
-<p>All statistical columns are kept as PostgreSQL <code>ARRAY</code>s, ordered by dates (very handy for the future d3.js viz by the&nbsp;way).</p>
-<blockquote>
-<p>Note that since the <code>FULL OUTER JOIN</code> is needed in the next step, SQLite can&#8217;t be used. Pity&nbsp;though.</p>
-</blockquote>
-<p>The whole transformation bash script is the&nbsp;plain:</p>
-<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
-
-psql -qAt --no-psqlrc -f transform.sql <span class="p">|</span> psql -qAt --no-psqlrc
-</pre></div>
-
-
-<p>The <code>transform.sql</code> file is used to build the dynamic <span class="caps">SQL</span> query, which - once built - is piped to another <code>psql</code> command. I admit, pipes are super&nbsp;awesome.</p>
-<div class="highlight"><pre><span></span><span class="k">WITH</span> <span class="n">tables</span> <span class="k">AS</span> <span class="p">(</span>
-<span class="c1">-- FULL OUTER JOIN all the data_YYYYMMDD tables</span>
+<p>As mentioned, each row of data represents the cellphone&#8217;s location when connecting to a wi-fi network. To get real wi-fi transmitter position, I calculated the average of location of each cellphone ever connected (although the signal strength should be taken into account here as&nbsp;well).</p>
+<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="n">UNLOGGED</span> <span class="k">TABLE</span> <span class="n">data_cstore</span><span class="p">.</span><span class="n">wifi_avg_loc</span> <span class="k">AS</span>
 <span class="k">SELECT</span>
-    <span class="k">table_name</span><span class="p">,</span>
-    <span class="n">table_schema</span><span class="p">,</span>
-    <span class="s1">&#39;d&#39;</span> <span class="o">||</span> <span class="n">id</span> <span class="n">tbl</span><span class="p">,</span>
-    <span class="k">CASE</span> <span class="k">WHEN</span> <span class="n">id</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="k">THEN</span> <span class="n">table_schema</span> <span class="o">||</span> <span class="s1">&#39;.&#39;</span> <span class="o">||</span> <span class="k">table_name</span> <span class="o">||</span> <span class="s1">&#39; d&#39;</span> <span class="o">||</span> <span class="n">id</span>
-        <span class="k">ELSE</span> <span class="s1">&#39;FULL OUTER JOIN &#39;</span> <span class="o">||</span> <span class="n">table_schema</span> <span class="o">||</span> <span class="s1">&#39;.&#39;</span> <span class="o">||</span> <span class="k">table_name</span> <span class="o">||</span> <span class="s1">&#39; d&#39;</span> <span class="o">||</span> <span class="n">id</span> <span class="o">||</span> <span class="s1">&#39; ON (d1.ku_kod = d&#39;</span> <span class="o">||</span> <span class="n">id</span> <span class="o">||</span> <span class="s1">&#39;.ku_kod)&#39;</span>
-    <span class="k">END</span> <span class="n">tbl_join</span>
+    <span class="n">row_number</span><span class="p">()</span> <span class="n">OVER</span> <span class="p">()</span> <span class="n">id</span><span class="p">,</span>
+    <span class="n">mac</span><span class="p">,</span>
+    <span class="n">ST_SetSRID</span><span class="p">(</span><span class="n">ST_MakePoint</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="mi">32633</span><span class="p">)</span> <span class="n">geom</span>
 <span class="k">FROM</span> <span class="p">(</span>
     <span class="k">SELECT</span>
-        <span class="k">table_name</span><span class="p">,</span>
-        <span class="n">table_schema</span><span class="p">,</span>
-        <span class="n">row_number</span><span class="p">()</span> <span class="n">OVER</span> <span class="p">(</span><span class="k">ORDER</span> <span class="k">BY</span> <span class="k">table_name</span><span class="p">)</span> <span class="n">id</span>
-    <span class="k">FROM</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">tables</span>
-    <span class="k">WHERE</span> <span class="k">table_name</span> <span class="k">LIKE</span> <span class="s1">&#39;data_%&#39;</span>
-        <span class="k">AND</span> <span class="n">table_type</span> <span class="o">=</span> <span class="s1">&#39;BASE TABLE&#39;</span>
-        <span class="k">AND</span> <span class="n">table_schema</span> <span class="o">=</span> <span class="s1">&#39;public&#39;</span>
-<span class="p">)</span> <span class="n">a</span>
-<span class="p">)</span>
-<span class="c1">-- create data table with the correct values order for each statistical column</span>
-<span class="c1">-- note that the whole process would crash if d1.ku_kod would be NULL -&gt; @todo fix me</span>
-<span class="k">SELECT</span> <span class="s1">&#39;DROP TABLE IF EXISTS data;</span>
-<span class="s1">    CREATE TABLE data AS</span>
-<span class="s1">    SELECT d1.ku_kod, d1.ku_nazev,&#39;</span>
-<span class="k">UNION</span> <span class="k">ALL</span>
+        <span class="n">mac</span><span class="p">,</span>
+        <span class="k">AVG</span><span class="p">(</span><span class="n">ST_X</span><span class="p">(</span><span class="n">geom</span><span class="p">))</span> <span class="n">x</span><span class="p">,</span>
+        <span class="k">AVG</span><span class="p">(</span><span class="n">ST_Y</span><span class="p">(</span><span class="n">geom</span><span class="p">))</span> <span class="n">y</span>
+    <span class="k">FROM</span> <span class="n">data_cstore</span><span class="p">.</span><span class="n">wifi_loc</span>
+    <span class="k">GROUP</span> <span class="k">BY</span> <span class="mi">1</span>
+<span class="p">)</span> <span class="n">a</span><span class="p">;</span>
+</pre></div>
+</article>
+<article>
+    <h1><a href="/posts/2017/routing-with-grass-gis-catchment-area-calculation/" rel="bookmark" title="Permalink to Routing with GRASS GIS: Catchment Area Calculation">Routing with <span class="caps">GRASS</span> <span class="caps">GIS</span>: Catchment Area&nbsp;Calculation</a></h1>
+    Written on Apr 20, 2017
+    and marked as
+    <a href="/tag/grass.html">grass</a>    | <a href="/category/gis.html">GIS</a>
+    <p>I got my hands on <a href="/posts/2017/routing-with-pgrouting-catchment-area-calculation/">pgRouting</a> in the last post and I&#8217;m about to do the same with <span class="caps">GRASS</span> <span class="caps">GIS</span> in this&nbsp;one.</p>
+<p><span class="caps">GRASS</span> <span class="caps">GIS</span> stores the topology for the native vector format by default, which makes it easy to use for the network analysis. All the commands associated with the network analysis can be found in the <code>v.net</code> family. The ones I&#8217;m going to discuss in this post are <code>v.net</code> itself, <code>v.net.path</code>, <code>.v.net.alloc</code> and <code>v.net.iso</code>,&nbsp;respectively.</p>
+<h2>Data</h2>
+<p>I&#8217;m going to use the roads data <a href="/posts/2017/routing-with-pgrouting-catchment-area-calculation/">from the previous post</a> together with some random points used as catchment areas&nbsp;centers.</p>
+<div class="highlight"><pre><span></span><span class="c1"># create the new GRASS GIS location</span>
+grass -text -c ./osm/czech
+
+<span class="c1"># import the roads</span>
+v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&quot;PG:host=localhost dbname=pgrouting&quot;</span> <span class="nv">layer</span><span class="o">=</span>cze.roads <span class="nv">output</span><span class="o">=</span>roads -eo  --overwrite
+
+<span class="c1"># import the random points</span>
+v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&quot;PG:host=localhost dbname=pgrouting&quot;</span> <span class="nv">layer</span><span class="o">=</span>temp.points <span class="nv">output</span><span class="o">=</span>points -eo --overwrite
+</pre></div>
+
+
+<p>I got six different points and the pretty dense road network. Note none of the points is connected to the existing&nbsp;network.</p>
+<div class="text-center"><img src="/assets/routing-with-grass-gis-catchment-area-calculation/roads_points.png"/></div>
+
+<p>You have to have routable network to do the actual routing (the worst sentence ever written). To do so,&nbsp;let&#8217;s:</p>
+<ul>
+<li>connect the random points to the&nbsp;network</li>
+<li>add nodes to ends and intersections of the&nbsp;roads</li>
+</ul>
+<p>Note I&#8217;m using the 500m as the max distance in which to connect the points to the&nbsp;network.</p>
+<div class="highlight"><pre><span></span>v.net <span class="nv">input</span><span class="o">=</span>roads <span class="nv">points</span><span class="o">=</span>points <span class="nv">operation</span><span class="o">=</span>connect <span class="nv">threshold</span><span class="o">=</span><span class="m">500</span> <span class="nv">output</span><span class="o">=</span>network
+v.net <span class="nv">input</span><span class="o">=</span>network <span class="nv">output</span><span class="o">=</span>network_noded <span class="nv">operation</span><span class="o">=</span>nodes
+</pre></div>
+
+
+<h2>Finding the shortest path between two&nbsp;points</h2>
+<p>Once the network is routable, it is easy to find the shortest path between points number 1 and 4 and store it in the new&nbsp;map.</p>
+<div class="highlight"><pre><span></span><span class="nb">echo</span> <span class="s2">&quot;1 1 4&quot;</span> <span class="p">|</span> v.net.path <span class="nv">input</span><span class="o">=</span>network_noded <span class="nv">output</span><span class="o">=</span>path_1_4
+</pre></div>
+
+
+<p>The algorithm doesn&#8217;t take bridges, tunnels and oneways into account, it&#8217;s capable of doing so&nbsp;though.</p>
+<div class="text-center"><img src="/assets/routing-with-grass-gis-catchment-area-calculation/shortest_path.png" width="70%"/></div>
+
+<h2>Distributing the subnets for nearest&nbsp;centers</h2>
+<div class="highlight"><pre><span></span>v.net.alloc <span class="nv">input</span><span class="o">=</span>network_noded <span class="nv">output</span><span class="o">=</span>network_alloc <span class="nv">center_cats</span><span class="o">=</span><span class="m">1</span>-6 <span class="nv">node_layer</span><span class="o">=</span><span class="m">2</span>
+</pre></div>
+
+
+<p><code>v.net.alloc</code> module takes the given centers and distributes the network so each of its parts belongs to exactly one center - the nearest one (speaking the distance, time units,&nbsp;&hellip;).</p>
+<div class="text-center"><img src="/assets/routing-with-grass-gis-catchment-area-calculation/subnets.png" width="70%"/></div>
+
+<h2>Creating catchment&nbsp;areas</h2>
+<div class="highlight"><pre><span></span>v.net.iso <span class="nv">input</span><span class="o">=</span>network_noded <span class="nv">output</span><span class="o">=</span>network_iso <span class="nv">center_cats</span><span class="o">=</span><span class="m">1</span>-6 <span class="nv">costs</span><span class="o">=</span><span class="m">1000</span>,3000,5000
+</pre></div>
+
+
+<p><code>v.net.iso</code> splits net by cost isolines. Again, the costs might be specified as lengths, time units,&nbsp;&hellip;.</p>
+<div class="text-center"><img src="/assets/routing-with-grass-gis-catchment-area-calculation/isolines.png" width="70%"/></div>
+
+<p>Two different ways lead to the actual catchment area creation. First, you extract nodes from the roads with their values, turn them into the raster grid and either extract contours or polygonize the raster. I find the last step suboptimal and would love to find another way of polygonizing the&nbsp;results.</p>
+<div class="text-center"><img src="/assets/routing-with-grass-gis-catchment-area-calculation/catchment_area.gif" width="70%"/></div>
+
+<p>Note when extracting contours the interval has to be set to the reasonable number depending on the nodes&nbsp;values.</p>
+<h2>Remarks</h2>
+<ul>
+<li>Once you grasp the basics, <span class="caps">GRASS</span> <span class="caps">GIS</span> is real fun. Grasping the basics is pretty tough&nbsp;though.</li>
+<li>Pedestrians usually don&#8217;t follow the road&nbsp;network.</li>
+<li>Bridges and tunnels might be an&nbsp;issue.</li>
+<li>Personally, I find <span class="caps">GRASS</span> <span class="caps">GIS</span> easier to use for the network analysis compared to&nbsp;pgRouting.</li>
+</ul>
+</article>
+<article>
+    <h1><a href="/posts/2017/routing-with-pgrouting-catchment-area-calculation/" rel="bookmark" title="Permalink to Routing with pgRouting: Catchment Area Calculation">Routing with pgRouting: Catchment Area&nbsp;Calculation</a></h1>
+    Written on Apr 14, 2017
+    and marked as
+    <a href="/tag/postgis.html">postgis</a>,     <a href="/tag/pgrouting.html">pgrouting</a>    | <a href="/category/sql.html">SQL</a>
+    <p>For a long time I&#8217;ve wanted to play with <a href="http://pgrouting.org/">pgRouting</a> and that time has finally come. Among many other routing functions there is one that caught my eye, called <code>pgr_drivingdistance</code>. As the documentation says, it <em>returns the driving distance from a start node</em> using Dijkstra algorithm. The aforementioned distance doesn&#8217;t need to be defined in Euclidean space (the real distance between two points), it might be calculated in units of time, slopeness etc. How to get it&nbsp;going?</p>
+<h2>Data</h2>
+<p><span class="caps">OSM</span> will do as it always does. There is a tool called <code>osm2pgrouting</code> to help you load the data, the pure <span class="caps">GDAL</span> seems to be a better way to me though. Importing the downloaded data is&nbsp;trivial.</p>
+<div class="highlight"><pre><span></span>ogr2ogr -f <span class="s2">&quot;PostgreSQL&quot;</span> PG:<span class="s2">&quot;dbname=pgrouting active_schema=cze&quot;</span> <span class="se">\</span>
+    -s_srs EPSG:4326 <span class="se">\</span>
+    -t_srs EPSG:5514 <span class="se">\</span>
+    roads.shp <span class="se">\</span>
+    -nln roads <span class="se">\</span>
+    -lco <span class="nv">GEOMETRY_NAME</span><span class="o">=</span>the_geom <span class="se">\</span>
+    -lco <span class="nv">FID</span><span class="o">=</span>id <span class="se">\</span>
+    -gt <span class="m">65000</span> <span class="se">\</span>
+    -nlt PROMOTE_TO_MULTI <span class="se">\</span>
+    -clipsrc <span class="m">16</span>.538 <span class="m">49</span>.147 <span class="m">16</span>.699 <span class="m">49</span>.240
+</pre></div>
+
+
+<p>To route the network, it has to be properly noded. Although pgRouting comes with built-in <code>pgr_nodenetwork</code>, it didn&#8217;t seem to work very well. To node the network, use PostGIS <code>ST_Node</code>. <strong>Note this doesn&#8217;t consider bridges and&nbsp;tunnels.</strong></p>
+<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="k">AS</span>
 <span class="k">SELECT</span>
-    <span class="n">array_to_string</span><span class="p">(</span><span class="n">array_agg</span><span class="p">(</span><span class="n">r</span><span class="p">),</span> <span class="s1">&#39;, &#39;</span><span class="p">)</span> <span class="n">r</span>
+    <span class="p">(</span><span class="n">ST_Dump</span><span class="p">(</span><span class="n">geom</span><span class="p">)).</span><span class="n">geom</span> <span class="n">the_geom</span>
 <span class="k">FROM</span> <span class="p">(</span>
     <span class="k">SELECT</span>
-    <span class="s1">&#39;ARRAY[&#39;</span> <span class="o">||</span> <span class="n">array_to_string</span><span class="p">(</span><span class="n">array_agg</span><span class="p">(</span><span class="n">tables</span><span class="p">.</span><span class="n">tbl</span> <span class="o">||</span> <span class="s1">&#39;.&#39;</span> <span class="o">||</span> <span class="n">columns</span><span class="p">.</span><span class="k">column_name</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">tables</span><span class="p">.</span><span class="k">table_name</span><span class="p">),</span> <span class="s1">&#39;, &#39;</span><span class="p">)</span> <span class="o">||</span> <span class="s1">&#39;]&#39;</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span> <span class="n">columns</span><span class="p">.</span><span class="k">column_name</span> <span class="n">r</span>
-    <span class="k">FROM</span> <span class="n">tables</span>
-    <span class="k">JOIN</span> <span class="p">(</span>
-    <span class="k">SELECT</span>
-        <span class="n">table_schema</span><span class="p">,</span>
-        <span class="k">table_name</span><span class="p">,</span>
-        <span class="k">column_name</span>
-    <span class="k">FROM</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">columns</span>
-    <span class="k">WHERE</span> <span class="k">column_name</span> <span class="k">NOT</span> <span class="k">LIKE</span> <span class="s1">&#39;ku_%&#39;</span>
-    <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">ordinal_position</span>
-    <span class="p">)</span> <span class="n">columns</span>
-    <span class="k">ON</span> <span class="p">(</span><span class="n">tables</span><span class="p">.</span><span class="k">table_name</span> <span class="o">=</span> <span class="n">columns</span><span class="p">.</span><span class="k">table_name</span> <span class="k">AND</span> <span class="n">columns</span><span class="p">.</span><span class="n">table_schema</span> <span class="o">=</span> <span class="n">tables</span><span class="p">.</span><span class="n">table_schema</span><span class="p">)</span>
-    <span class="k">GROUP</span> <span class="k">BY</span> <span class="n">columns</span><span class="p">.</span><span class="k">column_name</span>
+        <span class="n">ST_Node</span><span class="p">(</span><span class="n">geom</span><span class="p">)</span> <span class="n">geom</span>
+    <span class="k">FROM</span> <span class="p">(</span>
+        <span class="k">SELECT</span> <span class="n">ST_Union</span><span class="p">(</span><span class="n">the_geom</span><span class="p">)</span> <span class="n">geom</span>
+        <span class="k">FROM</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads</span>
+    <span class="p">)</span> <span class="n">a</span>
+<span class="p">)</span> <span class="n">b</span><span class="p">;</span>
+</pre></div>
+
+
+<p>After noding the network, all the information about speed limits and oneways is lost. If needed, it can be brought back with&nbsp;following:</p>
+<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">INDEX</span> <span class="k">ON</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="k">USING</span> <span class="n">gist</span><span class="p">(</span><span class="n">the_geom</span><span class="p">);</span>
+<span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="k">ADD</span> <span class="k">COLUMN</span> <span class="n">id</span> <span class="nb">SERIAL</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">;</span>
+<span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="k">ADD</span> <span class="k">COLUMN</span> <span class="n">maxspeed</span> <span class="nb">integer</span><span class="p">;</span>
+
+<span class="k">UPDATE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span>
+<span class="k">SET</span> <span class="n">maxspeed</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">maxspeed</span>
+<span class="k">FROM</span> <span class="p">(</span>
+    <span class="k">SELECT</span> <span class="k">DISTINCT</span> <span class="k">ON</span> <span class="p">(</span><span class="n">rn</span><span class="p">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="n">rn</span><span class="p">.</span><span class="n">id</span><span class="p">,</span>
+        <span class="n">r</span><span class="p">.</span><span class="n">maxspeed</span>
+    <span class="k">FROM</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="n">rn</span>
+    <span class="k">JOIN</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads</span> <span class="n">r</span> <span class="k">ON</span> <span class="p">(</span><span class="n">ST_Intersects</span><span class="p">(</span><span class="n">rn</span><span class="p">.</span><span class="n">the_geom</span><span class="p">,</span> <span class="n">r</span><span class="p">.</span><span class="n">the_geom</span><span class="p">))</span>
+    <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">rn</span><span class="p">.</span><span class="n">id</span><span class="p">,</span> <span class="n">ST_Length</span><span class="p">(</span><span class="n">ST_Intersection</span><span class="p">(</span><span class="n">rn</span><span class="p">.</span><span class="n">the_geom</span><span class="p">,</span> <span class="n">r</span><span class="p">.</span><span class="n">the_geom</span><span class="p">))</span> <span class="k">DESC</span>
 <span class="p">)</span> <span class="n">a</span>
-<span class="k">UNION</span> <span class="k">ALL</span>
-<span class="k">SELECT</span> <span class="s1">&#39;FROM&#39;</span>
-<span class="k">UNION</span> <span class="k">ALL</span>
-<span class="k">SELECT</span> <span class="n">tbl_join</span> <span class="k">FROM</span> <span class="n">tables</span><span class="p">;</span>
+<span class="k">WHERE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">id</span><span class="p">;</span>
 </pre></div>
 
 
-<p><code>psql -qAt --no-psqlrc -f transform.sql</code> builds the actual query from the query above, <code>| psql -qAt --no-psqlrc</code> sends it to the database again. This part was really fun to&nbsp;implement!</p>
-<p>I&#8217;m still considering to store diff values instead of absolute values in those <code>ARRAY</code>s - that would save some serious&nbsp;bandwidth!</p>
-<h2>Load</h2>
-<p>See <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">III</span>)</a>.</p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i" rel="bookmark" title="Permalink to Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part&nbsp;I)</a></h1>
-            <small>Written on Nov 13, 2016
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>,         <a href="https://www.zimmi.cz/posts/tag/d3.html">d3</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>        | <a href="https://www.zimmi.cz/posts/category/data.html">data</a>
-        </small>
-        <section>
-            <p>This post is the first part of the upcoming series summarizing the process of visualizing landuse data with bash, PostgreSQL and d3.js. Read other&nbsp;parts:</p>
-<ol>
-<li>you&#8217;re reading it&nbsp;now</li>
-<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></li>
-<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">III</span>)</a></li>
-</ol>
-<p><a href="http://cuzk.cz/en">Czech Office for Surveying, Mapping and Cadastre</a> has recently published lot of data via <a href="http://atom.cuzk.cz">Atom feed</a>. There&#8217;s pretty small and a bit boring dataset included, featuring quarterly updated landuse-related values for all 13,091 cadastral&nbsp;areas:</p>
-<ul>
-<li>absolute number of land lots within given category (arable land, forests,&nbsp;etc.)</li>
-<li>absolute area of land lots within given&nbsp;category</li>
-</ul>
-<p>Data are published as <span class="caps">CSV</span> files linked from the Atom feed. Sadly, they come windows-1250 encoded, using Windows line endings, with trailing semicolons and header rows using&nbsp;diacritics.</p>
-<h2><span class="caps">ETL</span>&nbsp;process</h2>
-<p>Before the d3 viz can be crafted, it&#8217;s necessary&nbsp;to:</p>
-<ol>
-<li>extract <span class="caps">CSV</span> data from the URLs provided via the Atom&nbsp;feed</li>
-<li>transform those data into a relational database, do some&nbsp;math</li>
-<li>load data into a d3.js&nbsp;viz</li>
-<li>profit (as&nbsp;usual)</li>
-</ol>
-<h3>Extract</h3>
-<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
-<span class="c1"># extract.sh -f YYYYMMDD</span>
-
-<span class="k">while</span> <span class="o">[[</span> <span class="nv">$#</span> -gt <span class="m">1</span> <span class="o">]]</span>
-<span class="k">do</span>
-<span class="nv">key</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>
-
-<span class="k">case</span> <span class="nv">$key</span> in
-    -f<span class="p">|</span>--file<span class="o">)</span>
-    <span class="nv">FILE</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$2</span><span class="s2">&quot;</span>
-    <span class="nb">shift</span> <span class="c1"># past argument</span>
-    <span class="p">;;</span>
-    *<span class="o">)</span>
-        <span class="c1"># unknown option</span>
-    <span class="p">;;</span>
-<span class="k">esac</span>
-<span class="nb">shift</span> <span class="c1"># past argument or value</span>
-<span class="k">done</span>
-
-<span class="nv">URL</span><span class="o">=</span>http://services.cuzk.cz/sestavy/UHDP/UHDP-
-<span class="nv">CSVFILE</span><span class="o">=</span><span class="nv">$FILE</span>.csv
-<span class="nv">CSVUTF8FILE</span><span class="o">=</span><span class="si">${</span><span class="nv">CSVFILE</span><span class="p">%.*</span><span class="si">}</span>.utf.csv
-<span class="nv">URL</span><span class="o">+=</span><span class="nv">$CSVFILE</span>
-
-<span class="nb">echo</span> <span class="s2">&quot;downloading </span><span class="nv">$URL</span><span class="s2">&quot;</span>
-wget -q <span class="nv">$URL</span> -O <span class="nv">$CSVFILE</span>
-
-<span class="k">if</span> <span class="o">[[</span> <span class="nv">$?</span> !<span class="o">=</span> <span class="m">0</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
-    rm -f <span class="nv">$CSVFILE</span>
-    <span class="nb">echo</span> <span class="s2">&quot;download failed&quot;</span>
-    <span class="nb">exit</span>
-<span class="k">fi</span>
-
-<span class="nb">echo</span> <span class="s2">&quot;converting to utf-8&quot;</span>
-iconv -f WINDOWS-1250 -t UTF-8 <span class="nv">$CSVFILE</span> -o <span class="nv">$CSVUTF8FILE</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
-<span class="nb">echo</span> <span class="s2">&quot;modifying </span><span class="si">${</span><span class="nv">FILE</span><span class="si">}</span><span class="s2">&quot;</span>
-sed -i <span class="s1">&#39;s/^M$//&#39;</span> <span class="nv">$CSVUTF8FILE</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
-sed -i <span class="s1">&#39;s/\r$//&#39;</span> <span class="nv">$CSVUTF8FILE</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
-sed -i <span class="s1">&#39;s/;*$//g&#39;</span> <span class="nv">$CSVUTF8FILE</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
-sed -i <span class="s1">&#39;1d&#39;</span> <span class="nv">$CSVUTF8FILE</span>
-
-<span class="nb">echo</span> <span class="s2">&quot;importing to database&quot;</span>
-sed -e <span class="s2">&quot;s/\${DATE}/</span><span class="nv">$FILE</span><span class="s2">/g&quot;</span> extract.sql <span class="p">|</span> psql -qAt --no-psqlrc
-
-rm <span class="nv">$CSVFILE</span> <span class="nv">$CSVUTF8FILE</span>
+<p>With everything set, the topology can be&nbsp;built.</p>
+<div class="highlight"><pre><span></span><span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="k">ADD</span> <span class="k">COLUMN</span> <span class="k">source</span> <span class="nb">integer</span><span class="p">;</span>
+<span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="k">ADD</span> <span class="k">COLUMN</span> <span class="n">target</span> <span class="nb">integer</span><span class="p">;</span>
+<span class="k">SELECT</span> <span class="n">pgr_createTopology</span><span class="p">(</span><span class="s1">&#39;cze.roads_noded&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 </pre></div>
 
 
-<p>This script downloads <span class="caps">CSV</span> file, deals with all the pitfalls mentioned above and, when done, <code>copy</code> command within <code>extract.sql</code> loads the data into a <code>data_YYYYMMDD</code> table. Putting all the files into the one table would have saved me a lot of transformation <span class="caps">SQL</span>, yet it didn&#8217;t feel quite right&nbsp;though.</p>
-<h2>Transform</h2>
-<p>See <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a>.</p>
-<h2>Load</h2>
-<p>See <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">III</span>)</a>.</p>
-        </section>
-        </div>
-    </div>
+<p>This function creates the <code>cze.roads_noded_vertices_pgr</code> that contains all the extracted nodes from the&nbsp;network.</p>
+<div class="text-center"><img src="/assets/routing-with-pgrouting-catchment-area-calculation/nodes.png" width="70%" /></div>
 
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2016/introducing-blind-maps-project/" rel="bookmark" title="Permalink to Introducing Blind Maps Project">Introducing Blind Maps&nbsp;Project</a></h1>
-            <small>Written on Nov 2, 2016
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>,         <a href="https://www.zimmi.cz/posts/tag/leaflet.html">leaflet</a>        | <a href="https://www.zimmi.cz/posts/category/web-maps.html">web maps</a>
-        </small>
-        <section>
-            <p>I&#8217;d like to introduce you to my little pet project, which might just as well be awarded <em>the first pet project I&#8217;ve ever completed</em>, called <a href="https://www.zimmi.cz/blind-maps">Blind maps</a>.</p>
-<p>It&#8217;s a very simple, yet useful web application built on top of the great <a href="../../tag/leaflet.html">Leaflet</a> library meant to help you get to know our world a bit better. As the name suggests, the app shows you, well&hellip; a blind map, and you try to fill as many features as you&nbsp;can.</p>
-<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/introducing-blind-maps-project/map.png" /></div>
+<p>As already mentioned, measures other than length can be used as a distance, I chose the time to get to a given node on&nbsp;foot.</p>
+<div class="highlight"><pre><span></span><span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="k">ADD</span> <span class="k">COLUMN</span> <span class="n">cost_minutes</span> <span class="nb">integer</span><span class="p">;</span>
+<span class="k">UPDATE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span>
+<span class="k">SET</span> <span class="n">cost_minutes</span> <span class="o">=</span> <span class="p">(</span><span class="n">ST_Length</span><span class="p">(</span><span class="n">the_geom</span><span class="p">)</span> <span class="o">/</span> <span class="mi">83</span><span class="p">.</span><span class="mi">0</span><span class="p">)::</span><span class="nb">integer</span><span class="p">;</span> <span class="c1">-- it takes average person one minute to walk 83 meters</span>
 
-<p>The app is ready and can be&nbsp;used:</p>
+<span class="k">UPDATE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span>
+<span class="k">SET</span> <span class="n">cost_minutes</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="k">WHERE</span> <span class="n">cost_minutes</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</pre></div>
+
+
+<h2>Routing</h2>
+<p>Now the interesting part. All the routing functions are built on what&#8217;s called <a href="http://docs.pgrouting.org/2.4/en/pgRouting-concepts.html#inner-queries"><em>inner queries</em></a> that are expected to return a certain data structure with no geometry included. As I want to see the results in <span class="caps">QGIS</span> immediately, I had to use a simple anonymous <span class="caps">PL</span>/pgSQL block that writes polygonal catchment areas to a table (consider it a proof of concept, not the final&nbsp;solution).</p>
+<div class="highlight"><pre><span></span><span class="k">DROP</span> <span class="k">TABLE</span> <span class="k">IF</span> <span class="k">EXISTS</span> <span class="n">cze</span><span class="p">.</span><span class="n">temp</span><span class="p">;</span>
+<span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">cze</span><span class="p">.</span><span class="n">temp</span> <span class="k">AS</span>
+<span class="k">SELECT</span> <span class="o">*</span>
+<span class="k">FROM</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded_vertices_pgr</span> <span class="n">ver</span>
+<span class="k">JOIN</span> <span class="p">(</span>
+    <span class="k">SELECT</span> <span class="o">*</span>
+    <span class="k">FROM</span> <span class="n">pgr_drivingDistance</span><span class="p">(</span>
+        <span class="s1">&#39;SELECT id, source, target, cost_minutes as cost, cost_minutes as reverse_cost FROM cze.roads_noded&#39;</span><span class="p">,</span>
+        <span class="mi">6686</span><span class="p">,</span>
+        <span class="mi">10</span><span class="p">,</span>
+        <span class="k">true</span>
+    <span class="p">)</span>
+<span class="p">)</span><span class="n">dist</span> <span class="k">ON</span> <span class="n">ver</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">dist</span><span class="p">.</span><span class="n">node</span><span class="p">;</span>
+
+<span class="k">DO</span> <span class="err">$$</span>
+<span class="k">DECLARE</span>
+    <span class="k">c</span> <span class="nb">integer</span><span class="p">;</span>
+<span class="k">BEGIN</span>
+    <span class="k">DROP</span> <span class="k">TABLE</span> <span class="k">IF</span> <span class="k">EXISTS</span> <span class="n">tmp</span><span class="p">;</span>
+    <span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">tmp</span> <span class="p">(</span>
+        <span class="n">agg_cost</span> <span class="nb">integer</span><span class="p">,</span>
+        <span class="n">geom</span> <span class="n">geometry</span><span class="p">(</span><span class="n">MULTIPOLYGON</span><span class="p">,</span> <span class="mi">5514</span><span class="p">)</span>
+    <span class="p">);</span>
+
+    <span class="c1">-- order by the biggest area so the polygons are not hidden beneath the bigger ones</span>
+    <span class="k">FOR</span> <span class="k">c</span> <span class="k">IN</span> <span class="k">SELECT</span> <span class="n">agg_cost</span> <span class="k">FROM</span> <span class="n">cze</span><span class="p">.</span><span class="n">temp</span> <span class="k">GROUP</span> <span class="k">BY</span> <span class="n">agg_cost</span> <span class="k">HAVING</span> <span class="k">COUNT</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="mi">1</span> <span class="k">DESC</span> <span class="n">LOOP</span>
+        <span class="n">RAISE</span> <span class="n">INFO</span> <span class="s1">&#39;%&#39;</span><span class="p">,</span> <span class="k">c</span><span class="p">;</span>
+        <span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">tmp</span> <span class="p">(</span><span class="n">agg_cost</span><span class="p">,</span> <span class="n">geom</span><span class="p">)</span>
+        <span class="k">SELECT</span>
+            <span class="k">c</span><span class="p">,</span>
+            <span class="n">ST_Multi</span><span class="p">(</span><span class="n">ST_SetSRID</span><span class="p">(</span><span class="n">pgr_pointsAsPolygon</span><span class="p">(</span>
+                <span class="s1">&#39;SELECT</span>
+<span class="s1">                        temp.id::integer,</span>
+<span class="s1">                        ST_X(temp.the_geom)::float AS x,</span>
+<span class="s1">                        ST_Y(temp.the_geom)::float AS y</span>
+<span class="s1">                FROM cze.temp</span>
+<span class="s1">                WHERE agg_cost = &#39;</span> <span class="o">||</span> <span class="k">c</span>
+            <span class="p">),</span> <span class="mi">5514</span><span class="p">));</span>
+    <span class="k">END</span> <span class="n">LOOP</span><span class="p">;</span>
+<span class="k">END</span><span class="err">$$</span><span class="p">;</span>
+</pre></div>
+
+
+<p>Using <code>pgr_pointsAsPolygon</code> renders resulting nodes accessible in 10-minute walk in polygons, but weird looking ones. Not bad, could be better&nbsp;though.</p>
+<div class="text-center"><img src="/assets/routing-with-pgrouting-catchment-area-calculation/area1.png" width="70%" /></div>
+
+<p>How about seeing only nodes instead of&nbsp;polygons?</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span>
+    <span class="n">agg_cost</span><span class="p">,</span>
+    <span class="n">ST_PointN</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+<span class="k">FROM</span> <span class="p">(</span>
+    <span class="k">SELECT</span>
+        <span class="n">agg_cost</span><span class="p">,</span>
+        <span class="n">ST_ExteriorRing</span><span class="p">((</span><span class="n">ST_Dump</span><span class="p">(</span><span class="n">geom</span><span class="p">)).</span><span class="n">geom</span><span class="p">)</span> <span class="n">geom</span><span class="p">,</span>
+        <span class="n">generate_series</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">ST_NumPoints</span><span class="p">(</span><span class="n">ST_ExteriorRing</span><span class="p">((</span><span class="n">ST_Dump</span><span class="p">(</span><span class="n">geom</span><span class="p">)).</span><span class="n">geom</span><span class="p">)))</span> <span class="n">i</span>
+    <span class="k">FROM</span> <span class="n">tmp</span>
+<span class="p">)</span> <span class="n">a</span><span class="p">;</span>
+</pre></div>
+
+
+<p>Looks good, could be better&nbsp;though.</p>
+<div class="text-center"><img src="/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png" width="70%" /></div>
+
+<p>How about creating concave hulls from the extracted&nbsp;nodes?</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span>
+    <span class="n">agg_cost</span><span class="p">,</span>
+    <span class="n">ST_ConcaveHull</span><span class="p">(</span><span class="n">ST_Union</span><span class="p">(</span><span class="n">geom</span><span class="p">))</span> <span class="n">geom</span>
+<span class="k">FROM</span> <span class="p">(</span>
+    <span class="k">SELECT</span>
+        <span class="n">agg_cost</span><span class="p">,</span>
+        <span class="n">ST_PointN</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="n">geom</span>
+    <span class="k">FROM</span> <span class="p">(</span>
+        <span class="k">SELECT</span>
+            <span class="n">agg_cost</span><span class="p">,</span><span class="o">&lt;</span><span class="n">div</span> <span class="k">class</span><span class="o">=</span><span class="ss">&quot;text-center&quot;</span><span class="o">&gt;&lt;</span><span class="n">img</span> <span class="n">src</span><span class="o">=</span><span class="ss">&quot;{filename}/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png&quot;</span> <span class="n">width</span><span class="o">=</span><span class="ss">&quot;70%&quot;</span> <span class="o">/&gt;&lt;/</span><span class="n">div</span><span class="o">&gt;</span>
+            <span class="n">ST_ExteriorRing</span><span class="p">((</span><span class="n">ST_Dump</span><span class="p">(</span><span class="n">geom</span><span class="p">)).</span><span class="n">geom</span><span class="p">)</span> <span class="n">geom</span><span class="p">,</span>
+            <span class="n">generate_series</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">ST_NumPoints</span><span class="p">(</span><span class="n">ST_ExteriorRing</span><span class="p">((</span><span class="n">ST_Dump</span><span class="p">(</span><span class="n">geom</span><span class="p">)).</span><span class="n">geom</span><span class="p">)))</span> <span class="n">i</span>
+        <span class="k">FROM</span> <span class="n">tmp</span>
+    <span class="p">)</span> <span class="n">a</span>
+<span class="p">)</span> <span class="n">b</span>
+<span class="k">GROUP</span> <span class="k">BY</span> <span class="n">agg_cost</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="n">agg_cost</span> <span class="k">DESC</span><span class="p">;</span>
+</pre></div>
+
+
+<p>This one looks the best I&nbsp;guess.</p>
+<div class="text-center"><img src="/assets/routing-with-pgrouting-catchment-area-calculation/area2.png" width="70%" /></div>
+
+<h2>Remarks</h2>
 <ul>
-<li>online at <a href="https://www.zimmi.cz/blind-maps/">Blind maps</a> with the map of your choice (if&nbsp;available)</li>
-<li>offline, downloaded to your computer and filled with whatever data you&nbsp;want</li>
+<li>The documentation doesn&#8217;t help&nbsp;much.</li>
+<li>I&#8217;d expect existing functions to return different data structures to be easy-to-use,&nbsp;actually.</li>
+<li><code>LATERAL</code> might be really handy with those inner queries, have to give it a shot in the&nbsp;future.</li>
+<li>Pedestrians usually don&#8217;t follow the road&nbsp;network.</li>
+<li>Bridges and tunnels might be an&nbsp;issue.</li>
 </ul>
-<p>What I find great about this project is the ease of adding new dataset. For starters, I filled it with data coming from <a href="naturalearthdata.com">Natural Earth</a>:</p>
-<ul>
-<li><span class="caps">CONUS</span>&nbsp;states</li>
-<li>European&nbsp;states</li>
-<li>World&nbsp;capitals</li>
-</ul>
-<p>If you wish, feel free to send me a pull request with GeoJSON data, I&#8217;ll be happy to have more datasets available! The process is described at the <a href="https://www.zimmi.cz/blind-maps">project homepage</a>.</p>
-<p>As you notice at the project homepage, there are two versions of the game&nbsp;available:</p>
-<ul>
-<li>one lets you find map features by their&nbsp;names</li>
-<li>the other one lets you type name highlighted feature (much&nbsp;tougher)</li>
-</ul>
-<p>Have&nbsp;fun!</p>
-        </section>
-        </div>
-    </div>
+</article>
+<article>
+    <h1><a href="/posts/2017/exploiting-prague-open-data-without-api/" rel="bookmark" title="Permalink to Exploiting Prague Open Data without API">Exploiting Prague Open Data without <span class="caps">API</span></a></h1>
+    Written on Apr 3, 2017
+    and marked as
+    <a href="/tag/bash.html">bash</a>    | <a href="/category/data.html">data</a>
+    <p>Speaking the Czech Republic, <a href="http://www.geoportalpraha.cz">Prague is an undoubted leader in open data publishing</a>. However, there is no public <span class="caps">API</span> to explore/search existing&nbsp;datasets.</p>
+<p>I wanted to download the <span class="caps">ESRI</span> Shapefile of the city urban plan that <a href="http://www.geoportalpraha.cz/cs/opendata/21733E1F-21B7-4ABC-B1C2-DC19C0237380#.WOKHMbmFvVM">is divided into more than a hundred files</a> (a file representing a cadastral&nbsp;area).</p>
+<p>This becomes a piece of cake with Opera Developer tools and a bit of JavaScript&nbsp;code</p>
+<div class="highlight"><pre><span></span><span class="kd">let</span> <span class="nx">links</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementsByClassName</span><span class="p">(</span><span class="s1">&#39;open-data-icon-rastr open-data-link tooltipstered&#39;</span><span class="p">)</span>
 
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2016/degrees-to-decimal-with-javascript-reworked/" rel="bookmark" title="Permalink to Degrees To Decimal With Javascript Reworked">Degrees To Decimal With Javascript&nbsp;Reworked</a></h1>
-            <small>Written on Oct 28, 2016
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>        | <a href="https://www.zimmi.cz/posts/category/development.html">development</a>
-        </small>
-        <section>
-            <p>Two years ago I was pretty happy with <a href="https://www.zimmi.cz/posts/2014/degrees-to-decimal-with-javascript/">this little piece of code to transform degrees to the decimal value</a>. Yesterday, I found a neater way to do the&nbsp;same:</p>
-<div class="highlight"><pre><span></span><span class="kd">let</span> <span class="nx">deg</span> <span class="o">=</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">0</span><span class="p">];</span>
-
-<span class="kd">function</span> <span class="nx">degToDec</span><span class="p">(</span><span class="nx">prev</span><span class="p">,</span> <span class="nx">cur</span><span class="p">,</span> <span class="nx">curIndex</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">prev</span> <span class="o">+</span> <span class="nx">cur</span> <span class="o">/</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="nx">curIndex</span><span class="p">);</span>
+<span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">link</span> <span class="k">of</span> <span class="nx">links</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">link</span><span class="p">.</span><span class="nx">href</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s1">&#39;SHP&#39;</span><span class="p">)</span> <span class="o">===</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span> <span class="k">continue</span><span class="p">;}</span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">link</span><span class="p">.</span><span class="nx">href</span><span class="p">)</span>
 <span class="p">}</span>
-
-<span class="nx">deg</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">degToDec</span><span class="p">);</span>
 </pre></div>
 
 
-<p>Once you have an input array, that&#8217;s pretty much it. Love&nbsp;JavaScript.</p>
-        </section>
-        </div>
-    </div>
+<p>With the list saved to a file called <code>list.txt</code>, <code>wget --input-file=list.txt</code> will download the data. Followed by <code>for f in *.zip; do unzip $f -d ${f%%.zip}; done</code>, each archive will be extracted in the directory called by its&nbsp;name.</p>
+<p>Once done and assuming that the files are named consistently across the folders, <code>ogr2ogr</code> will merge all of them into a single GeoPackage file, resulting in just four files. Not bad considered I began with more than a hundred &times;&nbsp;4.</p>
+<div class="highlight"><pre><span></span>ogr2ogr -f <span class="s2">&quot;GPKG&quot;</span> pvp_fvu_p.gpkg ./PVP_fvu_p_Bechovice_SHP/PVP_fvu_p.shp
+find -type f -not -path <span class="s1">&#39;./PVP_fvu_p_Bechovice_SHP*&#39;</span> -iname <span class="s1">&#39;*fvu_p.shp&#39;</span> -exec ogr2ogr -update -append -f <span class="s2">&quot;GPKG&quot;</span> pvp_fvu_p.gpkg <span class="s1">&#39;{}&#39;</span> <span class="se">\;</span>
 
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2016/ogrinfo-output-formatting/" rel="bookmark" title="Permalink to Ogrinfo Output Formatting">Ogrinfo Output&nbsp;Formatting</a></h1>
-            <small>Written on Oct 21, 2016
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>        | <a href="https://www.zimmi.cz/posts/category/automation.html">automation</a>
-        </small>
-        <section>
-            <p>Today my workmate asked if there was a way to see an attribute table other than importing spatial data into a PostGIS database. I told him about <span class="caps">QGIS</span> and while talking about other <span class="caps">GIS</span> stuff, I started thinking about <em>pipes</em> and how awesome it would be to actually format the output of the <code>ogrinfo</code> command.</p>
-<p>Here it is. It is just a much longer way to do <code>ogr2ogr -f "CSV" dest source</code>, but sometimes you just have to experiment a&nbsp;bit.</p>
-<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
-<span class="nv">FILE</span><span class="o">=</span><span class="nv">$1</span>
+ogr2ogr -f <span class="s2">&quot;GPKG&quot;</span> pvp_fvu_popis_z_a.gpkg ./PVP_fvu_p_Bechovice_SHP/PVP_fvu_popis_z_a.shp
+find -type f -not -path <span class="s1">&#39;./PVP_fvu_p_Bechovice_SHP*&#39;</span> -iname <span class="s1">&#39;*fvu_popis_z_a.shp&#39;</span> -exec ogr2ogr -update -append -f <span class="s2">&quot;GPKG&quot;</span> pvp_fvu_popis_z_a.gpkg <span class="s1">&#39;{}&#39;</span> <span class="se">\;</span>
 
-<span class="k">function</span> columns <span class="o">{</span>
-    ogrinfo <span class="nv">$FILE</span> -al -so <span class="p">|</span> <span class="se">\</span>
-    sed <span class="s1">&#39;/Column/,$!d&#39;</span> <span class="p">|</span> <span class="se">\</span>
-    sed <span class="s1">&#39;/Geometry Column/d&#39;</span> <span class="p">|</span> <span class="se">\</span>
-    sed -e <span class="s1">&#39;s/Column =/\:/g&#39;</span> <span class="p">|</span> <span class="se">\</span>
-    awk -F: <span class="s1">&#39;{print $1}&#39;</span> <span class="p">|</span> <span class="se">\</span>
-    awk -v <span class="nv">RS</span><span class="o">=</span> -v <span class="nv">OFS</span><span class="o">=</span><span class="s2">&quot;|&quot;</span> <span class="s1">&#39;{$1 = $1} 1&#39;</span>
-<span class="o">}</span>
+ogr2ogr -f <span class="s2">&quot;GPKG&quot;</span> pvp_pp_pl_a.gpkg ./PVP_fvu_p_Bechovice_SHP/PVP_pp_pl_a.shp
+find -type f -not -path <span class="s1">&#39;./PVP_fvu_p_Bechovice_SHP*&#39;</span> -iname <span class="s1">&#39;*pp_pl_a.shp&#39;</span> -exec ogr2ogr -update -append -f <span class="s2">&quot;GPKG&quot;</span> pvp_pp_pl_a.gpkg <span class="s1">&#39;{}&#39;</span> <span class="se">\;</span>
 
-<span class="k">function</span> data <span class="o">{</span>
-   ogrinfo <span class="nv">$FILE</span> -al <span class="p">|</span> <span class="se">\</span>
-   sed <span class="s1">&#39;/OGRFeature/,$!d&#39;</span> <span class="p">|</span> <span class="se">\</span>
-   sed <span class="s1">&#39;/POLYGON\|LINESTRING\|POINT/ d&#39;</span> <span class="p">|</span> <span class="se">\</span>
-   sed -e <span class="s1">&#39;s/OGRFeature\(.*\)\://g&#39;</span> <span class="p">|</span> <span class="se">\</span>
-   sed -e <span class="s1">&#39;s/.*\s*\(.*\)\s*=\s*//g&#39;</span> <span class="p">|</span> <span class="se">\</span>
-   awk -v <span class="nv">RS</span><span class="o">=</span> -v <span class="nv">OFS</span><span class="o">=</span><span class="s2">&quot;|&quot;</span> <span class="s1">&#39;{$1 = $1} 1&#39;</span>
-<span class="o">}</span>
-
-<span class="o">{</span> columns<span class="p">;</span> data<span class="p">;</span> <span class="o">}</span>
+ogr2ogr -f <span class="s2">&quot;GPKG&quot;</span> pvp_pp_s_a.gpkg ./PVP_fvu_p_Bechovice_SHP/PVP_pp_s_a.shp
+find -type f -not -path <span class="s1">&#39;./PVP_fvu_p_Bechovice_SHP*&#39;</span> -iname <span class="s1">&#39;*pp_s_a.shp&#39;</span> -exec ogr2ogr -update -append -f <span class="s2">&quot;GPKG&quot;</span> pvp_pp_s_a.gpkg <span class="s1">&#39;{}&#39;</span> <span class="se">\;</span>
 </pre></div>
 
 
-<p>The result can be piped to other <code>bash</code> functions, such as <code>less</code> or <code>more</code>. I call it <code>ogrinfotable</code>.</p>
-        </section>
-        </div>
-    </div>
+<p>A boring task that would take me hours five years ago transformed into simple, yet fun, piece of work done in no more than half an&nbsp;hour.</p>
+</article>
+<article>
+    <h1><a href="/posts/2017/upgrading-postgresql-95-to-postgresql-96-with-postgis/" rel="bookmark" title="Permalink to Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with PostGIS">Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with&nbsp;PostGIS</a></h1>
+    Written on Mar 1, 2017
+    and marked as
+    <a href="/tag/sql.html">sql</a>,     <a href="/tag/postgresql.html">postgresql</a>    | <a href="/category/sql.html">SQL</a>
+    <p>Thanks to <code>pg_upgrade</code> tool the PostgreSQL upgrade on Ubuntu is pretty straightforward. Different PostGIS versions might cause troubles though. This post covers PostgreSQL 9.5, PostGIS 2.2 to PostgreSQL 9.6, PostGIS 2.3&nbsp;migration.</p>
+<p>First of all, install the PostgreSQL 9.6 with PostGIS&nbsp;2.3.</p>
+<div class="highlight"><pre><span></span>apt install postgresql-9.6 postgresql-9.6-postgis-2.3
+</pre></div>
 
+
+<p>Mind that newly installed database cluster runs on port <code>5433</code>.</p>
+<p>If you run <code>pg_upgrade</code> at this stage, it will fail with the following&nbsp;error.</p>
+<div class="highlight"><pre><span></span>could not load library <span class="s2">&quot;</span><span class="nv">$libdir</span><span class="s2">/postgis_topology-2.2&quot;</span>:
+ERROR:  could not access file <span class="s2">&quot;</span><span class="nv">$libdir</span><span class="s2">/postgis_topology-2.2&quot;</span>: No such file or directory
+</pre></div>
+
+
+<p><code>pg_upgrade</code> can&#8217;t run the upgrade because PostGIS versions don&#8217;t match. Install the PostGIS 2.3 for PostgreSQL 9.5 and update extensions in all your&nbsp;databases.</p>
+<div class="highlight"><pre><span></span>apt install postgresql-9.5-postgis-2.3
+
+:::sql
+ALTER EXTENSION postgis UPDATE<span class="p">;</span>
+</pre></div>
+
+
+<p>With both clusters using the same PostGIS version, the upgrade can begin. First, stop them&nbsp;with</p>
+<div class="highlight"><pre><span></span>service postgresql stop
+</pre></div>
+
+
+<p>Then, run the actual <code>pg_upgrade</code> command as <code>postgres</code> user. Make sure the <code>pg_hba.conf</code> file is set to allow local&nbsp;connections.</p>
+<div class="highlight"><pre><span></span>/usr/lib/postgresql/9.6/bin/pg_upgrade <span class="se">\</span>
+-b /usr/lib/postgresql/9.5/bin/ <span class="se">\</span>
+-B /usr/lib/postgresql/9.6/bin/ <span class="se">\</span>
+-d /var/lib/postgresql/9.5/main <span class="se">\</span>
+-D /var/lib/postgresql/9.6/main <span class="se">\</span>
+-o <span class="s1">&#39; -c config_file=/etc/postgresql/9.5/main/postgresql.conf&#39;</span> <span class="se">\</span>
+-O <span class="s1">&#39; -c config_file=/etc/postgresql/9.6/main/postgresql.conf&#39;</span>
+</pre></div>
+
+
+<p>The following result means the upgrade was&nbsp;smooth.</p>
+<div class="highlight"><pre><span></span>Performing Consistency Checks
+-----------------------------
+Checking cluster versions                                   ok
+Checking database user is the install user                  ok
+Checking database connection settings                       ok
+Checking <span class="k">for</span> prepared transactions                          ok
+Checking <span class="k">for</span> reg* system OID user data types                ok
+Checking <span class="k">for</span> contrib/isn with bigint-passing mismatch       ok
+Checking <span class="k">for</span> roles starting with <span class="s1">&#39;pg_&#39;</span>                      ok
+Creating dump of global objects                             ok
+Creating dump of database schemas
+                                                            ok
+Checking <span class="k">for</span> presence of required libraries                 ok
+Checking database user is the install user                  ok
+Checking <span class="k">for</span> prepared transactions                          ok
+
+If pg_upgrade fails after this point, you must re-initdb the
+new cluster before continuing.
+
+Performing Upgrade
+------------------
+Analyzing all rows in the new cluster                       ok
+Freezing all rows on the new cluster                        ok
+Deleting files from new pg_clog                             ok
+Copying old pg_clog to new server                           ok
+Setting next transaction ID and epoch <span class="k">for</span> new cluster       ok
+Deleting files from new pg_multixact/offsets                ok
+Copying old pg_multixact/offsets to new server              ok
+Deleting files from new pg_multixact/members                ok
+Copying old pg_multixact/members to new server              ok
+Setting next multixact ID and offset <span class="k">for</span> new cluster        ok
+Resetting WAL archives                                      ok
+Setting frozenxid and minmxid counters in new cluster       ok
+Restoring global objects in the new cluster                 ok
+Restoring database schemas in the new cluster
+                                                            ok
+Copying user relation files
+                                                            ok
+Setting next OID <span class="k">for</span> new cluster                            ok
+Sync data directory to disk                                 ok
+Creating script to analyze new cluster                      ok
+Creating script to delete old cluster                       ok
+
+Upgrade Complete
+----------------
+Optimizer statistics are not transferred by pg_upgrade so,
+once you start the new server, consider running:
+    ./analyze_new_cluster.sh
+
+Running this script will delete the old cluster<span class="err">&#39;</span>s data files:
+    ./delete_old_cluster.sh
+</pre></div>
+
+
+<p>The old cluster can be removed and the new one switched back to port <code>5432</code>. Run <code>/usr/lib/postgresql/9.6/bin/vacuumdb -p 5433 --all --analyze-in-stages</code> to collect&nbsp;statistics.</p>
+</article>
 <div class="pagination row">
     <div class="large-6 columns">
-            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Previous page']);" href="https://www.zimmi.cz/posts/author/michal-zimmermann.html" class="button card card-1">&laquo; Previous page</a>
+            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Previous page']);" href="/author/michal-zimmermann.html" class="button card card-1">&laquo; Previous page</a>
     </div>
     <div class="large-6 columns">
-            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Next page']);" href="https://www.zimmi.cz/posts/author/michal-zimmermann3.html" class="button card card-1">Next page &raquo;</a>
+            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Next page']);" href="/author/michal-zimmermann3.html" class="button card card-1">Next page &raquo;</a>
     </div>
-</div>            </div>
-        </div>
-        <div class="row">
-            <div class="large-12 columns footer">
-                <footer>
-                    <address>
-                    Written by <a href="http://www.zimmi.cz">Michal Zimmermann</a>.
-                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
-                    which takes great advantage of <a href="http://python.org">Python</a>.
-                    </address><!-- /#about -->
-                </footer><!-- /#contentinfo -->
-            </div>
-        </div>
-<!-- Piwik -->
-<script type="text/javascript">
-  var _paq = _paq || [];
-  /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-  _paq.push(['enableHeartBeatTimer']);
-  _paq.push(['trackPageView']);
-  _paq.push(['enableLinkTracking']);
-  (function() {
-    var u="//piwik-zimmi.rhcloud.com/analytics/";
-    _paq.push(['setTrackerUrl', u+'piwik.php']);
-    _paq.push(['setSiteId', '1']);
-    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
-  })();
-</script>
-<!-- End Piwik Code -->
-<script src="https://www.zimmi.cz/posts/theme/js/packed.js?8bee1467"></script>
-<script>
-$(document).foundation();
-</script>
+</div>    </main>
+    <footer>
+        Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
+        Proudly powered by <a href="//getpelican.com/">Pelican</a>,
+        which takes great advantage of <a href="//python.org">Python</a>.
+    </footer>
+<script src="/theme/webassets-external/5acf220afe81b3dd00333bbb93fbaa41_jquery.js"></script>
+<script src="/theme/webassets-external/b80143a60770d5aa122a039a2b889970_foundation.min.js"></script>
 </body>
 </html>

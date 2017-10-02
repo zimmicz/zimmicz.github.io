@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+        <title>Michal Zimmermann | category: SQL</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
+        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="/theme/webassets-external/e17ffd2049da5254bb4b3183ea73c922_normalize.css">
+        <link rel="stylesheet" href="/theme/webassets-external/35f123b951b653f7b2d441b35b63d32a_github.css">
+        <link rel="stylesheet" href="/theme/webassets-external/310a2979488959b3c24d4edd2e18b50d_screen.css">
+</head>
+<body>
+    <nav role="navigation">
+        <ul>
+            <li><a href="/categories">Categories</a></li>
+            <li><a href="/tags">Tags</a></li>
+            <li><a href="/feed.xml">Subscribe to RSS feed</a></li>
+        </ul>
+    </nav>
+    <header>
+        <h1><a href="/posts">Michal Zimmermann<small>Pieces of knowledge from the world of GIS.</small></a></h1>
+    </header>
+    <main>
+<h2 class="text-center">Articles in the SQL category</h2>
+
+<article>
+    <h1><a href="/posts/2015/postgis-case-study-vozejkmap-open-data-part-ii/" rel="bookmark" title="Permalink to PostGIS Case Study: Vozejkmap Open Data (Part II)">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">II</span>)</a></h1>
+    Written on Feb 21, 2015
+    and marked as
+    <a href="/tag/postgresql.html">postgresql</a>,     <a href="/tag/postgis.html">postgis</a>    | <a href="/category/sql.html">SQL</a>
+    <p><a href="{{ pcposturl(2014, 12, 02, 'postgis-case-study-vozejkmap-open-data-part-i') }}">In the first part of my little case study</a> I downloaded <a href="http://vozejkmap.cz">vozejkmap.cz</a> dataset and imported it into the PostGIS database. Having spatial data safely stored the time comes to get it onto the map. Libraries used&nbsp;are:</p>
+<ul>
+<li><a href="http://leafletjs.com">Leaflet</a></li>
+<li><a href="https://github.com/lvoogdt/Leaflet.awesome-markers">Leaflet.awesome-markers</a></li>
+<li><a href="https://github.com/Leaflet/Leaflet.markercluster">Leaflet.markercluster</a></li>
+</ul>
+<p>I teach cartography visualization classes this semester and this map should serve well as an example of what can be done with online&nbsp;maps.</p>
+<h2>Retrieving data from the PostGIS&nbsp;database</h2>
+<p>Our goal is to build the whole map as a static <span class="caps">HTML</span> page without any backend logic. Thus, data needs to be extracted from the database into the format readable with Leaflet - <a href="http://geojson.org/">GeoJSON</a>.</p>
+<p>That&#8217;s fairly easy with the <a href="http://www.postgresonline.com/journal/archives/267-Creating-GeoJSON-Feature-Collections-with-JSON-and-PostGIS-functions.html">postgresonline.com tutorial</a>. It took me quite a time to find out what the following query does. Splitting it into smaller chunks helped a&nbsp;lot.</p>
+<div class="highlight"><pre><span></span>SELECT row_to_json(fc)
+FROM (
+SELECT &#39;FeatureCollection&#39; AS type,
+    array_to_json(array_agg(f)) AS features
+    FROM (SELECT &#39;Feature&#39; AS type,
+        ST_AsGeoJSON(lg.geom)::json As geometry,
+        row_to_json((SELECT l FROM (SELECT id, title, location_type, description, author_name, attr1, attr2, attr3) AS l
+  )) AS properties
+FROM vozejkmap AS lg ) AS f )  AS fc \g /path/to/file.json;
+</pre></div>
+
+
+<p>To get all rows with <code>type</code>, <code>geometry</code> and <code>properties</code> columns (these are the ones defined in GeoJSON specification, see the link above), run&nbsp;this:</p>
+<div class="highlight"><pre><span></span>SELECT &#39;Feature&#39; AS type,
+            ST_AsGeoJSON(lg.geom)::json As geometry,
+            row_to_json((SELECT l FROM (SELECT id, title, location_type, description, author_name, attr1, attr2, attr3) AS l
+      )) AS properties
+    FROM vozejkmap AS lg
+</pre></div>
+
+
+<p><code>array_agg()</code> squashes all the rows into an array while <code>array_to_json()</code> returns the array as <span class="caps">JSON</span>.</p>
+<div class="highlight"><pre><span></span>SELECT &#39;FeatureCollection&#39; AS type,
+    array_to_json(array_agg(f)) AS features
+    FROM (SELECT &#39;Feature&#39; AS type,
+        ST_AsGeoJSON(lg.geom)::json As geometry,
+        row_to_json((SELECT l FROM (SELECT id, title, location_type, description, author_name, attr1, attr2, attr3) AS l
+  )) AS properties
+FROM vozejkmap AS lg ) AS f
+</pre></div>
+
+
+<p>In the last step (the whole code as shown above) <code>row_to_json</code> returns the result as <span class="caps">JSON</span>.</p>
+<h3>Caveats</h3>
+<p>If you run this code from the psql console, be sure&nbsp;you</p>
+<ul>
+<li>set <em>show only row</em> to true with <code>\t</code></li>
+<li>set <em>expanded output</em> to false with <code>\x off</code></li>
+</ul>
+<p>If you don&#8217;t, you&#8217;ll have lots of hyphens and column names saved to the json&nbsp;file.</p>
+<h2>Leaflet&nbsp;map</h2>
+<p>Map JavaScript is rather simple with ~30 lines of code (not taking styles into account). Thanks to the great plugins it is easy to show ~7,600 points on the map real&nbsp;quick.</p>
+<p>I didn&#8217;t do much customization apart from styling markers and binding&nbsp;popups.</p>
+<p><img src="/assets/postgis-case-study-vozejkmap-open-data-part-ii/map.png" title="vozejkmap.cz data map" class="img-responsive centered"></p>
+<h2>What&#8217;s&nbsp;next</h2>
+<ol>
+<li><a href="http://turfjs.org">Turf</a> which means I need to think of what could be fun to do with this&nbsp;data</li>
+<li>Layers&nbsp;switching</li>
+<li>Map key (by extending&nbsp;L.Control)</li>
+</ol>
+<p>The code is still <a href="https://github.com/zimmicz/vozejkmap-to-postgis">available at my GitHub</a>.</p>
+</article>
+<article>
+    <h1><a href="/posts/2015/using-postgresql-to-update-outdated-map-links/" rel="bookmark" title="Permalink to Using PostgreSQL To Update Outdated Map Links">Using PostgreSQL To Update Outdated Map&nbsp;Links</a></h1>
+    Written on Feb 16, 2015
+    and marked as
+    <a href="/tag/postgresql.html">postgresql</a>,     <a href="/tag/regex.html">regex</a>    | <a href="/category/sql.html">SQL</a>
+    <p><a href="http://www.edpp.cz/pdb_mapa-povodnoveho-planu-mesta/">We&#8217;ve rolled out</a> completely new map <span class="caps">GUI</span> at <a href="http://edpp.cz">edpp.cz</a> built on top of <a href="http://ol3js.org">OpenLayers 3</a>. It looks great and has lots of functions both for <span class="caps">BFU</span> and power users. The only pitfall that came with moving away from OpenLayers 2 were remarkable differences in zoom levels between the old map and the new&nbsp;one.</p>
+<p>Each of our maps is defined by our admins (center, zoom level, layers) at the map creation. Lots of links calling different views of map are created as well. They take form of <code>http://edpp.cz/some-map?0=0&amp;1=0...zoom=5</code>. That <code>zoom=&lt;Number&gt;</code> started causing troubles immediately after the map switch. No way my workmates would update them one by one as there were ~4,500 of them. Sounds like a task for little bit of regular expressions and some <span class="caps">SQL</span>&nbsp;updates.</p>
+<div class="highlight"><pre><span></span>UPDATE table
+    SET column = regexp_replace(column, &#39;zoom=\d&#39;, &#39;zoom=&#39; || subquery.zoom, &#39;g&#39;)
+    FROM (
+        SELECT regexp_replace(
+            substring(column from &#39;zoom=\d&#39;),
+            &#39;zoom=(\d)&#39;,
+            &#39;\1&#39;,
+            &#39;g&#39;)::integer + 2 AS zoom, guid
+        FROM table) AS subquery
+    WHERE column ~ &#39;zoom=\d&#39;
+        AND table.guid = subquery.guid
+</pre></div>
+
+
+<p>That&#8217;s what I&#8217;ve come up with. It basically extracts the zoom level from the link, adds number two to its value and writes it back to the&nbsp;string.</p>
+</article>
+<article>
+    <h1><a href="/posts/2014/postgis-case-study-vozejkmap-open-data-part-i/" rel="bookmark" title="Permalink to PostGIS Case Study: VozejkMap Open Data (Part I)">PostGIS Case Study: VozejkMap Open Data (Part&nbsp;I)</a></h1>
+    Written on Dec 2, 2014
+    and marked as
+    <a href="/tag/postgresql.html">postgresql</a>,     <a href="/tag/postgis.html">postgis</a>    | <a href="/category/sql.html">SQL</a>
+    <p><a href="http://www.vozejkmap.cz">VozejkMap.cz</a> is a Czech <strong>open data</strong> iniatitive that collects data about wheelchair accessible places, e.g. pubs, toilets, cafes etc. As part of being open, they offer a <a href="http://www.vozejkmap.cz/opendata/"><span class="caps">JSON</span> data download</a>. <span class="caps">JSON</span> is a great text format, not so great spatial format (leaving GeoJSON aside) though. Anyway, nothing that <a href="http://posts.zimmi.cz/tag/postgis/">PostGIS</a> wouldn&#8217;t be able to take care&nbsp;of.</p>
+<h3>Let&#8217;s get some&nbsp;data</h3>
+<p>Using curl or wget, let&#8217;s download the <span class="caps">JSON</span>&nbsp;file:</p>
+<div class="highlight"><pre><span></span>wget -O /tmp/locations.json http://www.vozejkmap.cz/opendata/locations.json
+</pre></div>
+
+
+<p>We need to split them into rows to load each point into one&nbsp;row:</p>
+<div class="highlight"><pre><span></span>sed -i &#39;s/\},{/\n},{/g&#39; /tmp/locations.json
+</pre></div>
+
+
+<p>If you peep into the file, you&#8217;ll see lots of unicode characters we don&#8217;t want to have in our pretty little table. Here&#8217;s how we get rid of&nbsp;them:</p>
+<div class="highlight"><pre><span></span>echo -en &quot;$(cat /tmp/locations.json)&quot;
+</pre></div>
+
+
+<h3>Let&#8217;s load the&nbsp;data</h3>
+<p>Let&#8217;s just be nice and leave the public schema&nbsp;clean.</p>
+<div class="highlight"><pre><span></span>CREATE SCHEMA vozejkmap;
+SET search_path=vozejkmap, public;
+</pre></div>
+
+
+<p>Load the&nbsp;data:</p>
+<div class="highlight"><pre><span></span>CREATE TABLE vozejkmap_raw(id SERIAL PRIMARY KEY, raw text);
+COPY vozejkmap_raw(raw) FROM &#39;/tmp/locations.json&#39; DELIMITERS &#39;#&#39; ESCAPE &#39;\&#39; CSV;
+</pre></div>
+
+
+<p>A few&nbsp;notes:</p>
+<ol>
+<li>I&#8217;m using <code>/tmp</code> folder to avoid any permission-denied issues when opening the file from <code>psql</code>.</li>
+<li>By setting <code>DELIMITERS</code> to <code>#</code> we tell PostgreSQL to load whole data into one column, because it is safe to assume there is no such character in our&nbsp;data.</li>
+<li><code>ESCAPE</code> needs to be set because there is one trailing quote in the&nbsp;dataset.</li>
+</ol>
+<h3>Let&#8217;s get dirty with spatial&nbsp;data</h3>
+<p>Great, now what? We loaded all the data into one column. That is not very useful, is it? How about splitting them into separate columns with this query? Shall we call it a <code>split_part</code> hell?</p>
+<div class="highlight"><pre><span></span>CREATE TABLE vozejkmap AS
+SELECT
+    id,
+    trim(
+        split_part(
+            split_part(
+                raw, &#39;title:&#39;, 2
+            ),
+            &#39;,location_type:&#39;, 1
+        )
+    ) AS title,
+
+    trim(
+        split_part(
+            split_part(
+                raw, &#39;location_type:&#39;, 2
+            ),
+            &#39;,description:&#39;, 1
+        )
+    )::integer AS location_type,
+
+    trim(
+        split_part(
+            split_part(
+                raw, &#39;description:&#39;, 2
+            ),
+            &#39;,lat:&#39;, 1
+        )
+    ) AS description,
+
+    cast( trim(
+        split_part(
+            split_part(
+                raw, &#39;lat:&#39;, 2
+            ),
+            &#39;,lng:&#39;, 1
+        )
+    ) AS double precision) AS lat,
+
+    cast( trim(
+        split_part(
+            split_part(
+                raw, &#39;lng:&#39;, 2
+            ),
+            &#39;,attr1:&#39;, 1
+        )
+    )  AS double precision) AS lng,
+
+    trim(
+        split_part(
+            split_part(
+                raw, &#39;attr1:&#39;, 2
+            ),
+            &#39;,attr2:&#39;, 1
+        )
+    )::integer AS attr1,
+
+    trim(
+        split_part(
+            split_part(
+                raw, &#39;attr2:&#39;, 2
+            ),
+            &#39;,attr3:&#39;, 1
+        )
+    ) AS attr2,
+
+    trim(
+        split_part(
+            split_part(
+                raw, &#39;attr3:&#39;, 2
+            ),
+            &#39;,author_name:&#39;, 1
+        )
+    ) AS attr3,
+
+    trim(
+        split_part(
+            split_part(
+                raw, &#39;author_name:&#39;, 2
+            ),
+            &#39;,}:&#39;, 1
+        )
+    ) AS author_name
+
+FROM vozejkmap_raw;
+</pre></div>
+
+
+<p>It just splits the <span class="caps">JSON</span> data and creates table out of it according to the <a href="http://www.vozejkmap.cz/opendata/">VozejkMap.cz data specification</a>. Before going on we should create a table with location types to join their numeric codes to real&nbsp;names:</p>
+<div class="highlight"><pre><span></span>CREATE TABLE location_type (
+    id integer PRIMARY KEY,
+    description varchar(255)
+);
+
+INSERT INTO location_type VALUES(1, &#39;Kultura&#39;);
+INSERT INTO location_type VALUES(2, &#39;Sport&#39;);
+INSERT INTO location_type VALUES(3, &#39;Instituce&#39;);
+INSERT INTO location_type VALUES(4, &#39;Jídlo a pití&#39;);
+INSERT INTO location_type VALUES(5, &#39;Ubytování&#39;);
+INSERT INTO location_type VALUES(6, &#39;Lékaři, lékárny&#39;);
+INSERT INTO location_type VALUES(7, &#39;Jiné&#39;);
+INSERT INTO location_type VALUES(8, &#39;Doprava&#39;);
+INSERT INTO location_type VALUES(9, &#39;Veřejné WC&#39;);
+INSERT INTO location_type VALUES(10, &#39;Benzínka&#39;);
+INSERT INTO location_type VALUES(11, &#39;Obchod&#39;);
+INSERT INTO location_type VALUES(12, &#39;Banka, bankomat&#39;);
+INSERT INTO location_type VALUES(13, &#39;Parkoviště&#39;);
+INSERT INTO location_type VALUES(14, &#39;Prodejní a servisní místa Škoda Auto&#39;);
+</pre></div>
+
+
+<p>Let&#8217;s build some geometry column, constraints and indexes. And don&#8217;t forget to get rid of all the mess (the <code>vozejkmap_raw</code> table).</p>
+<div class="highlight"><pre><span></span>DROP TABLE vozejkmap_raw;
+ALTER TABLE vozejkmap ADD PRIMARY KEY(id);
+-- 4326 geometry is not very useful for measurements, I might get to that next time
+ALTER TABLE vozejkmap ADD COLUMN geom geometry(point, 4326);
+ALTER TABLE vozejkmap ADD CONSTRAINT loctype_fk FOREIGN KEY(location_type); REFERENCES location_type(id);
+
+UPDATE vozejkmap SET geom = ST_SetSRID(ST_MakePoint(lng, lat), 4326);
+</pre></div>
+
+
+<p><strong>And here we are, ready to use our spatial&nbsp;data!</strong></p>
+<p>Feel free to <a href="https://github.com/zimmicz/vozejkmap-to-postgis">grab the code</a> at&nbsp;GitHub.</p>
+</article>
+<article>
+    <h1><a href="/posts/2014/postgis-spatial-indexing-with-st_intersects/" rel="bookmark" title="Permalink to PostGIS Spatial Indexing With ST_Intersects">PostGIS Spatial Indexing With&nbsp;ST_Intersects</a></h1>
+    Written on Nov 23, 2014
+    and marked as
+    <a href="/tag/postgis.html">postgis</a>    | <a href="/category/sql.html">SQL</a>
+    <p><a href="http://postgis.net/docs/ST_Intersects.html">PostGIS docs</a> clearly states that:
+    &gt; This function call will automatically include a bounding box comparison that will make use of any indexes that are available on the&nbsp;geometries.</p>
+<p>That means (or at least I think so) that you shouldn&#8217;t bother with using <a href="http://postgis.net/docs/reference.html#Operators">operators</a> before calling this&nbsp;function.</p>
+<p><a href="http://slides.com/michalzimmermann">I was preparing</a> my second lecture on PostGIS and I was experimenting a bit and came up with an interesting thing on this&nbsp;matter:</p>
+<p>Let&#8217;s have two <span class="caps">SQL</span> relations, <code>roads</code> and <code>regions</code>. I would like to retrieve every road that intersects a certain region. Spatial indexes were built beforehand on both&nbsp;tables.</p>
+<p>First&nbsp;try:</p>
+<div class="highlight"><pre><span></span>EXPLAIN ANALYZE SELECT roads.* FROM roads
+JOIN regions ON ST_Intersects(roads.geom, regions.geom)
+WHERE regions.&quot;NAZEV&quot; = &#39;Jihomoravský&#39;;`
+</pre></div>
+
+
+<p>And here comes the&nbsp;result:</p>
+<div class="highlight"><pre><span></span>Nested Loop  (cost=4.85..324.26 rows=249 width=214) (actual time=45.102..5101.472 rows=74253 loops=1)
+-&gt;  Seq Scan on regions  (cost=0.00..12.62 rows=1 width=32) (actual time=0.015..0.018 rows=1 loops=1)
+     Filter: ((&quot;NAZEV&quot;)::text = &#39;Jihomoravský&#39;::text)
+     Rows Removed by Filter: 13
+-&gt;  Bitmap Heap Scan on roads  (cost=4.85..311.38 rows=25 width=214) (actual time=45.079..4931.495 rows=74253 loops=1)
+     Recheck Cond: (geom &amp;&amp; regions.geom)
+     Rows Removed by Index Recheck: 154841
+     Filter: _st_intersects(geom, regions.geom)
+     Rows Removed by Filter: 71212
+     -&gt;  Bitmap Index Scan on roads_idx  (cost=0.00..4.85 rows=75 width=0) (actual time=40.142..40.142 rows=145465 loops=1)
+           Index Cond: (geom &amp;&amp; regions.geom)
+Total runtime: 5181.459 ms
+</pre></div>
+
+
+<p>I was pretty satisfied with the result, I kept digging deeper&nbsp;though.</p>
+<p>Second&nbsp;try:</p>
+<div class="highlight"><pre><span></span>EXPLAIN ANALYZE SELECT roads.* FROM roads
+JOIN regions ON roads.geom &amp;&amp; regions.geom
+WHERE regions.&quot;NAZEV&quot; = &#39;Jihomoravský&#39; AND ST_Intersects(roads.geom, regions.geom);
+</pre></div>
+
+
+<p>And the&nbsp;result:</p>
+<div class="highlight"><pre><span></span>Nested Loop  (cost=0.29..21.19 rows=1 width=214) (actual time=3.041..3850.302 rows=74253 loops=1)
+-&gt;  Seq Scan on regions  (cost=0.00..12.62 rows=1 width=32) (actual time=0.021..0.024 rows=1 loops=1)
+     Filter: ((&quot;NAZEV&quot;)::text = &#39;Jihomoravský&#39;::text)
+     Rows Removed by Filter: 13
+-&gt;  Index Scan using roads_idx on roads  (cost=0.29..8.55 rows=1 width=214) (actual time=2.938..3681.432 rows=74253 loops=1)
+     Index Cond: ((geom &amp;&amp; regions.geom) AND (geom &amp;&amp; regions.geom))
+     Filter: _st_intersects(geom, regions.geom)
+     Rows Removed by Filter: 71212
+Total runtime: 3930.270 ms
+</pre></div>
+
+
+<p>Now there&#8217;s a significant difference between total runtimes of both queries and - more important - also a difference between their query plans. The latter is like <strong>20 % faster</strong>.</p>
+<p>I&#8217;m puzzled about this behavior and would appreciate any thoughts on this. Reach me at <a href="http://twitter.com/zimmicz">Twitter</a>, <a href="https://www.linkedin.com/pub/michal-zimmermann/29/8/b30">LinkedIn</a> or e-mail&nbsp;(zimmicz[at]gmail.com).</p>
+</article>
+<div class="pagination row">
+    <div class="large-6 columns">
+            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Previous page']);" href="/category/sql4.html" class="button card card-1">&laquo; Previous page</a>
+    </div>
+    <div class="large-6 columns">
+    </div>
+</div>    </main>
+    <footer>
+        Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
+        Proudly powered by <a href="//getpelican.com/">Pelican</a>,
+        which takes great advantage of <a href="//python.org">Python</a>.
+    </footer>
+<script src="/theme/webassets-external/5acf220afe81b3dd00333bbb93fbaa41_jquery.js"></script>
+<script src="/theme/webassets-external/b80143a60770d5aa122a039a2b889970_foundation.min.js"></script>
+</body>
+</html>

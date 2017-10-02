@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+        <title>Michal Zimmermann | tag: postgresql</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
+        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="/theme/webassets-external/e17ffd2049da5254bb4b3183ea73c922_normalize.css">
+        <link rel="stylesheet" href="/theme/webassets-external/35f123b951b653f7b2d441b35b63d32a_github.css">
+        <link rel="stylesheet" href="/theme/webassets-external/310a2979488959b3c24d4edd2e18b50d_screen.css">
+</head>
+<body>
+    <nav role="navigation">
+        <ul>
+            <li><a href="/categories">Categories</a></li>
+            <li><a href="/tags">Tags</a></li>
+            <li><a href="/feed.xml">Subscribe to RSS feed</a></li>
+        </ul>
+    </nav>
+    <header>
+        <h1><a href="/posts">Michal Zimmermann<small>Pieces of knowledge from the world of GIS.</small></a></h1>
+    </header>
+    <main>
+<h2 class="text-center">Articles tagged with postgresql tag</h2>
+
+<article>
+    <h1><a href="/posts/2014/postgresql-remote-access/" rel="bookmark" title="Permalink to PostgreSQL Remote Access">PostgreSQL Remote&nbsp;Access</a></h1>
+    Written on Sep 17, 2014
+    and marked as
+    <a href="/tag/postgresql.html">postgresql</a>,     <a href="/tag/linux.html">linux</a>    | <a href="/category/development.html">development</a>
+    <p>PostgreSQL is set to listen only to connections coming from localhost by default. I guess that&#8217;s fine as far as you don&#8217;t need access to the database from anywhere else (like your work network). If you do, you need to log via <span class="caps">SSH</span> or use some online database management tool (go for <a href="http://adminer.org">Adminer</a> and forget about anything called php[pg|my]admin). Or you can set it up to access connections from other&nbsp;locations.</p>
+<p>You need&nbsp;to:</p>
+<ol>
+<li>set <code>listen_addresses</code> to <code>*</code> in your postgres.conf. That does not mean anyone can connect to your database, that means that the server will listen to connections coming from any available <span class="caps">IP</span>&nbsp;interface.</li>
+<li>insert new entry into pg_hba.conf looking like this: <code>host database user xxx.xxx.xxx.xxx md5</code>. Now we&#8217;re saying we only want connections coming from <span class="caps">IP</span> <code>xxx.xxx.xxx.xxx</code> accepted.</li>
+<li>
+<p>Add rule allowing the database server access to iptables. Number 5 says it will be the fifth rule in the order. It must come before the final <span class="caps">REJECT</span> <span class="caps">ALL</span> rule if&nbsp;present.</p>
+<p><code>iptables -I INPUT 5 -p tcp --dport 5432 -s xxx.xxx.xxx.xxx -j ACCEPT</code>
+4. Just to be sure noone else is able to connect, reject all on port&nbsp;5432.</p>
+<p><code>iptables -I INPUT 6 -p tcp --dport 5432 -j REJECT</code></p>
+</li>
+</ol>
+<p>You&#8217;re set to remotely connect to your database&nbsp;server.</p>
+</article>
+<div class="pagination row">
+    <div class="large-6 columns">
+            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Previous page']);" href="/tag/postgresql5.html" class="button card card-1">&laquo; Previous page</a>
+    </div>
+    <div class="large-6 columns">
+    </div>
+</div>    </main>
+    <footer>
+        Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
+        Proudly powered by <a href="//getpelican.com/">Pelican</a>,
+        which takes great advantage of <a href="//python.org">Python</a>.
+    </footer>
+<script src="/theme/webassets-external/5acf220afe81b3dd00333bbb93fbaa41_jquery.js"></script>
+<script src="/theme/webassets-external/b80143a60770d5aa122a039a2b889970_foundation.min.js"></script>
+</body>
+</html>

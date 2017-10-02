@@ -4,71 +4,32 @@
         <title>Michal Zimmermann | category: Tools</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
-        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?d5d1e141">
-<!-- Start of Async Drift Code -->
-<script>
-    !function () {
-        var t;
-        if (t = window.driftt = window.drift = window.driftt || [], !t.init) return t.invoked ? void (window.console && console.error && console.error("Drift snippet included twice.")) : (t.invoked = !0,
-            t.methods = ["identify", "config", "track", "reset", "debug", "show", "ping", "page", "hide", "off", "on"],
-            t.factory = function (e) {
-                return function () {
-                    var n;
-                    return n = Array.prototype.slice.call(arguments), n.unshift(e), t.push(n), t;
-                };
-            }, t.methods.forEach(function (e) {
-                t[e] = t.factory(e);
-            }), t.load = function (t) {
-                var e, n, o, i;
-                e = 3e5, i = Math.ceil(new Date() / e) * e, o = document.createElement("script"),
-                    o.type = "text/javascript", o.async = !0, o.crossorigin = "anonymous", o.src = "https://js.driftt.com/include/" + i + "/" + t + ".js",
-                    n = document.getElementsByTagName("script")[0], n.parentNode.insertBefore(o, n);
-            });
-    }();
-    drift.SNIPPET_VERSION = '0.3.1';
-    drift.load('caacyauy5t6b');
-
-</script>
-<!-- End of Async Drift Code --></head>
-
-<body id="index" class="home">
-    <nav class="top-bar card-1" data-topbar role="navigation">
-        <ul class="title-area">
-            <li class="name">
-                <h1><a href="/posts">Home</a></h1>
-            </li>
-     <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
-            <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+        <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
+        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="/theme/webassets-external/e17ffd2049da5254bb4b3183ea73c922_normalize.css">
+        <link rel="stylesheet" href="/theme/webassets-external/35f123b951b653f7b2d441b35b63d32a_github.css">
+        <link rel="stylesheet" href="/theme/webassets-external/310a2979488959b3c24d4edd2e18b50d_screen.css">
+</head>
+<body>
+    <nav role="navigation">
+        <ul>
+            <li><a href="/categories">Categories</a></li>
+            <li><a href="/tags">Tags</a></li>
+            <li><a href="/feed.xml">Subscribe to RSS feed</a></li>
         </ul>
-        <section class="top-bar-section">
-    <!-- Right Nav Section -->
-            <ul class="right">
-                <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
-                <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
-                <li><a href="https://www.zimmi.cz/posts/feed.xml">RSS feed</a></li>
-            </ul>
-        </section>
     </nav>
-        <div class="row">
-          <div class="large-12 columns header">
-            <h1><a href="/posts">Michal Zimmermann</a> <small>Pieces of knowledge from the world of GIS.</small></h1>
-          </div>
-        </div>
-        <div class="row">
-            <div class="large-12 columns">
+    <header>
+        <h1><a href="/posts">Michal Zimmermann<small>Pieces of knowledge from the world of GIS.</small></a></h1>
+    </header>
+    <main>
 <h2 class="text-center">Articles in the Tools category</h2>
 
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2015/qgis-tips-for-collaborative-mapping/" rel="bookmark" title="Permalink to QGIS Tips For Collaborative Mapping"><span class="caps">QGIS</span> Tips For Collaborative&nbsp;Mapping</a></h1>
-            <small>Written on Jul 21, 2015
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>        | <a href="https://www.zimmi.cz/posts/category/tools.html">Tools</a>
-        </small>
-        <section>
-            <p>Right now I&#8217;m setting up a project aimed at crop evaluation over ortophotos, <span class="caps">HR</span> and <span class="caps">VHR</span> imagery. All the steps of evaluation will be done in <span class="caps">QGIS</span> with PostGIS used for data storage and&nbsp;post-processing.</p>
+<article>
+    <h1><a href="/posts/2015/qgis-tips-for-collaborative-mapping/" rel="bookmark" title="Permalink to QGIS Tips For Collaborative Mapping"><span class="caps">QGIS</span> Tips For Collaborative&nbsp;Mapping</a></h1>
+    Written on Jul 21, 2015
+    and marked as
+    <a href="/tag/qgis.html">qgis</a>    | <a href="/category/tools.html">Tools</a>
+    <p>Right now I&#8217;m setting up a project aimed at crop evaluation over ortophotos, <span class="caps">HR</span> and <span class="caps">VHR</span> imagery. All the steps of evaluation will be done in <span class="caps">QGIS</span> with PostGIS used for data storage and&nbsp;post-processing.</p>
 <p>In the initial phase, fifteen <span class="caps">GIS</span> operators will be using <span class="caps">QGIS</span> to reshape geometries and fill attribute data accordingly. Fifteen are not so many, but it is enough to be a possible source of errors. Luckily, there are many things you can do with <span class="caps">QGIS</span> to prevent people from making&nbsp;mistakes.</p>
 <h2><span class="caps">QGIS</span> project&nbsp;file</h2>
 <p><span class="caps">QGIS</span> project, the .qgs file, is a pure <span class="caps">XML</span> and, unlike <span class="caps">ESRI</span>&#8217;s .mxd, can be edited with any text editor. That&#8217;s great advantage when you need to prepare one project for many different operators. My project has to load some database layers that should be different for different operators that have different database&nbsp;accounts.</p>
@@ -81,55 +42,27 @@
 <p>Using this multiple times for each user-specific layer is a great time&nbsp;saver.</p>
 <h2>Adjust attribute table to fit your&nbsp;needs</h2>
 <p><span class="caps">QGIS</span> attribute table has so many settings you probably don&#8217;t use on daily basis and yet they might be invaluable in such project. All of them are available from layer properties under the Fields&nbsp;tab.</p>
-<p class='text-center'><img src="https://www.zimmi.cz/posts/assets/qgis-tips-for-collaborative-mapping/hidden.png" width=50% class="img-responsive centered"></p>
+<p class='text-center'><img src="/assets/qgis-tips-for-collaborative-mapping/hidden.png" width=50% class="img-responsive centered"></p>
 
 <p>Sadly, our PostGIS layers are very wide in terms of column count. Not all of the columns are to be edited or even seen by operators, so it might be a good idea to hide them by setting their Edit Widget to Hidden. Those that should be seen, but not edited, might be set as not editable by unchecking that&nbsp;option.</p>
 <p>Lots of our attributes use enumerations provided by our project partner as <span class="caps">CSV</span> files. We use them in <span class="caps">QGIS</span> as value maps, so operators don&#8217;t have to type them manually - we both make their work easier and eliminate mistakes they&nbsp;made.</p>
-<p class='text-center'><img src="https://www.zimmi.cz/posts/assets/qgis-tips-for-collaborative-mapping/valuemap.png" width=50% class="img-responsive centered"></p>
+<p class='text-center'><img src="/assets/qgis-tips-for-collaborative-mapping/valuemap.png" width=50% class="img-responsive centered"></p>
 
 <p>Note <span class="caps">QGIS</span> swallows the first row of the given <span class="caps">CSV</span> file as if it was a header. Don&#8217;t forget about this when creating your own enumerations. Once set, operators will see a friendly combo box instead of a hostile blank input in the attribute&nbsp;table.</p>
 <p>These are just small adjustments that can make a big difference in your <span class="caps">QGIS</span>&nbsp;workflow.</p>
-        </section>
-        </div>
-    </div>
-
+</article>
 <div class="pagination row">
     <div class="large-6 columns">
     </div>
     <div class="large-6 columns">
     </div>
-</div>            </div>
-        </div>
-        <div class="row">
-            <div class="large-12 columns footer">
-                <footer>
-                    <address>
-                    Written by <a href="http://www.zimmi.cz">Michal Zimmermann</a>.
-                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
-                    which takes great advantage of <a href="http://python.org">Python</a>.
-                    </address><!-- /#about -->
-                </footer><!-- /#contentinfo -->
-            </div>
-        </div>
-<!-- Piwik -->
-<script type="text/javascript">
-  var _paq = _paq || [];
-  /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-  _paq.push(['enableHeartBeatTimer']);
-  _paq.push(['trackPageView']);
-  _paq.push(['enableLinkTracking']);
-  (function() {
-    var u="//piwik-zimmi.rhcloud.com/analytics/";
-    _paq.push(['setTrackerUrl', u+'piwik.php']);
-    _paq.push(['setSiteId', '1']);
-    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
-  })();
-</script>
-<!-- End Piwik Code -->
-<script src="https://www.zimmi.cz/posts/theme/js/packed.js?8bee1467"></script>
-<script>
-$(document).foundation();
-</script>
+</div>    </main>
+    <footer>
+        Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
+        Proudly powered by <a href="//getpelican.com/">Pelican</a>,
+        which takes great advantage of <a href="//python.org">Python</a>.
+    </footer>
+<script src="/theme/webassets-external/5acf220afe81b3dd00333bbb93fbaa41_jquery.js"></script>
+<script src="/theme/webassets-external/b80143a60770d5aa122a039a2b889970_foundation.min.js"></script>
 </body>
 </html>

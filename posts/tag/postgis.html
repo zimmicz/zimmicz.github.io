@@ -4,71 +4,32 @@
         <title>Michal Zimmermann | tag: postgis</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
-        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?d5d1e141">
-<!-- Start of Async Drift Code -->
-<script>
-    !function () {
-        var t;
-        if (t = window.driftt = window.drift = window.driftt || [], !t.init) return t.invoked ? void (window.console && console.error && console.error("Drift snippet included twice.")) : (t.invoked = !0,
-            t.methods = ["identify", "config", "track", "reset", "debug", "show", "ping", "page", "hide", "off", "on"],
-            t.factory = function (e) {
-                return function () {
-                    var n;
-                    return n = Array.prototype.slice.call(arguments), n.unshift(e), t.push(n), t;
-                };
-            }, t.methods.forEach(function (e) {
-                t[e] = t.factory(e);
-            }), t.load = function (t) {
-                var e, n, o, i;
-                e = 3e5, i = Math.ceil(new Date() / e) * e, o = document.createElement("script"),
-                    o.type = "text/javascript", o.async = !0, o.crossorigin = "anonymous", o.src = "https://js.driftt.com/include/" + i + "/" + t + ".js",
-                    n = document.getElementsByTagName("script")[0], n.parentNode.insertBefore(o, n);
-            });
-    }();
-    drift.SNIPPET_VERSION = '0.3.1';
-    drift.load('caacyauy5t6b');
-
-</script>
-<!-- End of Async Drift Code --></head>
-
-<body id="index" class="home">
-    <nav class="top-bar card-1" data-topbar role="navigation">
-        <ul class="title-area">
-            <li class="name">
-                <h1><a href="/posts">Home</a></h1>
-            </li>
-     <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
-            <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+        <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
+        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="/theme/webassets-external/e17ffd2049da5254bb4b3183ea73c922_normalize.css">
+        <link rel="stylesheet" href="/theme/webassets-external/35f123b951b653f7b2d441b35b63d32a_github.css">
+        <link rel="stylesheet" href="/theme/webassets-external/310a2979488959b3c24d4edd2e18b50d_screen.css">
+</head>
+<body>
+    <nav role="navigation">
+        <ul>
+            <li><a href="/categories">Categories</a></li>
+            <li><a href="/tags">Tags</a></li>
+            <li><a href="/feed.xml">Subscribe to RSS feed</a></li>
         </ul>
-        <section class="top-bar-section">
-    <!-- Right Nav Section -->
-            <ul class="right">
-                <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
-                <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
-                <li><a href="https://www.zimmi.cz/posts/feed.xml">RSS feed</a></li>
-            </ul>
-        </section>
     </nav>
-        <div class="row">
-          <div class="large-12 columns header">
-            <h1><a href="/posts">Michal Zimmermann</a> <small>Pieces of knowledge from the world of GIS.</small></h1>
-          </div>
-        </div>
-        <div class="row">
-            <div class="large-12 columns">
+    <header>
+        <h1><a href="/posts">Michal Zimmermann<small>Pieces of knowledge from the world of GIS.</small></a></h1>
+    </header>
+    <main>
 <h2 class="text-center">Articles tagged with postgis tag</h2>
 
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2017/postgis-as-a-mapbox-vector-tiles-generator/" rel="bookmark" title="Permalink to PostGIS as a Mapbox Vector Tiles generator">PostGIS as a Mapbox Vector Tiles&nbsp;generator</a></h1>
-            <small>Written on Aug 6, 2017
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/docker.html">docker</a>,         <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>,         <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
-        </small>
-        <section>
-            <p><a href="http://postgis.net/2017/08/05/postgis-2.4.0alpha/">PostGIS 2.4.0</a> was released recently bringing the possibilities to generate <strong>Mapbox Vector Tiles</strong> without any third party tools. I got a shot at it with Node.js and docker. Even if it&#8217;s not as straightforward as solely using <a href="https://postgis.net/docs/manual-dev/ST_AsMVT.html">ST_AsMVT</a>, it still looks pretty&nbsp;great.</p>
+<article>
+    <h1><a href="/posts/2017/postgis-as-a-mapbox-vector-tiles-generator/" rel="bookmark" title="Permalink to PostGIS as a Mapbox Vector Tiles generator">PostGIS as a Mapbox Vector Tiles&nbsp;generator</a></h1>
+    Written on Aug 6, 2017
+    and marked as
+    <a href="/tag/docker.html">docker</a>,     <a href="/tag/postgis.html">postgis</a>,     <a href="/tag/javascript.html">javascript</a>    | <a href="/category/sql.html">SQL</a>
+    <p><a href="http://postgis.net/2017/08/05/postgis-2.4.0alpha/">PostGIS 2.4.0</a> was released recently bringing the possibilities to generate <strong>Mapbox Vector Tiles</strong> without any third party tools. I got a shot at it with Node.js and docker. Even if it&#8217;s not as straightforward as solely using <a href="https://postgis.net/docs/manual-dev/ST_AsMVT.html">ST_AsMVT</a>, it still looks pretty&nbsp;great.</p>
 <h2>Docker&nbsp;container</h2>
 <p>There are no Ubuntu or Debian based PostGIS 2.4.0 packages as far as I know. As installation from source (especially considering <span class="caps">GIS</span> software) is always a bit risky, I prefer using Docker to stay away from trouble. The image is based on Ubuntu 17.04, has PostgreSQL 9.6 and PostGIS 2.4.0 installed. It exposes port 5432 to the host, so you can access the database from the outside the&nbsp;container.</p>
 <div class="highlight"><pre><span></span>FROM ubuntu:17.04
@@ -130,7 +91,7 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
 <p>I got a cadastre area dataset of the Czech Republic for testing, which contains ~ 13,000 polygons. The geometries should come in Web Mercator a.k.a. <span class="caps">EPSG</span>:3857 to work with <a href="https://www.mapbox.com/vector-tiles/specification/"><span class="caps">MVT</span></a>.</p>
 <h2>Vector&nbsp;tiles</h2>
 <p>I got a bit confused by the docs of <a href="https://postgis.net/docs/manual-dev/ST_AsMVT.html">ST_AsMVT</a> and <a href="https://postgis.net/docs/manual-dev/ST_AsMVTGeom.html">ST_AsMVTGeom</a>. Especially the latter one took me a few hours to get it right. What is essential (I guess) about Mapbox Vector Tiles is that you have to abstract from the real world coordinates and start thinking inside the tile coordinates. What PostGIS does with <code>ST_AsMVTGeom</code> (and what any other <span class="caps">MVT</span> implemenation should do for you) is that it takes real world coordinates and put them inside a&nbsp;tile.</p>
-<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/postgis-as-a-mapbox-vector-tiles-generator/mvt.gif"/></div>
+<div class="text-center"><img src="/assets/postgis-as-a-mapbox-vector-tiles-generator/mvt.gif"/></div>
 
 <p>To make this work, you need to know every bounding box of every tile on every zoom level in a Web Mercator projection. Or you can use <a href="https://github.com/mapbox/postgis-vt-util/blob/master/src/TileBBox.sql">TileBBox procedure by Mapbox</a>, if you&nbsp;wish.</p>
 <p>The <span class="caps">SQL</span> query itself is pretty simple (this comes from an express route I&#8217;ll be discussing&nbsp;shortly).</p>
@@ -165,19 +126,13 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
 
 
 <p>The <a href="https://gist.github.com/zimmicz/9e78d9888ab73abc7e87553b77999bc8">server <span class="caps">MVP</span> is available</a> as a GitHub&nbsp;gist.</p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/" rel="bookmark" title="Permalink to Routing with pgRouting: Catchment Area Calculation">Routing with pgRouting: Catchment Area&nbsp;Calculation</a></h1>
-            <small>Written on Apr 14, 2017
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>,         <a href="https://www.zimmi.cz/posts/tag/pgrouting.html">pgrouting</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
-        </small>
-        <section>
-            <p>For a long time I&#8217;ve wanted to play with <a href="http://pgrouting.org/">pgRouting</a> and that time has finally come. Among many other routing functions there is one that caught my eye, called <code>pgr_drivingdistance</code>. As the documentation says, it <em>returns the driving distance from a start node</em> using Dijkstra algorithm. The aforementioned distance doesn&#8217;t need to be defined in Euclidean space (the real distance between two points), it might be calculated in units of time, slopeness etc. How to get it&nbsp;going?</p>
+</article>
+<article>
+    <h1><a href="/posts/2017/routing-with-pgrouting-catchment-area-calculation/" rel="bookmark" title="Permalink to Routing with pgRouting: Catchment Area Calculation">Routing with pgRouting: Catchment Area&nbsp;Calculation</a></h1>
+    Written on Apr 14, 2017
+    and marked as
+    <a href="/tag/postgis.html">postgis</a>,     <a href="/tag/pgrouting.html">pgrouting</a>    | <a href="/category/sql.html">SQL</a>
+    <p>For a long time I&#8217;ve wanted to play with <a href="http://pgrouting.org/">pgRouting</a> and that time has finally come. Among many other routing functions there is one that caught my eye, called <code>pgr_drivingdistance</code>. As the documentation says, it <em>returns the driving distance from a start node</em> using Dijkstra algorithm. The aforementioned distance doesn&#8217;t need to be defined in Euclidean space (the real distance between two points), it might be calculated in units of time, slopeness etc. How to get it&nbsp;going?</p>
 <h2>Data</h2>
 <p><span class="caps">OSM</span> will do as it always does. There is a tool called <code>osm2pgrouting</code> to help you load the data, the pure <span class="caps">GDAL</span> seems to be a better way to me though. Importing the downloaded data is&nbsp;trivial.</p>
 <div class="highlight"><pre><span></span>ogr2ogr -f <span class="s2">&quot;PostgreSQL&quot;</span> PG:<span class="s2">&quot;dbname=pgrouting active_schema=cze&quot;</span> <span class="se">\</span>
@@ -235,7 +190,7 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
 
 
 <p>This function creates the <code>cze.roads_noded_vertices_pgr</code> that contains all the extracted nodes from the&nbsp;network.</p>
-<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-pgrouting-catchment-area-calculation/nodes.png" width="70%" /></div>
+<div class="text-center"><img src="/assets/routing-with-pgrouting-catchment-area-calculation/nodes.png" width="70%" /></div>
 
 <p>As already mentioned, measures other than length can be used as a distance, I chose the time to get to a given node on&nbsp;foot.</p>
 <div class="highlight"><pre><span></span><span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="k">ADD</span> <span class="k">COLUMN</span> <span class="n">cost_minutes</span> <span class="nb">integer</span><span class="p">;</span>
@@ -294,7 +249,7 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
 
 
 <p>Using <code>pgr_pointsAsPolygon</code> renders resulting nodes accessible in 10-minute walk in polygons, but weird looking ones. Not bad, could be better&nbsp;though.</p>
-<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-pgrouting-catchment-area-calculation/area1.png" width="70%" /></div>
+<div class="text-center"><img src="/assets/routing-with-pgrouting-catchment-area-calculation/area1.png" width="70%" /></div>
 
 <p>How about seeing only nodes instead of&nbsp;polygons?</p>
 <div class="highlight"><pre><span></span><span class="k">SELECT</span>
@@ -311,7 +266,7 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
 
 
 <p>Looks good, could be better&nbsp;though.</p>
-<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png" width="70%" /></div>
+<div class="text-center"><img src="/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png" width="70%" /></div>
 
 <p>How about creating concave hulls from the extracted&nbsp;nodes?</p>
 <div class="highlight"><pre><span></span><span class="k">SELECT</span>
@@ -335,7 +290,7 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
 
 
 <p>This one looks the best I&nbsp;guess.</p>
-<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-pgrouting-catchment-area-calculation/area2.png" width="70%" /></div>
+<div class="text-center"><img src="/assets/routing-with-pgrouting-catchment-area-calculation/area2.png" width="70%" /></div>
 
 <h2>Remarks</h2>
 <ul>
@@ -345,21 +300,15 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
 <li>Pedestrians usually don&#8217;t follow the road&nbsp;network.</li>
 <li>Bridges and tunnels might be an&nbsp;issue.</li>
 </ul>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2017/subdivide-and-conquer-effective-spatial-indexes-in-postgis/" rel="bookmark" title="Permalink to Subdivide and Conquer: Effective Spatial Indexes in PostGIS">Subdivide and Conquer: Effective Spatial Indexes in&nbsp;PostGIS</a></h1>
-            <small>Written on Jan 10, 2017
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
-        </small>
-        <section>
-            <p>Spatial indexes are absolutely crucial part of any spatial database and - as I tend to say quite often - only a fool would try to query spatial data without building spatial indexes&nbsp;beforehand.</p>
+</article>
+<article>
+    <h1><a href="/posts/2017/subdivide-and-conquer-effective-spatial-indexes-in-postgis/" rel="bookmark" title="Permalink to Subdivide and Conquer: Effective Spatial Indexes in PostGIS">Subdivide and Conquer: Effective Spatial Indexes in&nbsp;PostGIS</a></h1>
+    Written on Jan 10, 2017
+    and marked as
+    <a href="/tag/sql.html">sql</a>,     <a href="/tag/postgresql.html">postgresql</a>,     <a href="/tag/postgis.html">postgis</a>    | <a href="/category/sql.html">SQL</a>
+    <p>Spatial indexes are absolutely crucial part of any spatial database and - as I tend to say quite often - only a fool would try to query spatial data without building spatial indexes&nbsp;beforehand.</p>
 <p>Spatial indexes are based on bounding box comparisons, which are generally very fast. Yet, there are situations when spatial indexes don&#8217;t help much (or they don&#8217;t help as much as they could, if you&nbsp;wish).</p>
-<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/subdivide-and-conquer-effective-spatial-indexes-in-postgis/index.svg" /></div>
+<div class="text-center"><img src="/assets/subdivide-and-conquer-effective-spatial-indexes-in-postgis/index.svg" /></div>
 
 <p>Bounding box comparisons are effective with lots of small bounding boxes rather then few large ones. Why? See the picture above. The curved line (imagine it&#8217;s a pipeline for example) clearly demonstrates when the spatial index/bounding box comparison might fall short of what you&#8217;d&nbsp;expect.</p>
 <p>Once the bounding box gets really big, it intersects so many other geometries&#8217; bounding boxes that the whole comparison starts to slow&nbsp;down.</p>
@@ -388,7 +337,7 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
 
 <p>It&#8217;s a perfectly standard query that intersects several request geometries with ~20M parcels, nothing really fancy. Except that it takes 25 minutes to finish. Why? Pipelines,&nbsp;remember?</p>
 <p>Yet, the query below takes only 30 seconds to finish (that&#8217;s a huge time saver considering that the whole process used to take ~40 minutes)! Why? Because the <code>ST_Subdivide</code> effectively shrinks the <code>req_geom</code> geometries until they have 50 vertices each at most. Such small geometries are perfect input for the bounding box comparison. Remember to call <code>DISTINCT</code> when using <code>ST_Subdivide</code>, you&#8217;d probably get duplicate parcel ids&nbsp;otherwise.</p>
-<p>I also replaced the <code>UNION</code> with the <a href="https://www.zimmi.cz/posts/2015/postgresql-in-vs-exists/"><code>WHERE NOT EXISTS</code></a> expression, as it&#8217;s reasonable to assume that numeric ids comparison will be&nbsp;faster.</p>
+<p>I also replaced the <code>UNION</code> with the <a href="/posts/2015/postgresql-in-vs-exists/"><code>WHERE NOT EXISTS</code></a> expression, as it&#8217;s reasonable to assume that numeric ids comparison will be&nbsp;faster.</p>
 <div class="highlight"><pre><span></span><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">requested_parcels</span> <span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">par_id</span><span class="p">)</span>
 <span class="k">SELECT</span> <span class="k">DISTINCT</span>
     <span class="n">reqs</span><span class="p">.</span><span class="n">uid</span><span class="p">,</span>
@@ -420,19 +369,13 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
      <span class="k">WHERE</span> <span class="n">pp</span><span class="p">.</span><span class="n">par_id</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">idpar</span>
   <span class="p">);</span>
 </pre></div>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-wind-rose/" rel="bookmark" title="Permalink to PostGIS Custom Function to Create Wind Rose">PostGIS Custom Function to Create Wind&nbsp;Rose</a></h1>
-            <small>Written on Sep 1, 2016
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
-        </small>
-        <section>
-            <p>I&#8217;ve come across the <a href="http://gis.stackexchange.com/questions/208797/draw-wind-rose-with-qgis-from-postgis/">beautiful <span class="caps">GIS</span> StackExchange question</a> recently, asking how to draw a <a href="https://en.wikipedia.org/wiki/Wind_rose">wind rose</a> within&nbsp;PostGIS.</p>
+</article>
+<article>
+    <h1><a href="/posts/2016/postgis-custom-function-to-create-wind-rose/" rel="bookmark" title="Permalink to PostGIS Custom Function to Create Wind Rose">PostGIS Custom Function to Create Wind&nbsp;Rose</a></h1>
+    Written on Sep 1, 2016
+    and marked as
+    <a href="/tag/postgis.html">postgis</a>,     <a href="/tag/postgresql.html">postgresql</a>,     <a href="/tag/sql.html">sql</a>    | <a href="/category/sql.html">SQL</a>
+    <p>I&#8217;ve come across the <a href="http://gis.stackexchange.com/questions/208797/draw-wind-rose-with-qgis-from-postgis/">beautiful <span class="caps">GIS</span> StackExchange question</a> recently, asking how to draw a <a href="https://en.wikipedia.org/wiki/Wind_rose">wind rose</a> within&nbsp;PostGIS.</p>
 <div class="text-center">
 <img src="http://i.stack.imgur.com/0xAMU.png">
 </div>
@@ -496,19 +439,13 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
 
 <div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">ST_WindRose</span><span class="p">(</span><span class="n">ST_MakeLine</span><span class="p">(</span><span class="n">ST_MakePoint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">ST_MakePoint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)),</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mi">01</span><span class="p">);</span>
 </pre></div>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-polygon-from-centroid/" rel="bookmark" title="Permalink to PostGIS Custom Function to Create Polygon from Centroid">PostGIS Custom Function to Create Polygon from&nbsp;Centroid</a></h1>
-            <small>Written on Aug 28, 2016
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
-        </small>
-        <section>
-            <p>Needed to create a polygon from a point defining its size in both axes, here&#8217;s a little syntax sugar to make life&nbsp;easier.</p>
+</article>
+<article>
+    <h1><a href="/posts/2016/postgis-custom-function-to-create-polygon-from-centroid/" rel="bookmark" title="Permalink to PostGIS Custom Function to Create Polygon from Centroid">PostGIS Custom Function to Create Polygon from&nbsp;Centroid</a></h1>
+    Written on Aug 28, 2016
+    and marked as
+    <a href="/tag/postgis.html">postgis</a>,     <a href="/tag/postgresql.html">postgresql</a>,     <a href="/tag/sql.html">sql</a>    | <a href="/category/sql.html">SQL</a>
+    <p>Needed to create a polygon from a point defining its size in both axes, here&#8217;s a little syntax sugar to make life&nbsp;easier.</p>
 <!-- codeblock -->
 
 <div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">OR</span> <span class="k">REPLACE</span> <span class="k">FUNCTION</span> <span class="n">ST_PolygonFromCentroid</span><span class="p">(</span><span class="n">centroid</span> <span class="n">geometry</span><span class="p">,</span> <span class="n">xsize</span> <span class="nb">numeric</span><span class="p">,</span> <span class="n">ysize</span> <span class="nb">numeric</span><span class="p">)</span>
@@ -530,405 +467,20 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
 
 <div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">ST_PolygonFromCentroid</span><span class="p">(</span><span class="n">ST_SetSRID</span><span class="p">(</span><span class="n">ST_MakePoint</span><span class="p">(</span><span class="mi">13</span><span class="p">.</span><span class="mi">912</span><span class="p">,</span><span class="mi">50</span><span class="p">.</span><span class="mi">633</span><span class="p">),</span><span class="mi">4326</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 </pre></div>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2016/finding-polygons-lying-across-other-polygons-with-postgis/" rel="bookmark" title="Permalink to Finding Polygons Lying across Other Polygons with PostGIS">Finding Polygons Lying across Other Polygons with&nbsp;PostGIS</a></h1>
-            <small>Written on Aug 5, 2016
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
-        </small>
-        <section>
-            <p>Doing overlays (<code>ST_Intersection()</code>) in PostGIS based on spatial relationships (<code>ST_Intersects()</code>, <code>ST_Contains()</code>, &hellip;) is so easy it is not something you get particularly excited&nbsp;about.</p>
-<p>Today I faced a bit more interesting task: <strong>given two polygon layers, get me all the polygons from layer A such that they lie across the polygons from layer B and&hellip; a picture worth a thousand words,&nbsp;right?</strong></p>
-<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/finding-polygons-lying-across-other-polygons-with-postgis/polygons.svg" /></div>
-
-<p>I hope you got the idea, it is fairly&nbsp;simple:</p>
-<ol>
-<li>Intersect A (red, blue) with B&nbsp;(green)</li>
-<li>Subtract the result of previous from layer&nbsp;A</li>
-<li>Combine results from steps 1 and&nbsp;2</li>
-<li>Keep polygon only if its id occurs more than twice (that means it went straight through the layer&nbsp;B)</li>
-<li>Profit!</li>
-</ol>
-<!-- codeblock -->
-
-<div class="highlight"><pre><span></span><span class="k">WITH</span> <span class="n">overlays</span> <span class="k">AS</span> <span class="p">(</span>
-<span class="cm">/* nothing fancy here */</span>
-    <span class="k">SELECT</span>
-        <span class="n">A</span><span class="p">.</span><span class="n">ogc_fid</span> <span class="n">a_id</span><span class="p">,</span>
-        <span class="n">B</span><span class="p">.</span><span class="n">ogc_fid</span> <span class="n">b_id</span><span class="p">,</span>
-        <span class="n">ST_Intersection</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">B</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">geom</span><span class="p">,</span>
-        <span class="n">ST_Area</span><span class="p">(</span><span class="n">ST_Intersection</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">B</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">area_shared</span>
-    <span class="k">FROM</span> <span class="n">A</span>
-    <span class="k">JOIN</span> <span class="n">B</span> <span class="k">ON</span> <span class="p">(</span><span class="n">ST_Intersects</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">B</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span>
-<span class="p">),</span>
-<span class="n">diffs</span> <span class="k">AS</span> <span class="p">(</span>
-<span class="cm">/* note this is a 1:1 relationship in ST_Difference */</span>
-<span class="cm">/* a little hack is needed to prevent PostGIS from returning its usual difference mess */</span>
-    <span class="k">SELECT</span>
-        <span class="n">o</span><span class="p">.</span><span class="n">a_id</span><span class="p">,</span>
-        <span class="n">o</span><span class="p">.</span><span class="n">b_id</span><span class="p">,</span>
-        <span class="p">(</span><span class="n">ST_Dump</span><span class="p">(</span><span class="n">ST_Difference</span><span class="p">(</span><span class="n">ST_Buffer</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="o">-</span><span class="mi">0</span><span class="p">.</span><span class="mi">0001</span><span class="p">),</span> <span class="n">o</span><span class="p">.</span><span class="n">geom</span><span class="p">))).</span><span class="n">geom</span><span class="p">,</span> <span class="c1">-- ugly hack</span>
-        <span class="n">o</span><span class="p">.</span><span class="n">area_shared</span>
-    <span class="k">FROM</span> <span class="n">overlays</span> <span class="n">o</span>
-    <span class="k">JOIN</span> <span class="n">A</span> <span class="k">ON</span> <span class="p">(</span><span class="n">o</span><span class="p">.</span><span class="n">a_id</span> <span class="o">=</span> <span class="n">A</span><span class="p">.</span><span class="n">id</span><span class="p">)</span>
-<span class="p">),</span>
-
-<span class="n">merged</span> <span class="k">AS</span> <span class="p">(</span>
-<span class="cm">/* put those two result sets together */</span>
-    <span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">overlays</span>
-    <span class="k">UNION</span> <span class="k">ALL</span>
-    <span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">diffs</span>
-<span class="p">),</span>
-
-<span class="n">merged_reduced</span> <span class="k">AS</span> <span class="p">(</span>
-<span class="cm">/* get only those A polygons that consist of three parts at least for each intersection with B polygon */</span>
-  <span class="k">SELECT</span>
-    <span class="n">m</span><span class="p">.</span><span class="o">*</span>
-  <span class="k">FROM</span> <span class="n">merged</span> <span class="n">m</span>
-  <span class="k">JOIN</span> <span class="p">(</span>
-    <span class="k">SELECT</span>
-      <span class="n">a_id</span><span class="p">,</span>
-      <span class="n">b_id</span>
-    <span class="k">FROM</span> <span class="n">merged</span>
-    <span class="k">GROUP</span> <span class="k">BY</span> <span class="n">a_id</span><span class="p">,</span> <span class="n">b_id</span>
-    <span class="k">HAVING</span> <span class="k">COUNT</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span>
-  <span class="p">)</span> <span class="n">a</span> <span class="k">ON</span> <span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">a_id</span> <span class="o">=</span> <span class="n">m</span><span class="p">.</span><span class="n">a_id</span> <span class="k">AND</span> <span class="n">a</span><span class="p">.</span><span class="n">b_id</span> <span class="o">=</span> <span class="n">m</span><span class="p">.</span><span class="n">b_id</span><span class="p">)</span>
-<span class="p">)</span>
-<span class="cm">/* do as you wish with the result */</span>
-<span class="k">SELECT</span> <span class="o">*</span>
-<span class="k">FROM</span> <span class="n">merged_reduced</span><span class="p">;</span>
-</pre></div>
-
-
-<p>In my case, centerlines of layer B were also included and their length inside each intersection was used to divide the area of the smallest part with. It was fun,&nbsp;actually.</p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2016/dead-simple-random-points-in-polygons-with-postgis/" rel="bookmark" title="Permalink to Dead Simple Random Points in Polygons with PostGIS">Dead Simple Random Points in Polygons with&nbsp;PostGIS</a></h1>
-            <small>Written on Aug 3, 2016
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>,         <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>        | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
-        </small>
-        <section>
-            <p>Since PostgreSQL 9.3 there has been a handy little keyword called <code>LATERAL</code>, which - combined with <code>JOIN</code> - might rock your <span class="caps">GIS</span> world in a second. To keep it simple, a <code>LATERAL JOIN</code> enables a subquery in the <code>FROM</code> part of a query to reference columns from preceding expressions in the <code>FROM</code> list. What the&nbsp;heck?</p>
-<p>Imagine that not so unusual request to <strong>generate random points in polygons</strong> (something I needed to do today). Do it automatically without your favorite piece of desktop <span class="caps">GIS</span>&nbsp;software.</p>
-<p>It is pretty easy using <code>LATERAL JOIN</code>:</p>
-<div class="highlight"><pre><span></span><span class="k">SELECT</span>
-    <span class="n">a</span><span class="p">.</span><span class="n">id</span><span class="p">,</span>
-    <span class="n">b</span><span class="p">.</span><span class="o">*</span>
-<span class="k">FROM</span> <span class="p">(</span>
-    <span class="k">VALUES</span><span class="p">(</span>
-        <span class="mi">1</span><span class="p">,</span>
-        <span class="n">ST_SetSRID</span><span class="p">(</span>
-            <span class="n">ST_GeomFromText</span><span class="p">(</span>
-                <span class="s1">&#39;POLYGON((0 0, -1 0, -1 -1, 0 -1, 0 0))&#39;</span>
-            <span class="p">),</span>
-        <span class="mi">4326</span><span class="p">)</span>
-    <span class="p">)</span>
-    <span class="k">UNION</span> <span class="k">ALL</span>
-    <span class="k">VALUES</span><span class="p">(</span>
-        <span class="mi">2</span><span class="p">,</span>
-        <span class="n">ST_SetSRID</span><span class="p">(</span>
-            <span class="n">ST_GeomFromText</span><span class="p">(</span>
-                <span class="s1">&#39;POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))&#39;</span>
-            <span class="p">),</span>
-        <span class="mi">4326</span><span class="p">)</span>
-    <span class="p">)</span>
-<span class="p">)</span> <span class="n">a</span><span class="p">(</span><span class="n">id</span><span class="p">,</span> <span class="n">geom</span><span class="p">)</span>
-<span class="k">CROSS</span> <span class="k">JOIN</span> <span class="k">LATERAL</span> <span class="p">(</span>
-    <span class="k">SELECT</span> <span class="n">ST_SetSRID</span><span class="p">(</span><span class="n">ST_MakePoint</span><span class="p">(</span><span class="n">tmp</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">tmp</span><span class="p">.</span><span class="n">y</span><span class="p">),</span> <span class="mi">4326</span><span class="p">)</span> <span class="n">geom</span>
-    <span class="k">FROM</span> <span class="p">(</span>
-        <span class="k">SELECT</span>
-            <span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">ST_XMax</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="o">-</span> <span class="n">ST_XMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span> <span class="o">+</span> <span class="n">ST_XMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">x</span><span class="p">,</span>
-            <span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">ST_YMax</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="o">-</span> <span class="n">ST_YMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span> <span class="o">+</span> <span class="n">ST_YMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">y</span>
-        <span class="k">FROM</span> <span class="n">generate_series</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">)</span>
-    <span class="p">)</span> <span class="n">tmp</span>
-<span class="p">)</span> <span class="n">b</span><span class="p">;</span>
-</pre></div>
-
-
-<p>What actually happened over there? If you want to put points inside polygons, you need&#8230; polygons. We will do just fine with two of them created inside this&nbsp;query:</p>
-<div class="highlight"><pre><span></span><span class="k">VALUES</span><span class="p">(</span>
-    <span class="mi">1</span><span class="p">,</span>
-    <span class="n">ST_SetSRID</span><span class="p">(</span>
-        <span class="n">ST_GeomFromText</span><span class="p">(</span>
-            <span class="s1">&#39;POLYGON((0 0, -1 0, -1 -1, 0 -1, 0 0))&#39;</span>
-        <span class="p">),</span>
-    <span class="mi">4326</span><span class="p">)</span>
-<span class="p">)</span>
-<span class="k">UNION</span> <span class="k">ALL</span>
-<span class="k">VALUES</span><span class="p">(</span>
-    <span class="mi">2</span><span class="p">,</span>
-    <span class="n">ST_SetSRID</span><span class="p">(</span>
-        <span class="n">ST_GeomFromText</span><span class="p">(</span>
-            <span class="s1">&#39;POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))&#39;</span>
-        <span class="p">),</span>
-    <span class="mi">4326</span><span class="p">)</span>
-<span class="p">)</span>
-</pre></div>
-
-
-<p>All the magic happens inside the <code>LATERAL JOIN</code> part of the&nbsp;query:</p>
-<div class="highlight"><pre><span></span><span class="k">CROSS</span> <span class="k">JOIN</span> <span class="k">LATERAL</span> <span class="p">(</span>
-    <span class="k">SELECT</span> <span class="n">ST_SetSRID</span><span class="p">(</span><span class="n">ST_MakePoint</span><span class="p">(</span><span class="n">tmp</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">tmp</span><span class="p">.</span><span class="n">y</span><span class="p">),</span> <span class="mi">4326</span><span class="p">)</span> <span class="n">geom</span>
-    <span class="k">FROM</span> <span class="p">(</span>
-        <span class="k">SELECT</span>
-            <span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">ST_XMax</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="o">-</span> <span class="n">ST_XMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span> <span class="o">+</span> <span class="n">ST_XMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">x</span><span class="p">,</span>
-            <span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">ST_YMax</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="o">-</span> <span class="n">ST_YMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span> <span class="o">+</span> <span class="n">ST_YMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">y</span>
-        <span class="k">FROM</span> <span class="n">generate_series</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">)</span>
-    <span class="p">)</span> <span class="n">tmp</span>
-<span class="p">)</span> <span class="n">b</span><span class="p">;</span>
-</pre></div>
-
-
-<p>The inner <code>SELECT</code> calculates random points based on the extent of the polygon. Note it directly calls <code>a.geom</code>, a value that comes from the previous <code>SELECT</code>! The <code>LATERAL JOIN</code> part is thus run for every row of the previous <code>SELECT</code> statement inside <code>FROM</code> part of the query. This means it will return 201 points for each of the two polygons (run the query inside <span class="caps">QGIS</span> to see the&nbsp;result).</p>
-<p>Note all the points fall inside the polygons by accident, because they are <strong>square</strong>. Otherwise a <code>ST_Contains</code> or <code>ST_Within</code> should be used inside the outermost <code>WHERE</code> query to filter outliers. This part could use some&nbsp;tweaking.</p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2015/liftago-open-dataset-infographics/" rel="bookmark" title="Permalink to Liftago Open Dataset Infographics">Liftago Open Dataset&nbsp;Infographics</a></h1>
-            <small>Written on Dec 21, 2015
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/python.html">python</a>,         <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>,         <a href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>,         <a href="https://www.zimmi.cz/posts/tag/visualization.html">visualization</a>        | <a href="https://www.zimmi.cz/posts/category/data.html">data</a>
-        </small>
-        <section>
-            <p><a href="https://www.liftago.com/cs">Liftago</a> (the Czech analogy of Uber) has recently <a href="http://try.liftago.com/info-wants-to-be-free/">released a sample of its data</a> covering four weeks of driver/pasenger&nbsp;interactions.</p>
-<p>Have a look at my infographics created with PostGIS, Inkscape, Python and&nbsp;pygal.</p>
-<p class="text-center"><a href="https://www.zimmi.cz/posts/assets/liftago-open-dataset-infographics/liftago.pdf"><img title="Liftago infographics" src="https://www.zimmi.cz/posts/assets/liftago-open-dataset-infographics/liftago.png" class="img-responsive centered"></a></p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-iii/" rel="bookmark" title="Permalink to PostGIS Case Study: Vozejkmap Open Data (Part III)">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">III</span>)</a></h1>
-            <small>Written on Nov 14, 2015
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>,         <a href="https://www.zimmi.cz/posts/tag/leaflet.html">leaflet</a>,         <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>        | <a href="https://www.zimmi.cz/posts/category/web-maps.html">web maps</a>
-        </small>
-        <section>
-            <p>After a while I got back to my <a href="https://www.zimmi.cz/posts/2014/postgis-case-study-vozejkmap-open-data-part-i/">PostGIS open data</a> <a href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-ii/">case study</a>. Last time I left it with clustering implemented, looking forward to incorporate <a href="http://turfjs.org">Turf.js</a> in the future. <em>And the future is now.</em> <a href="https://github.com/zimmicz/vozejkmap-to-postgis">The code is still available on&nbsp;GitHub.</a></p>
-<h2>Subgroup&nbsp;clustering</h2>
-<p>Vozejkmap data is categorized based on the place type (banks, parking lots, pubs, &hellip;). One of the core features of map showing such data should be the easy way to turn these categories on and&nbsp;off.</p>
-<p>As far as I know, it&#8217;s not trivial to do this with the standard Leaflet library. Extending <code>L.control.layers</code> and implement its <code>addOverlay</code>, <code>removeOverlay</code> methods on your own might be the way to add needed behavior. Fortunately, there&#8217;s an easier option thanks to <a href="https://github.com/ghybs/Leaflet.FeatureGroup.SubGroup">Leaflet.FeatureGroup.SubGroup</a> that can handle such use case and is really straightforward. See the code&nbsp;below.</p>
-<div class="highlight"><pre><span></span><span class="nx">cluster</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">markerClusterGroup</span><span class="p">({</span>
-    <span class="nx">chunkedLoading</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
-    <span class="nx">chunkInterval</span><span class="o">:</span> <span class="mi">500</span>
-<span class="p">});</span>
-
-<span class="nx">cluster</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
-
-<span class="p">...</span>
-
-<span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">category</span> <span class="k">in</span> <span class="nx">categories</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">// just use L.featureGroup.subGroup instead of L.layerGroup or L.featureGroup</span>
-    <span class="nx">overlays</span><span class="p">[</span><span class="nx">my</span><span class="p">.</span><span class="nx">Style</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="nx">category</span><span class="p">).</span><span class="nx">type</span><span class="p">]</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">featureGroup</span><span class="p">.</span><span class="nx">subGroup</span><span class="p">(</span><span class="nx">cluster</span><span class="p">,</span> <span class="nx">categories</span><span class="p">[</span><span class="nx">category</span><span class="p">]);</span>
-<span class="p">}</span>
-
-<span class="nx">mapkey</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">control</span><span class="p">.</span><span class="nx">layers</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">overlays</span><span class="p">).</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
-</pre></div>
-
-
-<p>With this piece of code you get a map key with checkboxes for all the categories, yet they&#8217;re still kept in the single cluster on the map.&nbsp;Brilliant!</p>
-<p><img src="https://www.zimmi.cz/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/map.png" title="vozejkmap.cz data map" class="img-responsive centered"></p>
-<h2>Using Turf.js for&nbsp;analysis</h2>
-<p>Turf is one of those libraries I get amazed easily with, spending a week trying to find a use case, finally putting it aside with <em>&#8220;I&#8217;ll get back to it later&#8221;</em>. I usually don&#8217;t. This time it&#8217;s&nbsp;different.</p>
-<p>I use Turf to get the nearest neighbor for any marker on click. My first try ended up with the same marker being the result as it was a member of a feature collection passed to <code>turf.nearest()</code> method. After snooping around the docs I found <code>turf.remove()</code> method that can filter GeoJSON based on key-value&nbsp;pair.</p>
-<p>Another handy function is <code>turf.distance()</code> that gives you distance between two points. The code below adds an information about the nearest point and its distance into the&nbsp;popup.</p>
-<div class="highlight"><pre><span></span><span class="c1">// data is a geojson feature collection</span>
-<span class="nx">json</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">geoJson</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span> <span class="p">{</span>
-    <span class="nx">onEachFeature</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">feature</span><span class="p">,</span> <span class="nx">layer</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">layer</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;click&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
-            <span class="kd">var</span> <span class="nx">nearest</span> <span class="o">=</span> <span class="nx">turf</span><span class="p">.</span><span class="nx">nearest</span><span class="p">(</span><span class="nx">layer</span><span class="p">.</span><span class="nx">toGeoJSON</span><span class="p">(),</span> <span class="nx">turf</span><span class="p">.</span><span class="nx">remove</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="nx">feature</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">title</span><span class="p">)),</span>
-                <span class="nx">distance</span> <span class="o">=</span> <span class="nx">turf</span><span class="p">.</span><span class="nx">distance</span><span class="p">(</span><span class="nx">layer</span><span class="p">.</span><span class="nx">toGeoJSON</span><span class="p">(),</span> <span class="nx">nearest</span><span class="p">,</span> <span class="s2">&quot;kilometers&quot;</span><span class="p">).</span><span class="nx">toPrecision</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
-                <span class="nx">popup</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">popup</span><span class="p">({</span><span class="nx">offset</span><span class="o">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">35</span><span class="p">]}).</span><span class="nx">setLatLng</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">latlng</span><span class="p">),</span>
-                <span class="nx">content</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">Util</span><span class="p">.</span><span class="nx">template</span><span class="p">(</span>
-                    <span class="s2">&quot;&lt;h1&gt;{title}&lt;/h1&gt;&lt;p&gt;{description}&lt;/p&gt; \</span>
-<span class="s2">                    &lt;p&gt;Nejbližší bod: {nearest} je {distance} km daleko.&lt;/p&gt;&quot;</span><span class="p">,</span> <span class="p">{</span>
-                    <span class="nx">title</span><span class="o">:</span> <span class="nx">feature</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">title</span><span class="p">,</span>
-                    <span class="nx">description</span><span class="o">:</span> <span class="nx">feature</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">description</span><span class="p">,</span>
-                    <span class="nx">nearest</span><span class="o">:</span> <span class="nx">nearest</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">title</span><span class="p">,</span>
-                    <span class="nx">distance</span><span class="o">:</span> <span class="nx">distance</span>
-                <span class="p">});</span>
-
-            <span class="nx">popup</span><span class="p">.</span><span class="nx">setContent</span><span class="p">(</span><span class="nx">content</span><span class="p">);</span>
-            <span class="nx">popup</span><span class="p">.</span><span class="nx">openOn</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
-
-            <span class="p">...</span>
-</pre></div>
-
-
-<p>From what I&#8217;ve tried so far, Turf seems to be incredibly fast and easy to use. I&#8217;ll try to find the nearest point for any of the categories, that could take Turf some&nbsp;time.</p>
-<h2>Update</h2>
-<p>Turf is blazing fast! I&#8217;ve implemented nearest point for each of the categories and it gets done in a blink of an eye. Some screenshots below. Geolocation implemented as&nbsp;well.</p>
-<p><img src="https://www.zimmi.cz/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen1.png" title="vozejkmap.cz data map" class="img-responsive centered"> You can locate the point&nbsp;easily.</p>
-
-<p><img src="https://www.zimmi.cz/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen2.png" title="vozejkmap.cz data map" class="img-responsive centered"> You can hide the&nbsp;infobox.</p>
-
-<p><img src="https://www.zimmi.cz/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen3.png" title="vozejkmap.cz data map" class="img-responsive centered">You can jump to any of the nearest&nbsp;places.</p>
-        </section>
-        </div>
-    </div>
-
-    <div class="panel card card-1">
-        <div class="post-name">
-            <h1><a href="https://www.zimmi.cz/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/" rel="bookmark" title="Permalink to Installing PostGIS 2.2 with SFCGAL on Ubuntu-based OS">Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span></a></h1>
-            <small>Written on Oct 29, 2015
-        and marked as
-        <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>,         <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>,         <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>        | <a href="https://www.zimmi.cz/posts/category/development.html">development</a>
-        </small>
-        <section>
-            <p>I&#8217;ve seen a bunch of questions on <span class="caps">GIS</span> StackExchange recently related to <a href="http://sfcgal.org/"><span class="caps">SFCGAL</span></a> extension for <a href="http://postgis.net">PostGIS 2.2</a>. Great news are it can be installed with one simple query <code>CREATE EXTENSION postgis_sfcgal</code>. Not so great news are you have to compile it from source for Ubuntu-based <span class="caps">OS</span> (14.04) as recent versions of required packages are not available in the&nbsp;repositories.</p>
-<p>I tested my solution on elementary <span class="caps">OS</span> 0.3.1 based on Ubuntu 14.04. <strong>And it works!</strong> It installs PostgreSQL 9.4 from repositories together with <span class="caps">GDAL</span> and <span class="caps">GEOS</span> and some other libs PostGIS depends on. PostGIS itself, <span class="caps">CGAL</span>, Boost, <span class="caps">MPFR</span> and <span class="caps">GMP</span> are built from&nbsp;source.</p>
-<p>Here comes the code (commented where&nbsp;needed).</p>
-<div class="highlight"><pre><span></span>sudo -i
-<span class="nb">echo</span> <span class="s2">&quot;deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main&quot;</span> <span class="p">|</span> tee -a /etc/apt/sources.list
-wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc <span class="p">|</span> sudo apt-key add -
-apt-get update
-apt-get install -y postgresql-9.4 <span class="se">\</span>
-    postgresql-client-9.4 <span class="se">\</span>
-    postgresql-contrib-9.4 <span class="se">\</span>
-    libpq-dev <span class="se">\</span>
-    postgresql-server-dev-9.4 <span class="se">\</span>
-    build-essential <span class="se">\</span>
-    libgeos-c1 <span class="se">\</span>
-    libgdal-dev <span class="se">\</span>
-    libproj-dev <span class="se">\</span>
-    libjson0-dev <span class="se">\</span>
-    libxml2-dev <span class="se">\</span>
-    libxml2-utils <span class="se">\</span>
-    xsltproc <span class="se">\</span>
-    docbook-xsl <span class="se">\</span>
-    docbook-mathml <span class="se">\</span>
-    cmake <span class="se">\</span>
-    gcc <span class="se">\</span>
-    m4 <span class="se">\</span>
-    icu-devtools
-
-<span class="nb">exit</span> <span class="c1"># leave root otherwise postgis will choke</span>
-
-<span class="nb">cd</span> /tmp
-touch download.txt
-cat <span class="s">&lt;&lt;EOT &gt;&gt; download.txt</span>
-<span class="s">https://gmplib.org/download/gmp/gmp-6.0.0a.tar.bz2</span>
-<span class="s">https://github.com/Oslandia/SFCGAL/archive/v1.2.0.tar.gz</span>
-<span class="s">http://www.mpfr.org/mpfr-current/mpfr-3.1.3.tar.gz</span>
-<span class="s">http://downloads.sourceforge.net/project/boost/boost/1.59.0/boost_1_59_0.tar.gz</span>
-<span class="s">https://github.com/CGAL/cgal/archive/releases/CGAL-4.6.3.tar.gz</span>
-<span class="s">http://download.osgeo.org/postgis/source/postgis-2.2.0.tar.gz</span>
-
-<span class="s">EOT</span>
-
-cat download.txt <span class="p">|</span> xargs -n <span class="m">1</span> -P <span class="m">8</span> wget <span class="c1"># make wget a little bit faster</span>
-
-tar xjf gmp-6.0.0a.tar.bz2
-tar xzf mpfr-3.1.3.tar.gz
-tar xzf v1.2.0.tar.gz
-tar xzf boost_1_59_0.tar.gz
-tar xzf CGAL-4.6.3.tar.gz
-tar xzf postgis-2.2.0.tar.gz
-
-<span class="nv">CORES</span><span class="o">=</span><span class="k">$(</span>nproc<span class="k">)</span>
-
-<span class="k">if</span> <span class="o">[[</span> <span class="nv">$CORES</span> &gt; <span class="m">1</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
-    <span class="nv">CORES</span><span class="o">=</span><span class="k">$(</span>expr <span class="nv">$CORES</span> - <span class="m">1</span><span class="k">)</span> <span class="c1"># be nice to your PC</span>
-<span class="k">fi</span>
-
-<span class="nb">cd</span> gmp-6.0.0
-./configure <span class="o">&amp;&amp;</span> make -j <span class="nv">$CORES</span> <span class="o">&amp;&amp;</span> sudo make -j <span class="nv">$CORES</span> install
-
-<span class="nb">cd</span> ..
-<span class="nb">cd</span> mpfr-3.1.3
-./configure <span class="o">&amp;&amp;</span> make -j <span class="nv">$CORES</span> <span class="o">&amp;&amp;</span> sudo make -j <span class="nv">$CORES</span> install
-
-<span class="nb">cd</span> ..
-<span class="nb">cd</span> boost_1_59_0
-./bootstrap.sh --prefix<span class="o">=</span>/usr/local --with-libraries<span class="o">=</span>all <span class="o">&amp;&amp;</span> sudo ./b2 install <span class="c1"># there might be some warnings along the way, don&#39;t panic</span>
-<span class="nb">echo</span> <span class="s2">&quot;/usr/local/lib&quot;</span> <span class="p">|</span> sudo tee /etc/ld.so.conf.d/boost.conf
-sudo ldconfig
-
-<span class="nb">cd</span> ..
-<span class="nb">cd</span> cgal-releases-CGAL-4.6.3
-cmake . <span class="o">&amp;&amp;</span> make -j <span class="nv">$CORES</span> <span class="o">&amp;&amp;</span> sudo make -j <span class="nv">$CORES</span> install
-
-<span class="nb">cd</span> ..
-<span class="nb">cd</span> SFCGAL-1.2.0/
-cmake . <span class="o">&amp;&amp;</span> make -j <span class="nv">$CORES</span> <span class="o">&amp;&amp;</span> sudo make -j <span class="nv">$CORES</span> install
-
-<span class="nb">cd</span> ..
-<span class="nb">cd</span> postgis-2.2.0
-./configure <span class="se">\</span>
-    --with-geosconfig<span class="o">=</span>/usr/bin/geos-config <span class="se">\</span>
-    --with-xml2config<span class="o">=</span>/usr/bin/xml2-config <span class="se">\</span>
-    --with-projdir<span class="o">=</span>/usr/share/proj <span class="se">\</span>
-    --with-libiconv<span class="o">=</span>/usr/bin <span class="se">\</span>
-    --with-jsondir<span class="o">=</span>/usr/include/json <span class="se">\</span>
-    --with-gdalconfig<span class="o">=</span>/usr/bin/gdal-config <span class="se">\</span>
-    --with-raster <span class="se">\</span>
-    --with-topology <span class="se">\</span>
-    --with-sfcgal<span class="o">=</span>/usr/local/bin/sfcgal-config <span class="o">&amp;&amp;</span> <span class="se">\</span>
-make <span class="o">&amp;&amp;</span> make cheatsheets <span class="o">&amp;&amp;</span> sudo make install <span class="c1"># deliberately one CPU only</span>
-
-sudo -u postgres psql
-sudo -u postgres createdb spatial_template
-sudo -u postgres psql -d spatial_template -c <span class="s2">&quot;CREATE EXTENSION postgis;&quot;</span>
-sudo -u postgres psql -d spatial_template -c <span class="s2">&quot;CREATE EXTENSION postgis_topology;&quot;</span>
-sudo -u postgres psql -d spatial_template -c <span class="s2">&quot;CREATE EXTENSION postgis_sfcgal;&quot;</span>
-sudo -u postgres psql -d spatial_template -c <span class="s2">&quot;SELECT postgis_full_version();&quot;</span>
-</pre></div>
-        </section>
-        </div>
-    </div>
-
+</article>
 <div class="pagination row">
     <div class="large-6 columns">
     </div>
     <div class="large-6 columns">
-            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Next page']);" href="https://www.zimmi.cz/posts/tag/postgis2.html" class="button card card-1">Next page &raquo;</a>
+            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Next page']);" href="/tag/postgis2.html" class="button card card-1">Next page &raquo;</a>
     </div>
-</div>            </div>
-        </div>
-        <div class="row">
-            <div class="large-12 columns footer">
-                <footer>
-                    <address>
-                    Written by <a href="http://www.zimmi.cz">Michal Zimmermann</a>.
-                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
-                    which takes great advantage of <a href="http://python.org">Python</a>.
-                    </address><!-- /#about -->
-                </footer><!-- /#contentinfo -->
-            </div>
-        </div>
-<!-- Piwik -->
-<script type="text/javascript">
-  var _paq = _paq || [];
-  /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-  _paq.push(['enableHeartBeatTimer']);
-  _paq.push(['trackPageView']);
-  _paq.push(['enableLinkTracking']);
-  (function() {
-    var u="//piwik-zimmi.rhcloud.com/analytics/";
-    _paq.push(['setTrackerUrl', u+'piwik.php']);
-    _paq.push(['setSiteId', '1']);
-    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
-  })();
-</script>
-<!-- End Piwik Code -->
-<script src="https://www.zimmi.cz/posts/theme/js/packed.js?8bee1467"></script>
-<script>
-$(document).foundation();
-</script>
+</div>    </main>
+    <footer>
+        Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
+        Proudly powered by <a href="//getpelican.com/">Pelican</a>,
+        which takes great advantage of <a href="//python.org">Python</a>.
+    </footer>
+<script src="/theme/webassets-external/5acf220afe81b3dd00333bbb93fbaa41_jquery.js"></script>
+<script src="/theme/webassets-external/b80143a60770d5aa122a039a2b889970_foundation.min.js"></script>
 </body>
 </html>
