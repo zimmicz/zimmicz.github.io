@@ -5,17 +5,16 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="/theme/webassets-external/e17ffd2049da5254bb4b3183ea73c922_normalize.css">
-        <link rel="stylesheet" href="/theme/webassets-external/35f123b951b653f7b2d441b35b63d32a_github.css">
-        <link rel="stylesheet" href="/theme/webassets-external/310a2979488959b3c24d4edd2e18b50d_screen.css">
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?1ec62741">
 </head>
 <body>
     <nav role="navigation">
         <ul>
-            <li><a href="/categories">Categories</a></li>
-            <li><a href="/tags">Tags</a></li>
-            <li><a href="/feed.xml">Subscribe to RSS feed</a></li>
+            <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+            <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+            <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
         </ul>
     </nav>
     <header>
@@ -25,11 +24,12 @@
 <h2 class="text-center">Articles tagged with openshift tag</h2>
 
 <article>
-    <h1><a href="/posts/2015/twitter-rest-api-data-mining-on-openshift-part-ii/" rel="bookmark" title="Permalink to Twitter REST API Data Mining on OpenShift (Part II)">Twitter <span class="caps">REST</span> <span class="caps">API</span> Data Mining on OpenShift (Part <span class="caps">II</span>)</a></h1>
-    Written on Dec 6, 2015
-    and marked as
-    <a href="/tag/javascript.html">javascript</a>,     <a href="/tag/openshift.html">openshift</a>,     <a href="/tag/twitter.html">twitter</a>    | <a href="/category/development.html">development</a>
-    <p>Last time I described <a href="/posts/2015/twitter-rest-api-data-mining-on-openshift-part-i/">the setup of my OpenShift Twitter crawler</a> and let it running and downloading data. It&#8217;s been more than two months since I started and I got interesting amount of data. I also made a simple <span class="caps">ETL</span> process to load it into my local PostGIS database, which I&#8217;d like to cover in this&nbsp;post.</p>
+    <h1><a href="https://www.zimmi.cz/posts/2015/twitter-rest-api-data-mining-on-openshift-part-ii/" rel="bookmark" title="Permalink to Twitter REST API Data Mining on OpenShift (Part II)">Twitter <span class="caps">REST</span> <span class="caps">API</span> Data Mining on OpenShift (Part <span class="caps">II</span>)</a></h1>
+    <aside><span>Dec 6, 2015</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>     <a href="https://www.zimmi.cz/posts/tag/openshift.html">openshift</a>     <a href="https://www.zimmi.cz/posts/tag/twitter.html">twitter</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+    </aside>
+    <p>Last time I described <a href="https://www.zimmi.cz/posts/2015/twitter-rest-api-data-mining-on-openshift-part-i/">the setup of my OpenShift Twitter crawler</a> and let it running and downloading data. It&#8217;s been more than two months since I started and I got interesting amount of data. I also made a simple <span class="caps">ETL</span> process to load it into my local PostGIS database, which I&#8217;d like to cover in this&nbsp;post.</p>
 <h2>Extract&nbsp;data</h2>
 <p>Each day is written to the separate sqlite file with a name like <code>tw_day_D_M_YYYY</code>. <code>Bash</code> is used to gzip all the files before downloading them from&nbsp;OpenShift.</p>
 <div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
@@ -98,17 +98,18 @@ psql <span class="nv">$DATABASE</span> <span class="s">&lt;&lt; EOF</span>
 
 <h2>First&nbsp;statistics</h2>
 <p>Some interesting charts and numbers&nbsp;follow.</p>
-<p class="text-center"><img title="Top 100 Twitter users in the Czech Republic" src="/assets/twitter-rest-api-data-mining-on-openshift-part-ii/authors.png" class="img-responsive centered"></p>
+<p class="text-center"><img title="Top 100 Twitter users in the Czech Republic" src="https://www.zimmi.cz/posts/assets/twitter-rest-api-data-mining-on-openshift-part-ii/authors.png" class="img-responsive centered"></p>
 
-<p class="text-center"><img title="When people tweet in the Czech Republic" src="/assets/twitter-rest-api-data-mining-on-openshift-part-ii/hours.png" class="img-responsive centered"></p>
+<p class="text-center"><img title="When people tweet in the Czech Republic" src="https://www.zimmi.cz/posts/assets/twitter-rest-api-data-mining-on-openshift-part-ii/hours.png" class="img-responsive centered"></p>
 
-<p class="text-center"><img title="Languages on Twitter in the Czech Republic" src="/assets/twitter-rest-api-data-mining-on-openshift-part-ii/languages.png" class="img-responsive centered"></p>
+<p class="text-center"><img title="Languages on Twitter in the Czech Republic" src="https://www.zimmi.cz/posts/assets/twitter-rest-api-data-mining-on-openshift-part-ii/languages.png" class="img-responsive centered"></p>
 </article>
 <article>
-    <h1><a href="/posts/2015/twitter-rest-api-data-mining-on-openshift-part-i/" rel="bookmark" title="Permalink to Twitter REST API Data Mining on OpenShift (Part I)">Twitter <span class="caps">REST</span> <span class="caps">API</span> Data Mining on OpenShift (Part&nbsp;I)</a></h1>
-    Written on Nov 6, 2015
-    and marked as
-    <a href="/tag/javascript.html">javascript</a>,     <a href="/tag/openshift.html">openshift</a>,     <a href="/tag/twitter.html">twitter</a>    | <a href="/category/development.html">development</a>
+    <h1><a href="https://www.zimmi.cz/posts/2015/twitter-rest-api-data-mining-on-openshift-part-i/" rel="bookmark" title="Permalink to Twitter REST API Data Mining on OpenShift (Part I)">Twitter <span class="caps">REST</span> <span class="caps">API</span> Data Mining on OpenShift (Part&nbsp;I)</a></h1>
+    <aside><span>Nov 6, 2015</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>     <a href="https://www.zimmi.cz/posts/tag/openshift.html">openshift</a>     <a href="https://www.zimmi.cz/posts/tag/twitter.html">twitter</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+    </aside>
     <p>More than a year ago I wrote about <a href="http://www.zimmi.cz/posts/2014/analyzing-twitter-languages-with-streaming-api/">analyzing Twitter languages with Streaming <span class="caps">API</span></a>. Back then I kept my laptop running for a week to download data. Not a comfortable way, especially if you decide to get more data. One year uptime doesn&#8217;t sound like anything you want to be part of. <a href="https://www.openshift.com/">OpenShift</a> by Red Hat seems to be almost perfect replacement.&nbsp;Almost.</p>
 <h2>OpenShift&nbsp;setup</h2>
 <p>I started with Node.js application running on one small gear. Once running, you can easily <code>git push</code> the code to your OpenShift repo and login via <span class="caps">SSH</span>. I quickly found simple copy-pasting my local solution wasn&#8217;t going to work. and fixed it with some minor tweaks. That&#8217;s where the fun&nbsp;begins&#8230;</p>
@@ -189,10 +190,11 @@ git push <span class="o">&amp;&amp;</span> <span class="se">\</span>
 <sup>1</sup>&frasl;<sub>6</sub> to <sup>1</sup>&frasl;<sub>5</sub> of them is located with latitude and longitude. More on this next&nbsp;time.</p>
 </article>
 <article>
-    <h1><a href="/posts/2015/hosting-website-on-openshift/" rel="bookmark" title="Permalink to Hosting Website On Openshift">Hosting Website On&nbsp;Openshift</a></h1>
-    Written on Feb 23, 2015
-    and marked as
-    <a href="/tag/openshift.html">openshift</a>    | <a href="/category/development.html">development</a>
+    <h1><a href="https://www.zimmi.cz/posts/2015/hosting-website-on-openshift/" rel="bookmark" title="Permalink to Hosting Website On Openshift">Hosting Website On&nbsp;Openshift</a></h1>
+    <aside><span>Feb 23, 2015</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/openshift.html">openshift</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+    </aside>
     <p>I decided to migrate <a href="http://www.zimmi.cz">my web</a> to <a href="http://openshift.com">OpenShift</a>. It was a bit frustrating but I got it working&nbsp;eventually.</p>
 <h2>Things to know before taking the&nbsp;leap</h2>
 <p>Some domain providers don&#8217;t support <span class="caps">CNAME</span> changes for root domains (zimmi.cz in my case). This means you can&#8217;t simply tell your domain to serve content from OpenShift address. But what you can do is to tell your <code>www</code> subdomain to do&nbsp;so:</p>
@@ -215,18 +217,21 @@ www.posts.zimmi.cz CNAME posts-zimmi.rhcloud.com
 
 <p>Just don&#8217;t forget to handle both naked and <code>www</code> version. When Google reindexes new URLs (http://www.zimmi.cz/posts instead of http://posts.zimmi.cz) subdomain application might be&nbsp;deleted.</p>
 </article>
-<div class="pagination row">
-    <div class="large-6 columns">
-    </div>
-    <div class="large-6 columns">
-    </div>
-</div>    </main>
+<aside id="pagination">
+</aside>    </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
         Proudly powered by <a href="//getpelican.com/">Pelican</a>,
         which takes great advantage of <a href="//python.org">Python</a>.
     </footer>
-<script src="/theme/webassets-external/5acf220afe81b3dd00333bbb93fbaa41_jquery.js"></script>
-<script src="/theme/webassets-external/b80143a60770d5aa122a039a2b889970_foundation.min.js"></script>
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-43432739-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments)};
+  gtag('js', new Date());
+
+  gtag('config', 'UA-43432739-2');
+</script>
 </body>
 </html>

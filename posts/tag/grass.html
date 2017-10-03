@@ -5,17 +5,16 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="/theme/webassets-external/e17ffd2049da5254bb4b3183ea73c922_normalize.css">
-        <link rel="stylesheet" href="/theme/webassets-external/35f123b951b653f7b2d441b35b63d32a_github.css">
-        <link rel="stylesheet" href="/theme/webassets-external/310a2979488959b3c24d4edd2e18b50d_screen.css">
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?1ec62741">
 </head>
 <body>
     <nav role="navigation">
         <ul>
-            <li><a href="/categories">Categories</a></li>
-            <li><a href="/tags">Tags</a></li>
-            <li><a href="/feed.xml">Subscribe to RSS feed</a></li>
+            <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+            <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+            <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
         </ul>
     </nav>
     <header>
@@ -25,14 +24,15 @@
 <h2 class="text-center">Articles tagged with grass tag</h2>
 
 <article>
-    <h1><a href="/posts/2017/routing-with-grass-gis-catchment-area-calculation/" rel="bookmark" title="Permalink to Routing with GRASS GIS: Catchment Area Calculation">Routing with <span class="caps">GRASS</span> <span class="caps">GIS</span>: Catchment Area&nbsp;Calculation</a></h1>
-    Written on Apr 20, 2017
-    and marked as
-    <a href="/tag/grass.html">grass</a>    | <a href="/category/gis.html">GIS</a>
-    <p>I got my hands on <a href="/posts/2017/routing-with-pgrouting-catchment-area-calculation/">pgRouting</a> in the last post and I&#8217;m about to do the same with <span class="caps">GRASS</span> <span class="caps">GIS</span> in this&nbsp;one.</p>
+    <h1><a href="https://www.zimmi.cz/posts/2017/routing-with-grass-gis-catchment-area-calculation/" rel="bookmark" title="Permalink to Routing with GRASS GIS: Catchment Area Calculation">Routing with <span class="caps">GRASS</span> <span class="caps">GIS</span>: Catchment Area&nbsp;Calculation</a></h1>
+    <aside><span>Apr 20, 2017</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/grass.html">grass</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
+    </aside>
+    <p>I got my hands on <a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/">pgRouting</a> in the last post and I&#8217;m about to do the same with <span class="caps">GRASS</span> <span class="caps">GIS</span> in this&nbsp;one.</p>
 <p><span class="caps">GRASS</span> <span class="caps">GIS</span> stores the topology for the native vector format by default, which makes it easy to use for the network analysis. All the commands associated with the network analysis can be found in the <code>v.net</code> family. The ones I&#8217;m going to discuss in this post are <code>v.net</code> itself, <code>v.net.path</code>, <code>.v.net.alloc</code> and <code>v.net.iso</code>,&nbsp;respectively.</p>
 <h2>Data</h2>
-<p>I&#8217;m going to use the roads data <a href="/posts/2017/routing-with-pgrouting-catchment-area-calculation/">from the previous post</a> together with some random points used as catchment areas&nbsp;centers.</p>
+<p>I&#8217;m going to use the roads data <a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/">from the previous post</a> together with some random points used as catchment areas&nbsp;centers.</p>
 <div class="highlight"><pre><span></span><span class="c1"># create the new GRASS GIS location</span>
 grass -text -c ./osm/czech
 
@@ -45,7 +45,7 @@ v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&
 
 
 <p>I got six different points and the pretty dense road network. Note none of the points is connected to the existing&nbsp;network.</p>
-<div class="text-center"><img src="/assets/routing-with-grass-gis-catchment-area-calculation/roads_points.png"/></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/roads_points.png"/></div>
 
 <p>You have to have routable network to do the actual routing (the worst sentence ever written). To do so,&nbsp;let&#8217;s:</p>
 <ul>
@@ -65,7 +65,7 @@ v.net <span class="nv">input</span><span class="o">=</span>network <span class="
 
 
 <p>The algorithm doesn&#8217;t take bridges, tunnels and oneways into account, it&#8217;s capable of doing so&nbsp;though.</p>
-<div class="text-center"><img src="/assets/routing-with-grass-gis-catchment-area-calculation/shortest_path.png" width="70%"/></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/shortest_path.png" width="70%"/></div>
 
 <h2>Distributing the subnets for nearest&nbsp;centers</h2>
 <div class="highlight"><pre><span></span>v.net.alloc <span class="nv">input</span><span class="o">=</span>network_noded <span class="nv">output</span><span class="o">=</span>network_alloc <span class="nv">center_cats</span><span class="o">=</span><span class="m">1</span>-6 <span class="nv">node_layer</span><span class="o">=</span><span class="m">2</span>
@@ -73,7 +73,7 @@ v.net <span class="nv">input</span><span class="o">=</span>network <span class="
 
 
 <p><code>v.net.alloc</code> module takes the given centers and distributes the network so each of its parts belongs to exactly one center - the nearest one (speaking the distance, time units,&nbsp;&hellip;).</p>
-<div class="text-center"><img src="/assets/routing-with-grass-gis-catchment-area-calculation/subnets.png" width="70%"/></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/subnets.png" width="70%"/></div>
 
 <h2>Creating catchment&nbsp;areas</h2>
 <div class="highlight"><pre><span></span>v.net.iso <span class="nv">input</span><span class="o">=</span>network_noded <span class="nv">output</span><span class="o">=</span>network_iso <span class="nv">center_cats</span><span class="o">=</span><span class="m">1</span>-6 <span class="nv">costs</span><span class="o">=</span><span class="m">1000</span>,3000,5000
@@ -81,10 +81,10 @@ v.net <span class="nv">input</span><span class="o">=</span>network <span class="
 
 
 <p><code>v.net.iso</code> splits net by cost isolines. Again, the costs might be specified as lengths, time units,&nbsp;&hellip;.</p>
-<div class="text-center"><img src="/assets/routing-with-grass-gis-catchment-area-calculation/isolines.png" width="70%"/></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/isolines.png" width="70%"/></div>
 
 <p>Two different ways lead to the actual catchment area creation. First, you extract nodes from the roads with their values, turn them into the raster grid and either extract contours or polygonize the raster. I find the last step suboptimal and would love to find another way of polygonizing the&nbsp;results.</p>
-<div class="text-center"><img src="/assets/routing-with-grass-gis-catchment-area-calculation/catchment_area.gif" width="70%"/></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/catchment_area.gif" width="70%"/></div>
 
 <p>Note when extracting contours the interval has to be set to the reasonable number depending on the nodes&nbsp;values.</p>
 <h2>Remarks</h2>
@@ -96,10 +96,11 @@ v.net <span class="nv">input</span><span class="o">=</span>network <span class="
 </ul>
 </article>
 <article>
-    <h1><a href="/posts/2015/grass-big-buffers-made-easy/" rel="bookmark" title="Permalink to GRASS: Big Buffers Made Easy"><span class="caps">GRASS</span>: Big Buffers Made&nbsp;Easy</a></h1>
-    Written on Apr 20, 2015
-    and marked as
-    <a href="/tag/grass.html">grass</a>    | <a href="/category/automation.html">automation</a>
+    <h1><a href="https://www.zimmi.cz/posts/2015/grass-big-buffers-made-easy/" rel="bookmark" title="Permalink to GRASS: Big Buffers Made Easy"><span class="caps">GRASS</span>: Big Buffers Made&nbsp;Easy</a></h1>
+    <aside><span>Apr 20, 2015</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/grass.html">grass</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
+    </aside>
     <p>Recently I&#8217;ve written about <a href="/2015/postgis-buffers-intersections-differences-and-collections/">struggling with fairly complex geometries in PostGIS</a>. Lesson learned from the last time was to use more smaller geometries instead of several really huge. You can obtain the small ones from the big by <a href="/2015/postgis-rectangular-grid-creation/">cutting it with a grid</a>.</p>
 <p>A supervisor of a project I&#8217;ve been working on came up with a task that totally buried the previous process in a blink of an eye: <strong>Give me the buffer (diffed with original geometries) that is smoothed on the outer bounds so there are no edges shorter than 10 cm.</strong> I sighed. Then, I cursed. Then, I gave it a try with PostGIS. Achieving this goal involves these&nbsp;steps:</p>
 <ul>
@@ -165,18 +166,21 @@ v.out.postgis <span class="nv">input</span><span class="o">=</span>buffer_050_gr
 </ul>
 <p>The more I work with big data, the more I get used to not seeing them. That&#8217;s kind of a twist after crafting maps at&nbsp;university.</p>
 </article>
-<div class="pagination row">
-    <div class="large-6 columns">
-    </div>
-    <div class="large-6 columns">
-    </div>
-</div>    </main>
+<aside id="pagination">
+</aside>    </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
         Proudly powered by <a href="//getpelican.com/">Pelican</a>,
         which takes great advantage of <a href="//python.org">Python</a>.
     </footer>
-<script src="/theme/webassets-external/5acf220afe81b3dd00333bbb93fbaa41_jquery.js"></script>
-<script src="/theme/webassets-external/b80143a60770d5aa122a039a2b889970_foundation.min.js"></script>
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-43432739-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments)};
+  gtag('js', new Date());
+
+  gtag('config', 'UA-43432739-2');
+</script>
 </body>
 </html>

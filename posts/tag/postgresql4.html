@@ -5,17 +5,16 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="/theme/webassets-external/e17ffd2049da5254bb4b3183ea73c922_normalize.css">
-        <link rel="stylesheet" href="/theme/webassets-external/35f123b951b653f7b2d441b35b63d32a_github.css">
-        <link rel="stylesheet" href="/theme/webassets-external/310a2979488959b3c24d4edd2e18b50d_screen.css">
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?1ec62741">
 </head>
 <body>
     <nav role="navigation">
         <ul>
-            <li><a href="/categories">Categories</a></li>
-            <li><a href="/tags">Tags</a></li>
-            <li><a href="/feed.xml">Subscribe to RSS feed</a></li>
+            <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+            <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+            <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
         </ul>
     </nav>
     <header>
@@ -25,10 +24,11 @@
 <h2 class="text-center">Articles tagged with postgresql tag</h2>
 
 <article>
-    <h1><a href="/posts/2016/looking-for-the-next-row-with-postgresql/" rel="bookmark" title="Permalink to Looking for the Next Row with PostgreSQL">Looking for the Next Row with&nbsp;PostgreSQL</a></h1>
-    Written on Jan 23, 2016
-    and marked as
-    <a href="/tag/postgresql.html">postgresql</a>,     <a href="/tag/sql.html">sql</a>    | <a href="/category/sql.html">SQL</a>
+    <h1><a href="https://www.zimmi.cz/posts/2016/looking-for-the-next-row-with-postgresql/" rel="bookmark" title="Permalink to Looking for the Next Row with PostgreSQL">Looking for the Next Row with&nbsp;PostgreSQL</a></h1>
+    <aside><span>Jan 23, 2016</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
     <h2>Using <span class="caps">JOIN</span>&nbsp;clause</h2>
 <p>All my <span class="caps">GIS</span> life I&#8217;ve been using a simple <code>JOIN</code> clause to find a row with an <code>id = previous_id + 1</code>. In other words, imagine a simple table with no&nbsp;indices:</p>
 <div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">test</span> <span class="p">(</span><span class="n">id</span> <span class="nb">integer</span><span class="p">);</span>
@@ -99,11 +99,12 @@
 <p>It reads well and the purpose of such a query is pretty&nbsp;obvious.</p>
 </article>
 <article>
-    <h1><a href="/posts/2015/postgis-case-study-vozejkmap-open-data-part-iii/" rel="bookmark" title="Permalink to PostGIS Case Study: Vozejkmap Open Data (Part III)">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">III</span>)</a></h1>
-    Written on Nov 14, 2015
-    and marked as
-    <a href="/tag/postgresql.html">postgresql</a>,     <a href="/tag/postgis.html">postgis</a>,     <a href="/tag/leaflet.html">leaflet</a>,     <a href="/tag/javascript.html">javascript</a>    | <a href="/category/web-maps.html">web maps</a>
-    <p>After a while I got back to my <a href="/posts/2014/postgis-case-study-vozejkmap-open-data-part-i/">PostGIS open data</a> <a href="/posts/2015/postgis-case-study-vozejkmap-open-data-part-ii/">case study</a>. Last time I left it with clustering implemented, looking forward to incorporate <a href="http://turfjs.org">Turf.js</a> in the future. <em>And the future is now.</em> <a href="https://github.com/zimmicz/vozejkmap-to-postgis">The code is still available on&nbsp;GitHub.</a></p>
+    <h1><a href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-iii/" rel="bookmark" title="Permalink to PostGIS Case Study: Vozejkmap Open Data (Part III)">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">III</span>)</a></h1>
+    <aside><span>Nov 14, 2015</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a href="https://www.zimmi.cz/posts/tag/leaflet.html">leaflet</a>     <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/web-maps.html">web maps</a></span>
+    </aside>
+    <p>After a while I got back to my <a href="https://www.zimmi.cz/posts/2014/postgis-case-study-vozejkmap-open-data-part-i/">PostGIS open data</a> <a href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-ii/">case study</a>. Last time I left it with clustering implemented, looking forward to incorporate <a href="http://turfjs.org">Turf.js</a> in the future. <em>And the future is now.</em> <a href="https://github.com/zimmicz/vozejkmap-to-postgis">The code is still available on&nbsp;GitHub.</a></p>
 <h2>Subgroup&nbsp;clustering</h2>
 <p>Vozejkmap data is categorized based on the place type (banks, parking lots, pubs, &hellip;). One of the core features of map showing such data should be the easy way to turn these categories on and&nbsp;off.</p>
 <p>As far as I know, it&#8217;s not trivial to do this with the standard Leaflet library. Extending <code>L.control.layers</code> and implement its <code>addOverlay</code>, <code>removeOverlay</code> methods on your own might be the way to add needed behavior. Fortunately, there&#8217;s an easier option thanks to <a href="https://github.com/ghybs/Leaflet.FeatureGroup.SubGroup">Leaflet.FeatureGroup.SubGroup</a> that can handle such use case and is really straightforward. See the code&nbsp;below.</p>
@@ -126,7 +127,7 @@
 
 
 <p>With this piece of code you get a map key with checkboxes for all the categories, yet they&#8217;re still kept in the single cluster on the map.&nbsp;Brilliant!</p>
-<p><img src="/assets/postgis-case-study-vozejkmap-open-data-part-iii/map.png" title="vozejkmap.cz data map" class="img-responsive centered"></p>
+<p><img src="https://www.zimmi.cz/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/map.png" title="vozejkmap.cz data map" class="img-responsive centered"></p>
 <h2>Using Turf.js for&nbsp;analysis</h2>
 <p>Turf is one of those libraries I get amazed easily with, spending a week trying to find a use case, finally putting it aside with <em>&#8220;I&#8217;ll get back to it later&#8221;</em>. I usually don&#8217;t. This time it&#8217;s&nbsp;different.</p>
 <p>I use Turf to get the nearest neighbor for any marker on click. My first try ended up with the same marker being the result as it was a member of a feature collection passed to <code>turf.nearest()</code> method. After snooping around the docs I found <code>turf.remove()</code> method that can filter GeoJSON based on key-value&nbsp;pair.</p>
@@ -157,17 +158,18 @@
 <p>From what I&#8217;ve tried so far, Turf seems to be incredibly fast and easy to use. I&#8217;ll try to find the nearest point for any of the categories, that could take Turf some&nbsp;time.</p>
 <h2>Update</h2>
 <p>Turf is blazing fast! I&#8217;ve implemented nearest point for each of the categories and it gets done in a blink of an eye. Some screenshots below. Geolocation implemented as&nbsp;well.</p>
-<p><img src="/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen1.png" title="vozejkmap.cz data map" class="img-responsive centered"> You can locate the point&nbsp;easily.</p>
+<p><img src="https://www.zimmi.cz/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen1.png" title="vozejkmap.cz data map" class="img-responsive centered"> You can locate the point&nbsp;easily.</p>
 
-<p><img src="/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen2.png" title="vozejkmap.cz data map" class="img-responsive centered"> You can hide the&nbsp;infobox.</p>
+<p><img src="https://www.zimmi.cz/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen2.png" title="vozejkmap.cz data map" class="img-responsive centered"> You can hide the&nbsp;infobox.</p>
 
-<p><img src="/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen3.png" title="vozejkmap.cz data map" class="img-responsive centered">You can jump to any of the nearest&nbsp;places.</p>
+<p><img src="https://www.zimmi.cz/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen3.png" title="vozejkmap.cz data map" class="img-responsive centered">You can jump to any of the nearest&nbsp;places.</p>
 </article>
 <article>
-    <h1><a href="/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/" rel="bookmark" title="Permalink to Installing PostGIS 2.2 with SFCGAL on Ubuntu-based OS">Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span></a></h1>
-    Written on Oct 29, 2015
-    and marked as
-    <a href="/tag/postgresql.html">postgresql</a>,     <a href="/tag/postgis.html">postgis</a>,     <a href="/tag/linux.html">linux</a>    | <a href="/category/development.html">development</a>
+    <h1><a href="https://www.zimmi.cz/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/" rel="bookmark" title="Permalink to Installing PostGIS 2.2 with SFCGAL on Ubuntu-based OS">Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span></a></h1>
+    <aside><span>Oct 29, 2015</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+    </aside>
     <p>I&#8217;ve seen a bunch of questions on <span class="caps">GIS</span> StackExchange recently related to <a href="http://sfcgal.org/"><span class="caps">SFCGAL</span></a> extension for <a href="http://postgis.net">PostGIS 2.2</a>. Great news are it can be installed with one simple query <code>CREATE EXTENSION postgis_sfcgal</code>. Not so great news are you have to compile it from source for Ubuntu-based <span class="caps">OS</span> (14.04) as recent versions of required packages are not available in the&nbsp;repositories.</p>
 <p>I tested my solution on elementary <span class="caps">OS</span> 0.3.1 based on Ubuntu 14.04. <strong>And it works!</strong> It installs PostgreSQL 9.4 from repositories together with <span class="caps">GDAL</span> and <span class="caps">GEOS</span> and some other libs PostGIS depends on. PostGIS itself, <span class="caps">CGAL</span>, Boost, <span class="caps">MPFR</span> and <span class="caps">GMP</span> are built from&nbsp;source.</p>
 <p>Here comes the code (commented where&nbsp;needed).</p>
@@ -268,10 +270,11 @@ sudo -u postgres psql -d spatial_template -c <span class="s2">&quot;SELECT postg
 </pre></div>
 </article>
 <article>
-    <h1><a href="/posts/2015/postgis-finding-biggest-land-users-nearby/" rel="bookmark" title="Permalink to PostGIS: Finding Biggest Land Users Nearby">PostGIS: Finding Biggest Land Users&nbsp;Nearby</a></h1>
-    Written on Apr 3, 2015
-    and marked as
-    <a href="/tag/postgresql.html">postgresql</a>,     <a href="/tag/postgis.html">postgis</a>    | <a href="/category/sql.html">SQL</a>
+    <h1><a href="https://www.zimmi.cz/posts/2015/postgis-finding-biggest-land-users-nearby/" rel="bookmark" title="Permalink to PostGIS: Finding Biggest Land Users Nearby">PostGIS: Finding Biggest Land Users&nbsp;Nearby</a></h1>
+    <aside><span>Apr 3, 2015</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
     <p>At <a href="http://clevermaps.cz">CleverMaps</a> we heavily rely on the cadastre of real estate, which is probably the biggest data source in my country. Using their excellent knowledge of this data set, my teammates often supply me with all kinds of weird&nbsp;challenges.</p>
 <h2>Give me the biggest land users&nbsp;nearby</h2>
 <p><em>Find the biggest land users in surrounding cadastral communities for each cadastral community (~ 13K)</em> being the latest task, here&#8217;s the query I tackled it&nbsp;with:</p>
@@ -327,10 +330,11 @@ JOIN ints
 <p>Writing this makes me realize the list should be probably sorted by area so only the occurence with the biggest value is kept for each c. community. Simple <code>ORDER BY</code> should deal with this just fine. Or even more sophisticated, using <code>GROUP BY</code> to output the total acreage in all surrounding c.&nbsp;communities.</p>
 </article>
 <article>
-    <h1><a href="/posts/2015/postgis-count-line-self-intersections/" rel="bookmark" title="Permalink to PostGIS: Count Line Self-Intersections">PostGIS: Count Line&nbsp;Self-Intersections</a></h1>
-    Written on Mar 30, 2015
-    and marked as
-    <a href="/tag/postgresql.html">postgresql</a>,     <a href="/tag/postgis.html">postgis</a>    | <a href="/category/sql.html">SQL</a>
+    <h1><a href="https://www.zimmi.cz/posts/2015/postgis-count-line-self-intersections/" rel="bookmark" title="Permalink to PostGIS: Count Line Self-Intersections">PostGIS: Count Line&nbsp;Self-Intersections</a></h1>
+    <aside><span>Mar 30, 2015</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
     <p><a href="https://gis.stackexchange.com/questions/107927/counting-self-intersections-of-linestring-using-postgis/140674#140674">Is there a way of using PostgreSQL + PostGIS for finding the number of self intersections in a linestring?</a> was a question that made me think of this problem. I came up with a solution that takes just a few lines of&nbsp;code.</p>
 <p>Assume the following&nbsp;geometries:</p>
 <div class="highlight"><pre><span></span>CREATE TABLE test2 (
@@ -344,7 +348,7 @@ COPY test2 (id, wkb_geometry) FROM stdin;
 </pre></div>
 
 
-<p><img src="/assets/postgis-count-line-self-intersections/lines.png" title="Self-intersecting lines" class="img-responsive centered"></p>
+<p><img src="https://www.zimmi.cz/posts/assets/postgis-count-line-self-intersections/lines.png" title="Self-intersecting lines" class="img-responsive centered"></p>
 <p>Note that those geometries are valid while not being simple, thus, <code>ST_IsValidReason()</code> wouldn&#8217;t help much. What if we compared it to their single counterparts? Those would have had vertices at intersections. Once you know the original number of vertices and the number of simple geometry vertices, it is fairly easy to subtract those&nbsp;two.</p>
 <div class="highlight"><pre><span></span>WITH noded AS (
 SELECT id, COUNT(id)
@@ -382,20 +386,23 @@ SELECT noded.id, noded.count - test.count cnt FROM noded JOIN test USING (id);
     </tr>
 </table></p>
 </article>
-<div class="pagination row">
-    <div class="large-6 columns">
-            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Previous page']);" href="/tag/postgresql3.html" class="button card card-1">&laquo; Previous page</a>
-    </div>
-    <div class="large-6 columns">
-            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Next page']);" href="/tag/postgresql5.html" class="button card card-1">Next page &raquo;</a>
-    </div>
-</div>    </main>
+<aside id="pagination">
+            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Previous page']);" href="https://www.zimmi.cz/posts/tag/postgresql3.html">&laquo; Previous page</a>
+            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Next page']);" href="https://www.zimmi.cz/posts/tag/postgresql5.html">Next page &raquo;</a>
+</aside>    </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
         Proudly powered by <a href="//getpelican.com/">Pelican</a>,
         which takes great advantage of <a href="//python.org">Python</a>.
     </footer>
-<script src="/theme/webassets-external/5acf220afe81b3dd00333bbb93fbaa41_jquery.js"></script>
-<script src="/theme/webassets-external/b80143a60770d5aa122a039a2b889970_foundation.min.js"></script>
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-43432739-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments)};
+  gtag('js', new Date());
+
+  gtag('config', 'UA-43432739-2');
+</script>
 </body>
 </html>

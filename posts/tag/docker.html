@@ -5,17 +5,16 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="/theme/webassets-external/e17ffd2049da5254bb4b3183ea73c922_normalize.css">
-        <link rel="stylesheet" href="/theme/webassets-external/35f123b951b653f7b2d441b35b63d32a_github.css">
-        <link rel="stylesheet" href="/theme/webassets-external/310a2979488959b3c24d4edd2e18b50d_screen.css">
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?1ec62741">
 </head>
 <body>
     <nav role="navigation">
         <ul>
-            <li><a href="/categories">Categories</a></li>
-            <li><a href="/tags">Tags</a></li>
-            <li><a href="/feed.xml">Subscribe to RSS feed</a></li>
+            <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+            <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+            <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
         </ul>
     </nav>
     <header>
@@ -25,10 +24,11 @@
 <h2 class="text-center">Articles tagged with docker tag</h2>
 
 <article>
-    <h1><a href="/posts/2017/postgis-as-a-mapbox-vector-tiles-generator/" rel="bookmark" title="Permalink to PostGIS as a Mapbox Vector Tiles generator">PostGIS as a Mapbox Vector Tiles&nbsp;generator</a></h1>
-    Written on Aug 6, 2017
-    and marked as
-    <a href="/tag/docker.html">docker</a>,     <a href="/tag/postgis.html">postgis</a>,     <a href="/tag/javascript.html">javascript</a>    | <a href="/category/sql.html">SQL</a>
+    <h1><a href="https://www.zimmi.cz/posts/2017/postgis-as-a-mapbox-vector-tiles-generator/" rel="bookmark" title="Permalink to PostGIS as a Mapbox Vector Tiles generator">PostGIS as a Mapbox Vector Tiles&nbsp;generator</a></h1>
+    <aside><span>Aug 6, 2017</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/docker.html">docker</a>     <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
     <p><a href="http://postgis.net/2017/08/05/postgis-2.4.0alpha/">PostGIS 2.4.0</a> was released recently bringing the possibilities to generate <strong>Mapbox Vector Tiles</strong> without any third party tools. I got a shot at it with Node.js and docker. Even if it&#8217;s not as straightforward as solely using <a href="https://postgis.net/docs/manual-dev/ST_AsMVT.html">ST_AsMVT</a>, it still looks pretty&nbsp;great.</p>
 <h2>Docker&nbsp;container</h2>
 <p>There are no Ubuntu or Debian based PostGIS 2.4.0 packages as far as I know. As installation from source (especially considering <span class="caps">GIS</span> software) is always a bit risky, I prefer using Docker to stay away from trouble. The image is based on Ubuntu 17.04, has PostgreSQL 9.6 and PostGIS 2.4.0 installed. It exposes port 5432 to the host, so you can access the database from the outside the&nbsp;container.</p>
@@ -91,7 +91,7 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
 <p>I got a cadastre area dataset of the Czech Republic for testing, which contains ~ 13,000 polygons. The geometries should come in Web Mercator a.k.a. <span class="caps">EPSG</span>:3857 to work with <a href="https://www.mapbox.com/vector-tiles/specification/"><span class="caps">MVT</span></a>.</p>
 <h2>Vector&nbsp;tiles</h2>
 <p>I got a bit confused by the docs of <a href="https://postgis.net/docs/manual-dev/ST_AsMVT.html">ST_AsMVT</a> and <a href="https://postgis.net/docs/manual-dev/ST_AsMVTGeom.html">ST_AsMVTGeom</a>. Especially the latter one took me a few hours to get it right. What is essential (I guess) about Mapbox Vector Tiles is that you have to abstract from the real world coordinates and start thinking inside the tile coordinates. What PostGIS does with <code>ST_AsMVTGeom</code> (and what any other <span class="caps">MVT</span> implemenation should do for you) is that it takes real world coordinates and put them inside a&nbsp;tile.</p>
-<div class="text-center"><img src="/assets/postgis-as-a-mapbox-vector-tiles-generator/mvt.gif"/></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/postgis-as-a-mapbox-vector-tiles-generator/mvt.gif"/></div>
 
 <p>To make this work, you need to know every bounding box of every tile on every zoom level in a Web Mercator projection. Or you can use <a href="https://github.com/mapbox/postgis-vt-util/blob/master/src/TileBBox.sql">TileBBox procedure by Mapbox</a>, if you&nbsp;wish.</p>
 <p>The <span class="caps">SQL</span> query itself is pretty simple (this comes from an express route I&#8217;ll be discussing&nbsp;shortly).</p>
@@ -128,10 +128,11 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
 <p>The <a href="https://gist.github.com/zimmicz/9e78d9888ab73abc7e87553b77999bc8">server <span class="caps">MVP</span> is available</a> as a GitHub&nbsp;gist.</p>
 </article>
 <article>
-    <h1><a href="/posts/2014/blogging-on-docker-piecrust-to-the-rescue/" rel="bookmark" title="Permalink to Blogging On Docker: Piecrust To The Rescue">Blogging On Docker: Piecrust To The&nbsp;Rescue</a></h1>
-    Written on Sep 11, 2014
-    and marked as
-    <a href="/tag/docker.html">docker</a>,     <a href="/tag/linux.html">linux</a>    | <a href="/category/development.html">development</a>
+    <h1><a href="https://www.zimmi.cz/posts/2014/blogging-on-docker-piecrust-to-the-rescue/" rel="bookmark" title="Permalink to Blogging On Docker: Piecrust To The Rescue">Blogging On Docker: Piecrust To The&nbsp;Rescue</a></h1>
+    <aside><span>Sep 11, 2014</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/docker.html">docker</a>     <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+    </aside>
     <p>I love blogging. I hate blogging systems. I hate content management systems. I just want to blog. That&#8217;s what <a href="http://bolt80.com/piecrust/">PieCrust</a> is all about - it lets you&nbsp;blog.</p>
 <p>It is powerful static website generator perfect for my needs (and for yours as well?). Blogging with PieCrust is really a piece of&nbsp;cake:</p>
 <ol>
@@ -162,18 +163,21 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
 <p>The last command tells chef to serve your site on port 8080 (which should be free unless you&#8217;re running Tomcat or something like that) and make it listen on every available network interface. If you used 127.0.0.1 instead, you would never reach your site from outside the&nbsp;container.</p>
 <p>See?&nbsp;Easy.</p>
 </article>
-<div class="pagination row">
-    <div class="large-6 columns">
-    </div>
-    <div class="large-6 columns">
-    </div>
-</div>    </main>
+<aside id="pagination">
+</aside>    </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
         Proudly powered by <a href="//getpelican.com/">Pelican</a>,
         which takes great advantage of <a href="//python.org">Python</a>.
     </footer>
-<script src="/theme/webassets-external/5acf220afe81b3dd00333bbb93fbaa41_jquery.js"></script>
-<script src="/theme/webassets-external/b80143a60770d5aa122a039a2b889970_foundation.min.js"></script>
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-43432739-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments)};
+  gtag('js', new Date());
+
+  gtag('config', 'UA-43432739-2');
+</script>
 </body>
 </html>

@@ -5,17 +5,16 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="/theme/webassets-external/e17ffd2049da5254bb4b3183ea73c922_normalize.css">
-        <link rel="stylesheet" href="/theme/webassets-external/35f123b951b653f7b2d441b35b63d32a_github.css">
-        <link rel="stylesheet" href="/theme/webassets-external/310a2979488959b3c24d4edd2e18b50d_screen.css">
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?1ec62741">
 </head>
 <body>
     <nav role="navigation">
         <ul>
-            <li><a href="/categories">Categories</a></li>
-            <li><a href="/tags">Tags</a></li>
-            <li><a href="/feed.xml">Subscribe to RSS feed</a></li>
+            <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+            <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+            <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
         </ul>
     </nav>
     <header>
@@ -24,15 +23,16 @@
     <main>
 
 <article>
-    <h1><a href="/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii" rel="bookmark" title="Permalink to Plotting the Czech Cadastre Land Use with d3: Data Transformation (part II)">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></h1>
-    Written on Nov 14, 2016
-    and marked as
-    <a href="/tag/javascript.html">javascript</a>,     <a href="/tag/d3.html">d3</a>,     <a href="/tag/postgresql.html">postgresql</a>,     <a href="/tag/svg.html">svg</a>    | <a href="/category/data.html">data</a>
+    <h1><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii" rel="bookmark" title="Permalink to Plotting the Czech Cadastre Land Use with d3: Data Transformation (part II)">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></h1>
+    <aside><span>Nov 14, 2016</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>     <a href="https://www.zimmi.cz/posts/tag/d3.html">d3</a>     <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/data.html">data</a></span>
+    </aside>
     <p>This post is the second part of the series summarizing the process of visualizing landuse data with bash, PostgreSQL and d3.js. Read other&nbsp;parts:</p>
 <ol>
-<li><a href="/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part&nbsp;I)</a></li>
+<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part&nbsp;I)</a></li>
 <li>you&#8217;re reading it&nbsp;now</li>
-<li><a href="/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">III</span>)</a></li>
+<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">III</span>)</a></li>
 </ol>
 <h2><span class="caps">ETL</span>&nbsp;process</h2>
 <p>Before the d3 viz can be crafted, it&#8217;s necessary&nbsp;to:</p>
@@ -177,18 +177,19 @@ psql -qAt --no-psqlrc -f transform.sql <span class="p">|</span> psql -qAt --no-p
 <p><code>psql -qAt --no-psqlrc -f transform.sql</code> builds the actual query from the query above, <code>| psql -qAt --no-psqlrc</code> sends it to the database again. This part was really fun to&nbsp;implement!</p>
 <p>I&#8217;m still considering to store diff values instead of absolute values in those <code>ARRAY</code>s - that would save some serious&nbsp;bandwidth!</p>
 <h2>Load</h2>
-<p>See <a href="/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">III</span>)</a>.</p>
+<p>See <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">III</span>)</a>.</p>
 </article>
 <article>
-    <h1><a href="/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i" rel="bookmark" title="Permalink to Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part&nbsp;I)</a></h1>
-    Written on Nov 13, 2016
-    and marked as
-    <a href="/tag/javascript.html">javascript</a>,     <a href="/tag/d3.html">d3</a>,     <a href="/tag/postgresql.html">postgresql</a>,     <a href="/tag/svg.html">svg</a>    | <a href="/category/data.html">data</a>
+    <h1><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i" rel="bookmark" title="Permalink to Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part&nbsp;I)</a></h1>
+    <aside><span>Nov 13, 2016</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>     <a href="https://www.zimmi.cz/posts/tag/d3.html">d3</a>     <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/data.html">data</a></span>
+    </aside>
     <p>This post is the first part of the upcoming series summarizing the process of visualizing landuse data with bash, PostgreSQL and d3.js. Read other&nbsp;parts:</p>
 <ol>
 <li>you&#8217;re reading it&nbsp;now</li>
-<li><a href="/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></li>
-<li><a href="/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">III</span>)</a></li>
+<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></li>
+<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">III</span>)</a></li>
 </ol>
 <p><a href="http://cuzk.cz/en">Czech Office for Surveying, Mapping and Cadastre</a> has recently published lot of data via <a href="http://atom.cuzk.cz">Atom feed</a>. There&#8217;s pretty small and a bit boring dataset included, featuring quarterly updated landuse-related values for all 13,091 cadastral&nbsp;areas:</p>
 <ul>
@@ -255,18 +256,19 @@ rm <span class="nv">$CSVFILE</span> <span class="nv">$CSVUTF8FILE</span>
 
 <p>This script downloads <span class="caps">CSV</span> file, deals with all the pitfalls mentioned above and, when done, <code>copy</code> command within <code>extract.sql</code> loads the data into a <code>data_YYYYMMDD</code> table. Putting all the files into the one table would have saved me a lot of transformation <span class="caps">SQL</span>, yet it didn&#8217;t feel quite right&nbsp;though.</p>
 <h2>Transform</h2>
-<p>See <a href="/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a>.</p>
+<p>See <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a>.</p>
 <h2>Load</h2>
-<p>See <a href="/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">III</span>)</a>.</p>
+<p>See <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">III</span>)</a>.</p>
 </article>
 <article>
-    <h1><a href="/posts/2016/introducing-blind-maps-project/" rel="bookmark" title="Permalink to Introducing Blind Maps Project">Introducing Blind Maps&nbsp;Project</a></h1>
-    Written on Nov 2, 2016
-    and marked as
-    <a href="/tag/javascript.html">javascript</a>,     <a href="/tag/leaflet.html">leaflet</a>    | <a href="/category/web-maps.html">web maps</a>
+    <h1><a href="https://www.zimmi.cz/posts/2016/introducing-blind-maps-project/" rel="bookmark" title="Permalink to Introducing Blind Maps Project">Introducing Blind Maps&nbsp;Project</a></h1>
+    <aside><span>Nov 2, 2016</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>     <a href="https://www.zimmi.cz/posts/tag/leaflet.html">leaflet</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/web-maps.html">web maps</a></span>
+    </aside>
     <p>I&#8217;d like to introduce you to my little pet project, which might just as well be awarded <em>the first pet project I&#8217;ve ever completed</em>, called <a href="https://www.zimmi.cz/blind-maps">Blind maps</a>.</p>
 <p>It&#8217;s a very simple, yet useful web application built on top of the great <a href="../../tag/leaflet.html">Leaflet</a> library meant to help you get to know our world a bit better. As the name suggests, the app shows you, well&hellip; a blind map, and you try to fill as many features as you&nbsp;can.</p>
-<div class="text-center"><img src="/assets/introducing-blind-maps-project/map.png" /></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/introducing-blind-maps-project/map.png" /></div>
 
 <p>The app is ready and can be&nbsp;used:</p>
 <ul>
@@ -288,10 +290,11 @@ rm <span class="nv">$CSVFILE</span> <span class="nv">$CSVUTF8FILE</span>
 <p>Have&nbsp;fun!</p>
 </article>
 <article>
-    <h1><a href="/posts/2016/degrees-to-decimal-with-javascript-reworked/" rel="bookmark" title="Permalink to Degrees To Decimal With Javascript Reworked">Degrees To Decimal With Javascript&nbsp;Reworked</a></h1>
-    Written on Oct 28, 2016
-    and marked as
-    <a href="/tag/javascript.html">javascript</a>    | <a href="/category/development.html">development</a>
+    <h1><a href="https://www.zimmi.cz/posts/2016/degrees-to-decimal-with-javascript-reworked/" rel="bookmark" title="Permalink to Degrees To Decimal With Javascript Reworked">Degrees To Decimal With Javascript&nbsp;Reworked</a></h1>
+    <aside><span>Oct 28, 2016</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+    </aside>
     <p>Two years ago I was pretty happy with <a href="https://www.zimmi.cz/posts/2014/degrees-to-decimal-with-javascript/">this little piece of code to transform degrees to the decimal value</a>. Yesterday, I found a neater way to do the&nbsp;same:</p>
 <div class="highlight"><pre><span></span><span class="kd">let</span> <span class="nx">deg</span> <span class="o">=</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">0</span><span class="p">];</span>
 
@@ -306,10 +309,11 @@ rm <span class="nv">$CSVFILE</span> <span class="nv">$CSVUTF8FILE</span>
 <p>Once you have an input array, that&#8217;s pretty much it. Love&nbsp;JavaScript.</p>
 </article>
 <article>
-    <h1><a href="/posts/2016/ogrinfo-output-formatting/" rel="bookmark" title="Permalink to Ogrinfo Output Formatting">Ogrinfo Output&nbsp;Formatting</a></h1>
-    Written on Oct 21, 2016
-    and marked as
-    <a href="/tag/gdal.html">gdal</a>    | <a href="/category/automation.html">automation</a>
+    <h1><a href="https://www.zimmi.cz/posts/2016/ogrinfo-output-formatting/" rel="bookmark" title="Permalink to Ogrinfo Output Formatting">Ogrinfo Output&nbsp;Formatting</a></h1>
+    <aside><span>Oct 21, 2016</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
+    </aside>
     <p>Today my workmate asked if there was a way to see an attribute table other than importing spatial data into a PostGIS database. I told him about <span class="caps">QGIS</span> and while talking about other <span class="caps">GIS</span> stuff, I started thinking about <em>pipes</em> and how awesome it would be to actually format the output of the <code>ogrinfo</code> command.</p>
 <p>Here it is. It is just a much longer way to do <code>ogr2ogr -f "CSV" dest source</code>, but sometimes you just have to experiment a&nbsp;bit.</p>
 <div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
@@ -339,20 +343,23 @@ rm <span class="nv">$CSVFILE</span> <span class="nv">$CSVUTF8FILE</span>
 
 <p>The result can be piped to other <code>bash</code> functions, such as <code>less</code> or <code>more</code>. I call it <code>ogrinfotable</code>.</p>
 </article>
-<div class="pagination row">
-    <div class="large-6 columns">
-            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Previous page']);" href="/index3.html" class="button card card-1">&laquo; Previous page</a>
-    </div>
-    <div class="large-6 columns">
-            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Next page']);" href="/index5.html" class="button card card-1">Next page &raquo;</a>
-    </div>
-</div>    </main>
+<aside id="pagination">
+            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Previous page']);" href="https://www.zimmi.cz/posts/index3.html">&laquo; Previous page</a>
+            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Next page']);" href="https://www.zimmi.cz/posts/index5.html">Next page &raquo;</a>
+</aside>    </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
         Proudly powered by <a href="//getpelican.com/">Pelican</a>,
         which takes great advantage of <a href="//python.org">Python</a>.
     </footer>
-<script src="/theme/webassets-external/5acf220afe81b3dd00333bbb93fbaa41_jquery.js"></script>
-<script src="/theme/webassets-external/b80143a60770d5aa122a039a2b889970_foundation.min.js"></script>
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-43432739-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments)};
+  gtag('js', new Date());
+
+  gtag('config', 'UA-43432739-2');
+</script>
 </body>
 </html>

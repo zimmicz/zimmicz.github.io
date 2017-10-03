@@ -4,6 +4,7 @@
           <title>Michal Zimmermann | PostGIS Spatial Indexing With ST_Intersects</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
         <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
         <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
 
@@ -13,67 +14,27 @@
   <meta property="og:title" content="PostGIS Spatial Indexing With ST_Intersects" />
   <meta property="og:description" content="PostGIS docs clearly states that: > This function call will automatically include a bounding box comparison that will make use of any indexes that are available on the geometries. That means (or at least I think so) that you shouldn’t bother with..." />
   <meta property="og:url" content="https://www.zimmi.cz/posts/2014/postgis-spatial-indexing-with-st_intersects/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?d5d1e141">
-<!-- Start of Async Drift Code -->
-<script>
-    !function () {
-        var t;
-        if (t = window.driftt = window.drift = window.driftt || [], !t.init) return t.invoked ? void (window.console && console.error && console.error("Drift snippet included twice.")) : (t.invoked = !0,
-            t.methods = ["identify", "config", "track", "reset", "debug", "show", "ping", "page", "hide", "off", "on"],
-            t.factory = function (e) {
-                return function () {
-                    var n;
-                    return n = Array.prototype.slice.call(arguments), n.unshift(e), t.push(n), t;
-                };
-            }, t.methods.forEach(function (e) {
-                t[e] = t.factory(e);
-            }), t.load = function (t) {
-                var e, n, o, i;
-                e = 3e5, i = Math.ceil(new Date() / e) * e, o = document.createElement("script"),
-                    o.type = "text/javascript", o.async = !0, o.crossorigin = "anonymous", o.src = "https://js.driftt.com/include/" + i + "/" + t + ".js",
-                    n = document.getElementsByTagName("script")[0], n.parentNode.insertBefore(o, n);
-            });
-    }();
-    drift.SNIPPET_VERSION = '0.3.1';
-    drift.load('caacyauy5t6b');
-
-</script>
-<!-- End of Async Drift Code --></head>
-
-<body id="index" class="home">
-    <nav class="top-bar card-1" data-topbar role="navigation">
-        <ul class="title-area">
-            <li class="name">
-                <h1><a href="/posts">Home</a></h1>
-            </li>
-     <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
-            <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?1ec62741">
+</head>
+<body>
+    <nav role="navigation">
+        <ul>
+            <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+            <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+            <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
         </ul>
-        <section class="top-bar-section">
-    <!-- Right Nav Section -->
-            <ul class="right">
-                <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
-                <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
-                <li><a href="https://www.zimmi.cz/posts/feed.xml">RSS feed</a></li>
-            </ul>
-        </section>
     </nav>
-        <div class="row">
-          <div class="large-12 columns header">
-            <h1><a href="/posts">Michal Zimmermann</a> <small>Pieces of knowledge from the world of GIS.</small></h1>
-          </div>
-        </div>
-        <div class="row">
-            <div class="large-12 columns">
-<div class="panel card card-1">
-    <div class="post-name">
-        <h1><a href="https://www.zimmi.cz/posts/2014/postgis-spatial-indexing-with-st_intersects/" rel="bookmark" title="Permalink to PostGIS Spatial Indexing With ST_Intersects">PostGIS Spatial Indexing With&nbsp;ST_Intersects</a></h1>
-        <small>Written on Nov 23, 2014
-    and marked as
-    <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    | <a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a>
-    </small>
-    <section>
-        <p><a href="http://postgis.net/docs/ST_Intersects.html">PostGIS docs</a> clearly states that:
+    <header>
+        <h1><a href="/posts">Michal Zimmermann<small>Pieces of knowledge from the world of GIS.</small></a></h1>
+    </header>
+    <main>
+<article>
+    <h1><a href="https://www.zimmi.cz/posts/2014/postgis-spatial-indexing-with-st_intersects/" rel="bookmark" title="Permalink to PostGIS Spatial Indexing With ST_Intersects">PostGIS Spatial Indexing With&nbsp;ST_Intersects</a></h1>
+    <aside><span>Nov 23, 2014</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+<p><a href="http://postgis.net/docs/ST_Intersects.html">PostGIS docs</a> clearly states that:
     &gt; This function call will automatically include a bounding box comparison that will make use of any indexes that are available on the&nbsp;geometries.</p>
 <p>That means (or at least I think so) that you shouldn&#8217;t bother with using <a href="http://postgis.net/docs/reference.html#Operators">operators</a> before calling this&nbsp;function.</p>
 <p><a href="http://slides.com/michalzimmermann">I was preparing</a> my second lecture on PostGIS and I was experimenting a bit and came up with an interesting thing on this&nbsp;matter:</p>
@@ -124,61 +85,35 @@ Total runtime: 3930.270 ms
 
 <p>Now there&#8217;s a significant difference between total runtimes of both queries and - more important - also a difference between their query plans. The latter is like <strong>20 % faster</strong>.</p>
 <p>I&#8217;m puzzled about this behavior and would appreciate any thoughts on this. Reach me at <a href="http://twitter.com/zimmicz">Twitter</a>, <a href="https://www.linkedin.com/pub/michal-zimmermann/29/8/b30">LinkedIn</a> or e-mail&nbsp;(zimmicz[at]gmail.com).</p>
-    </section>
-    </div>
-<div class="neighbors">
-    <h3>More reading</h3>
-    <ul>
-        <li>
-            <a onclick="javascript:_paq.push(['trackEvent', 'Neighbors', 'Previous article']);" href="https://www.zimmi.cz/posts/2014/bash-prepend-to-filename/">
-                 Bash: Prepend To&nbsp;Filename
-            </a>
-        </li>
-         <li>
-             <a onclick="javascript:_paq.push(['trackEvent', 'Neighbors', 'Next article']);" href="https://www.zimmi.cz/posts/2014/postgis-case-study-vozejkmap-open-data-part-i/">
-                 PostGIS Case Study: VozejkMap Open Data (Part&nbsp;I)
-             </a>
-         </li>
-         <li>
-             <a onclick="javascript:_paq.push(['trackEvent', 'Neighbors', 'Next article in category']);" href="https://www.zimmi.cz/posts/2014/postgis-case-study-vozejkmap-open-data-part-i/">
-                 PostGIS Case Study: VozejkMap Open Data (Part&nbsp;I)
-             </a>
-         </li>
-        </li>
-    </ul>
-</div></div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="large-12 columns footer">
-                <footer>
-                    <address>
-                    Written by <a href="http://www.zimmi.cz">Michal Zimmermann</a>.
-                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
-                    which takes great advantage of <a href="http://python.org">Python</a>.
-                    </address><!-- /#about -->
-                </footer><!-- /#contentinfo -->
-            </div>
-        </div>
-<!-- Piwik -->
-<script type="text/javascript">
-  var _paq = _paq || [];
-  /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-  _paq.push(['enableHeartBeatTimer']);
-  _paq.push(['trackPageView']);
-  _paq.push(['enableLinkTracking']);
-  (function() {
-    var u="//piwik-zimmi.rhcloud.com/analytics/";
-    _paq.push(['setTrackerUrl', u+'piwik.php']);
-    _paq.push(['setSiteId', '1']);
-    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
-  })();
-</script>
-<!-- End Piwik Code -->
-<script src="https://www.zimmi.cz/posts/theme/js/packed.js?8bee1467"></script>
+<aside>
+<h3>More reading</h3>
+<ul>
+    <li>
+        <a onclick="javascript:_paq.push(['trackEvent', 'Neighbors', 'Previous article']);" href="https://www.zimmi.cz/posts/2014/bash-prepend-to-filename/">
+             Bash: Prepend To&nbsp;Filename
+        </a>
+    </li>
+     <li>
+         <a onclick="javascript:_paq.push(['trackEvent', 'Neighbors', 'Next article']);" href="https://www.zimmi.cz/posts/2014/postgis-case-study-vozejkmap-open-data-part-i/">
+             PostGIS Case Study: VozejkMap Open Data (Part&nbsp;I)
+         </a>
+     </li>
+    </li>
+</ul></aside>
+    </main>
+    <footer>
+        Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
+        Proudly powered by <a href="//getpelican.com/">Pelican</a>,
+        which takes great advantage of <a href="//python.org">Python</a>.
+    </footer>
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-43432739-2"></script>
 <script>
-$(document).foundation();
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments)};
+  gtag('js', new Date());
+
+  gtag('config', 'UA-43432739-2');
 </script>
 </body>
 </html>

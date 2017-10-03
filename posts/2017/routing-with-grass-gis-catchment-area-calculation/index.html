@@ -4,6 +4,7 @@
           <title>Michal Zimmermann | Routing with GRASS GIS: Catchment Area Calculation</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
         <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
         <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
 
@@ -14,67 +15,27 @@
   <meta property="og:title" content="Routing with GRASS GIS: Catchment Area Calculation" />
   <meta property="og:description" content="I got my hands on pgRouting in the last post and I’m about to do the same with GRASS GIS in this one. GRASS GIS stores the topology for the native vector format by default, which makes it easy to use for the network analysis. All the commands..." />
   <meta property="og:url" content="https://www.zimmi.cz/posts/2017/routing-with-grass-gis-catchment-area-calculation/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?d5d1e141">
-<!-- Start of Async Drift Code -->
-<script>
-    !function () {
-        var t;
-        if (t = window.driftt = window.drift = window.driftt || [], !t.init) return t.invoked ? void (window.console && console.error && console.error("Drift snippet included twice.")) : (t.invoked = !0,
-            t.methods = ["identify", "config", "track", "reset", "debug", "show", "ping", "page", "hide", "off", "on"],
-            t.factory = function (e) {
-                return function () {
-                    var n;
-                    return n = Array.prototype.slice.call(arguments), n.unshift(e), t.push(n), t;
-                };
-            }, t.methods.forEach(function (e) {
-                t[e] = t.factory(e);
-            }), t.load = function (t) {
-                var e, n, o, i;
-                e = 3e5, i = Math.ceil(new Date() / e) * e, o = document.createElement("script"),
-                    o.type = "text/javascript", o.async = !0, o.crossorigin = "anonymous", o.src = "https://js.driftt.com/include/" + i + "/" + t + ".js",
-                    n = document.getElementsByTagName("script")[0], n.parentNode.insertBefore(o, n);
-            });
-    }();
-    drift.SNIPPET_VERSION = '0.3.1';
-    drift.load('caacyauy5t6b');
-
-</script>
-<!-- End of Async Drift Code --></head>
-
-<body id="index" class="home">
-    <nav class="top-bar card-1" data-topbar role="navigation">
-        <ul class="title-area">
-            <li class="name">
-                <h1><a href="/posts">Home</a></h1>
-            </li>
-     <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
-            <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?1ec62741">
+</head>
+<body>
+    <nav role="navigation">
+        <ul>
+            <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+            <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+            <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
         </ul>
-        <section class="top-bar-section">
-    <!-- Right Nav Section -->
-            <ul class="right">
-                <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
-                <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
-                <li><a href="https://www.zimmi.cz/posts/feed.xml">RSS feed</a></li>
-            </ul>
-        </section>
     </nav>
-        <div class="row">
-          <div class="large-12 columns header">
-            <h1><a href="/posts">Michal Zimmermann</a> <small>Pieces of knowledge from the world of GIS.</small></h1>
-          </div>
-        </div>
-        <div class="row">
-            <div class="large-12 columns">
-<div class="panel card card-1">
-    <div class="post-name">
-        <h1><a href="https://www.zimmi.cz/posts/2017/routing-with-grass-gis-catchment-area-calculation/" rel="bookmark" title="Permalink to Routing with GRASS GIS: Catchment Area Calculation">Routing with <span class="caps">GRASS</span> <span class="caps">GIS</span>: Catchment Area&nbsp;Calculation</a></h1>
-        <small>Written on Apr 20, 2017
-    and marked as
-    <a href="https://www.zimmi.cz/posts/tag/grass.html">grass</a>    | <a href="https://www.zimmi.cz/posts/category/gis.html">GIS</a>
-    </small>
-    <section>
-        <p>I got my hands on <a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/">pgRouting</a> in the last post and I&#8217;m about to do the same with <span class="caps">GRASS</span> <span class="caps">GIS</span> in this&nbsp;one.</p>
+    <header>
+        <h1><a href="/posts">Michal Zimmermann<small>Pieces of knowledge from the world of GIS.</small></a></h1>
+    </header>
+    <main>
+<article>
+    <h1><a href="https://www.zimmi.cz/posts/2017/routing-with-grass-gis-catchment-area-calculation/" rel="bookmark" title="Permalink to Routing with GRASS GIS: Catchment Area Calculation">Routing with <span class="caps">GRASS</span> <span class="caps">GIS</span>: Catchment Area&nbsp;Calculation</a></h1>
+    <aside><span>Apr 20, 2017</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/grass.html">grass</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
+    </aside>
+<p>I got my hands on <a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/">pgRouting</a> in the last post and I&#8217;m about to do the same with <span class="caps">GRASS</span> <span class="caps">GIS</span> in this&nbsp;one.</p>
 <p><span class="caps">GRASS</span> <span class="caps">GIS</span> stores the topology for the native vector format by default, which makes it easy to use for the network analysis. All the commands associated with the network analysis can be found in the <code>v.net</code> family. The ones I&#8217;m going to discuss in this post are <code>v.net</code> itself, <code>v.net.path</code>, <code>.v.net.alloc</code> and <code>v.net.iso</code>,&nbsp;respectively.</p>
 <h2>Data</h2>
 <p>I&#8217;m going to use the roads data <a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/">from the previous post</a> together with some random points used as catchment areas&nbsp;centers.</p>
@@ -139,61 +100,35 @@ v.net <span class="nv">input</span><span class="o">=</span>network <span class="
 <li>Bridges and tunnels might be an&nbsp;issue.</li>
 <li>Personally, I find <span class="caps">GRASS</span> <span class="caps">GIS</span> easier to use for the network analysis compared to&nbsp;pgRouting.</li>
 </ul>
-    </section>
-    </div>
-<div class="neighbors">
-    <h3>More reading</h3>
-    <ul>
-        <li>
-            <a onclick="javascript:_paq.push(['trackEvent', 'Neighbors', 'Previous article']);" href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/">
-                 Routing with pgRouting: Catchment Area&nbsp;Calculation
-            </a>
-        </li>
-         <li>
-             <a onclick="javascript:_paq.push(['trackEvent', 'Neighbors', 'Next article']);" href="https://www.zimmi.cz/posts/2017/wifileaks-wi-fi-networks-dataviz/">
-                 Wifileaks Wi-Fi Networks&nbsp;Dataviz
-             </a>
-         </li>
-         <li>
-             <a onclick="javascript:_paq.push(['trackEvent', 'Neighbors', 'Next article in category']);" href="https://www.zimmi.cz/posts/2017/wifileaks-wi-fi-networks-dataviz/">
-                 Wifileaks Wi-Fi Networks&nbsp;Dataviz
-             </a>
-         </li>
-        </li>
-    </ul>
-</div></div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="large-12 columns footer">
-                <footer>
-                    <address>
-                    Written by <a href="http://www.zimmi.cz">Michal Zimmermann</a>.
-                    Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
-                    which takes great advantage of <a href="http://python.org">Python</a>.
-                    </address><!-- /#about -->
-                </footer><!-- /#contentinfo -->
-            </div>
-        </div>
-<!-- Piwik -->
-<script type="text/javascript">
-  var _paq = _paq || [];
-  /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-  _paq.push(['enableHeartBeatTimer']);
-  _paq.push(['trackPageView']);
-  _paq.push(['enableLinkTracking']);
-  (function() {
-    var u="//piwik-zimmi.rhcloud.com/analytics/";
-    _paq.push(['setTrackerUrl', u+'piwik.php']);
-    _paq.push(['setSiteId', '1']);
-    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
-  })();
-</script>
-<!-- End Piwik Code -->
-<script src="https://www.zimmi.cz/posts/theme/js/packed.js?8bee1467"></script>
+<aside>
+<h3>More reading</h3>
+<ul>
+    <li>
+        <a onclick="javascript:_paq.push(['trackEvent', 'Neighbors', 'Previous article']);" href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/">
+             Routing with pgRouting: Catchment Area&nbsp;Calculation
+        </a>
+    </li>
+     <li>
+         <a onclick="javascript:_paq.push(['trackEvent', 'Neighbors', 'Next article']);" href="https://www.zimmi.cz/posts/2017/wifileaks-wi-fi-networks-dataviz/">
+             Wifileaks Wi-Fi Networks&nbsp;Dataviz
+         </a>
+     </li>
+    </li>
+</ul></aside>
+    </main>
+    <footer>
+        Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
+        Proudly powered by <a href="//getpelican.com/">Pelican</a>,
+        which takes great advantage of <a href="//python.org">Python</a>.
+    </footer>
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-43432739-2"></script>
 <script>
-$(document).foundation();
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments)};
+  gtag('js', new Date());
+
+  gtag('config', 'UA-43432739-2');
 </script>
 </body>
 </html>

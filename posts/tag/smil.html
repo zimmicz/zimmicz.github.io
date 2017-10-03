@@ -5,17 +5,16 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="/theme/webassets-external/e17ffd2049da5254bb4b3183ea73c922_normalize.css">
-        <link rel="stylesheet" href="/theme/webassets-external/35f123b951b653f7b2d441b35b63d32a_github.css">
-        <link rel="stylesheet" href="/theme/webassets-external/310a2979488959b3c24d4edd2e18b50d_screen.css">
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?1ec62741">
 </head>
 <body>
     <nav role="navigation">
         <ul>
-            <li><a href="/categories">Categories</a></li>
-            <li><a href="/tags">Tags</a></li>
-            <li><a href="/feed.xml">Subscribe to RSS feed</a></li>
+            <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+            <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+            <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
         </ul>
     </nav>
     <header>
@@ -25,10 +24,11 @@
 <h2 class="text-center">Articles tagged with smil tag</h2>
 
 <article>
-    <h1><a href="/posts/2015/animating-svg-maps-with-smil/" rel="bookmark" title="Permalink to Animating SVG Maps With SMIL">Animating <span class="caps">SVG</span> Maps With <span class="caps">SMIL</span></a></h1>
-    Written on Apr 29, 2015
-    and marked as
-    <a href="/tag/svg.html">svg</a>,     <a href="/tag/smil.html">smil</a>    | <a href="/category/web-maps.html">web maps</a>
+    <h1><a href="https://www.zimmi.cz/posts/2015/animating-svg-maps-with-smil/" rel="bookmark" title="Permalink to Animating SVG Maps With SMIL">Animating <span class="caps">SVG</span> Maps With <span class="caps">SMIL</span></a></h1>
+    <aside><span>Apr 29, 2015</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>     <a href="https://www.zimmi.cz/posts/tag/smil.html">smil</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/web-maps.html">web maps</a></span>
+    </aside>
     <p>Using <span class="caps">SVG</span> to build web maps have both pros and cons and to be honest I don&#8217;t know any <em>serious</em> map/<span class="caps">GIS</span> project built on top of <span class="caps">SVG</span>. However, as a part of my job at university, I was forced to use both <span class="caps">SVG</span> and <span class="caps">SMIL</span> to produce animated web map (see the small version below or the big one at <a href="https://zimmicz.github.io/svg-smil-airplanes/map.svg">GitHub</a>) and I&#8217;d like to share my&nbsp;findings.</p>
 <p><object width="400" data="https://zimmicz.github.io/svg-smil-airplanes/map.svg" type="image/svg+xml"></object></p>
 <h2>Data&nbsp;preprocessing</h2>
@@ -224,18 +224,21 @@
 
 <p><span class="caps">SMIL</span> with <span class="caps">SVG</span> seems to be interesting option for web map animation, a bit lengthy though. Syncing animations can easily become pain in the ass (<a href="https://stackoverflow.com/questions/29897355/svg-smil-animatemotion-only-triggers-once/">see StackOverflow thread</a>). Never call your function <code>animate</code> - there is namesake function defined in <a href="https://w3c.github.io/web-animations/">Web Animations <span class="caps">API</span></a> that makes animation crash in Chrome. <code>&lt;animateMotion /&gt;</code> is a great tool to animate elements along&nbsp;path.</p>
 </article>
-<div class="pagination row">
-    <div class="large-6 columns">
-    </div>
-    <div class="large-6 columns">
-    </div>
-</div>    </main>
+<aside id="pagination">
+</aside>    </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
         Proudly powered by <a href="//getpelican.com/">Pelican</a>,
         which takes great advantage of <a href="//python.org">Python</a>.
     </footer>
-<script src="/theme/webassets-external/5acf220afe81b3dd00333bbb93fbaa41_jquery.js"></script>
-<script src="/theme/webassets-external/b80143a60770d5aa122a039a2b889970_foundation.min.js"></script>
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-43432739-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments)};
+  gtag('js', new Date());
+
+  gtag('config', 'UA-43432739-2');
+</script>
 </body>
 </html>

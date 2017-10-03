@@ -5,17 +5,16 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="/theme/webassets-external/e17ffd2049da5254bb4b3183ea73c922_normalize.css">
-        <link rel="stylesheet" href="/theme/webassets-external/35f123b951b653f7b2d441b35b63d32a_github.css">
-        <link rel="stylesheet" href="/theme/webassets-external/310a2979488959b3c24d4edd2e18b50d_screen.css">
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?1ec62741">
 </head>
 <body>
     <nav role="navigation">
         <ul>
-            <li><a href="/categories">Categories</a></li>
-            <li><a href="/tags">Tags</a></li>
-            <li><a href="/feed.xml">Subscribe to RSS feed</a></li>
+            <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+            <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+            <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
         </ul>
     </nav>
     <header>
@@ -25,10 +24,11 @@
 <h2 class="text-center">Articles tagged with bash tag</h2>
 
 <article>
-    <h1><a href="/posts/2017/postgresql-dollar-quoting-inside-bash-heredoc/" rel="bookmark" title="Permalink to PostgreSQL Dollar Quoting inside Bash Heredoc">PostgreSQL Dollar Quoting inside Bash&nbsp;Heredoc</a></h1>
-    Written on Sep 22, 2017
-    and marked as
-    <a href="/tag/sql.html">sql</a>,     <a href="/tag/postgresql.html">postgresql</a>,     <a href="/tag/bash.html">bash</a>    | <a href="/category/sql.html">SQL</a>
+    <h1><a href="https://www.zimmi.cz/posts/2017/postgresql-dollar-quoting-inside-bash-heredoc/" rel="bookmark" title="Permalink to PostgreSQL Dollar Quoting inside Bash Heredoc">PostgreSQL Dollar Quoting inside Bash&nbsp;Heredoc</a></h1>
+    <aside><span>Sep 22, 2017</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
     <p>Yesterday I spent two very unpleasant hours debugging the weirdest <span class="caps">SQL</span> error I&#8217;ve seen in my life, running the below query (simplified for this&nbsp;post).</p>
 <div class="highlight"><pre><span></span><span class="n">psql</span> <span class="o">-</span><span class="n">qAt</span> <span class="c1">--no-psqlrc &lt;&lt;BACKUP</span>
 <span class="k">DO</span>
@@ -69,10 +69,11 @@ LINE <span class="m">2</span>: <span class="m">1111</span><span class="p">;</spa
 </pre></div>
 </article>
 <article>
-    <h1><a href="/posts/2017/fighting-raster-geopackage-with-gdal/" rel="bookmark" title="Permalink to Fighting Raster GeoPackage with GDAL">Fighting Raster GeoPackage with <span class="caps">GDAL</span></a></h1>
-    Written on Jul 19, 2017
-    and marked as
-    <a href="/tag/bash.html">bash</a>,     <a href="/tag/gdal.html">gdal</a>    | <a href="/category/gis.html">GIS</a>
+    <h1><a href="https://www.zimmi.cz/posts/2017/fighting-raster-geopackage-with-gdal/" rel="bookmark" title="Permalink to Fighting Raster GeoPackage with GDAL">Fighting Raster GeoPackage with <span class="caps">GDAL</span></a></h1>
+    <aside><span>Jul 19, 2017</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>     <a href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
+    </aside>
     <p>As I&#8217;m still running Ubuntu 16.04 based Linux Mint, I have no access to <span class="caps">GDAL</span> 2.x repositories (except for ubuntugis, that I really don&#8217;t like to use). Provided with a GeoPackage raster file recently, I had to find a way to load it into <span class="caps">QGIS</span>, somehow. The solution is simple: Docker with&nbsp;gdal_translate.</p>
 <h2>Preparing the Docker&nbsp;container</h2>
 <p>I like using Docker for experiments that might leave the <span class="caps">OS</span> in an <em>unexpected</em> state (which is exactly what happens to me with ubuntugis repository whenever I use it. That&#8217;s why I don&#8217;t anymore.). A very simple Dockerfile keeps the troubles away from&nbsp;you.</p>
@@ -126,13 +127,14 @@ RUN apt install -y gdal-bin
 
 
 <h2>Final Touch: Raster to&nbsp;Vector</h2>
-<p>After the GeoTiff is written to hard drive, <a href="/posts/2015/how-to-use-queue-with-rsync/">inotifywait</a> can be used to generate overviews. And with ease of calling <code>gdal_polygonize.py</code> on each of GeoTiffs&hellip;vector layer, at you&nbsp;service.</p>
+<p>After the GeoTiff is written to hard drive, <a href="https://www.zimmi.cz/posts/2015/how-to-use-queue-with-rsync/">inotifywait</a> can be used to generate overviews. And with ease of calling <code>gdal_polygonize.py</code> on each of GeoTiffs&hellip;vector layer, at you&nbsp;service.</p>
 </article>
 <article>
-    <h1><a href="/posts/2017/exploiting-prague-open-data-without-api/" rel="bookmark" title="Permalink to Exploiting Prague Open Data without API">Exploiting Prague Open Data without <span class="caps">API</span></a></h1>
-    Written on Apr 3, 2017
-    and marked as
-    <a href="/tag/bash.html">bash</a>    | <a href="/category/data.html">data</a>
+    <h1><a href="https://www.zimmi.cz/posts/2017/exploiting-prague-open-data-without-api/" rel="bookmark" title="Permalink to Exploiting Prague Open Data without API">Exploiting Prague Open Data without <span class="caps">API</span></a></h1>
+    <aside><span>Apr 3, 2017</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/data.html">data</a></span>
+    </aside>
     <p>Speaking the Czech Republic, <a href="http://www.geoportalpraha.cz">Prague is an undoubted leader in open data publishing</a>. However, there is no public <span class="caps">API</span> to explore/search existing&nbsp;datasets.</p>
 <p>I wanted to download the <span class="caps">ESRI</span> Shapefile of the city urban plan that <a href="http://www.geoportalpraha.cz/cs/opendata/21733E1F-21B7-4ABC-B1C2-DC19C0237380#.WOKHMbmFvVM">is divided into more than a hundred files</a> (a file representing a cadastral&nbsp;area).</p>
 <p>This becomes a piece of cake with Opera Developer tools and a bit of JavaScript&nbsp;code</p>
@@ -163,10 +165,11 @@ find -type f -not -path <span class="s1">&#39;./PVP_fvu_p_Bechovice_SHP*&#39;</s
 <p>A boring task that would take me hours five years ago transformed into simple, yet fun, piece of work done in no more than half an&nbsp;hour.</p>
 </article>
 <article>
-    <h1><a href="/posts/2016/syncing-two-postgresql-databases-faster/" rel="bookmark" title="Permalink to Syncing Two PostgreSQL Databases Faster">Syncing Two PostgreSQL Databases&nbsp;Faster</a></h1>
-    Written on Jul 17, 2016
-    and marked as
-    <a href="/tag/postgresql.html">postgresql</a>,     <a href="/tag/bash.html">bash</a>    | <a href="/category/sql.html">SQL</a>
+    <h1><a href="https://www.zimmi.cz/posts/2016/syncing-two-postgresql-databases-faster/" rel="bookmark" title="Permalink to Syncing Two PostgreSQL Databases Faster">Syncing Two PostgreSQL Databases&nbsp;Faster</a></h1>
+    <aside><span>Jul 17, 2016</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
     <p>Imagine you run two database machines hosting structurally the same databases on two separate servers and you need to transfer data from one to another. Not very often, let&#8217;s say once a month. Your tables aren&#8217;t small nor huge, let&#8217;s say millions rows in&nbsp;general.</p>
 <p>You&#8217;re going to use <code>pg_dump</code> and pipe it to <code>psql</code>, but the indices on your tables will slow you down a&nbsp;lot.</p>
 <p>That&#8217;s why you&#8217;ll want to drop all indices and constraints (<code>drop_indices_constraints.sql</code>):</p>
@@ -256,10 +259,11 @@ psql -qAt -d target -f create.sql
 </pre></div>
 </article>
 <article>
-    <h1><a href="/posts/2015/color-relief-shaded-map-using-open-data-with-open-source-software/" rel="bookmark" title="Permalink to Color Relief Shaded Map Using Open Data with Open Source Software">Color Relief Shaded Map Using Open Data with Open Source&nbsp;Software</a></h1>
-    Written on Oct 25, 2015
-    and marked as
-    <a href="/tag/bash.html">bash</a>,     <a href="/tag/gdal.html">gdal</a>,     <a href="/tag/linux.html">linux</a>,     <a href="/tag/qgis.html">qgis</a>    | <a href="/category/automation.html">automation</a>
+    <h1><a href="https://www.zimmi.cz/posts/2015/color-relief-shaded-map-using-open-data-with-open-source-software/" rel="bookmark" title="Permalink to Color Relief Shaded Map Using Open Data with Open Source Software">Color Relief Shaded Map Using Open Data with Open Source&nbsp;Software</a></h1>
+    <aside><span>Oct 25, 2015</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>     <a href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>     <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>     <a href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
+    </aside>
     <p>The Digital Elevation Model over Europe (<span class="caps">EU</span>-<span class="caps">DEM</span>) has been recently released for public usage at <a href="http://land.copernicus.eu/in-situ/eu-dem">Copernicus Land Monitoring Services homepage</a>. Strictly speaking, it is a <strong>digital surface model</strong> coming from weighted average of <span class="caps">SRTM</span> and <span class="caps">ASTER</span> <span class="caps">GDEM</span> with geographic accuracy of 25 m. Data are provided as GeoTIFF files projected in 1 degree by 1 degree tiles (projected to <span class="caps">EPSG</span>:3035), so they correspond to the <span class="caps">SRTM</span> naming&nbsp;convention.</p>
 <p>If you can&#8217;t see the map to choose the data to download, make sure you&#8217;re not using <span class="caps">HTTPS</span> Everywhere or similar browser&nbsp;plugin.</p>
 <p>I chose <strong>Austria</strong> to play with the&nbsp;data.</p>
@@ -278,7 +282,7 @@ unrar dem.rar -d copernicus
 
 
 <p>And here comes the&nbsp;Alps.</p>
-<p class="text-center"><img title="Hillshade" src="/assets/color-relief-shaded-map-using-open-data-and-open-source-software/hillshade.png" class="center"></p>
+<p class="text-center"><img title="Hillshade" src="https://www.zimmi.cz/posts/assets/color-relief-shaded-map-using-open-data-and-open-source-software/hillshade.png" class="center"></p>
 
 <p>To create a color relief you need a ramp of heights with colors. <a href="http://cartographicperspectives.org/index.php/journal/article/viewFile/20/70">&#8220;The Development and Rationale of Cross-blended Hypsometric Tints&#8221;</a> by T. Patterson and B. Jenny is a great read on <strong>hypsometric tints</strong>. They also give advice on what colors to choose in different environments (see the table at the last page of the article). I settled for warm humid color&nbsp;values.</p>
 <table class="center">
@@ -354,7 +358,7 @@ unrar dem.rar -d copernicus
 
 
 <p>And here comes hypsometric&nbsp;tints.</p>
-<p class="text-center"><img title="Color relief" src="/assets/color-relief-shaded-map-using-open-data-and-open-source-software/color_relief.png" class="center"></p>
+<p class="text-center"><img title="Color relief" src="https://www.zimmi.cz/posts/assets/color-relief-shaded-map-using-open-data-and-open-source-software/color_relief.png" class="center"></p>
 
 <p>Add a bit of compression and some overviews to make it smaller and load&nbsp;faster.</p>
 <div class="highlight"><pre><span></span>gdal_translate -of GTiff -co <span class="nv">TILED</span><span class="o">=</span>YES -co <span class="nv">COMPRESS</span><span class="o">=</span>DEFLATE color_relief.tif color_relief.compress.tif
@@ -370,25 +374,28 @@ gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span c
 
 <h2>Map&nbsp;composition</h2>
 <p>I chose Austria for its excessive amount of freely available datasets. What I didn&#8217;t take into consideration was my lack of knowledge when it comes to German (#fail). States come from <a href="http://data.gv.at">data.gv.at</a> and was dissolved from smaller administrative units. State capitals were downloaded from <a href="http://naturalearth.com">naturalearth.com</a>.</p>
-<p class="text-center"><a href="/assets/color-relief-shaded-map-using-open-data-and-open-source-software/map.pdf" title="Click for PDF version"><img title="Austria" src="/assets/color-relief-shaded-map-using-open-data-and-open-source-software/map.png" class="center"></a></p>
+<p class="text-center"><a href="https://www.zimmi.cz/posts/assets/color-relief-shaded-map-using-open-data-and-open-source-software/map.pdf" title="Click for PDF version"><img title="Austria" src="https://www.zimmi.cz/posts/assets/color-relief-shaded-map-using-open-data-and-open-source-software/map.png" class="center"></a></p>
 
 <p>I&#8217;d like to add some more thematic layers in the future. And translate the map to&nbsp;English.</p>
 <h2>Few words on <span class="caps">INSPIRE</span>&nbsp;Geoportal</h2>
 <p><a href="http://inspire-geoportal.ec.europa.eu/"><span class="caps">INSPIRE</span> Geoportal</a> should be the first place you go to search for European spatial data (at last <span class="caps">EU</span> thinks so). I used it to find data for this map and it was a very frustrating experience. It was actually more frustrating than using Austrian open data portal in German. Last news are from May 21, 2015, but the whole site looks and feels like deep 90s or early 2000 at&nbsp;least.</p>
 </article>
-<div class="pagination row">
-    <div class="large-6 columns">
-    </div>
-    <div class="large-6 columns">
-            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Next page']);" href="/tag/bash2.html" class="button card card-1">Next page &raquo;</a>
-    </div>
-</div>    </main>
+<aside id="pagination">
+            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Next page']);" href="https://www.zimmi.cz/posts/tag/bash2.html">Next page &raquo;</a>
+</aside>    </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
         Proudly powered by <a href="//getpelican.com/">Pelican</a>,
         which takes great advantage of <a href="//python.org">Python</a>.
     </footer>
-<script src="/theme/webassets-external/5acf220afe81b3dd00333bbb93fbaa41_jquery.js"></script>
-<script src="/theme/webassets-external/b80143a60770d5aa122a039a2b889970_foundation.min.js"></script>
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-43432739-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments)};
+  gtag('js', new Date());
+
+  gtag('config', 'UA-43432739-2');
+</script>
 </body>
 </html>

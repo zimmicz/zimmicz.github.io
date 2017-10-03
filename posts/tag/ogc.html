@@ -5,17 +5,16 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="/theme/webassets-external/e17ffd2049da5254bb4b3183ea73c922_normalize.css">
-        <link rel="stylesheet" href="/theme/webassets-external/35f123b951b653f7b2d441b35b63d32a_github.css">
-        <link rel="stylesheet" href="/theme/webassets-external/310a2979488959b3c24d4edd2e18b50d_screen.css">
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?1ec62741">
 </head>
 <body>
     <nav role="navigation">
         <ul>
-            <li><a href="/categories">Categories</a></li>
-            <li><a href="/tags">Tags</a></li>
-            <li><a href="/feed.xml">Subscribe to RSS feed</a></li>
+            <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+            <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+            <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
         </ul>
     </nav>
     <header>
@@ -25,10 +24,11 @@
 <h2 class="text-center">Articles tagged with ogc tag</h2>
 
 <article>
-    <h1><a href="/posts/2015/wms-download-for-future-offline-use/" rel="bookmark" title="Permalink to WMS Download For Future Offline Use"><span class="caps">WMS</span> Download For Future Offline&nbsp;Use</a></h1>
-    Written on Mar 15, 2015
-    and marked as
-    <a href="/tag/ogc.html">ogc</a>,     <a href="/tag/python.html">python</a>,     <a href="/tag/wms.html">wms</a>    | <a href="/category/automation.html">automation</a>
+    <h1><a href="https://www.zimmi.cz/posts/2015/wms-download-for-future-offline-use/" rel="bookmark" title="Permalink to WMS Download For Future Offline Use"><span class="caps">WMS</span> Download For Future Offline&nbsp;Use</a></h1>
+    <aside><span>Mar 15, 2015</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/ogc.html">ogc</a>     <a href="https://www.zimmi.cz/posts/tag/python.html">python</a>     <a href="https://www.zimmi.cz/posts/tag/wms.html">wms</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
+    </aside>
     <p>Using <span class="caps">WMS</span> in real time might easily become pain in the ass due to low connection speed or slow server response. Downloading images beforehand seems to be a reasonable choice both to avoid any slowdowns and to improve user experience when working with <span class="caps">WMS</span>&nbsp;layers.</p>
 <p><a href="https://geopython.github.io/OWSLib/">OWSLib</a> is a great tool to help you get images from <span class="caps">WMS</span> server. Code and some comments&nbsp;follow.</p>
 <div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
@@ -125,10 +125,11 @@
 <p>Code given is not bulletproof, it will fail on any network error. However, if you restart it after such a crash, it checks for existing files and starts with the first missing, so you don&#8217;t have to download all the tiles&nbsp;again.</p>
 </article>
 <article>
-    <h1><a href="/posts/2014/connecting-to-secured-arcgis-server-layer-with-openlayers-3/" rel="bookmark" title="Permalink to Connecting To Secured ArcGIS Server Layer With OpenLayers 3">Connecting To Secured ArcGIS Server Layer With OpenLayers&nbsp;3</a></h1>
-    Written on Sep 12, 2014
-    and marked as
-    <a href="/tag/javascript.html">javascript</a>,     <a href="/tag/openlayers.html">openlayers</a>,     <a href="/tag/ogc.html">ogc</a>    | <a href="/category/web-maps.html">web maps</a>
+    <h1><a href="https://www.zimmi.cz/posts/2014/connecting-to-secured-arcgis-server-layer-with-openlayers-3/" rel="bookmark" title="Permalink to Connecting To Secured ArcGIS Server Layer With OpenLayers 3">Connecting To Secured ArcGIS Server Layer With OpenLayers&nbsp;3</a></h1>
+    <aside><span>Sep 12, 2014</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>     <a href="https://www.zimmi.cz/posts/tag/openlayers.html">openlayers</a>     <a href="https://www.zimmi.cz/posts/tag/ogc.html">ogc</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/web-maps.html">web maps</a></span>
+    </aside>
     <p>I was made to use ArcGIS Server with <a href="http://openlayers.org">Openlayers 3</a> just recently as one of the projects I&#8217;ve been working on demands such different tools to work&nbsp;together.</p>
 <p><strong>tl;dr: I hate&nbsp;Esri.</strong></p>
 <p>I found myself in need to access secured layers published via <span class="caps">WMS</span> on ArcGIS Server using username and password I was given, so here&#8217;s a little how-to for anyone who would have to do the&nbsp;same.</p>
@@ -181,10 +182,11 @@
 </ol>
 </article>
 <article>
-    <h1><a href="/posts/2014/wmts-few-things-i-want-to-remember/" rel="bookmark" title="Permalink to WMTS: Few Things I Want To Remember"><span class="caps">WMTS</span>: Few Things I Want To&nbsp;Remember</a></h1>
-    Written on Sep 10, 2014
-    and marked as
-    <a href="/tag/ogc.html">ogc</a>,     <a href="/tag/wmts.html">wmts</a>    | <a href="/category/web-maps.html">web maps</a>
+    <h1><a href="https://www.zimmi.cz/posts/2014/wmts-few-things-i-want-to-remember/" rel="bookmark" title="Permalink to WMTS: Few Things I Want To Remember"><span class="caps">WMTS</span>: Few Things I Want To&nbsp;Remember</a></h1>
+    <aside><span>Sep 10, 2014</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/ogc.html">ogc</a>     <a href="https://www.zimmi.cz/posts/tag/wmts.html">wmts</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/web-maps.html">web maps</a></span>
+    </aside>
     <ul>
 <li>Used to serve prepared rectangular tiles; this means you are limited by web server speed rather than map server&nbsp;speed</li>
 <li>Several ways to retrieve tiles are defined: <span class="caps">KVP</span> and <span class="caps">REST</span> are mandatory, <span class="caps">SOAP</span> is&nbsp;optional</li>
@@ -217,20 +219,23 @@
 <li><code>tileMatrixMaxX = tileMatrixMinX + tileSpanX × matrixWidth;</code></li>
 <li><code>tileMatrixMinY = tileMatrixMaxY - tileSpanY × matrixHeight;</code></li>
 </ul>
-<p><img src="/assets/wmts-few-things-i-want-to-remember/wmts.png" title="WMTS tiling schema" class="img-responsive centered"></p>
+<p><img src="https://www.zimmi.cz/posts/assets/wmts-few-things-i-want-to-remember/wmts.png" title="WMTS tiling schema" class="img-responsive centered"></p>
 </article>
-<div class="pagination row">
-    <div class="large-6 columns">
-    </div>
-    <div class="large-6 columns">
-    </div>
-</div>    </main>
+<aside id="pagination">
+</aside>    </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
         Proudly powered by <a href="//getpelican.com/">Pelican</a>,
         which takes great advantage of <a href="//python.org">Python</a>.
     </footer>
-<script src="/theme/webassets-external/5acf220afe81b3dd00333bbb93fbaa41_jquery.js"></script>
-<script src="/theme/webassets-external/b80143a60770d5aa122a039a2b889970_foundation.min.js"></script>
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-43432739-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments)};
+  gtag('js', new Date());
+
+  gtag('config', 'UA-43432739-2');
+</script>
 </body>
 </html>

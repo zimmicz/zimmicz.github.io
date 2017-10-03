@@ -5,17 +5,16 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="/theme/webassets-external/e17ffd2049da5254bb4b3183ea73c922_normalize.css">
-        <link rel="stylesheet" href="/theme/webassets-external/35f123b951b653f7b2d441b35b63d32a_github.css">
-        <link rel="stylesheet" href="/theme/webassets-external/310a2979488959b3c24d4edd2e18b50d_screen.css">
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?1ec62741">
 </head>
 <body>
     <nav role="navigation">
         <ul>
-            <li><a href="/categories">Categories</a></li>
-            <li><a href="/tags">Tags</a></li>
-            <li><a href="/feed.xml">Subscribe to RSS feed</a></li>
+            <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+            <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+            <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
         </ul>
     </nav>
     <header>
@@ -25,10 +24,11 @@
 <h2 class="text-center">Articles tagged with bash tag</h2>
 
 <article>
-    <h1><a href="/posts/2015/how-to-use-queue-with-rsync/" rel="bookmark" title="Permalink to How to Use Queue with Rsync">How to Use Queue with&nbsp;Rsync</a></h1>
-    Written on Oct 1, 2015
-    and marked as
-    <a href="/tag/linux.html">linux</a>,     <a href="/tag/bash.html">bash</a>    | <a href="/category/automation.html">automation</a>
+    <h1><a href="https://www.zimmi.cz/posts/2015/how-to-use-queue-with-rsync/" rel="bookmark" title="Permalink to How to Use Queue with Rsync">How to Use Queue with&nbsp;Rsync</a></h1>
+    <aside><span>Oct 1, 2015</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>     <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
+    </aside>
     <p>Having more than 120K <span class="caps">5MB</span>+ images that should be moved to the server is a great oportunity for some automatic bash processing. It might be good idea to use <a href="http://www.imagemagick.org/script/index.php">ImageMagick</a> <a href="http://www.imagemagick.org/script/convert.php">convert tool</a> to make images smaller in a simple for loop. <a href="http://www.gnu.org/software/parallel/"><span class="caps">GNU</span> Parallel</a> can significantly increase the performance by running one job per <span class="caps">CPU</span>&nbsp;core.</p>
 <div class="highlight"><pre><span></span>parallel --verbose convert <span class="o">{}</span> -quality <span class="m">40</span>% <span class="o">{}</span> ::: *.jpg
 </pre></div>
@@ -49,10 +49,11 @@
 <p>The last step, as usual, is&nbsp;profit.</p>
 </article>
 <article>
-    <h1><a href="/posts/2015/ssh-grass-processing-status-check/" rel="bookmark" title="Permalink to SSH GRASS Processing Status Check"><span class="caps">SSH</span> <span class="caps">GRASS</span> Processing Status&nbsp;Check</a></h1>
-    Written on Jul 21, 2015
-    and marked as
-    <a href="/tag/bash.html">bash</a>,     <a href="/tag/linux.html">linux</a>    | <a href="/category/development.html">development</a>
+    <h1><a href="https://www.zimmi.cz/posts/2015/ssh-grass-processing-status-check/" rel="bookmark" title="Permalink to SSH GRASS Processing Status Check"><span class="caps">SSH</span> <span class="caps">GRASS</span> Processing Status&nbsp;Check</a></h1>
+    <aside><span>Jul 21, 2015</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>     <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+    </aside>
     <p>I&#8217;ve been running some <span class="caps">GRASS</span>/PostGIS computations on a remote server that were taking hours to finish. Once in a while I checked for their state by issuing <code>tail log_XX.log</code> from my laptop to see if they were ready yet. It suddenly became pretty annoying to check five different logs every ten&nbsp;minutes.</p>
 <p>Instead of waiting and checking the logs, I thought it would be great to automate this. And it would be awesome if checking was fun. So I wrote a simple routine that takes log number as an argument (every process logs to a separate logfile) and checks it every minute until it says <em>done</em>. Right after that <code>notify-send</code> gives me a neat popup and Queen starts playing their <em>We are the champions</em> thanks to <code>mpg123</code>.</p>
 <div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env bash</span>
@@ -77,29 +78,33 @@
 <p>What seemed to be really frustrating makes me happy right now. Unless Freddie starts singing in the middle of the&nbsp;night.</p>
 </article>
 <article>
-    <h1><a href="/posts/2014/bash-prepend-to-filename/" rel="bookmark" title="Permalink to Bash: Prepend To Filename">Bash: Prepend To&nbsp;Filename</a></h1>
-    Written on Nov 1, 2014
-    and marked as
-    <a href="/tag/linux.html">linux</a>,     <a href="/tag/bash.html">bash</a>    | <a href="/category/development.html">development</a>
+    <h1><a href="https://www.zimmi.cz/posts/2014/bash-prepend-to-filename/" rel="bookmark" title="Permalink to Bash: Prepend To Filename">Bash: Prepend To&nbsp;Filename</a></h1>
+    <aside><span>Nov 1, 2014</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>     <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+    </aside>
     <div class="highlight"><pre><span></span>for f in *; do mv &quot;$f&quot; &quot;prepend_$f&quot;; done
 </pre></div>
 
 
 <p>Whenever you need to prepend anything to your&nbsp;files.</p>
 </article>
-<div class="pagination row">
-    <div class="large-6 columns">
-            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Previous page']);" href="/tag/bash.html" class="button card card-1">&laquo; Previous page</a>
-    </div>
-    <div class="large-6 columns">
-    </div>
-</div>    </main>
+<aside id="pagination">
+            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Previous page']);" href="https://www.zimmi.cz/posts/tag/bash.html">&laquo; Previous page</a>
+</aside>    </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
         Proudly powered by <a href="//getpelican.com/">Pelican</a>,
         which takes great advantage of <a href="//python.org">Python</a>.
     </footer>
-<script src="/theme/webassets-external/5acf220afe81b3dd00333bbb93fbaa41_jquery.js"></script>
-<script src="/theme/webassets-external/b80143a60770d5aa122a039a2b889970_foundation.min.js"></script>
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-43432739-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments)};
+  gtag('js', new Date());
+
+  gtag('config', 'UA-43432739-2');
+</script>
 </body>
 </html>

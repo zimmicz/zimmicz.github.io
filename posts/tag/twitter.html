@@ -5,17 +5,16 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="/theme/webassets-external/e17ffd2049da5254bb4b3183ea73c922_normalize.css">
-        <link rel="stylesheet" href="/theme/webassets-external/35f123b951b653f7b2d441b35b63d32a_github.css">
-        <link rel="stylesheet" href="/theme/webassets-external/310a2979488959b3c24d4edd2e18b50d_screen.css">
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?1ec62741">
 </head>
 <body>
     <nav role="navigation">
         <ul>
-            <li><a href="/categories">Categories</a></li>
-            <li><a href="/tags">Tags</a></li>
-            <li><a href="/feed.xml">Subscribe to RSS feed</a></li>
+            <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+            <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+            <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
         </ul>
     </nav>
     <header>
@@ -25,11 +24,12 @@
 <h2 class="text-center">Articles tagged with twitter tag</h2>
 
 <article>
-    <h1><a href="/posts/2015/twitter-rest-api-data-mining-on-openshift-part-ii/" rel="bookmark" title="Permalink to Twitter REST API Data Mining on OpenShift (Part II)">Twitter <span class="caps">REST</span> <span class="caps">API</span> Data Mining on OpenShift (Part <span class="caps">II</span>)</a></h1>
-    Written on Dec 6, 2015
-    and marked as
-    <a href="/tag/javascript.html">javascript</a>,     <a href="/tag/openshift.html">openshift</a>,     <a href="/tag/twitter.html">twitter</a>    | <a href="/category/development.html">development</a>
-    <p>Last time I described <a href="/posts/2015/twitter-rest-api-data-mining-on-openshift-part-i/">the setup of my OpenShift Twitter crawler</a> and let it running and downloading data. It&#8217;s been more than two months since I started and I got interesting amount of data. I also made a simple <span class="caps">ETL</span> process to load it into my local PostGIS database, which I&#8217;d like to cover in this&nbsp;post.</p>
+    <h1><a href="https://www.zimmi.cz/posts/2015/twitter-rest-api-data-mining-on-openshift-part-ii/" rel="bookmark" title="Permalink to Twitter REST API Data Mining on OpenShift (Part II)">Twitter <span class="caps">REST</span> <span class="caps">API</span> Data Mining on OpenShift (Part <span class="caps">II</span>)</a></h1>
+    <aside><span>Dec 6, 2015</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>     <a href="https://www.zimmi.cz/posts/tag/openshift.html">openshift</a>     <a href="https://www.zimmi.cz/posts/tag/twitter.html">twitter</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+    </aside>
+    <p>Last time I described <a href="https://www.zimmi.cz/posts/2015/twitter-rest-api-data-mining-on-openshift-part-i/">the setup of my OpenShift Twitter crawler</a> and let it running and downloading data. It&#8217;s been more than two months since I started and I got interesting amount of data. I also made a simple <span class="caps">ETL</span> process to load it into my local PostGIS database, which I&#8217;d like to cover in this&nbsp;post.</p>
 <h2>Extract&nbsp;data</h2>
 <p>Each day is written to the separate sqlite file with a name like <code>tw_day_D_M_YYYY</code>. <code>Bash</code> is used to gzip all the files before downloading them from&nbsp;OpenShift.</p>
 <div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
@@ -98,17 +98,18 @@ psql <span class="nv">$DATABASE</span> <span class="s">&lt;&lt; EOF</span>
 
 <h2>First&nbsp;statistics</h2>
 <p>Some interesting charts and numbers&nbsp;follow.</p>
-<p class="text-center"><img title="Top 100 Twitter users in the Czech Republic" src="/assets/twitter-rest-api-data-mining-on-openshift-part-ii/authors.png" class="img-responsive centered"></p>
+<p class="text-center"><img title="Top 100 Twitter users in the Czech Republic" src="https://www.zimmi.cz/posts/assets/twitter-rest-api-data-mining-on-openshift-part-ii/authors.png" class="img-responsive centered"></p>
 
-<p class="text-center"><img title="When people tweet in the Czech Republic" src="/assets/twitter-rest-api-data-mining-on-openshift-part-ii/hours.png" class="img-responsive centered"></p>
+<p class="text-center"><img title="When people tweet in the Czech Republic" src="https://www.zimmi.cz/posts/assets/twitter-rest-api-data-mining-on-openshift-part-ii/hours.png" class="img-responsive centered"></p>
 
-<p class="text-center"><img title="Languages on Twitter in the Czech Republic" src="/assets/twitter-rest-api-data-mining-on-openshift-part-ii/languages.png" class="img-responsive centered"></p>
+<p class="text-center"><img title="Languages on Twitter in the Czech Republic" src="https://www.zimmi.cz/posts/assets/twitter-rest-api-data-mining-on-openshift-part-ii/languages.png" class="img-responsive centered"></p>
 </article>
 <article>
-    <h1><a href="/posts/2015/twitter-rest-api-data-mining-on-openshift-part-i/" rel="bookmark" title="Permalink to Twitter REST API Data Mining on OpenShift (Part I)">Twitter <span class="caps">REST</span> <span class="caps">API</span> Data Mining on OpenShift (Part&nbsp;I)</a></h1>
-    Written on Nov 6, 2015
-    and marked as
-    <a href="/tag/javascript.html">javascript</a>,     <a href="/tag/openshift.html">openshift</a>,     <a href="/tag/twitter.html">twitter</a>    | <a href="/category/development.html">development</a>
+    <h1><a href="https://www.zimmi.cz/posts/2015/twitter-rest-api-data-mining-on-openshift-part-i/" rel="bookmark" title="Permalink to Twitter REST API Data Mining on OpenShift (Part I)">Twitter <span class="caps">REST</span> <span class="caps">API</span> Data Mining on OpenShift (Part&nbsp;I)</a></h1>
+    <aside><span>Nov 6, 2015</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>     <a href="https://www.zimmi.cz/posts/tag/openshift.html">openshift</a>     <a href="https://www.zimmi.cz/posts/tag/twitter.html">twitter</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+    </aside>
     <p>More than a year ago I wrote about <a href="http://www.zimmi.cz/posts/2014/analyzing-twitter-languages-with-streaming-api/">analyzing Twitter languages with Streaming <span class="caps">API</span></a>. Back then I kept my laptop running for a week to download data. Not a comfortable way, especially if you decide to get more data. One year uptime doesn&#8217;t sound like anything you want to be part of. <a href="https://www.openshift.com/">OpenShift</a> by Red Hat seems to be almost perfect replacement.&nbsp;Almost.</p>
 <h2>OpenShift&nbsp;setup</h2>
 <p>I started with Node.js application running on one small gear. Once running, you can easily <code>git push</code> the code to your OpenShift repo and login via <span class="caps">SSH</span>. I quickly found simple copy-pasting my local solution wasn&#8217;t going to work. and fixed it with some minor tweaks. That&#8217;s where the fun&nbsp;begins&#8230;</p>
@@ -189,10 +190,11 @@ git push <span class="o">&amp;&amp;</span> <span class="se">\</span>
 <sup>1</sup>&frasl;<sub>6</sub> to <sup>1</sup>&frasl;<sub>5</sub> of them is located with latitude and longitude. More on this next&nbsp;time.</p>
 </article>
 <article>
-    <h1><a href="/posts/2014/analyzing-twitter-languages-with-streaming-api/" rel="bookmark" title="Permalink to Analyzing Twitter Languages With Streaming API">Analyzing Twitter Languages With Streaming <span class="caps">API</span></a></h1>
-    Written on Sep 2, 2014
-    and marked as
-    <a href="/tag/javascript.html">javascript</a>,     <a href="/tag/leaflet.html">leaflet</a>,     <a href="/tag/twitter.html">twitter</a>    | <a href="/category/development.html">development</a>
+    <h1><a href="https://www.zimmi.cz/posts/2014/analyzing-twitter-languages-with-streaming-api/" rel="bookmark" title="Permalink to Analyzing Twitter Languages With Streaming API">Analyzing Twitter Languages With Streaming <span class="caps">API</span></a></h1>
+    <aside><span>Sep 2, 2014</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>     <a href="https://www.zimmi.cz/posts/tag/leaflet.html">leaflet</a>     <a href="https://www.zimmi.cz/posts/tag/twitter.html">twitter</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+    </aside>
     <p>I am writing a diploma thesis focused on extracting spatial data from social networks. I have been working mainly with Twitter <span class="caps">API</span> and results I have got so far look really promising. This post was written as a reaction to many retweets I got when I shared one of my visualizations. It aims to make it clear how to connect to Twitter Streaming <span class="caps">API</span> using <a href="http://nodejs.org/">node.js</a>, <a href="http://leafletjs.com/">Leaflet</a> and <a href="http://sqlite.org/">SQLite</a> and retrieve tweets to analyze them&nbsp;later.</p>
 
 <p>If you have any further questions after reading this paper, feel free to contact me via <a href="https://twitter.com/zimmicz">Twitter</a> or <a href="mailto:zimmicz@gmail.com">e-mail</a>. I must say right here <strong>that the code will be shared as well as the map</strong>, but there are still some bugs/features I would like to&nbsp;remove/add.</p>
@@ -241,7 +243,7 @@ git push <span class="o">&amp;&amp;</span> <span class="se">\</span>
 
 <p>I decided to throw away the tweets with the empty <code>coordinates</code> field, because the accuracy of the value specified in the place field can be generally considered very low and insufficient for my purposes. You still need to account for position inaccuracies of users&#8217; devices though, however that is not something that we can deal with. <em>Let us just assume that geotagged tweets are&nbsp;accurate.</em></p>
 
-<div class="text-center"><img src="/assets/analyzing-twitter-languages-with-streaming-api/cr.png" width="50%" height="50%" title="Geotagged tweets" class="img-rounded"><p><strong>Figure:</strong> Twitter seems not to be very accurate when matching tweets against bounding&nbsp;box.</p></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/analyzing-twitter-languages-with-streaming-api/cr.png" width="50%" height="50%" title="Geotagged tweets" class="img-rounded"><p><strong>Figure:</strong> Twitter seems not to be very accurate when matching tweets against bounding&nbsp;box.</p></div>
 
 <p>Although, as you can see in the picture, they are not. Or they are, but Twitter is not good at telling so. Besides that, none of the countries in the world is shaped like a rectangle and we would need to clip the data anyway. That is where SQLite comes in, because I have been saving incoming tweets right into the&nbsp;database.</p>
 
@@ -265,15 +267,16 @@ git push <span class="o">&amp;&amp;</span> <span class="se">\</span>
 
 <p>I am definitely willing to share the <abbr title="Do not expect much, it was my first time with node.js">code</abbr> and the final viz. Meanwhile, you can have a look at the screenshot on picture [*]. I have already implemented nationality switch (legend items are clickable) and I would like to add a day/night switch to see whether there are any differences between the peoples&#8217;&nbsp;behaviour. </p>
 
-<div class="text-center"><img width="60%" height="60%" src="/assets/analyzing-twitter-languages-with-streaming-api/screenshot.png" title="Final geoviz using Leaflet" class="img-rounded"><p><strong>Figure:</strong> Final map screenshot. A legend is used to turn nationalities on and off. You are looking at Prague by the&nbsp;way.</p></div>
+<div class="text-center"><img width="60%" height="60%" src="https://www.zimmi.cz/posts/assets/analyzing-twitter-languages-with-streaming-api/screenshot.png" title="Final geoviz using Leaflet" class="img-rounded"><p><strong>Figure:</strong> Final map screenshot. A legend is used to turn nationalities on and off. You are looking at Prague by the&nbsp;way.</p></div>
 
 <p>Obviously the most tweets were sent from the most populated places, e.g. Prague, Brno,&nbsp;Ostrava. </p>
 </article>
 <article>
-    <h1><a href="/posts/2014/going-3d-with-space-time-cube/" rel="bookmark" title="Permalink to Going 3D With Space Time Cube">Going 3D With Space Time&nbsp;Cube</a></h1>
-    Written on Sep 2, 2014
-    and marked as
-    <a href="/tag/python.html">python</a>,     <a href="/tag/twitter.html">twitter</a>    | <a href="/category/development.html">development</a>
+    <h1><a href="https://www.zimmi.cz/posts/2014/going-3d-with-space-time-cube/" rel="bookmark" title="Permalink to Going 3D With Space Time Cube">Going 3D With Space Time&nbsp;Cube</a></h1>
+    <aside><span>Sep 2, 2014</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/python.html">python</a>     <a href="https://www.zimmi.cz/posts/tag/twitter.html">twitter</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+    </aside>
     <p>Seeing <a href="http://anitagraser.com/2012/08/05/space-time-cubes-exploring-twitter-streams-3/">Anita&#8217;s space-time cube</a> back in 2013 was a moment of <em>woooow</em> for me. I&#8217;ve been interested in unusual ways of displaying data ever since I started studying <span class="caps">GIS</span> and this one was just great. <em>How the hell did she make it?!</em>, I thought back&nbsp;then.</p>
 
 <p>And I asked her, we had a little e-mail conversation and that was it. I got busy and had to postpone my attemps to create that viz until I dove into my diploma thesis. So&hellip;here you&nbsp;go.</p>
@@ -412,18 +415,21 @@ z = map(lat, 16.59971950210866964, 63.68835804244784526, 0, height)
 
 <iframe width="420" height="315" src="//www.youtube.com/embed/4jl6-qOiSAE?rel=0" frameborder="0" allowfullscreen></iframe>
 </article>
-<div class="pagination row">
-    <div class="large-6 columns">
-    </div>
-    <div class="large-6 columns">
-    </div>
-</div>    </main>
+<aside id="pagination">
+</aside>    </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
         Proudly powered by <a href="//getpelican.com/">Pelican</a>,
         which takes great advantage of <a href="//python.org">Python</a>.
     </footer>
-<script src="/theme/webassets-external/5acf220afe81b3dd00333bbb93fbaa41_jquery.js"></script>
-<script src="/theme/webassets-external/b80143a60770d5aa122a039a2b889970_foundation.min.js"></script>
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-43432739-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments)};
+  gtag('js', new Date());
+
+  gtag('config', 'UA-43432739-2');
+</script>
 </body>
 </html>

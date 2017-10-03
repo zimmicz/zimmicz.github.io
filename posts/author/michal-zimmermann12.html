@@ -5,17 +5,16 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="/theme/webassets-external/e17ffd2049da5254bb4b3183ea73c922_normalize.css">
-        <link rel="stylesheet" href="/theme/webassets-external/35f123b951b653f7b2d441b35b63d32a_github.css">
-        <link rel="stylesheet" href="/theme/webassets-external/310a2979488959b3c24d4edd2e18b50d_screen.css">
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?1ec62741">
 </head>
 <body>
     <nav role="navigation">
         <ul>
-            <li><a href="/categories">Categories</a></li>
-            <li><a href="/tags">Tags</a></li>
-            <li><a href="/feed.xml">Subscribe to RSS feed</a></li>
+            <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+            <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+            <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
         </ul>
     </nav>
     <header>
@@ -25,10 +24,11 @@
 <h2>Articles by Michal Zimmermann</h2>
 
 <article>
-    <h1><a href="/posts/2014/postgis-spatial-indexing-with-st_intersects/" rel="bookmark" title="Permalink to PostGIS Spatial Indexing With ST_Intersects">PostGIS Spatial Indexing With&nbsp;ST_Intersects</a></h1>
-    Written on Nov 23, 2014
-    and marked as
-    <a href="/tag/postgis.html">postgis</a>    | <a href="/category/sql.html">SQL</a>
+    <h1><a href="https://www.zimmi.cz/posts/2014/postgis-spatial-indexing-with-st_intersects/" rel="bookmark" title="Permalink to PostGIS Spatial Indexing With ST_Intersects">PostGIS Spatial Indexing With&nbsp;ST_Intersects</a></h1>
+    <aside><span>Nov 23, 2014</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
     <p><a href="http://postgis.net/docs/ST_Intersects.html">PostGIS docs</a> clearly states that:
     &gt; This function call will automatically include a bounding box comparison that will make use of any indexes that are available on the&nbsp;geometries.</p>
 <p>That means (or at least I think so) that you shouldn&#8217;t bother with using <a href="http://postgis.net/docs/reference.html#Operators">operators</a> before calling this&nbsp;function.</p>
@@ -82,10 +82,11 @@ Total runtime: 3930.270 ms
 <p>I&#8217;m puzzled about this behavior and would appreciate any thoughts on this. Reach me at <a href="http://twitter.com/zimmicz">Twitter</a>, <a href="https://www.linkedin.com/pub/michal-zimmermann/29/8/b30">LinkedIn</a> or e-mail&nbsp;(zimmicz[at]gmail.com).</p>
 </article>
 <article>
-    <h1><a href="/posts/2014/bash-prepend-to-filename/" rel="bookmark" title="Permalink to Bash: Prepend To Filename">Bash: Prepend To&nbsp;Filename</a></h1>
-    Written on Nov 1, 2014
-    and marked as
-    <a href="/tag/linux.html">linux</a>,     <a href="/tag/bash.html">bash</a>    | <a href="/category/development.html">development</a>
+    <h1><a href="https://www.zimmi.cz/posts/2014/bash-prepend-to-filename/" rel="bookmark" title="Permalink to Bash: Prepend To Filename">Bash: Prepend To&nbsp;Filename</a></h1>
+    <aside><span>Nov 1, 2014</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>     <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+    </aside>
     <div class="highlight"><pre><span></span>for f in *; do mv &quot;$f&quot; &quot;prepend_$f&quot;; done
 </pre></div>
 
@@ -93,10 +94,11 @@ Total runtime: 3930.270 ms
 <p>Whenever you need to prepend anything to your&nbsp;files.</p>
 </article>
 <article>
-    <h1><a href="/posts/2014/migrating-geoserver-and-checking-for-missing-data/" rel="bookmark" title="Permalink to Migrating Geoserver And Checking For Missing Data">Migrating Geoserver And Checking For Missing&nbsp;Data</a></h1>
-    Written on Oct 29, 2014
-    and marked as
-    <a href="/tag/geoserver.html">geoserver</a>,     <a href="/tag/python.html">python</a>    | <a href="/category/development.html">development</a>
+    <h1><a href="https://www.zimmi.cz/posts/2014/migrating-geoserver-and-checking-for-missing-data/" rel="bookmark" title="Permalink to Migrating Geoserver And Checking For Missing Data">Migrating Geoserver And Checking For Missing&nbsp;Data</a></h1>
+    <aside><span>Oct 29, 2014</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/geoserver.html">geoserver</a>     <a href="https://www.zimmi.cz/posts/tag/python.html">python</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+    </aside>
     <p>I&#8217;ve upgraded a handful of Geoserver installations and it has never been flawless. If you&#8217;re lucky you end up with just <em>some</em> layers missing, if you&#8217;re not, you&#8217;ll miss a bunch of them (together with layergroups, some stores, workspaces might screw up&nbsp;etc.).</p>
 <p>But how do you check for missing data before switching to the newer version? Thanks to the <a href="http://docs.geoserver.org/stable/en/user/rest/api/index.html"><span class="caps">REST</span> <span class="caps">API</span> implemented within Geoserver</a>, it&#8217;s rather&nbsp;easy.</p>
 <div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
@@ -124,10 +126,11 @@ Total runtime: 3930.270 ms
 <p>I guess it&#8217;s reasonable to check your maps by hand as well, but this gives you the picture of the current state of your data real&nbsp;quick.</p>
 </article>
 <article>
-    <h1><a href="/posts/2014/ogr2ogr-unix-x-windows/" rel="bookmark" title="Permalink to ogr2ogr UNIX x Windows">ogr2ogr <span class="caps">UNIX</span> x&nbsp;Windows</a></h1>
-    Written on Sep 23, 2014
-    and marked as
-    <a href="/tag/spatial.html">spatial</a>,     <a href="/tag/linux.html">linux</a>    | <a href="/category/development.html">development</a>
+    <h1><a href="https://www.zimmi.cz/posts/2014/ogr2ogr-unix-x-windows/" rel="bookmark" title="Permalink to ogr2ogr UNIX x Windows">ogr2ogr <span class="caps">UNIX</span> x&nbsp;Windows</a></h1>
+    <aside><span>Sep 23, 2014</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/spatial.html">spatial</a>     <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+    </aside>
     <p><span class="caps">GDAL</span> with its ogr2ogr, ogrinfo and many more is one of the best open source tools to do anything to your spatial data. It is a&nbsp;command line tool, which sort of determines it to be used with <span class="caps">UNIX</span> systems, but you might bump into a Windows guy trying to use it as well once in a&nbsp;while.</p>
 <p>Be careful, it behaves differently on different <span class="caps">OS</span>. Let&#8217;s say you do something like this on <span class="caps">UNIX</span>:</p>
 <div class="highlight"><pre><span></span>ogr2ogr -f GeoJSON -where &quot;attribute IN (&#39;value1&#39;, &#39;value2&#39;)&quot; output.json input.json
@@ -138,10 +141,11 @@ Total runtime: 3930.270 ms
 <p>Well, that&#8217;s the ogr2ogr&#8217;s way to tell you: <em>Hello there, you need to switch single quotes for double quotes and vice versa, you dumb!</em> I don&#8217;t know why and I find it really annoying. Just in case you get stuck with ogr2ogr (or probably any other command line tool), try&nbsp;this.</p>
 </article>
 <article>
-    <h1><a href="/posts/2014/notify-when-average-of-10-subsequent-numbers-is-bigger-than-given-value/" rel="bookmark" title="Permalink to Notify When Average of 10 Subsequent Numbers Is Bigger Than Given Value">Notify When Average of 10 Subsequent Numbers Is Bigger Than Given&nbsp;Value</a></h1>
-    Written on Sep 21, 2014
-    and marked as
-    <a href="/tag/php.html">php</a>    | <a href="/category/development.html">development</a>
+    <h1><a href="https://www.zimmi.cz/posts/2014/notify-when-average-of-10-subsequent-numbers-is-bigger-than-given-value/" rel="bookmark" title="Permalink to Notify When Average of 10 Subsequent Numbers Is Bigger Than Given Value">Notify When Average of 10 Subsequent Numbers Is Bigger Than Given&nbsp;Value</a></h1>
+    <aside><span>Sep 21, 2014</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/php.html">php</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+    </aside>
     <p>I found an <a href="http://stackoverflow.com/questions/25952380/php-find-a-maximum-average-for-10-subsequent-numbers-in-a-list-of-50-random-numb">interesting question</a> at StackOverflow asking for help finding solution to what I have already mentioned in the title, with <span class="caps">PHP</span>. I gave it a try before reading answers and came up with the following&nbsp;code:</p>
 <div class="highlight"><pre><span></span>$avg  = // value we are looking for
 $size = count($numbers);
@@ -180,20 +184,23 @@ for ($i = 0; $i &lt; $size; $i++) {
 <p>I made a simple benchmark with <a href="http://php.net/manual/en/function.microtime.php"><code>microtime()</code></a> and found out that my solution (ran 100k times) took about ~12.3 seconds while Dave&#8217;s took only ~7.4 seconds to finish. That makes his code almost twice faster than&nbsp;mine.</p>
 <p><strong>Lesson learned: do not stop&nbsp;learning!</strong></p>
 </article>
-<div class="pagination row">
-    <div class="large-6 columns">
-            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Previous page']);" href="/author/michal-zimmermann11.html" class="button card card-1">&laquo; Previous page</a>
-    </div>
-    <div class="large-6 columns">
-            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Next page']);" href="/author/michal-zimmermann13.html" class="button card card-1">Next page &raquo;</a>
-    </div>
-</div>    </main>
+<aside id="pagination">
+            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Previous page']);" href="https://www.zimmi.cz/posts/author/michal-zimmermann11.html">&laquo; Previous page</a>
+            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Next page']);" href="https://www.zimmi.cz/posts/author/michal-zimmermann13.html">Next page &raquo;</a>
+</aside>    </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
         Proudly powered by <a href="//getpelican.com/">Pelican</a>,
         which takes great advantage of <a href="//python.org">Python</a>.
     </footer>
-<script src="/theme/webassets-external/5acf220afe81b3dd00333bbb93fbaa41_jquery.js"></script>
-<script src="/theme/webassets-external/b80143a60770d5aa122a039a2b889970_foundation.min.js"></script>
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-43432739-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments)};
+  gtag('js', new Date());
+
+  gtag('config', 'UA-43432739-2');
+</script>
 </body>
 </html>

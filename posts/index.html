@@ -5,17 +5,16 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="/theme/webassets-external/e17ffd2049da5254bb4b3183ea73c922_normalize.css">
-        <link rel="stylesheet" href="/theme/webassets-external/35f123b951b653f7b2d441b35b63d32a_github.css">
-        <link rel="stylesheet" href="/theme/webassets-external/310a2979488959b3c24d4edd2e18b50d_screen.css">
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?1ec62741">
 </head>
 <body>
     <nav role="navigation">
         <ul>
-            <li><a href="/categories">Categories</a></li>
-            <li><a href="/tags">Tags</a></li>
-            <li><a href="/feed.xml">Subscribe to RSS feed</a></li>
+            <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+            <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+            <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
         </ul>
     </nav>
     <header>
@@ -24,10 +23,11 @@
     <main>
 
 <article>
-    <h1><a href="/posts/2017/postgresql-dollar-quoting-inside-bash-heredoc/" rel="bookmark" title="Permalink to PostgreSQL Dollar Quoting inside Bash Heredoc">PostgreSQL Dollar Quoting inside Bash&nbsp;Heredoc</a></h1>
-    Written on Sep 22, 2017
-    and marked as
-    <a href="/tag/sql.html">sql</a>,     <a href="/tag/postgresql.html">postgresql</a>,     <a href="/tag/bash.html">bash</a>    | <a href="/category/sql.html">SQL</a>
+    <h1><a href="https://www.zimmi.cz/posts/2017/postgresql-dollar-quoting-inside-bash-heredoc/" rel="bookmark" title="Permalink to PostgreSQL Dollar Quoting inside Bash Heredoc">PostgreSQL Dollar Quoting inside Bash&nbsp;Heredoc</a></h1>
+    <aside><span>Sep 22, 2017</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
     <p>Yesterday I spent two very unpleasant hours debugging the weirdest <span class="caps">SQL</span> error I&#8217;ve seen in my life, running the below query (simplified for this&nbsp;post).</p>
 <div class="highlight"><pre><span></span><span class="n">psql</span> <span class="o">-</span><span class="n">qAt</span> <span class="c1">--no-psqlrc &lt;&lt;BACKUP</span>
 <span class="k">DO</span>
@@ -68,10 +68,11 @@ LINE <span class="m">2</span>: <span class="m">1111</span><span class="p">;</spa
 </pre></div>
 </article>
 <article>
-    <h1><a href="/posts/2017/postgresql-development-history-revealed-with-postgresql/" rel="bookmark" title="Permalink to PostgreSQL Development History Revealed with PostgreSQL">PostgreSQL Development History Revealed with&nbsp;PostgreSQL</a></h1>
-    Written on Aug 9, 2017
-    and marked as
-    <a href="/tag/postgresql.html">postgresql</a>,     <a href="/tag/python.html">python</a>    | <a href="/category/sql.html">SQL</a>
+    <h1><a href="https://www.zimmi.cz/posts/2017/postgresql-development-history-revealed-with-postgresql/" rel="bookmark" title="Permalink to PostgreSQL Development History Revealed with PostgreSQL">PostgreSQL Development History Revealed with&nbsp;PostgreSQL</a></h1>
+    <aside><span>Aug 9, 2017</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/python.html">python</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
     <p>I spend a lot of time reading <a href="https://www.postgresql.org/docs/manuals/">PostgreSQL docs</a>. It occurred to me just a few weeks ago that those versioned manuals are great opportunity to get an insight into PostgreSQL development history. Using PostgreSQL, of&nbsp;course.</p>
 <h2><span class="caps">TOP</span> 5 functions with the most verbose docs in each&nbsp;version</h2>
 <div class="highlight"><pre><span></span><span class="k">SELECT</span>
@@ -260,7 +261,7 @@ LINE <span class="m">2</span>: <span class="m">1111</span><span class="p">;</spa
 </pre></div>
 
 
-<div class="text-center"><img src="/assets/postgresql-development-history-revealed-with-postgresql/plot1.png"/></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/postgresql-development-history-revealed-with-postgresql/plot1.png"/></div>
 
 <h2>The most verbose docs in each&nbsp;version</h2>
 <div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="k">DISTINCT</span> <span class="k">ON</span> <span class="p">(</span><span class="k">version</span><span class="p">)</span>
@@ -388,16 +389,17 @@ LINE <span class="m">2</span>: <span class="m">1111</span><span class="p">;</spa
 
 
 <p>Something&#8217;s going on in an upcoming 10.0&nbsp;version.</p>
-<div class="text-center"><img src="/assets/postgresql-development-history-revealed-with-postgresql/plot2.png"/></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/postgresql-development-history-revealed-with-postgresql/plot2.png"/></div>
 
 <p>All the data was obtained with the following Python script and processed inside the PostgreSQL database. Plots done with <a href="http://bokeh.pydata.org/en/latest/">Bokeh</a>, though I probably wouldn&#8217;t use it again, the docs site is absurdly sluggish and the info is just all over the&nbsp;place.</p>
 <script src="https://gist.github.com/zimmicz/f69a5ce5d3cf3a220e171553c35e0391.js"></script>
 </article>
 <article>
-    <h1><a href="/posts/2017/postgis-as-a-mapbox-vector-tiles-generator/" rel="bookmark" title="Permalink to PostGIS as a Mapbox Vector Tiles generator">PostGIS as a Mapbox Vector Tiles&nbsp;generator</a></h1>
-    Written on Aug 6, 2017
-    and marked as
-    <a href="/tag/docker.html">docker</a>,     <a href="/tag/postgis.html">postgis</a>,     <a href="/tag/javascript.html">javascript</a>    | <a href="/category/sql.html">SQL</a>
+    <h1><a href="https://www.zimmi.cz/posts/2017/postgis-as-a-mapbox-vector-tiles-generator/" rel="bookmark" title="Permalink to PostGIS as a Mapbox Vector Tiles generator">PostGIS as a Mapbox Vector Tiles&nbsp;generator</a></h1>
+    <aside><span>Aug 6, 2017</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/docker.html">docker</a>     <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
     <p><a href="http://postgis.net/2017/08/05/postgis-2.4.0alpha/">PostGIS 2.4.0</a> was released recently bringing the possibilities to generate <strong>Mapbox Vector Tiles</strong> without any third party tools. I got a shot at it with Node.js and docker. Even if it&#8217;s not as straightforward as solely using <a href="https://postgis.net/docs/manual-dev/ST_AsMVT.html">ST_AsMVT</a>, it still looks pretty&nbsp;great.</p>
 <h2>Docker&nbsp;container</h2>
 <p>There are no Ubuntu or Debian based PostGIS 2.4.0 packages as far as I know. As installation from source (especially considering <span class="caps">GIS</span> software) is always a bit risky, I prefer using Docker to stay away from trouble. The image is based on Ubuntu 17.04, has PostgreSQL 9.6 and PostGIS 2.4.0 installed. It exposes port 5432 to the host, so you can access the database from the outside the&nbsp;container.</p>
@@ -460,7 +462,7 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
 <p>I got a cadastre area dataset of the Czech Republic for testing, which contains ~ 13,000 polygons. The geometries should come in Web Mercator a.k.a. <span class="caps">EPSG</span>:3857 to work with <a href="https://www.mapbox.com/vector-tiles/specification/"><span class="caps">MVT</span></a>.</p>
 <h2>Vector&nbsp;tiles</h2>
 <p>I got a bit confused by the docs of <a href="https://postgis.net/docs/manual-dev/ST_AsMVT.html">ST_AsMVT</a> and <a href="https://postgis.net/docs/manual-dev/ST_AsMVTGeom.html">ST_AsMVTGeom</a>. Especially the latter one took me a few hours to get it right. What is essential (I guess) about Mapbox Vector Tiles is that you have to abstract from the real world coordinates and start thinking inside the tile coordinates. What PostGIS does with <code>ST_AsMVTGeom</code> (and what any other <span class="caps">MVT</span> implemenation should do for you) is that it takes real world coordinates and put them inside a&nbsp;tile.</p>
-<div class="text-center"><img src="/assets/postgis-as-a-mapbox-vector-tiles-generator/mvt.gif"/></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/postgis-as-a-mapbox-vector-tiles-generator/mvt.gif"/></div>
 
 <p>To make this work, you need to know every bounding box of every tile on every zoom level in a Web Mercator projection. Or you can use <a href="https://github.com/mapbox/postgis-vt-util/blob/master/src/TileBBox.sql">TileBBox procedure by Mapbox</a>, if you&nbsp;wish.</p>
 <p>The <span class="caps">SQL</span> query itself is pretty simple (this comes from an express route I&#8217;ll be discussing&nbsp;shortly).</p>
@@ -497,10 +499,11 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
 <p>The <a href="https://gist.github.com/zimmicz/9e78d9888ab73abc7e87553b77999bc8">server <span class="caps">MVP</span> is available</a> as a GitHub&nbsp;gist.</p>
 </article>
 <article>
-    <h1><a href="/posts/2017/fighting-raster-geopackage-with-gdal/" rel="bookmark" title="Permalink to Fighting Raster GeoPackage with GDAL">Fighting Raster GeoPackage with <span class="caps">GDAL</span></a></h1>
-    Written on Jul 19, 2017
-    and marked as
-    <a href="/tag/bash.html">bash</a>,     <a href="/tag/gdal.html">gdal</a>    | <a href="/category/gis.html">GIS</a>
+    <h1><a href="https://www.zimmi.cz/posts/2017/fighting-raster-geopackage-with-gdal/" rel="bookmark" title="Permalink to Fighting Raster GeoPackage with GDAL">Fighting Raster GeoPackage with <span class="caps">GDAL</span></a></h1>
+    <aside><span>Jul 19, 2017</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>     <a href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
+    </aside>
     <p>As I&#8217;m still running Ubuntu 16.04 based Linux Mint, I have no access to <span class="caps">GDAL</span> 2.x repositories (except for ubuntugis, that I really don&#8217;t like to use). Provided with a GeoPackage raster file recently, I had to find a way to load it into <span class="caps">QGIS</span>, somehow. The solution is simple: Docker with&nbsp;gdal_translate.</p>
 <h2>Preparing the Docker&nbsp;container</h2>
 <p>I like using Docker for experiments that might leave the <span class="caps">OS</span> in an <em>unexpected</em> state (which is exactly what happens to me with ubuntugis repository whenever I use it. That&#8217;s why I don&#8217;t anymore.). A very simple Dockerfile keeps the troubles away from&nbsp;you.</p>
@@ -554,17 +557,18 @@ RUN apt install -y gdal-bin
 
 
 <h2>Final Touch: Raster to&nbsp;Vector</h2>
-<p>After the GeoTiff is written to hard drive, <a href="/posts/2015/how-to-use-queue-with-rsync/">inotifywait</a> can be used to generate overviews. And with ease of calling <code>gdal_polygonize.py</code> on each of GeoTiffs&hellip;vector layer, at you&nbsp;service.</p>
+<p>After the GeoTiff is written to hard drive, <a href="https://www.zimmi.cz/posts/2015/how-to-use-queue-with-rsync/">inotifywait</a> can be used to generate overviews. And with ease of calling <code>gdal_polygonize.py</code> on each of GeoTiffs&hellip;vector layer, at you&nbsp;service.</p>
 </article>
 <article>
-    <h1><a href="/2017/mapping-north-america-with-qgis-tips-and-tricks" rel="bookmark" title="Permalink to Mapping North America with QGIS: Tips and Tricks">Mapping North America with <span class="caps">QGIS</span>: Tips and&nbsp;Tricks</a></h1>
-    Written on May 21, 2017
-    and marked as
-    <a href="/tag/qgis.html">qgis</a>,     <a href="/tag/visualization.html">visualization</a>    | <a href="/category/gis.html">GIS</a>
+    <h1><a href="https://www.zimmi.cz/posts/2017/mapping-north-america-with-qgis-tips-and-tricks" rel="bookmark" title="Permalink to Mapping North America with QGIS: Tips and Tricks">Mapping North America with <span class="caps">QGIS</span>: Tips and&nbsp;Tricks</a></h1>
+    <aside><span>May 21, 2017</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>     <a href="https://www.zimmi.cz/posts/tag/visualization.html">visualization</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
+    </aside>
     <p>Recently I&#8217;ve bought a book called <em>Maps</em> by Aleksandra Mizielinska and Daniel Mizielinski to my nephew. The book&#8217;s absolutely wonderful and made me want to try crafting a map with similar looks. I don&#8217;t do maps much at <a href="https://clevermaps.cz">CleverMaps</a>, so this was a great opportunity to find out what new features became available during the last months of <span class="caps">QGIS</span>&nbsp;development.</p>
 <h2>Result</h2>
 <p>A map of North America in scale of 1:22,000,000 featuring the biggest lakes, rivers, mountain ranges and basic administrative units for the North American countries. I aimed for visually appealing overview map rather than perfectly correct topographic&nbsp;one.</p>
-<div class="text-center"><a href="/assets/mapping-north-america-with-qgis-tips-and-tricks/map.png" title="Click for the full size (3 MB)"><img src="/assets/mapping-north-america-with-qgis-tips-and-tricks/map.min.png"/></a></div>
+<div class="text-center"><a href="https://www.zimmi.cz/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/map.png" title="Click for the full size (3 MB)"><img src="https://www.zimmi.cz/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/map.min.png"/></a></div>
 
 <h2>Data</h2>
 <p>I used my beloved <a href="http://www.naturalearthdata.com">Natural Earth dataset</a> for both cultural (boundaries, cities) and physical (rivers, lakes) map features. Different scales came to play for different map layers as they seemed a bit too/few simplified for the given&nbsp;scale.</p>
@@ -576,15 +580,15 @@ RUN apt install -y gdal-bin
 <p>I&#8217;ve used several techniques I find interesting enough to be listed&nbsp;here.</p>
 <h3>Coastlines</h3>
 <p>For a long time I&#8217;ve considered coastlines a field for cartographic invention. They can be emphasized by shading or 3D effects. I chose the set of four parallel coastlines subtly disappearing into the sea, hopefully invoking the feeling of waves coming to the&nbsp;shore.</p>
-<div class="text-center"><img src="/assets/mapping-north-america-with-qgis-tips-and-tricks/coastlines.png"/></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/coastlines.png"/></div>
 
 <p>It&#8217;s done by dissolving all the features and buffering them again and&nbsp;again.</p>
 <h3>Buffered&nbsp;labels</h3>
 <p>Buffered labels are usually hard to get right, because they fill so much space if the buffer color&#8217;s not corresponding to its surroundings. But choosing the proper color can be a real struggle at&nbsp;times.</p>
-<div class="text-center"><img src="/assets/mapping-north-america-with-qgis-tips-and-tricks/qgis_expressions.png"/></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/qgis_expressions.png"/></div>
 
 <p>On this map, almost all the labels are buffered with the color of its surroundings, which makes them more legible, yet not too expressive. This is possible thanks to <span class="caps">QGIS</span> expression based properties that let you define unique styling to different map&nbsp;features.</p>
-<div class="text-center"><img src="/assets/mapping-north-america-with-qgis-tips-and-tricks/buffered_labels.png"/></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/buffered_labels.png"/></div>
 
 <p>Where it isn&#8217;t possible (e.g. Bahamas or Honduras) to choose just one buffer color, the label is not buffered at all (or the semi-transparent white buffer is&nbsp;used).</p>
 <p>Note the <em>Rocky Mountains</em> label is split on the borders of the <span class="caps">U.S.A.</span> and Canada and its both parts match the background&nbsp;color.</p>
@@ -592,30 +596,33 @@ RUN apt install -y gdal-bin
 <p>Rivers are tapered based on the Natural Earth&#8217;s width attribute value for each river&nbsp;segment.</p>
 <h3>Labels in separate&nbsp;layers</h3>
 <p>I&#8217;m used to put labels into separate layers in more complicated map compositions, especially when you need to draw label along path for areal features (such as countries or&nbsp;states).</p>
-<div class="text-center"><img src="/assets/mapping-north-america-with-qgis-tips-and-tricks/labels.png"/></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/labels.png"/></div>
 
 <p>It becomes a bit harder to keep the features in sync with the labels though. I&#8217;d like to use only one layer for all the map layers in the future, as I feel that&#8217;s the way to go for the best&nbsp;labeling.</p>
 <h3>Labels wrapped on&nbsp;character</h3>
 <p>Some labels just can&#8217;t fit the feature they belong to and <span class="caps">QGIS</span> lets you deal with this by wrapping labels on a special character, <code>\</code> in my&nbsp;case.</p>
-<div class="text-center"><img src="/assets/mapping-north-america-with-qgis-tips-and-tricks/wrapped_labels.png"/></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/wrapped_labels.png"/></div>
 
 <h3>Layer blending&nbsp;mode</h3>
 <p>The mechanics behind layer blending modes are still a mystery to me, but they can add that little extra to a map very easily. Thanks to the Overlay blending mode, <em>the Rocky Mountains</em> may remain very subtle on different kinds of&nbsp;background.</p>
-<div class="text-center"><img src="/assets/mapping-north-america-with-qgis-tips-and-tricks/blending_mode.png"/></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/blending_mode.png"/></div>
 </article>
-<div class="pagination row">
-    <div class="large-6 columns">
-    </div>
-    <div class="large-6 columns">
-            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Next page']);" href="/index2.html" class="button card card-1">Next page &raquo;</a>
-    </div>
-</div>    </main>
+<aside id="pagination">
+            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Next page']);" href="https://www.zimmi.cz/posts/index2.html">Next page &raquo;</a>
+</aside>    </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
         Proudly powered by <a href="//getpelican.com/">Pelican</a>,
         which takes great advantage of <a href="//python.org">Python</a>.
     </footer>
-<script src="/theme/webassets-external/5acf220afe81b3dd00333bbb93fbaa41_jquery.js"></script>
-<script src="/theme/webassets-external/b80143a60770d5aa122a039a2b889970_foundation.min.js"></script>
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-43432739-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments)};
+  gtag('js', new Date());
+
+  gtag('config', 'UA-43432739-2');
+</script>
 </body>
 </html>

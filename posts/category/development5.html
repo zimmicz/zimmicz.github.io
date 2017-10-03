@@ -5,17 +5,16 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="/theme/webassets-external/e17ffd2049da5254bb4b3183ea73c922_normalize.css">
-        <link rel="stylesheet" href="/theme/webassets-external/35f123b951b653f7b2d441b35b63d32a_github.css">
-        <link rel="stylesheet" href="/theme/webassets-external/310a2979488959b3c24d4edd2e18b50d_screen.css">
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?1ec62741">
 </head>
 <body>
     <nav role="navigation">
         <ul>
-            <li><a href="/categories">Categories</a></li>
-            <li><a href="/tags">Tags</a></li>
-            <li><a href="/feed.xml">Subscribe to RSS feed</a></li>
+            <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+            <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+            <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
         </ul>
     </nav>
     <header>
@@ -25,10 +24,11 @@
 <h2 class="text-center">Articles in the development category</h2>
 
 <article>
-    <h1><a href="/posts/2014/leaflet-coordinates-control/" rel="bookmark" title="Permalink to Leaflet Coordinates Control">Leaflet Coordinates&nbsp;Control</a></h1>
-    Written on Sep 2, 2014
-    and marked as
-    <a href="/tag/leaflet.html">leaflet</a>,     <a href="/tag/javascript.html">javascript</a>    | <a href="/category/development.html">development</a>
+    <h1><a href="https://www.zimmi.cz/posts/2014/leaflet-coordinates-control/" rel="bookmark" title="Permalink to Leaflet Coordinates Control">Leaflet Coordinates&nbsp;Control</a></h1>
+    <aside><span>Sep 2, 2014</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/leaflet.html">leaflet</a>     <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+    </aside>
     <p>I&#8217;ve made a <a href="https://github.com/zimmicz/Leaflet-Coordinates-Control">simple Leaflet control</a> that displays coordinates when user clicks the map. It is possible to copy them out by clicking the&nbsp;control.</p>
 
 <p><a href="http://zimmicz.github.io/Leaflet-Coordinates-Control/">See GitHub for&nbsp;demo.</a></p>
@@ -36,22 +36,23 @@
 <p>You can find it in a <a href="http://leafletjs.com/plugins">list of Leaflet plugins</a> as well (Controls and Interaction section). My first contribution to the open source world&nbsp;ever.</p>
 </article>
 <article>
-    <h1><a href="/posts/2014/leaflet-chmi-radar-control/" rel="bookmark" title="Permalink to Leaflet CHMI Radar Control">Leaflet <span class="caps">CHMI</span> Radar&nbsp;Control</a></h1>
-    Written on Sep 1, 2014
-    and marked as
-    <a href="/tag/leaflet.html">leaflet</a>,     <a href="/tag/javascript.html">javascript</a>    | <a href="/category/development.html">development</a>
+    <h1><a href="https://www.zimmi.cz/posts/2014/leaflet-chmi-radar-control/" rel="bookmark" title="Permalink to Leaflet CHMI Radar Control">Leaflet <span class="caps">CHMI</span> Radar&nbsp;Control</a></h1>
+    <aside><span>Sep 1, 2014</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/leaflet.html">leaflet</a>     <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+    </aside>
     <p>I&#8217;ve been in love with Leaflet ever since v0.4 was released. Well-documented, clean <span class="caps">API</span> included, beautiful controls and tons of plugins makes it my number one choice to create a web map. I wrote a Google Maps <span class="caps">API</span> app used at edpp.cz a year and a half ago and I&#8217;ve been thinking of refactoring it since then. I don&#8217;t think I even knew Leaflet existed back in those&nbsp;days.</p>
 <p>I used to use Google Maps as my primary tool for web maps, it used to be the only choice back then. OpenLayers <span class="caps">API</span> documentation was one of the worst docs I have ever read (<em>alphabetic sorting, please!</em>), thus making it a no-go for me. It looked ugly and was sort of overwhelmed with functions. Leaflet came out completely different and I decided to rewrite our main map app using this great open-source&nbsp;library.</p>
 
 <h3>My first&nbsp;control</h3>
 
-<p><img src="/assets/leaflet-chmi-radar-control/google_maps.png" title="Google maps layer control" class="left">Modularity is one of the things I like the most about Leaflet. I was struggling with creating checkboxes used to toggle layers in Google Maps app, it comes ready with Leaflet. Adding a control to the map is easy as piece of cake, you do <a href="http://leafletjs.com/reference.html#icontrol"><code>L.Control.extend({)}</code></a> and that&#8217;s it (almost). Since the map displays animated radar images showing the precipitation that occurred during last three hours or so I thought it would be great implementing this as a control: a button used to toggle the animation on/off and displaying the time currently shown image was created&nbsp;at.</p>
+<p><img src="https://www.zimmi.cz/posts/assets/leaflet-chmi-radar-control/google_maps.png" title="Google maps layer control" class="left">Modularity is one of the things I like the most about Leaflet. I was struggling with creating checkboxes used to toggle layers in Google Maps app, it comes ready with Leaflet. Adding a control to the map is easy as piece of cake, you do <a href="http://leafletjs.com/reference.html#icontrol"><code>L.Control.extend({)}</code></a> and that&#8217;s it (almost). Since the map displays animated radar images showing the precipitation that occurred during last three hours or so I thought it would be great implementing this as a control: a button used to toggle the animation on/off and displaying the time currently shown image was created&nbsp;at.</p>
 
 <p>The image on the left side displays the old solution using Google Maps. It was using a lot of <span class="caps">DOM</span> manipulation, was quite hard to maintain and definitely not eye-candy. When the animation was turned on, another control popped up in the map&#8217;s top left corner displaying the time the image was taken at. The animation toggle (<em>srážkový radar</em>) was incorporated into the layer control. I decided to take it out and make it a separate feature of the&nbsp;map.</p>
 
-<p><img src="/assets/leaflet-chmi-radar-control/control.png" title="Leaflet radar control" class="right">You can see the result in the image below. The control is a simple button with the radar icon displaying the time when active. It is only useful for the Czech Republic and is highly dependent on the image provider (<abbr title="Czech Hydrometeorogical Institute"><span class="caps">CHMI</span></abbr>), which means that if the <span class="caps">URL</span> of the images was to be changed, the whole control would&nbsp;break.</p>
+<p><img src="https://www.zimmi.cz/posts/assets/leaflet-chmi-radar-control/control.png" title="Leaflet radar control" class="right">You can see the result in the image below. The control is a simple button with the radar icon displaying the time when active. It is only useful for the Czech Republic and is highly dependent on the image provider (<abbr title="Czech Hydrometeorogical Institute"><span class="caps">CHMI</span></abbr>), which means that if the <span class="caps">URL</span> of the images was to be changed, the whole control would&nbsp;break.</p>
 
-<p>You can<a href="/assets/leaflet-chmi-radar-control/radarcontrol.zip"> grab the code if you like</a>. You add the control to the map as any other&nbsp;control:</p>
+<p>You can<a href="https://www.zimmi.cz/posts/assets/leaflet-chmi-radar-control/radarcontrol.zip"> grab the code if you like</a>. You add the control to the map as any other&nbsp;control:</p>
 
 <div class="highlight"><pre><span></span><span class="kd">var</span> <span class="nx">radar</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">L</span><span class="p">.</span><span class="nx">Control</span><span class="p">.</span><span class="nx">Radar</span><span class="p">();</span>
 <span class="nx">radar</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
@@ -60,19 +61,22 @@
 
 <p>You can set the control visibility with <code>visible</code> property passed into <code>options</code> of the&nbsp;control.</p>
 </article>
-<div class="pagination row">
-    <div class="large-6 columns">
-            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Previous page']);" href="/category/development4.html" class="button card card-1">&laquo; Previous page</a>
-    </div>
-    <div class="large-6 columns">
-    </div>
-</div>    </main>
+<aside id="pagination">
+            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Previous page']);" href="https://www.zimmi.cz/posts/category/development4.html">&laquo; Previous page</a>
+</aside>    </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
         Proudly powered by <a href="//getpelican.com/">Pelican</a>,
         which takes great advantage of <a href="//python.org">Python</a>.
     </footer>
-<script src="/theme/webassets-external/5acf220afe81b3dd00333bbb93fbaa41_jquery.js"></script>
-<script src="/theme/webassets-external/b80143a60770d5aa122a039a2b889970_foundation.min.js"></script>
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-43432739-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments)};
+  gtag('js', new Date());
+
+  gtag('config', 'UA-43432739-2');
+</script>
 </body>
 </html>

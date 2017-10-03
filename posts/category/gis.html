@@ -5,17 +5,16 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="/theme/webassets-external/e17ffd2049da5254bb4b3183ea73c922_normalize.css">
-        <link rel="stylesheet" href="/theme/webassets-external/35f123b951b653f7b2d441b35b63d32a_github.css">
-        <link rel="stylesheet" href="/theme/webassets-external/310a2979488959b3c24d4edd2e18b50d_screen.css">
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?1ec62741">
 </head>
 <body>
     <nav role="navigation">
         <ul>
-            <li><a href="/categories">Categories</a></li>
-            <li><a href="/tags">Tags</a></li>
-            <li><a href="/feed.xml">Subscribe to RSS feed</a></li>
+            <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+            <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+            <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
         </ul>
     </nav>
     <header>
@@ -25,10 +24,11 @@
 <h2 class="text-center">Articles in the GIS category</h2>
 
 <article>
-    <h1><a href="/posts/2017/fighting-raster-geopackage-with-gdal/" rel="bookmark" title="Permalink to Fighting Raster GeoPackage with GDAL">Fighting Raster GeoPackage with <span class="caps">GDAL</span></a></h1>
-    Written on Jul 19, 2017
-    and marked as
-    <a href="/tag/bash.html">bash</a>,     <a href="/tag/gdal.html">gdal</a>    | <a href="/category/gis.html">GIS</a>
+    <h1><a href="https://www.zimmi.cz/posts/2017/fighting-raster-geopackage-with-gdal/" rel="bookmark" title="Permalink to Fighting Raster GeoPackage with GDAL">Fighting Raster GeoPackage with <span class="caps">GDAL</span></a></h1>
+    <aside><span>Jul 19, 2017</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>     <a href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
+    </aside>
     <p>As I&#8217;m still running Ubuntu 16.04 based Linux Mint, I have no access to <span class="caps">GDAL</span> 2.x repositories (except for ubuntugis, that I really don&#8217;t like to use). Provided with a GeoPackage raster file recently, I had to find a way to load it into <span class="caps">QGIS</span>, somehow. The solution is simple: Docker with&nbsp;gdal_translate.</p>
 <h2>Preparing the Docker&nbsp;container</h2>
 <p>I like using Docker for experiments that might leave the <span class="caps">OS</span> in an <em>unexpected</em> state (which is exactly what happens to me with ubuntugis repository whenever I use it. That&#8217;s why I don&#8217;t anymore.). A very simple Dockerfile keeps the troubles away from&nbsp;you.</p>
@@ -82,17 +82,18 @@ RUN apt install -y gdal-bin
 
 
 <h2>Final Touch: Raster to&nbsp;Vector</h2>
-<p>After the GeoTiff is written to hard drive, <a href="/posts/2015/how-to-use-queue-with-rsync/">inotifywait</a> can be used to generate overviews. And with ease of calling <code>gdal_polygonize.py</code> on each of GeoTiffs&hellip;vector layer, at you&nbsp;service.</p>
+<p>After the GeoTiff is written to hard drive, <a href="https://www.zimmi.cz/posts/2015/how-to-use-queue-with-rsync/">inotifywait</a> can be used to generate overviews. And with ease of calling <code>gdal_polygonize.py</code> on each of GeoTiffs&hellip;vector layer, at you&nbsp;service.</p>
 </article>
 <article>
-    <h1><a href="/2017/mapping-north-america-with-qgis-tips-and-tricks" rel="bookmark" title="Permalink to Mapping North America with QGIS: Tips and Tricks">Mapping North America with <span class="caps">QGIS</span>: Tips and&nbsp;Tricks</a></h1>
-    Written on May 21, 2017
-    and marked as
-    <a href="/tag/qgis.html">qgis</a>,     <a href="/tag/visualization.html">visualization</a>    | <a href="/category/gis.html">GIS</a>
+    <h1><a href="https://www.zimmi.cz/posts/2017/mapping-north-america-with-qgis-tips-and-tricks" rel="bookmark" title="Permalink to Mapping North America with QGIS: Tips and Tricks">Mapping North America with <span class="caps">QGIS</span>: Tips and&nbsp;Tricks</a></h1>
+    <aside><span>May 21, 2017</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>     <a href="https://www.zimmi.cz/posts/tag/visualization.html">visualization</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
+    </aside>
     <p>Recently I&#8217;ve bought a book called <em>Maps</em> by Aleksandra Mizielinska and Daniel Mizielinski to my nephew. The book&#8217;s absolutely wonderful and made me want to try crafting a map with similar looks. I don&#8217;t do maps much at <a href="https://clevermaps.cz">CleverMaps</a>, so this was a great opportunity to find out what new features became available during the last months of <span class="caps">QGIS</span>&nbsp;development.</p>
 <h2>Result</h2>
 <p>A map of North America in scale of 1:22,000,000 featuring the biggest lakes, rivers, mountain ranges and basic administrative units for the North American countries. I aimed for visually appealing overview map rather than perfectly correct topographic&nbsp;one.</p>
-<div class="text-center"><a href="/assets/mapping-north-america-with-qgis-tips-and-tricks/map.png" title="Click for the full size (3 MB)"><img src="/assets/mapping-north-america-with-qgis-tips-and-tricks/map.min.png"/></a></div>
+<div class="text-center"><a href="https://www.zimmi.cz/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/map.png" title="Click for the full size (3 MB)"><img src="https://www.zimmi.cz/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/map.min.png"/></a></div>
 
 <h2>Data</h2>
 <p>I used my beloved <a href="http://www.naturalearthdata.com">Natural Earth dataset</a> for both cultural (boundaries, cities) and physical (rivers, lakes) map features. Different scales came to play for different map layers as they seemed a bit too/few simplified for the given&nbsp;scale.</p>
@@ -104,15 +105,15 @@ RUN apt install -y gdal-bin
 <p>I&#8217;ve used several techniques I find interesting enough to be listed&nbsp;here.</p>
 <h3>Coastlines</h3>
 <p>For a long time I&#8217;ve considered coastlines a field for cartographic invention. They can be emphasized by shading or 3D effects. I chose the set of four parallel coastlines subtly disappearing into the sea, hopefully invoking the feeling of waves coming to the&nbsp;shore.</p>
-<div class="text-center"><img src="/assets/mapping-north-america-with-qgis-tips-and-tricks/coastlines.png"/></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/coastlines.png"/></div>
 
 <p>It&#8217;s done by dissolving all the features and buffering them again and&nbsp;again.</p>
 <h3>Buffered&nbsp;labels</h3>
 <p>Buffered labels are usually hard to get right, because they fill so much space if the buffer color&#8217;s not corresponding to its surroundings. But choosing the proper color can be a real struggle at&nbsp;times.</p>
-<div class="text-center"><img src="/assets/mapping-north-america-with-qgis-tips-and-tricks/qgis_expressions.png"/></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/qgis_expressions.png"/></div>
 
 <p>On this map, almost all the labels are buffered with the color of its surroundings, which makes them more legible, yet not too expressive. This is possible thanks to <span class="caps">QGIS</span> expression based properties that let you define unique styling to different map&nbsp;features.</p>
-<div class="text-center"><img src="/assets/mapping-north-america-with-qgis-tips-and-tricks/buffered_labels.png"/></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/buffered_labels.png"/></div>
 
 <p>Where it isn&#8217;t possible (e.g. Bahamas or Honduras) to choose just one buffer color, the label is not buffered at all (or the semi-transparent white buffer is&nbsp;used).</p>
 <p>Note the <em>Rocky Mountains</em> label is split on the borders of the <span class="caps">U.S.A.</span> and Canada and its both parts match the background&nbsp;color.</p>
@@ -120,24 +121,25 @@ RUN apt install -y gdal-bin
 <p>Rivers are tapered based on the Natural Earth&#8217;s width attribute value for each river&nbsp;segment.</p>
 <h3>Labels in separate&nbsp;layers</h3>
 <p>I&#8217;m used to put labels into separate layers in more complicated map compositions, especially when you need to draw label along path for areal features (such as countries or&nbsp;states).</p>
-<div class="text-center"><img src="/assets/mapping-north-america-with-qgis-tips-and-tricks/labels.png"/></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/labels.png"/></div>
 
 <p>It becomes a bit harder to keep the features in sync with the labels though. I&#8217;d like to use only one layer for all the map layers in the future, as I feel that&#8217;s the way to go for the best&nbsp;labeling.</p>
 <h3>Labels wrapped on&nbsp;character</h3>
 <p>Some labels just can&#8217;t fit the feature they belong to and <span class="caps">QGIS</span> lets you deal with this by wrapping labels on a special character, <code>\</code> in my&nbsp;case.</p>
-<div class="text-center"><img src="/assets/mapping-north-america-with-qgis-tips-and-tricks/wrapped_labels.png"/></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/wrapped_labels.png"/></div>
 
 <h3>Layer blending&nbsp;mode</h3>
 <p>The mechanics behind layer blending modes are still a mystery to me, but they can add that little extra to a map very easily. Thanks to the Overlay blending mode, <em>the Rocky Mountains</em> may remain very subtle on different kinds of&nbsp;background.</p>
-<div class="text-center"><img src="/assets/mapping-north-america-with-qgis-tips-and-tricks/blending_mode.png"/></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/blending_mode.png"/></div>
 </article>
 <article>
-    <h1><a href="/posts/2017/wifileaks-wi-fi-networks-dataviz/" rel="bookmark" title="Permalink to Wifileaks Wi-Fi Networks Dataviz">Wifileaks Wi-Fi Networks&nbsp;Dataviz</a></h1>
-    Written on May 2, 2017
-    and marked as
-    <a href="/tag/qgis.html">qgis</a>,     <a href="/tag/visualization.html">visualization</a>    | <a href="/category/gis.html">GIS</a>
+    <h1><a href="https://www.zimmi.cz/posts/2017/wifileaks-wi-fi-networks-dataviz/" rel="bookmark" title="Permalink to Wifileaks Wi-Fi Networks Dataviz">Wifileaks Wi-Fi Networks&nbsp;Dataviz</a></h1>
+    <aside><span>May 2, 2017</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>     <a href="https://www.zimmi.cz/posts/tag/visualization.html">visualization</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
+    </aside>
     <p><a href="http://www.wifileaks.cz">Wifileaks</a> is a project by Jakub Čížek aimed to map the Czech wi-fi networks with Android/iOS app. The data gathered by people using the app <a href="http://download.wifileaks.cz/data/wifileaks_raw_170416.tar.gz">is available to download</a> and features ~&nbsp;90,000,000 records, each representing the position of the cellphone when connecting to the network. Just about perfect to craft some&nbsp;maps!</p>
-<div class="text-center"><img src="/assets/wifileaks-wifi-networks-dataviz/cr.png"/></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/cr.png"/></div>
 
 <h2>Using PostgreSQL&nbsp;cstore_fdw</h2>
 <p>I ran out of disk space immediately after loading the dataset into the PostgreSQL database. After fiddling around I remembered that columnar store should be a bit space-friendlier than the old fashioned relational database. Thus, I installed the <a href="https://github.com/citusdata/cstore_fdw">cstore_fdw</a> by Citus Data in just few&nbsp;steps.</p>
@@ -151,7 +153,7 @@ git clone git@github.com:citusdata/cstore_fdw.git
 </pre></div>
 
 
-<p>This makes <a href="/posts/2016/testing-postgresql-ogr-fdw/">another <span class="caps">FDW</span> available</a> to you inside the PostgreSQL. The actual foreign server has to be created before loading the data into a foreign&nbsp;table.</p>
+<p>This makes <a href="https://www.zimmi.cz/posts/2016/testing-postgresql-ogr-fdw/">another <span class="caps">FDW</span> available</a> to you inside the PostgreSQL. The actual foreign server has to be created before loading the data into a foreign&nbsp;table.</p>
 <div class="highlight"><pre><span></span>cat <span class="s">&lt;&lt;END | psql -qAt --no-psqlrc</span>
 <span class="s">    CREATE SERVER cstore_server FOREIGN DATA WRAPPER cstore_fdw;</span>
 <span class="s">    CREATE SCHEMA data_cstore;</span>
@@ -218,14 +220,14 @@ git clone git@github.com:citusdata/cstore_fdw.git
 <h2>Putting the networks on the&nbsp;map</h2>
 <table>
     <tr>
-        <td><a href="/assets/wifileaks-wifi-networks-dataviz/brno.png"><img src="/assets/wifileaks-wifi-networks-dataviz/brno.png"></a></td>
-        <td><a href="/assets/wifileaks-wifi-networks-dataviz/praha.png"><img src="/assets/wifileaks-wifi-networks-dataviz/praha.png"></a></td>
-        <td><a href="/assets/wifileaks-wifi-networks-dataviz/olomouc.png"><img src="/assets/wifileaks-wifi-networks-dataviz/olomouc.png"></a></td>
+        <td><a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"><img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"></a></td>
+        <td><a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"><img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"></a></td>
+        <td><a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"><img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"></a></td>
     </tr>
     <tr>
-        <td><a href="/assets/wifileaks-wifi-networks-dataviz/plzen.png"><img src="/assets/wifileaks-wifi-networks-dataviz/plzen.png"></a></td>
-        <td><a href="/assets/wifileaks-wifi-networks-dataviz/ostrava.png"><img src="/assets/wifileaks-wifi-networks-dataviz/ostrava.png"></a></td>
-        <td><a href="/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"><img src="/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"></a></td>
+        <td><a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"><img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"></a></td>
+        <td><a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"><img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"></a></td>
+        <td><a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"><img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"></a></td>
     </tr>
 </table>
 
@@ -246,14 +248,15 @@ git clone git@github.com:citusdata/cstore_fdw.git
 </pre></div>
 </article>
 <article>
-    <h1><a href="/posts/2017/routing-with-grass-gis-catchment-area-calculation/" rel="bookmark" title="Permalink to Routing with GRASS GIS: Catchment Area Calculation">Routing with <span class="caps">GRASS</span> <span class="caps">GIS</span>: Catchment Area&nbsp;Calculation</a></h1>
-    Written on Apr 20, 2017
-    and marked as
-    <a href="/tag/grass.html">grass</a>    | <a href="/category/gis.html">GIS</a>
-    <p>I got my hands on <a href="/posts/2017/routing-with-pgrouting-catchment-area-calculation/">pgRouting</a> in the last post and I&#8217;m about to do the same with <span class="caps">GRASS</span> <span class="caps">GIS</span> in this&nbsp;one.</p>
+    <h1><a href="https://www.zimmi.cz/posts/2017/routing-with-grass-gis-catchment-area-calculation/" rel="bookmark" title="Permalink to Routing with GRASS GIS: Catchment Area Calculation">Routing with <span class="caps">GRASS</span> <span class="caps">GIS</span>: Catchment Area&nbsp;Calculation</a></h1>
+    <aside><span>Apr 20, 2017</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/grass.html">grass</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
+    </aside>
+    <p>I got my hands on <a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/">pgRouting</a> in the last post and I&#8217;m about to do the same with <span class="caps">GRASS</span> <span class="caps">GIS</span> in this&nbsp;one.</p>
 <p><span class="caps">GRASS</span> <span class="caps">GIS</span> stores the topology for the native vector format by default, which makes it easy to use for the network analysis. All the commands associated with the network analysis can be found in the <code>v.net</code> family. The ones I&#8217;m going to discuss in this post are <code>v.net</code> itself, <code>v.net.path</code>, <code>.v.net.alloc</code> and <code>v.net.iso</code>,&nbsp;respectively.</p>
 <h2>Data</h2>
-<p>I&#8217;m going to use the roads data <a href="/posts/2017/routing-with-pgrouting-catchment-area-calculation/">from the previous post</a> together with some random points used as catchment areas&nbsp;centers.</p>
+<p>I&#8217;m going to use the roads data <a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/">from the previous post</a> together with some random points used as catchment areas&nbsp;centers.</p>
 <div class="highlight"><pre><span></span><span class="c1"># create the new GRASS GIS location</span>
 grass -text -c ./osm/czech
 
@@ -266,7 +269,7 @@ v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&
 
 
 <p>I got six different points and the pretty dense road network. Note none of the points is connected to the existing&nbsp;network.</p>
-<div class="text-center"><img src="/assets/routing-with-grass-gis-catchment-area-calculation/roads_points.png"/></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/roads_points.png"/></div>
 
 <p>You have to have routable network to do the actual routing (the worst sentence ever written). To do so,&nbsp;let&#8217;s:</p>
 <ul>
@@ -286,7 +289,7 @@ v.net <span class="nv">input</span><span class="o">=</span>network <span class="
 
 
 <p>The algorithm doesn&#8217;t take bridges, tunnels and oneways into account, it&#8217;s capable of doing so&nbsp;though.</p>
-<div class="text-center"><img src="/assets/routing-with-grass-gis-catchment-area-calculation/shortest_path.png" width="70%"/></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/shortest_path.png" width="70%"/></div>
 
 <h2>Distributing the subnets for nearest&nbsp;centers</h2>
 <div class="highlight"><pre><span></span>v.net.alloc <span class="nv">input</span><span class="o">=</span>network_noded <span class="nv">output</span><span class="o">=</span>network_alloc <span class="nv">center_cats</span><span class="o">=</span><span class="m">1</span>-6 <span class="nv">node_layer</span><span class="o">=</span><span class="m">2</span>
@@ -294,7 +297,7 @@ v.net <span class="nv">input</span><span class="o">=</span>network <span class="
 
 
 <p><code>v.net.alloc</code> module takes the given centers and distributes the network so each of its parts belongs to exactly one center - the nearest one (speaking the distance, time units,&nbsp;&hellip;).</p>
-<div class="text-center"><img src="/assets/routing-with-grass-gis-catchment-area-calculation/subnets.png" width="70%"/></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/subnets.png" width="70%"/></div>
 
 <h2>Creating catchment&nbsp;areas</h2>
 <div class="highlight"><pre><span></span>v.net.iso <span class="nv">input</span><span class="o">=</span>network_noded <span class="nv">output</span><span class="o">=</span>network_iso <span class="nv">center_cats</span><span class="o">=</span><span class="m">1</span>-6 <span class="nv">costs</span><span class="o">=</span><span class="m">1000</span>,3000,5000
@@ -302,10 +305,10 @@ v.net <span class="nv">input</span><span class="o">=</span>network <span class="
 
 
 <p><code>v.net.iso</code> splits net by cost isolines. Again, the costs might be specified as lengths, time units,&nbsp;&hellip;.</p>
-<div class="text-center"><img src="/assets/routing-with-grass-gis-catchment-area-calculation/isolines.png" width="70%"/></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/isolines.png" width="70%"/></div>
 
 <p>Two different ways lead to the actual catchment area creation. First, you extract nodes from the roads with their values, turn them into the raster grid and either extract contours or polygonize the raster. I find the last step suboptimal and would love to find another way of polygonizing the&nbsp;results.</p>
-<div class="text-center"><img src="/assets/routing-with-grass-gis-catchment-area-calculation/catchment_area.gif" width="70%"/></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/catchment_area.gif" width="70%"/></div>
 
 <p>Note when extracting contours the interval has to be set to the reasonable number depending on the nodes&nbsp;values.</p>
 <h2>Remarks</h2>
@@ -316,18 +319,21 @@ v.net <span class="nv">input</span><span class="o">=</span>network <span class="
 <li>Personally, I find <span class="caps">GRASS</span> <span class="caps">GIS</span> easier to use for the network analysis compared to&nbsp;pgRouting.</li>
 </ul>
 </article>
-<div class="pagination row">
-    <div class="large-6 columns">
-    </div>
-    <div class="large-6 columns">
-    </div>
-</div>    </main>
+<aside id="pagination">
+</aside>    </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
         Proudly powered by <a href="//getpelican.com/">Pelican</a>,
         which takes great advantage of <a href="//python.org">Python</a>.
     </footer>
-<script src="/theme/webassets-external/5acf220afe81b3dd00333bbb93fbaa41_jquery.js"></script>
-<script src="/theme/webassets-external/b80143a60770d5aa122a039a2b889970_foundation.min.js"></script>
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-43432739-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments)};
+  gtag('js', new Date());
+
+  gtag('config', 'UA-43432739-2');
+</script>
 </body>
 </html>

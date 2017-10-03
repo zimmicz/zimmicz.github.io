@@ -5,17 +5,16 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="/theme/webassets-external/e17ffd2049da5254bb4b3183ea73c922_normalize.css">
-        <link rel="stylesheet" href="/theme/webassets-external/35f123b951b653f7b2d441b35b63d32a_github.css">
-        <link rel="stylesheet" href="/theme/webassets-external/310a2979488959b3c24d4edd2e18b50d_screen.css">
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?1ec62741">
 </head>
 <body>
     <nav role="navigation">
         <ul>
-            <li><a href="/categories">Categories</a></li>
-            <li><a href="/tags">Tags</a></li>
-            <li><a href="/feed.xml">Subscribe to RSS feed</a></li>
+            <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+            <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+            <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
         </ul>
     </nav>
     <header>
@@ -24,12 +23,13 @@
     <main>
 
 <article>
-    <h1><a href="/posts/2017/wifileaks-wi-fi-networks-dataviz/" rel="bookmark" title="Permalink to Wifileaks Wi-Fi Networks Dataviz">Wifileaks Wi-Fi Networks&nbsp;Dataviz</a></h1>
-    Written on May 2, 2017
-    and marked as
-    <a href="/tag/qgis.html">qgis</a>,     <a href="/tag/visualization.html">visualization</a>    | <a href="/category/gis.html">GIS</a>
+    <h1><a href="https://www.zimmi.cz/posts/2017/wifileaks-wi-fi-networks-dataviz/" rel="bookmark" title="Permalink to Wifileaks Wi-Fi Networks Dataviz">Wifileaks Wi-Fi Networks&nbsp;Dataviz</a></h1>
+    <aside><span>May 2, 2017</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>     <a href="https://www.zimmi.cz/posts/tag/visualization.html">visualization</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
+    </aside>
     <p><a href="http://www.wifileaks.cz">Wifileaks</a> is a project by Jakub Čížek aimed to map the Czech wi-fi networks with Android/iOS app. The data gathered by people using the app <a href="http://download.wifileaks.cz/data/wifileaks_raw_170416.tar.gz">is available to download</a> and features ~&nbsp;90,000,000 records, each representing the position of the cellphone when connecting to the network. Just about perfect to craft some&nbsp;maps!</p>
-<div class="text-center"><img src="/assets/wifileaks-wifi-networks-dataviz/cr.png"/></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/cr.png"/></div>
 
 <h2>Using PostgreSQL&nbsp;cstore_fdw</h2>
 <p>I ran out of disk space immediately after loading the dataset into the PostgreSQL database. After fiddling around I remembered that columnar store should be a bit space-friendlier than the old fashioned relational database. Thus, I installed the <a href="https://github.com/citusdata/cstore_fdw">cstore_fdw</a> by Citus Data in just few&nbsp;steps.</p>
@@ -43,7 +43,7 @@ git clone git@github.com:citusdata/cstore_fdw.git
 </pre></div>
 
 
-<p>This makes <a href="/posts/2016/testing-postgresql-ogr-fdw/">another <span class="caps">FDW</span> available</a> to you inside the PostgreSQL. The actual foreign server has to be created before loading the data into a foreign&nbsp;table.</p>
+<p>This makes <a href="https://www.zimmi.cz/posts/2016/testing-postgresql-ogr-fdw/">another <span class="caps">FDW</span> available</a> to you inside the PostgreSQL. The actual foreign server has to be created before loading the data into a foreign&nbsp;table.</p>
 <div class="highlight"><pre><span></span>cat <span class="s">&lt;&lt;END | psql -qAt --no-psqlrc</span>
 <span class="s">    CREATE SERVER cstore_server FOREIGN DATA WRAPPER cstore_fdw;</span>
 <span class="s">    CREATE SCHEMA data_cstore;</span>
@@ -110,14 +110,14 @@ git clone git@github.com:citusdata/cstore_fdw.git
 <h2>Putting the networks on the&nbsp;map</h2>
 <table>
     <tr>
-        <td><a href="/assets/wifileaks-wifi-networks-dataviz/brno.png"><img src="/assets/wifileaks-wifi-networks-dataviz/brno.png"></a></td>
-        <td><a href="/assets/wifileaks-wifi-networks-dataviz/praha.png"><img src="/assets/wifileaks-wifi-networks-dataviz/praha.png"></a></td>
-        <td><a href="/assets/wifileaks-wifi-networks-dataviz/olomouc.png"><img src="/assets/wifileaks-wifi-networks-dataviz/olomouc.png"></a></td>
+        <td><a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"><img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"></a></td>
+        <td><a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"><img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"></a></td>
+        <td><a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"><img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"></a></td>
     </tr>
     <tr>
-        <td><a href="/assets/wifileaks-wifi-networks-dataviz/plzen.png"><img src="/assets/wifileaks-wifi-networks-dataviz/plzen.png"></a></td>
-        <td><a href="/assets/wifileaks-wifi-networks-dataviz/ostrava.png"><img src="/assets/wifileaks-wifi-networks-dataviz/ostrava.png"></a></td>
-        <td><a href="/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"><img src="/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"></a></td>
+        <td><a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"><img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"></a></td>
+        <td><a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"><img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"></a></td>
+        <td><a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"><img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"></a></td>
     </tr>
 </table>
 
@@ -138,14 +138,15 @@ git clone git@github.com:citusdata/cstore_fdw.git
 </pre></div>
 </article>
 <article>
-    <h1><a href="/posts/2017/routing-with-grass-gis-catchment-area-calculation/" rel="bookmark" title="Permalink to Routing with GRASS GIS: Catchment Area Calculation">Routing with <span class="caps">GRASS</span> <span class="caps">GIS</span>: Catchment Area&nbsp;Calculation</a></h1>
-    Written on Apr 20, 2017
-    and marked as
-    <a href="/tag/grass.html">grass</a>    | <a href="/category/gis.html">GIS</a>
-    <p>I got my hands on <a href="/posts/2017/routing-with-pgrouting-catchment-area-calculation/">pgRouting</a> in the last post and I&#8217;m about to do the same with <span class="caps">GRASS</span> <span class="caps">GIS</span> in this&nbsp;one.</p>
+    <h1><a href="https://www.zimmi.cz/posts/2017/routing-with-grass-gis-catchment-area-calculation/" rel="bookmark" title="Permalink to Routing with GRASS GIS: Catchment Area Calculation">Routing with <span class="caps">GRASS</span> <span class="caps">GIS</span>: Catchment Area&nbsp;Calculation</a></h1>
+    <aside><span>Apr 20, 2017</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/grass.html">grass</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
+    </aside>
+    <p>I got my hands on <a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/">pgRouting</a> in the last post and I&#8217;m about to do the same with <span class="caps">GRASS</span> <span class="caps">GIS</span> in this&nbsp;one.</p>
 <p><span class="caps">GRASS</span> <span class="caps">GIS</span> stores the topology for the native vector format by default, which makes it easy to use for the network analysis. All the commands associated with the network analysis can be found in the <code>v.net</code> family. The ones I&#8217;m going to discuss in this post are <code>v.net</code> itself, <code>v.net.path</code>, <code>.v.net.alloc</code> and <code>v.net.iso</code>,&nbsp;respectively.</p>
 <h2>Data</h2>
-<p>I&#8217;m going to use the roads data <a href="/posts/2017/routing-with-pgrouting-catchment-area-calculation/">from the previous post</a> together with some random points used as catchment areas&nbsp;centers.</p>
+<p>I&#8217;m going to use the roads data <a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/">from the previous post</a> together with some random points used as catchment areas&nbsp;centers.</p>
 <div class="highlight"><pre><span></span><span class="c1"># create the new GRASS GIS location</span>
 grass -text -c ./osm/czech
 
@@ -158,7 +159,7 @@ v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&
 
 
 <p>I got six different points and the pretty dense road network. Note none of the points is connected to the existing&nbsp;network.</p>
-<div class="text-center"><img src="/assets/routing-with-grass-gis-catchment-area-calculation/roads_points.png"/></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/roads_points.png"/></div>
 
 <p>You have to have routable network to do the actual routing (the worst sentence ever written). To do so,&nbsp;let&#8217;s:</p>
 <ul>
@@ -178,7 +179,7 @@ v.net <span class="nv">input</span><span class="o">=</span>network <span class="
 
 
 <p>The algorithm doesn&#8217;t take bridges, tunnels and oneways into account, it&#8217;s capable of doing so&nbsp;though.</p>
-<div class="text-center"><img src="/assets/routing-with-grass-gis-catchment-area-calculation/shortest_path.png" width="70%"/></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/shortest_path.png" width="70%"/></div>
 
 <h2>Distributing the subnets for nearest&nbsp;centers</h2>
 <div class="highlight"><pre><span></span>v.net.alloc <span class="nv">input</span><span class="o">=</span>network_noded <span class="nv">output</span><span class="o">=</span>network_alloc <span class="nv">center_cats</span><span class="o">=</span><span class="m">1</span>-6 <span class="nv">node_layer</span><span class="o">=</span><span class="m">2</span>
@@ -186,7 +187,7 @@ v.net <span class="nv">input</span><span class="o">=</span>network <span class="
 
 
 <p><code>v.net.alloc</code> module takes the given centers and distributes the network so each of its parts belongs to exactly one center - the nearest one (speaking the distance, time units,&nbsp;&hellip;).</p>
-<div class="text-center"><img src="/assets/routing-with-grass-gis-catchment-area-calculation/subnets.png" width="70%"/></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/subnets.png" width="70%"/></div>
 
 <h2>Creating catchment&nbsp;areas</h2>
 <div class="highlight"><pre><span></span>v.net.iso <span class="nv">input</span><span class="o">=</span>network_noded <span class="nv">output</span><span class="o">=</span>network_iso <span class="nv">center_cats</span><span class="o">=</span><span class="m">1</span>-6 <span class="nv">costs</span><span class="o">=</span><span class="m">1000</span>,3000,5000
@@ -194,10 +195,10 @@ v.net <span class="nv">input</span><span class="o">=</span>network <span class="
 
 
 <p><code>v.net.iso</code> splits net by cost isolines. Again, the costs might be specified as lengths, time units,&nbsp;&hellip;.</p>
-<div class="text-center"><img src="/assets/routing-with-grass-gis-catchment-area-calculation/isolines.png" width="70%"/></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/isolines.png" width="70%"/></div>
 
 <p>Two different ways lead to the actual catchment area creation. First, you extract nodes from the roads with their values, turn them into the raster grid and either extract contours or polygonize the raster. I find the last step suboptimal and would love to find another way of polygonizing the&nbsp;results.</p>
-<div class="text-center"><img src="/assets/routing-with-grass-gis-catchment-area-calculation/catchment_area.gif" width="70%"/></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/catchment_area.gif" width="70%"/></div>
 
 <p>Note when extracting contours the interval has to be set to the reasonable number depending on the nodes&nbsp;values.</p>
 <h2>Remarks</h2>
@@ -209,10 +210,11 @@ v.net <span class="nv">input</span><span class="o">=</span>network <span class="
 </ul>
 </article>
 <article>
-    <h1><a href="/posts/2017/routing-with-pgrouting-catchment-area-calculation/" rel="bookmark" title="Permalink to Routing with pgRouting: Catchment Area Calculation">Routing with pgRouting: Catchment Area&nbsp;Calculation</a></h1>
-    Written on Apr 14, 2017
-    and marked as
-    <a href="/tag/postgis.html">postgis</a>,     <a href="/tag/pgrouting.html">pgrouting</a>    | <a href="/category/sql.html">SQL</a>
+    <h1><a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/" rel="bookmark" title="Permalink to Routing with pgRouting: Catchment Area Calculation">Routing with pgRouting: Catchment Area&nbsp;Calculation</a></h1>
+    <aside><span>Apr 14, 2017</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a href="https://www.zimmi.cz/posts/tag/pgrouting.html">pgrouting</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
     <p>For a long time I&#8217;ve wanted to play with <a href="http://pgrouting.org/">pgRouting</a> and that time has finally come. Among many other routing functions there is one that caught my eye, called <code>pgr_drivingdistance</code>. As the documentation says, it <em>returns the driving distance from a start node</em> using Dijkstra algorithm. The aforementioned distance doesn&#8217;t need to be defined in Euclidean space (the real distance between two points), it might be calculated in units of time, slopeness etc. How to get it&nbsp;going?</p>
 <h2>Data</h2>
 <p><span class="caps">OSM</span> will do as it always does. There is a tool called <code>osm2pgrouting</code> to help you load the data, the pure <span class="caps">GDAL</span> seems to be a better way to me though. Importing the downloaded data is&nbsp;trivial.</p>
@@ -271,7 +273,7 @@ v.net <span class="nv">input</span><span class="o">=</span>network <span class="
 
 
 <p>This function creates the <code>cze.roads_noded_vertices_pgr</code> that contains all the extracted nodes from the&nbsp;network.</p>
-<div class="text-center"><img src="/assets/routing-with-pgrouting-catchment-area-calculation/nodes.png" width="70%" /></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-pgrouting-catchment-area-calculation/nodes.png" width="70%" /></div>
 
 <p>As already mentioned, measures other than length can be used as a distance, I chose the time to get to a given node on&nbsp;foot.</p>
 <div class="highlight"><pre><span></span><span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="k">ADD</span> <span class="k">COLUMN</span> <span class="n">cost_minutes</span> <span class="nb">integer</span><span class="p">;</span>
@@ -330,7 +332,7 @@ v.net <span class="nv">input</span><span class="o">=</span>network <span class="
 
 
 <p>Using <code>pgr_pointsAsPolygon</code> renders resulting nodes accessible in 10-minute walk in polygons, but weird looking ones. Not bad, could be better&nbsp;though.</p>
-<div class="text-center"><img src="/assets/routing-with-pgrouting-catchment-area-calculation/area1.png" width="70%" /></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-pgrouting-catchment-area-calculation/area1.png" width="70%" /></div>
 
 <p>How about seeing only nodes instead of&nbsp;polygons?</p>
 <div class="highlight"><pre><span></span><span class="k">SELECT</span>
@@ -347,7 +349,7 @@ v.net <span class="nv">input</span><span class="o">=</span>network <span class="
 
 
 <p>Looks good, could be better&nbsp;though.</p>
-<div class="text-center"><img src="/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png" width="70%" /></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png" width="70%" /></div>
 
 <p>How about creating concave hulls from the extracted&nbsp;nodes?</p>
 <div class="highlight"><pre><span></span><span class="k">SELECT</span>
@@ -371,7 +373,7 @@ v.net <span class="nv">input</span><span class="o">=</span>network <span class="
 
 
 <p>This one looks the best I&nbsp;guess.</p>
-<div class="text-center"><img src="/assets/routing-with-pgrouting-catchment-area-calculation/area2.png" width="70%" /></div>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-pgrouting-catchment-area-calculation/area2.png" width="70%" /></div>
 
 <h2>Remarks</h2>
 <ul>
@@ -383,10 +385,11 @@ v.net <span class="nv">input</span><span class="o">=</span>network <span class="
 </ul>
 </article>
 <article>
-    <h1><a href="/posts/2017/exploiting-prague-open-data-without-api/" rel="bookmark" title="Permalink to Exploiting Prague Open Data without API">Exploiting Prague Open Data without <span class="caps">API</span></a></h1>
-    Written on Apr 3, 2017
-    and marked as
-    <a href="/tag/bash.html">bash</a>    | <a href="/category/data.html">data</a>
+    <h1><a href="https://www.zimmi.cz/posts/2017/exploiting-prague-open-data-without-api/" rel="bookmark" title="Permalink to Exploiting Prague Open Data without API">Exploiting Prague Open Data without <span class="caps">API</span></a></h1>
+    <aside><span>Apr 3, 2017</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/data.html">data</a></span>
+    </aside>
     <p>Speaking the Czech Republic, <a href="http://www.geoportalpraha.cz">Prague is an undoubted leader in open data publishing</a>. However, there is no public <span class="caps">API</span> to explore/search existing&nbsp;datasets.</p>
 <p>I wanted to download the <span class="caps">ESRI</span> Shapefile of the city urban plan that <a href="http://www.geoportalpraha.cz/cs/opendata/21733E1F-21B7-4ABC-B1C2-DC19C0237380#.WOKHMbmFvVM">is divided into more than a hundred files</a> (a file representing a cadastral&nbsp;area).</p>
 <p>This becomes a piece of cake with Opera Developer tools and a bit of JavaScript&nbsp;code</p>
@@ -417,10 +420,11 @@ find -type f -not -path <span class="s1">&#39;./PVP_fvu_p_Bechovice_SHP*&#39;</s
 <p>A boring task that would take me hours five years ago transformed into simple, yet fun, piece of work done in no more than half an&nbsp;hour.</p>
 </article>
 <article>
-    <h1><a href="/posts/2017/upgrading-postgresql-95-to-postgresql-96-with-postgis/" rel="bookmark" title="Permalink to Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with PostGIS">Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with&nbsp;PostGIS</a></h1>
-    Written on Mar 1, 2017
-    and marked as
-    <a href="/tag/sql.html">sql</a>,     <a href="/tag/postgresql.html">postgresql</a>    | <a href="/category/sql.html">SQL</a>
+    <h1><a href="https://www.zimmi.cz/posts/2017/upgrading-postgresql-95-to-postgresql-96-with-postgis/" rel="bookmark" title="Permalink to Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with PostGIS">Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with&nbsp;PostGIS</a></h1>
+    <aside><span>Mar 1, 2017</span>
+    <span>    <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
+    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
     <p>Thanks to <code>pg_upgrade</code> tool the PostgreSQL upgrade on Ubuntu is pretty straightforward. Different PostGIS versions might cause troubles though. This post covers PostgreSQL 9.5, PostGIS 2.2 to PostgreSQL 9.6, PostGIS 2.3&nbsp;migration.</p>
 <p>First of all, install the PostgreSQL 9.6 with PostGIS&nbsp;2.3.</p>
 <div class="highlight"><pre><span></span>apt install postgresql-9.6 postgresql-9.6-postgis-2.3
@@ -515,20 +519,23 @@ Running this script will delete the old cluster<span class="err">&#39;</span>s d
 
 <p>The old cluster can be removed and the new one switched back to port <code>5432</code>. Run <code>/usr/lib/postgresql/9.6/bin/vacuumdb -p 5433 --all --analyze-in-stages</code> to collect&nbsp;statistics.</p>
 </article>
-<div class="pagination row">
-    <div class="large-6 columns">
-            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Previous page']);" href="/index.html" class="button card card-1">&laquo; Previous page</a>
-    </div>
-    <div class="large-6 columns">
-            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Next page']);" href="/index3.html" class="button card card-1">Next page &raquo;</a>
-    </div>
-</div>    </main>
+<aside id="pagination">
+            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Previous page']);" href="https://www.zimmi.cz/posts/index.html">&laquo; Previous page</a>
+            <a onclick="javascript:_paq.push(['trackEvent', 'Pagination', 'Next page']);" href="https://www.zimmi.cz/posts/index3.html">Next page &raquo;</a>
+</aside>    </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
         Proudly powered by <a href="//getpelican.com/">Pelican</a>,
         which takes great advantage of <a href="//python.org">Python</a>.
     </footer>
-<script src="/theme/webassets-external/5acf220afe81b3dd00333bbb93fbaa41_jquery.js"></script>
-<script src="/theme/webassets-external/b80143a60770d5aa122a039a2b889970_foundation.min.js"></script>
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-43432739-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments)};
+  gtag('js', new Date());
+
+  gtag('config', 'UA-43432739-2');
+</script>
 </body>
 </html>

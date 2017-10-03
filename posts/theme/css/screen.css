@@ -21,6 +21,14 @@ a {
   color: #A31621;
 }
 
+a:hover {
+  text-decoration: none;
+}
+
+a:focus {
+  outline-color: #A31621;
+}
+
 h1,
 h2,
 h3,
@@ -29,8 +37,28 @@ h5,
 h6 {
   color: #A31621;
   font-weight: normal;
-  text-align: center;
   text-transform: uppercase;
+}
+
+h2,
+h3,
+h4,
+h5,
+h6 {
+  border-bottom: 1px solid #e0e0e0;
+  border-top: 1px solid #e0e0e0;
+}
+
+h2 {
+  line-height: 3rem;
+  margin-bottom: 2.5rem;
+  margin-top: 2.5rem;
+}
+
+h3 {
+  border-bottom: 1px solid #e8e8e8;
+  border-top: 1px solid #e8e8e8;
+  padding-left: 1rem;
 }
 
 a,
@@ -52,8 +80,16 @@ nav ul {
   line-height: 30px;
   list-style: none;
   margin: 0;
-  margin-left: 2rem;
+  margin-left: 0rem;
   padding: 0;
+  text-align: center;
+}
+
+@media screen and (min-width: 800px) {
+  nav ul {
+    margin-left: 2rem;
+    text-align: left;
+  }
 }
 
 nav ul li {
@@ -140,6 +176,7 @@ main {
 
 article {
   margin-bottom: 3rem;
+  min-width: 100%;
 }
 
 article,
@@ -148,9 +185,11 @@ img {
 }
 
 article h1 {
-  border-bottom: 1px solid #CED3DC;
-  border-top: 1px solid #CED3DC;
+  border-bottom: 1px solid #A31621;
+  border-top: 1px solid #A31621;
   font-weight: normal;
+  line-height: 2.5rem;
+  margin-bottom: 0;
   padding-bottom: 15px;
   padding-top: 15px;
   text-align: center;
@@ -165,6 +204,47 @@ article h1:hover {
 article h1 a {
   display: block;
   text-decoration: none;
+}
+
+article aside {
+  background: #f1f1f1;
+  border-bottom: 1px solid #CED3DC;
+  display: flex;
+  padding: .5rem;
+}
+
+article aside:last-child {
+  border-top: 1px solid #CED3DC;
+  flex-wrap: wrap;
+}
+
+article aside:last-child h3 {
+  flex: 1 0 100%;
+}
+
+article aside span {
+  flex: 1 1 auto;
+}
+
+article aside span:first-child {
+  text-align: left;
+}
+
+article aside span:nth-child(2) {
+  text-align: center;
+}
+
+article aside span:last-child {
+  text-align: right;
+}
+
+article aside span a {
+  background: white;
+  border: 1px solid #CED3DC;
+  color: #a31621;
+  display: inline-block;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
 pre {
@@ -223,7 +303,6 @@ td {
   }
 }
 
-
 img.left {
   padding-bottom: .5rem;
   padding-right: .5rem;
@@ -247,6 +326,50 @@ img.right {
     margin: 1rem;
 }
 
+aside#pagination {
+  border-top: 1px solid #CED3DC;
+  flex: 1 0 100%;
+  padding-top: 2rem;
+  text-align: center;
+}
+
+aside#pagination a {
+  background: #a31621;
+  color: white;
+  padding: .5rem;
+  width: 180px;
+  display: inline-block;
+  margin-left: .5rem;
+  margin-right: .5rem;
+}
+
+ul#cloud {
+  display: flex;
+  flex: 1 1 100%;
+  flex-wrap: wrap;
+  justify-content: center;
+  list-style: none;
+}
+
+ul#cloud li {
+  flex-basis: 20%;
+  background: #f1f1f1;
+  border: 1px solid #ddd;
+  margin: .25rem;
+  height: 9rem;
+  line-height: 9rem;
+  position: relative;
+  text-align: center;
+}
+
+ul#cloud li a {
+  display: block;
+}
+
+ul#cloud li a:hover {
+  background: #a31621;
+  color: white;
+}
 /*body {
     background: white url('../img/crossword.png');
 }
