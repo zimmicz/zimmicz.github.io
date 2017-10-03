@@ -2,28 +2,28 @@
 <ul>
  {% if article.prev_article %}
     <li>
-        <a onclick="javascript:_paq.push(['trackEvent', 'Neighbors', 'Previous article']);" href="{{ SITEURL }}/{{ article.prev_article.url}}">
+        <a class="neighbor" href="{{ SITEURL }}/{{ article.prev_article.url}}">
              {{ article.prev_article.title }}
         </a>
     </li>
  {% endif %}
  {% if article.next_article %}
      <li>
-         <a onclick="javascript:_paq.push(['trackEvent', 'Neighbors', 'Next article']);" href="{{ SITEURL }}/{{ article.next_article.url}}">
+         <a class="neighbor" href="{{ SITEURL }}/{{ article.next_article.url}}">
              {{ article.next_article.title }}
          </a>
      </li>
  {% endif %}
  {% if article.prev_article_in_category and article.prev_article_in_category.title != article.prev_article.title %}
      <li>
-         <a onclick="javascript:_paq.push(['trackEvent', 'Neighbors', 'Previous article in category']);" href="{{ SITEURL }}/{{ article.prev_article_in_category.url}}">
+         <a class="neighbor" href="{{ SITEURL }}/{{ article.prev_article_in_category.url}}">
              {{ article.prev_article_in_category.title }}
          </a>
      </li>
  {% endif %}
  {% if article.next_article_in_category and article.next_article_in_category.title != article.next_article.title %}
      <li>
-         <a onclick="javascript:_paq.push(['trackEvent', 'Neighbors', 'Next article in category']);" href="{{ SITEURL }}/{{ article.next_article_in_category.url}}">
+         <a class="neighbor" href="{{ SITEURL }}/{{ article.next_article_in_category.url}}">
              {{ article.next_article_in_category.title }}
          </a>
      </li>
