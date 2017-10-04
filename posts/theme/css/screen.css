@@ -297,6 +297,19 @@ td {
   word-wrap: break-word;
 }
 
+[data-echo] {
+  border: 1px solid #CED3DC;
+  display: inline-block;
+  height: 100px;
+  max-width: 100%;
+  width: 100%;
+}
+
+[data-echo]:after {
+  content: "Image loading...";
+  vertical-align: 50px;
+}
+
 @media screen and (min-width: 800px) {
   td {
 
