@@ -7,7 +7,7 @@
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
         <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
         <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?1ec62741">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?ba1d4c76">
 </head>
 <body>
     <nav role="navigation">
@@ -31,7 +31,7 @@
     </aside>
     <p>I&#8217;ve come across the <a href="http://gis.stackexchange.com/questions/208797/draw-wind-rose-with-qgis-from-postgis/">beautiful <span class="caps">GIS</span> StackExchange question</a> recently, asking how to draw a <a href="https://en.wikipedia.org/wiki/Wind_rose">wind rose</a> within&nbsp;PostGIS.</p>
 <div class="text-center">
-<img src="http://i.stack.imgur.com/0xAMU.png">
+<img data-echo="http://i.stack.imgur.com/0xAMU.png">
 </div>
 
 <p>It&#8217;s pretty easy to accomplish this with a custom <span class="caps">PLPGSQL</span> procedure below, that takes line geometry, number of sections and radius of the inner circle as&nbsp;parameters.</p>
@@ -85,7 +85,7 @@
 
 <p>Wind rose created with this function might look like the one&nbsp;below.</p>
 <div class="text-center">
-<img src="http://i.stack.imgur.com/4OD0J.png">
+<img data-echo="http://i.stack.imgur.com/4OD0J.png">
 </div>
 
 <p>Run it as follows. The <code>line</code> parameter should be a simple straight line made of just two&nbsp;vertices.</p>
@@ -131,7 +131,7 @@
     </aside>
     <p>Doing overlays (<code>ST_Intersection()</code>) in PostGIS based on spatial relationships (<code>ST_Intersects()</code>, <code>ST_Contains()</code>, &hellip;) is so easy it is not something you get particularly excited&nbsp;about.</p>
 <p>Today I faced a bit more interesting task: <strong>given two polygon layers, get me all the polygons from layer A such that they lie across the polygons from layer B and&hellip; a picture worth a thousand words,&nbsp;right?</strong></p>
-<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/finding-polygons-lying-across-other-polygons-with-postgis/polygons.svg" /></div>
+<div class="text-center"><img data-echo="/posts/assets/finding-polygons-lying-across-other-polygons-with-postgis/polygons.svg" /></div>
 
 <p>I hope you got the idea, it is fairly&nbsp;simple:</p>
 <ol>
@@ -379,5 +379,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NW8R37N"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
+<script src="https://www.zimmi.cz/posts/theme/js/echo.min.js"></script>
+<script>
+echo.init({
+  offset: 200,
+  throttle: 250,
+  unload: false
+});
+</script>
 </body>
 </html>

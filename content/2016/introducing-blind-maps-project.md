@@ -7,7 +7,7 @@ I'd like to introduce you to my little pet project, which might just as well be 
 
 It's a very simple, yet useful web application built on top of the great [Leaflet](../../tag/leaflet.html) library meant to help you get to know our world a bit better. As the name suggests, the app shows you, well&hellip; a blind map, and you try to fill as many features as you can.
 
-<div class="text-center"><img src="{filename}/assets/introducing-blind-maps-project/map.png" /></div>
+<div class="text-center"><img data-echo="/posts/assets/introducing-blind-maps-project/map.png" /></div>
 
 The app is ready and can be used:
 

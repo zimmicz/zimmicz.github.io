@@ -3,7 +3,7 @@ Date: 2016-4-9 9:10
 Tags: spatial, visualization
 Category: space
 
-I've been sort of living in Brno for the last 7 years (college included). It's quite a hilly city, with lots of cars, very good public transportation system and ever-improving cycling infrastructure. All these years I was using trams, buses and trolleybuses to get myself from one place to another. 
+I've been sort of living in Brno for the last 7 years (college included). It's quite a hilly city, with lots of cars, very good public transportation system and ever-improving cycling infrastructure. All these years I was using trams, buses and trolleybuses to get myself from one place to another.
 
 These are all great, because:
 
@@ -21,9 +21,9 @@ These all suck, because:
 
 My period card expired on March 8 and I decided not to renew it. Why? See the list above. As I don't have a car and I work at the far end of the city, I can either ride a bike or run to work. Ask me how it's been for the first month? Not bad at all.
 
-<div class="text-center"><a href="{filename}/assets/a-month-of-commuting-on-my-own/training_calendar.png"><img src="{filename}/assets/a-month-of-commuting-on-my-own/training_calendar_small.png" title="Strava training log" class="img-rounded"></a><p><strong>Figure:</strong> March Strava log.</p></div>
+<div class="text-center"><a href="{filename}/assets/a-month-of-commuting-on-my-own/training_calendar.png"><img data-echo="/posts/assets/a-month-of-commuting-on-my-own/training_calendar_small.png" title="Strava training log" class="img-rounded"></a><p><strong>Figure:</strong> March Strava log.</p></div>
 
-<div class="text-center"><a href="{filename}/assets/a-month-of-commuting-on-my-own/training_calendar2.png"><img src="{filename}/assets/a-month-of-commuting-on-my-own/training_calendar_small2.png" title="Strava training log" class="img-rounded"></a><p><strong>Figure:</strong> April Strava log.</p></div>
+<div class="text-center"><a href="{filename}/assets/a-month-of-commuting-on-my-own/training_calendar2.png"><img data-echo="/posts/assets/a-month-of-commuting-on-my-own/training_calendar_small2.png" title="Strava training log" class="img-rounded"></a><p><strong>Figure:</strong> April Strava log.</p></div>
 
 ## What's so great about commuting?
 
@@ -51,7 +51,7 @@ As a by-product I started to care more about what I eat and when I eat it. I act
 
 ## Does it tell you something about your city?
 
-I guess the city you see on foot or from atop a saddle is completely different than the one seen from a bus or a car. 
+I guess the city you see on foot or from atop a saddle is completely different than the one seen from a bus or a car.
 
 Is it rather car or bike friendly? Do you feel at risk riding a bike or running? Is it faster to run/ride or drive? Does your city actually want you to leave your car at home at all, or has it been designed for cars?
 

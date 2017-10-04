@@ -15,7 +15,7 @@
   <meta property="og:title" content="WMTS: Few Things I Want To Remember" />
   <meta property="og:description" content="Used to serve prepared rectangular tiles; this means you are limited by web server speed rather than map server speed Several ways to retrieve tiles are defined: KVP and REST are mandatory, SOAP is optional Does not allow layer combination; additional..." />
   <meta property="og:url" content="https://www.zimmi.cz/posts/2014/wmts-few-things-i-want-to-remember/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?1ec62741">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?ba1d4c76">
 </head>
 <body>
     <nav role="navigation">
@@ -67,7 +67,7 @@
 <li><code>tileMatrixMaxX = tileMatrixMinX + tileSpanX × matrixWidth;</code></li>
 <li><code>tileMatrixMinY = tileMatrixMaxY - tileSpanY × matrixHeight;</code></li>
 </ul>
-<p><img src="https://www.zimmi.cz/posts/assets/wmts-few-things-i-want-to-remember/wmts.png" title="WMTS tiling schema" class="img-responsive centered"></p>
+<p><img data-echo="/posts/assets/wmts-few-things-i-want-to-remember/wmts.png" title="WMTS tiling schema" class="img-responsive centered"></p>
 <aside>
 <h3>More reading</h3>
 <ul>
@@ -139,5 +139,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NW8R37N"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
+<script src="https://www.zimmi.cz/posts/theme/js/echo.min.js"></script>
+<script>
+echo.init({
+  offset: 200,
+  throttle: 250,
+  unload: false
+});
+</script>
 </body>
 </html>

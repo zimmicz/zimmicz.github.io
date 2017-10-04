@@ -240,7 +240,7 @@ LINE &lt;span class="m"&gt;2&lt;/span&gt;: &lt;span class="m"&gt;1111&lt;/span&g
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/postgresql-development-history-revealed-with-postgresql/plot1.png"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/postgresql-development-history-revealed-with-postgresql/plot1.png"/&gt;&lt;/div&gt;
 
 &lt;h2&gt;The most verbose docs in each&amp;nbsp;version&lt;/h2&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt; &lt;span class="k"&gt;DISTINCT&lt;/span&gt; &lt;span class="k"&gt;ON&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;version&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
@@ -368,7 +368,7 @@ LINE &lt;span class="m"&gt;2&lt;/span&gt;: &lt;span class="m"&gt;1111&lt;/span&g
 
 
 &lt;p&gt;Something&amp;#8217;s going on in an upcoming 10.0&amp;nbsp;version.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/postgresql-development-history-revealed-with-postgresql/plot2.png"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/postgresql-development-history-revealed-with-postgresql/plot2.png"/&gt;&lt;/div&gt;
 
 &lt;p&gt;All the data was obtained with the following Python script and processed inside the PostgreSQL database. Plots done with &lt;a href="http://bokeh.pydata.org/en/latest/"&gt;Bokeh&lt;/a&gt;, though I probably wouldn&amp;#8217;t use it again, the docs site is absurdly sluggish and the info is just all over the&amp;nbsp;place.&lt;/p&gt;
 &lt;script src="https://gist.github.com/zimmicz/f69a5ce5d3cf3a220e171553c35e0391.js"&gt;&lt;/script&gt;</content><category term="postgresql"></category><category term="python"></category></entry><entry><title>PostGIS as a Mapbox Vector Tiles generator</title><link href="https://www.zimmi.cz/posts/2017/postgis-as-a-mapbox-vector-tiles-generator/" rel="alternate"></link><published>2017-08-06T18:00:00+02:00</published><updated>2017-08-06T18:00:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-08-06:/posts/2017/postgis-as-a-mapbox-vector-tiles-generator/</id><summary type="html">&lt;p&gt;&lt;a href="http://postgis.net/2017/08/05/postgis-2.4.0alpha/"&gt;PostGIS 2.4.0&lt;/a&gt; was released recently bringing the possibilities to generate &lt;strong&gt;Mapbox Vector Tiles&lt;/strong&gt; without any third party tools. I got a shot at it with Node.js and docker. Even if it&amp;#8217;s not as straightforward as solely using &lt;a href="https://postgis.net/docs/manual-dev/ST_AsMVT.html"&gt;ST_AsMVT&lt;/a&gt;, it still looks pretty&amp;nbsp;great.&lt;/p&gt;
@@ -435,7 +435,7 @@ su - postgres -c &lt;span class="s2"&gt;&amp;quot;psql -c \&amp;quot;CREATE EXTE
 &lt;p&gt;I got a cadastre area dataset of the Czech Republic for testing, which contains ~ 13,000 polygons. The geometries should come in Web Mercator a.k.a. &lt;span class="caps"&gt;EPSG&lt;/span&gt;:3857 to work with &lt;a href="https://www.mapbox.com/vector-tiles/specification/"&gt;&lt;span class="caps"&gt;MVT&lt;/span&gt;&lt;/a&gt;.&lt;/p&gt;
 &lt;h2&gt;Vector&amp;nbsp;tiles&lt;/h2&gt;
 &lt;p&gt;I got a bit confused by the docs of &lt;a href="https://postgis.net/docs/manual-dev/ST_AsMVT.html"&gt;ST_AsMVT&lt;/a&gt; and &lt;a href="https://postgis.net/docs/manual-dev/ST_AsMVTGeom.html"&gt;ST_AsMVTGeom&lt;/a&gt;. Especially the latter one took me a few hours to get it right. What is essential (I guess) about Mapbox Vector Tiles is that you have to abstract from the real world coordinates and start thinking inside the tile coordinates. What PostGIS does with &lt;code&gt;ST_AsMVTGeom&lt;/code&gt; (and what any other &lt;span class="caps"&gt;MVT&lt;/span&gt; implemenation should do for you) is that it takes real world coordinates and put them inside a&amp;nbsp;tile.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/postgis-as-a-mapbox-vector-tiles-generator/mvt.gif"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/postgis-as-a-mapbox-vector-tiles-generator/mvt.gif"/&gt;&lt;/div&gt;
 
 &lt;p&gt;To make this work, you need to know every bounding box of every tile on every zoom level in a Web Mercator projection. Or you can use &lt;a href="https://github.com/mapbox/postgis-vt-util/blob/master/src/TileBBox.sql"&gt;TileBBox procedure by Mapbox&lt;/a&gt;, if you&amp;nbsp;wish.&lt;/p&gt;
 &lt;p&gt;The &lt;span class="caps"&gt;SQL&lt;/span&gt; query itself is pretty simple (this comes from an express route I&amp;#8217;ll be discussing&amp;nbsp;shortly).&lt;/p&gt;
@@ -525,7 +525,7 @@ RUN apt install -y gdal-bin
 &lt;p&gt;After the GeoTiff is written to hard drive, &lt;a href="https://www.zimmi.cz/posts/2015/how-to-use-queue-with-rsync/"&gt;inotifywait&lt;/a&gt; can be used to generate overviews. And with ease of calling &lt;code&gt;gdal_polygonize.py&lt;/code&gt; on each of GeoTiffs&amp;hellip;vector layer, at you&amp;nbsp;service.&lt;/p&gt;</content><category term="bash"></category><category term="gdal"></category></entry><entry><title>Mapping North America with QGIS: Tips and Tricks</title><link href="https://www.zimmi.cz/posts/2017/mapping-north-america-with-qgis-tips-and-tricks" rel="alternate"></link><published>2017-05-21T15:30:00+02:00</published><updated>2017-05-21T15:30:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-05-21:/posts/2017/mapping-north-america-with-qgis-tips-and-tricks</id><summary type="html">&lt;p&gt;Recently I&amp;#8217;ve bought a book called &lt;em&gt;Maps&lt;/em&gt; by Aleksandra Mizielinska and Daniel Mizielinski to my nephew. The book&amp;#8217;s absolutely wonderful and made me want to try crafting a map with similar looks. I don&amp;#8217;t do maps much at &lt;a href="https://clevermaps.cz"&gt;CleverMaps&lt;/a&gt;, so this was a great opportunity to find …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Recently I&amp;#8217;ve bought a book called &lt;em&gt;Maps&lt;/em&gt; by Aleksandra Mizielinska and Daniel Mizielinski to my nephew. The book&amp;#8217;s absolutely wonderful and made me want to try crafting a map with similar looks. I don&amp;#8217;t do maps much at &lt;a href="https://clevermaps.cz"&gt;CleverMaps&lt;/a&gt;, so this was a great opportunity to find out what new features became available during the last months of &lt;span class="caps"&gt;QGIS&lt;/span&gt;&amp;nbsp;development.&lt;/p&gt;
 &lt;h2&gt;Result&lt;/h2&gt;
 &lt;p&gt;A map of North America in scale of 1:22,000,000 featuring the biggest lakes, rivers, mountain ranges and basic administrative units for the North American countries. I aimed for visually appealing overview map rather than perfectly correct topographic&amp;nbsp;one.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;a href="https://www.zimmi.cz/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/map.png" title="Click for the full size (3 MB)"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/map.min.png"/&gt;&lt;/a&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;a href="https://www.zimmi.cz/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/map.png" title="Click for the full size (3 MB)"&gt;&lt;img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/map.min.png"/&gt;&lt;/a&gt;&lt;/div&gt;
 
 &lt;h2&gt;Data&lt;/h2&gt;
 &lt;p&gt;I used my beloved &lt;a href="http://www.naturalearthdata.com"&gt;Natural Earth dataset&lt;/a&gt; for both cultural (boundaries, cities) and physical (rivers, lakes) map features. Different scales came to play for different map layers as they seemed a bit too/few simplified for the given&amp;nbsp;scale.&lt;/p&gt;
@@ -537,15 +537,15 @@ RUN apt install -y gdal-bin
 &lt;p&gt;I&amp;#8217;ve used several techniques I find interesting enough to be listed&amp;nbsp;here.&lt;/p&gt;
 &lt;h3&gt;Coastlines&lt;/h3&gt;
 &lt;p&gt;For a long time I&amp;#8217;ve considered coastlines a field for cartographic invention. They can be emphasized by shading or 3D effects. I chose the set of four parallel coastlines subtly disappearing into the sea, hopefully invoking the feeling of waves coming to the&amp;nbsp;shore.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/coastlines.png"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/coastlines.png"/&gt;&lt;/div&gt;
 
 &lt;p&gt;It&amp;#8217;s done by dissolving all the features and buffering them again and&amp;nbsp;again.&lt;/p&gt;
 &lt;h3&gt;Buffered&amp;nbsp;labels&lt;/h3&gt;
 &lt;p&gt;Buffered labels are usually hard to get right, because they fill so much space if the buffer color&amp;#8217;s not corresponding to its surroundings. But choosing the proper color can be a real struggle at&amp;nbsp;times.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/qgis_expressions.png"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/qgis_expressions.png"/&gt;&lt;/div&gt;
 
 &lt;p&gt;On this map, almost all the labels are buffered with the color of its surroundings, which makes them more legible, yet not too expressive. This is possible thanks to &lt;span class="caps"&gt;QGIS&lt;/span&gt; expression based properties that let you define unique styling to different map&amp;nbsp;features.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/buffered_labels.png"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/buffered_labels.png"/&gt;&lt;/div&gt;
 
 &lt;p&gt;Where it isn&amp;#8217;t possible (e.g. Bahamas or Honduras) to choose just one buffer color, the label is not buffered at all (or the semi-transparent white buffer is&amp;nbsp;used).&lt;/p&gt;
 &lt;p&gt;Note the &lt;em&gt;Rocky Mountains&lt;/em&gt; label is split on the borders of the &lt;span class="caps"&gt;U.S.A.&lt;/span&gt; and Canada and its both parts match the background&amp;nbsp;color.&lt;/p&gt;
@@ -553,17 +553,17 @@ RUN apt install -y gdal-bin
 &lt;p&gt;Rivers are tapered based on the Natural Earth&amp;#8217;s width attribute value for each river&amp;nbsp;segment.&lt;/p&gt;
 &lt;h3&gt;Labels in separate&amp;nbsp;layers&lt;/h3&gt;
 &lt;p&gt;I&amp;#8217;m used to put labels into separate layers in more complicated map compositions, especially when you need to draw label along path for areal features (such as countries or&amp;nbsp;states).&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/labels.png"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/labels.png"/&gt;&lt;/div&gt;
 
 &lt;p&gt;It becomes a bit harder to keep the features in sync with the labels though. I&amp;#8217;d like to use only one layer for all the map layers in the future, as I feel that&amp;#8217;s the way to go for the best&amp;nbsp;labeling.&lt;/p&gt;
 &lt;h3&gt;Labels wrapped on&amp;nbsp;character&lt;/h3&gt;
 &lt;p&gt;Some labels just can&amp;#8217;t fit the feature they belong to and &lt;span class="caps"&gt;QGIS&lt;/span&gt; lets you deal with this by wrapping labels on a special character, &lt;code&gt;\&lt;/code&gt; in my&amp;nbsp;case.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/wrapped_labels.png"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/wrapped_labels.png"/&gt;&lt;/div&gt;
 
 &lt;h3&gt;Layer blending&amp;nbsp;mode&lt;/h3&gt;
 &lt;p&gt;The mechanics behind layer blending modes are still a mystery to me, but they can add that little extra to a map very easily. Thanks to the Overlay blending mode, &lt;em&gt;the Rocky Mountains&lt;/em&gt; may remain very subtle on different kinds of&amp;nbsp;background.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/blending_mode.png"/&gt;&lt;/div&gt;</content><category term="qgis"></category><category term="visualization"></category></entry><entry><title>Wifileaks Wi-Fi Networks Dataviz</title><link href="https://www.zimmi.cz/posts/2017/wifileaks-wi-fi-networks-dataviz/" rel="alternate"></link><published>2017-05-02T18:30:00+02:00</published><updated>2017-05-02T18:30:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-05-02:/posts/2017/wifileaks-wi-fi-networks-dataviz/</id><summary type="html">&lt;p&gt;&lt;a href="http://www.wifileaks.cz"&gt;Wifileaks&lt;/a&gt; is a project by Jakub Čížek aimed to map the Czech wi-fi networks with Android/iOS app. The data gathered by people using the app &lt;a href="http://download.wifileaks.cz/data/wifileaks_raw_170416.tar.gz"&gt;is available to download&lt;/a&gt; and features ~&amp;nbsp;90,000,000 records, each representing the position of the cellphone when connecting to the network. Just about …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://www.wifileaks.cz"&gt;Wifileaks&lt;/a&gt; is a project by Jakub Čížek aimed to map the Czech wi-fi networks with Android/iOS app. The data gathered by people using the app &lt;a href="http://download.wifileaks.cz/data/wifileaks_raw_170416.tar.gz"&gt;is available to download&lt;/a&gt; and features ~&amp;nbsp;90,000,000 records, each representing the position of the cellphone when connecting to the network. Just about perfect to craft some&amp;nbsp;maps!&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/cr.png"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/blending_mode.png"/&gt;&lt;/div&gt;</content><category term="qgis"></category><category term="visualization"></category></entry><entry><title>Wifileaks Wi-Fi Networks Dataviz</title><link href="https://www.zimmi.cz/posts/2017/wifileaks-wi-fi-networks-dataviz/" rel="alternate"></link><published>2017-05-02T18:30:00+02:00</published><updated>2017-05-02T18:30:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-05-02:/posts/2017/wifileaks-wi-fi-networks-dataviz/</id><summary type="html">&lt;p&gt;&lt;a href="http://www.wifileaks.cz"&gt;Wifileaks&lt;/a&gt; is a project by Jakub Čížek aimed to map the Czech wi-fi networks with Android/iOS app. The data gathered by people using the app &lt;a href="http://download.wifileaks.cz/data/wifileaks_raw_170416.tar.gz"&gt;is available to download&lt;/a&gt; and features ~&amp;nbsp;90,000,000 records, each representing the position of the cellphone when connecting to the network. Just about …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://www.wifileaks.cz"&gt;Wifileaks&lt;/a&gt; is a project by Jakub Čížek aimed to map the Czech wi-fi networks with Android/iOS app. The data gathered by people using the app &lt;a href="http://download.wifileaks.cz/data/wifileaks_raw_170416.tar.gz"&gt;is available to download&lt;/a&gt; and features ~&amp;nbsp;90,000,000 records, each representing the position of the cellphone when connecting to the network. Just about perfect to craft some&amp;nbsp;maps!&lt;/p&gt;
+&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/cr.png"/&gt;&lt;/div&gt;
 
 &lt;h2&gt;Using PostgreSQL&amp;nbsp;cstore_fdw&lt;/h2&gt;
 &lt;p&gt;I ran out of disk space immediately after loading the dataset into the PostgreSQL database. After fiddling around I remembered that columnar store should be a bit space-friendlier than the old fashioned relational database. Thus, I installed the &lt;a href="https://github.com/citusdata/cstore_fdw"&gt;cstore_fdw&lt;/a&gt; by Citus Data in just few&amp;nbsp;steps.&lt;/p&gt;
@@ -644,14 +644,14 @@ git clone git@github.com:citusdata/cstore_fdw.git
 &lt;h2&gt;Putting the networks on the&amp;nbsp;map&lt;/h2&gt;
 &lt;table&gt;
     &lt;tr&gt;
-        &lt;td&gt;&lt;a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"&gt;&lt;/a&gt;&lt;/td&gt;
-        &lt;td&gt;&lt;a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"&gt;&lt;/a&gt;&lt;/td&gt;
-        &lt;td&gt;&lt;a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"&gt;&lt;img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"&gt;&lt;img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"&gt;&lt;img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"&gt;&lt;/a&gt;&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
-        &lt;td&gt;&lt;a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"&gt;&lt;/a&gt;&lt;/td&gt;
-        &lt;td&gt;&lt;a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"&gt;&lt;/a&gt;&lt;/td&gt;
-        &lt;td&gt;&lt;a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"&gt;&lt;img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"&gt;&lt;img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"&gt;&lt;img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"&gt;&lt;/a&gt;&lt;/td&gt;
     &lt;/tr&gt;
 &lt;/table&gt;
 
@@ -686,7 +686,7 @@ v.in.ogr &lt;span class="nv"&gt;input&lt;/span&gt;&lt;span class="o"&gt;=&lt;/sp
 
 
 &lt;p&gt;I got six different points and the pretty dense road network. Note none of the points is connected to the existing&amp;nbsp;network.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/roads_points.png"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/routing-with-grass-gis-catchment-area-calculation/roads_points.png"/&gt;&lt;/div&gt;
 
 &lt;p&gt;You have to have routable network to do the actual routing (the worst sentence ever written). To do so,&amp;nbsp;let&amp;#8217;s:&lt;/p&gt;
 &lt;ul&gt;
@@ -706,7 +706,7 @@ v.net &lt;span class="nv"&gt;input&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&
 
 
 &lt;p&gt;The algorithm doesn&amp;#8217;t take bridges, tunnels and oneways into account, it&amp;#8217;s capable of doing so&amp;nbsp;though.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/shortest_path.png" width="70%"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/routing-with-grass-gis-catchment-area-calculation/shortest_path.png" width="70%"/&gt;&lt;/div&gt;
 
 &lt;h2&gt;Distributing the subnets for nearest&amp;nbsp;centers&lt;/h2&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;v.net.alloc &lt;span class="nv"&gt;input&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;network_noded &lt;span class="nv"&gt;output&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;network_alloc &lt;span class="nv"&gt;center_cats&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;-6 &lt;span class="nv"&gt;node_layer&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;
@@ -714,7 +714,7 @@ v.net &lt;span class="nv"&gt;input&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&
 
 
 &lt;p&gt;&lt;code&gt;v.net.alloc&lt;/code&gt; module takes the given centers and distributes the network so each of its parts belongs to exactly one center - the nearest one (speaking the distance, time units,&amp;nbsp;&amp;hellip;).&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/subnets.png" width="70%"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/routing-with-grass-gis-catchment-area-calculation/subnets.png" width="70%"/&gt;&lt;/div&gt;
 
 &lt;h2&gt;Creating catchment&amp;nbsp;areas&lt;/h2&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;v.net.iso &lt;span class="nv"&gt;input&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;network_noded &lt;span class="nv"&gt;output&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;network_iso &lt;span class="nv"&gt;center_cats&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;-6 &lt;span class="nv"&gt;costs&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;1000&lt;/span&gt;,3000,5000
@@ -722,10 +722,10 @@ v.net &lt;span class="nv"&gt;input&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&
 
 
 &lt;p&gt;&lt;code&gt;v.net.iso&lt;/code&gt; splits net by cost isolines. Again, the costs might be specified as lengths, time units,&amp;nbsp;&amp;hellip;.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/isolines.png" width="70%"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/routing-with-grass-gis-catchment-area-calculation/isolines.png" width="70%"/&gt;&lt;/div&gt;
 
 &lt;p&gt;Two different ways lead to the actual catchment area creation. First, you extract nodes from the roads with their values, turn them into the raster grid and either extract contours or polygonize the raster. I find the last step suboptimal and would love to find another way of polygonizing the&amp;nbsp;results.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/catchment_area.gif" width="70%"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/routing-with-grass-gis-catchment-area-calculation/catchment_area.gif" width="70%"/&gt;&lt;/div&gt;
 
 &lt;p&gt;Note when extracting contours the interval has to be set to the reasonable number depending on the nodes&amp;nbsp;values.&lt;/p&gt;
 &lt;h2&gt;Remarks&lt;/h2&gt;
@@ -792,7 +792,7 @@ v.net &lt;span class="nv"&gt;input&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&
 
 
 &lt;p&gt;This function creates the &lt;code&gt;cze.roads_noded_vertices_pgr&lt;/code&gt; that contains all the extracted nodes from the&amp;nbsp;network.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/routing-with-pgrouting-catchment-area-calculation/nodes.png" width="70%" /&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/routing-with-pgrouting-catchment-area-calculation/nodes.png" width="70%" /&gt;&lt;/div&gt;
 
 &lt;p&gt;As already mentioned, measures other than length can be used as a distance, I chose the time to get to a given node on&amp;nbsp;foot.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;ALTER&lt;/span&gt; &lt;span class="k"&gt;TABLE&lt;/span&gt; &lt;span class="n"&gt;cze&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;roads_noded&lt;/span&gt; &lt;span class="k"&gt;ADD&lt;/span&gt; &lt;span class="k"&gt;COLUMN&lt;/span&gt; &lt;span class="n"&gt;cost_minutes&lt;/span&gt; &lt;span class="nb"&gt;integer&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
@@ -851,7 +851,7 @@ v.net &lt;span class="nv"&gt;input&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&
 
 
 &lt;p&gt;Using &lt;code&gt;pgr_pointsAsPolygon&lt;/code&gt; renders resulting nodes accessible in 10-minute walk in polygons, but weird looking ones. Not bad, could be better&amp;nbsp;though.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/routing-with-pgrouting-catchment-area-calculation/area1.png" width="70%" /&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img data-echo="{filename}/assets/routing-with-pgrouting-catchment-area-calculation/area1.png" width="70%" /&gt;&lt;/div&gt;
 
 &lt;p&gt;How about seeing only nodes instead of&amp;nbsp;polygons?&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt;
@@ -868,7 +868,7 @@ v.net &lt;span class="nv"&gt;input&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&
 
 
 &lt;p&gt;Looks good, could be better&amp;nbsp;though.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png" width="70%" /&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img data-echo="{filename}/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png" width="70%" /&gt;&lt;/div&gt;
 
 &lt;p&gt;How about creating concave hulls from the extracted&amp;nbsp;nodes?&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt;
@@ -880,7 +880,7 @@ v.net &lt;span class="nv"&gt;input&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&
         &lt;span class="n"&gt;ST_PointN&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;geom&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;geom&lt;/span&gt;
     &lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
         &lt;span class="k"&gt;SELECT&lt;/span&gt;
-            &lt;span class="n"&gt;agg_cost&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;div&lt;/span&gt; &lt;span class="k"&gt;class&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;text-center&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;img&lt;/span&gt; &lt;span class="n"&gt;src&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;{filename}/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png&amp;quot;&lt;/span&gt; &lt;span class="n"&gt;width&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;70%&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;/&amp;gt;&amp;lt;/&lt;/span&gt;&lt;span class="n"&gt;div&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+            &lt;span class="n"&gt;agg_cost&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;div&lt;/span&gt; &lt;span class="k"&gt;class&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;text-center&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;img&lt;/span&gt; &lt;span class="k"&gt;data&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;echo&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;{filename}/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png&amp;quot;&lt;/span&gt; &lt;span class="n"&gt;width&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;70%&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;/&amp;gt;&amp;lt;/&lt;/span&gt;&lt;span class="n"&gt;div&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
             &lt;span class="n"&gt;ST_ExteriorRing&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="n"&gt;ST_Dump&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;geom&lt;/span&gt;&lt;span class="p"&gt;)).&lt;/span&gt;&lt;span class="n"&gt;geom&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;geom&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
             &lt;span class="n"&gt;generate_series&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;ST_NumPoints&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ST_ExteriorRing&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="n"&gt;ST_Dump&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;geom&lt;/span&gt;&lt;span class="p"&gt;)).&lt;/span&gt;&lt;span class="n"&gt;geom&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;
         &lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="n"&gt;tmp&lt;/span&gt;
@@ -892,7 +892,7 @@ v.net &lt;span class="nv"&gt;input&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&
 
 
 &lt;p&gt;This one looks the best I&amp;nbsp;guess.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/routing-with-pgrouting-catchment-area-calculation/area2.png" width="70%" /&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img data-echo="{filename}/assets/routing-with-pgrouting-catchment-area-calculation/area2.png" width="70%" /&gt;&lt;/div&gt;
 
 &lt;h2&gt;Remarks&lt;/h2&gt;
 &lt;ul&gt;
@@ -1037,7 +1037,7 @@ Running this script will delete the old cluster&lt;span class="err"&gt;&amp;#39;
 &lt;p&gt;Brilliant.&lt;/p&gt;</content><category term="sql"></category><category term="postgresql"></category></entry><entry><title>Subdivide and Conquer: Effective Spatial Indexes in PostGIS</title><link href="https://www.zimmi.cz/posts/2017/subdivide-and-conquer-effective-spatial-indexes-in-postgis/" rel="alternate"></link><published>2017-01-10T21:45:00+01:00</published><updated>2017-01-10T21:45:00+01:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-01-10:/posts/2017/subdivide-and-conquer-effective-spatial-indexes-in-postgis/</id><summary type="html">&lt;p&gt;Spatial indexes are absolutely crucial part of any spatial database and - as I tend to say quite often - only a fool would try to query spatial data without building spatial indexes&amp;nbsp;beforehand.&lt;/p&gt;
 &lt;p&gt;Spatial indexes are based on bounding box comparisons, which are generally very fast. Yet, there are situations when …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Spatial indexes are absolutely crucial part of any spatial database and - as I tend to say quite often - only a fool would try to query spatial data without building spatial indexes&amp;nbsp;beforehand.&lt;/p&gt;
 &lt;p&gt;Spatial indexes are based on bounding box comparisons, which are generally very fast. Yet, there are situations when spatial indexes don&amp;#8217;t help much (or they don&amp;#8217;t help as much as they could, if you&amp;nbsp;wish).&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/subdivide-and-conquer-effective-spatial-indexes-in-postgis/index.svg" /&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/subdivide-and-conquer-effective-spatial-indexes-in-postgis/index.svg" /&gt;&lt;/div&gt;
 
 &lt;p&gt;Bounding box comparisons are effective with lots of small bounding boxes rather then few large ones. Why? See the picture above. The curved line (imagine it&amp;#8217;s a pipeline for example) clearly demonstrates when the spatial index/bounding box comparison might fall short of what you&amp;#8217;d&amp;nbsp;expect.&lt;/p&gt;
 &lt;p&gt;Once the bounding box gets really big, it intersects so many other geometries&amp;#8217; bounding boxes that the whole comparison starts to slow&amp;nbsp;down.&lt;/p&gt;
@@ -1125,7 +1125,7 @@ Running this script will delete the old cluster&lt;span class="err"&gt;&amp;#39;
 &lt;h2&gt;Data&amp;nbsp;vizualization&lt;/h2&gt;
 &lt;p&gt;Those of you who&amp;#8217;ve been following this series know all the data are set and ready to be used. The rest of you, &lt;em&gt;shame on you by the way&lt;/em&gt;, can go through the above posts to catch&amp;nbsp;up.&lt;/p&gt;
 &lt;p&gt;The result is available at &lt;a href="https://www.zimmi.cz/kn-landuse-monitor"&gt;https://www.zimmi.cz/kn-landuse-monitor&lt;/a&gt; and works like the gif&amp;nbsp;below.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/plotting-the-czech-cadastre-land-use-with-d3-part-iv/screen.gif" /&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/plotting-the-czech-cadastre-land-use-with-d3-part-iv/screen.gif" /&gt;&lt;/div&gt;
 
 &lt;h3&gt;Features&lt;/h3&gt;
 &lt;ul&gt;
@@ -1434,7 +1434,7 @@ rm &lt;span class="nv"&gt;$CSVFILE&lt;/span&gt; &lt;span class="nv"&gt;$CSVUTF8F
 &lt;p&gt;See &lt;a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/"&gt;Plotting the Czech Cadastre Land Use with d3: Data Transformation (part &lt;span class="caps"&gt;III&lt;/span&gt;)&lt;/a&gt;.&lt;/p&gt;</content><category term="javascript"></category><category term="d3"></category><category term="postgresql"></category><category term="svg"></category></entry><entry><title>Introducing Blind Maps Project</title><link href="https://www.zimmi.cz/posts/2016/introducing-blind-maps-project/" rel="alternate"></link><published>2016-11-02T18:30:00+01:00</published><updated>2016-11-02T18:30:00+01:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2016-11-02:/posts/2016/introducing-blind-maps-project/</id><summary type="html">&lt;p&gt;I&amp;#8217;d like to introduce you to my little pet project, which might just as well be awarded &lt;em&gt;the first pet project I&amp;#8217;ve ever completed&lt;/em&gt;, called &lt;a href="https://www.zimmi.cz/blind-maps"&gt;Blind maps&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;It&amp;#8217;s a very simple, yet useful web application built on top of the great &lt;a href="../../tag/leaflet.html"&gt;Leaflet&lt;/a&gt; library meant to help you …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I&amp;#8217;d like to introduce you to my little pet project, which might just as well be awarded &lt;em&gt;the first pet project I&amp;#8217;ve ever completed&lt;/em&gt;, called &lt;a href="https://www.zimmi.cz/blind-maps"&gt;Blind maps&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;It&amp;#8217;s a very simple, yet useful web application built on top of the great &lt;a href="../../tag/leaflet.html"&gt;Leaflet&lt;/a&gt; library meant to help you get to know our world a bit better. As the name suggests, the app shows you, well&amp;hellip; a blind map, and you try to fill as many features as you&amp;nbsp;can.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/introducing-blind-maps-project/map.png" /&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/introducing-blind-maps-project/map.png" /&gt;&lt;/div&gt;
 
 &lt;p&gt;The app is ready and can be&amp;nbsp;used:&lt;/p&gt;
 &lt;ul&gt;
@@ -1500,7 +1500,7 @@ rm &lt;span class="nv"&gt;$CSVFILE&lt;/span&gt; &lt;span class="nv"&gt;$CSVUTF8F
 
 &lt;p&gt;The result can be piped to other &lt;code&gt;bash&lt;/code&gt; functions, such as &lt;code&gt;less&lt;/code&gt; or &lt;code&gt;more&lt;/code&gt;. I call it &lt;code&gt;ogrinfotable&lt;/code&gt;.&lt;/p&gt;</content><category term="gdal"></category></entry><entry><title>PostGIS Custom Function to Create Wind Rose</title><link href="https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-wind-rose/" rel="alternate"></link><published>2016-09-01T22:00:00+02:00</published><updated>2016-09-01T22:00:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2016-09-01:/posts/2016/postgis-custom-function-to-create-wind-rose/</id><summary type="html">&lt;p&gt;I&amp;#8217;ve come across the &lt;a href="http://gis.stackexchange.com/questions/208797/draw-wind-rose-with-qgis-from-postgis/"&gt;beautiful &lt;span class="caps"&gt;GIS&lt;/span&gt; StackExchange question&lt;/a&gt; recently, asking how to draw a &lt;a href="https://en.wikipedia.org/wiki/Wind_rose"&gt;wind rose&lt;/a&gt; within&amp;nbsp;PostGIS.&lt;/p&gt;
 &lt;div class="text-center"&gt;
-&lt;img src="http://i.stack.imgur.com/0xAMU.png"&gt;
+&lt;img data-echo="http://i.stack.imgur.com/0xAMU.png"&gt;
 &lt;/div&gt;
 
 &lt;p&gt;It&amp;#8217;s pretty easy to accomplish this with a custom &lt;span class="caps"&gt;PLPGSQL&lt;/span&gt; procedure below, that takes line geometry, number of sections and radius of the inner circle as&amp;nbsp;parameters.&lt;/p&gt;
@@ -1508,7 +1508,7 @@ rm &lt;span class="nv"&gt;$CSVFILE&lt;/span&gt; &lt;span class="nv"&gt;$CSVUTF8F
 
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;CREATE&lt;/span&gt; &lt;span class="k"&gt;OR&lt;/span&gt; &lt;span class="k"&gt;REPLACE …&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;I&amp;#8217;ve come across the &lt;a href="http://gis.stackexchange.com/questions/208797/draw-wind-rose-with-qgis-from-postgis/"&gt;beautiful &lt;span class="caps"&gt;GIS&lt;/span&gt; StackExchange question&lt;/a&gt; recently, asking how to draw a &lt;a href="https://en.wikipedia.org/wiki/Wind_rose"&gt;wind rose&lt;/a&gt; within&amp;nbsp;PostGIS.&lt;/p&gt;
 &lt;div class="text-center"&gt;
-&lt;img src="http://i.stack.imgur.com/0xAMU.png"&gt;
+&lt;img data-echo="http://i.stack.imgur.com/0xAMU.png"&gt;
 &lt;/div&gt;
 
 &lt;p&gt;It&amp;#8217;s pretty easy to accomplish this with a custom &lt;span class="caps"&gt;PLPGSQL&lt;/span&gt; procedure below, that takes line geometry, number of sections and radius of the inner circle as&amp;nbsp;parameters.&lt;/p&gt;
@@ -1562,7 +1562,7 @@ rm &lt;span class="nv"&gt;$CSVFILE&lt;/span&gt; &lt;span class="nv"&gt;$CSVUTF8F
 
 &lt;p&gt;Wind rose created with this function might look like the one&amp;nbsp;below.&lt;/p&gt;
 &lt;div class="text-center"&gt;
-&lt;img src="http://i.stack.imgur.com/4OD0J.png"&gt;
+&lt;img data-echo="http://i.stack.imgur.com/4OD0J.png"&gt;
 &lt;/div&gt;
 
 &lt;p&gt;Run it as follows. The &lt;code&gt;line&lt;/code&gt; parameter should be a simple straight line made of just two&amp;nbsp;vertices.&lt;/p&gt;
@@ -1601,7 +1601,7 @@ rm &lt;span class="nv"&gt;$CSVFILE&lt;/span&gt; &lt;span class="nv"&gt;$CSVUTF8F
 &lt;/pre&gt;&lt;/div&gt;</content><category term="postgis"></category><category term="postgresql"></category><category term="sql"></category></entry><entry><title>Finding Polygons Lying across Other Polygons with PostGIS</title><link href="https://www.zimmi.cz/posts/2016/finding-polygons-lying-across-other-polygons-with-postgis/" rel="alternate"></link><published>2016-08-05T19:39:00+02:00</published><updated>2016-08-05T19:39:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2016-08-05:/posts/2016/finding-polygons-lying-across-other-polygons-with-postgis/</id><summary type="html">&lt;p&gt;Doing overlays (&lt;code&gt;ST_Intersection()&lt;/code&gt;) in PostGIS based on spatial relationships (&lt;code&gt;ST_Intersects()&lt;/code&gt;, &lt;code&gt;ST_Contains()&lt;/code&gt;, &amp;hellip;) is so easy it is not something you get particularly excited&amp;nbsp;about.&lt;/p&gt;
 &lt;p&gt;Today I faced a bit more interesting task: &lt;strong&gt;given two polygon layers, get me all the polygons from layer A such that they lie across the polygons …&lt;/strong&gt;&lt;/p&gt;</summary><content type="html">&lt;p&gt;Doing overlays (&lt;code&gt;ST_Intersection()&lt;/code&gt;) in PostGIS based on spatial relationships (&lt;code&gt;ST_Intersects()&lt;/code&gt;, &lt;code&gt;ST_Contains()&lt;/code&gt;, &amp;hellip;) is so easy it is not something you get particularly excited&amp;nbsp;about.&lt;/p&gt;
 &lt;p&gt;Today I faced a bit more interesting task: &lt;strong&gt;given two polygon layers, get me all the polygons from layer A such that they lie across the polygons from layer B and&amp;hellip; a picture worth a thousand words,&amp;nbsp;right?&lt;/strong&gt;&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/finding-polygons-lying-across-other-polygons-with-postgis/polygons.svg" /&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/finding-polygons-lying-across-other-polygons-with-postgis/polygons.svg" /&gt;&lt;/div&gt;
 
 &lt;p&gt;I hope you got the idea, it is fairly&amp;nbsp;simple:&lt;/p&gt;
 &lt;ol&gt;
@@ -1890,7 +1890,7 @@ OPTIONS (LAYER &amp;#39;A05_Vodni_nadrze&amp;#39;);
 &lt;li&gt;foreign tables mean no constraints nor&amp;nbsp;indices&lt;/li&gt;
 &lt;li&gt;no indices mean spatial queries are terribly slow compared to&amp;nbsp;PostGIS&lt;/li&gt;
 &lt;li&gt;I like the idea of &lt;code&gt;CREATE UNLOGGED TABLE dams2 AS SELECT * FROM dams&lt;/code&gt;, not sure what to use it for&amp;nbsp;though&lt;/li&gt;
-&lt;/ul&gt;</content><category term="postgresql"></category><category term="gdal"></category></entry><entry><title>A Month of Commuting on My Own</title><link href="https://www.zimmi.cz/posts/2016/a-month-of-commuting-on-my-own/" rel="alternate"></link><published>2016-04-09T09:10:00+02:00</published><updated>2016-04-09T09:10:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2016-04-09:/posts/2016/a-month-of-commuting-on-my-own/</id><summary type="html">&lt;p&gt;I&amp;#8217;ve been sort of living in Brno for the last 7 years (college included). It&amp;#8217;s quite a hilly city, with lots of cars, very good public transportation system and ever-improving cycling infrastructure. All these years I was using trams, buses and trolleybuses to get myself from one place …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I&amp;#8217;ve been sort of living in Brno for the last 7 years (college included). It&amp;#8217;s quite a hilly city, with lots of cars, very good public transportation system and ever-improving cycling infrastructure. All these years I was using trams, buses and trolleybuses to get myself from one place to&amp;nbsp;another. &lt;/p&gt;
+&lt;/ul&gt;</content><category term="postgresql"></category><category term="gdal"></category></entry><entry><title>A Month of Commuting on My Own</title><link href="https://www.zimmi.cz/posts/2016/a-month-of-commuting-on-my-own/" rel="alternate"></link><published>2016-04-09T09:10:00+02:00</published><updated>2016-04-09T09:10:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2016-04-09:/posts/2016/a-month-of-commuting-on-my-own/</id><summary type="html">&lt;p&gt;I&amp;#8217;ve been sort of living in Brno for the last 7 years (college included). It&amp;#8217;s quite a hilly city, with lots of cars, very good public transportation system and ever-improving cycling infrastructure. All these years I was using trams, buses and trolleybuses to get myself from one place …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I&amp;#8217;ve been sort of living in Brno for the last 7 years (college included). It&amp;#8217;s quite a hilly city, with lots of cars, very good public transportation system and ever-improving cycling infrastructure. All these years I was using trams, buses and trolleybuses to get myself from one place to&amp;nbsp;another.&lt;/p&gt;
 &lt;p&gt;These are all great,&amp;nbsp;because:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;you can read while you&amp;nbsp;ride&lt;/li&gt;
@@ -1906,9 +1906,9 @@ OPTIONS (LAYER &amp;#39;A05_Vodni_nadrze&amp;#39;);
 &lt;li&gt;they&amp;#8217;re&amp;nbsp;crowded&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;My period card expired on March 8 and I decided not to renew it. Why? See the list above. As I don&amp;#8217;t have a car and I work at the far end of the city, I can either ride a bike or run to work. Ask me how it&amp;#8217;s been for the first month? Not bad at&amp;nbsp;all.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;a href="https://www.zimmi.cz/posts/assets/a-month-of-commuting-on-my-own/training_calendar.png"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/a-month-of-commuting-on-my-own/training_calendar_small.png" title="Strava training log" class="img-rounded"&gt;&lt;/a&gt;&lt;p&gt;&lt;strong&gt;Figure:&lt;/strong&gt; March Strava&amp;nbsp;log.&lt;/p&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;a href="https://www.zimmi.cz/posts/assets/a-month-of-commuting-on-my-own/training_calendar.png"&gt;&lt;img data-echo="/posts/assets/a-month-of-commuting-on-my-own/training_calendar_small.png" title="Strava training log" class="img-rounded"&gt;&lt;/a&gt;&lt;p&gt;&lt;strong&gt;Figure:&lt;/strong&gt; March Strava&amp;nbsp;log.&lt;/p&gt;&lt;/div&gt;
 
-&lt;div class="text-center"&gt;&lt;a href="https://www.zimmi.cz/posts/assets/a-month-of-commuting-on-my-own/training_calendar2.png"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/a-month-of-commuting-on-my-own/training_calendar_small2.png" title="Strava training log" class="img-rounded"&gt;&lt;/a&gt;&lt;p&gt;&lt;strong&gt;Figure:&lt;/strong&gt; April Strava&amp;nbsp;log.&lt;/p&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;a href="https://www.zimmi.cz/posts/assets/a-month-of-commuting-on-my-own/training_calendar2.png"&gt;&lt;img data-echo="/posts/assets/a-month-of-commuting-on-my-own/training_calendar_small2.png" title="Strava training log" class="img-rounded"&gt;&lt;/a&gt;&lt;p&gt;&lt;strong&gt;Figure:&lt;/strong&gt; April Strava&amp;nbsp;log.&lt;/p&gt;&lt;/div&gt;
 
 &lt;h2&gt;What&amp;#8217;s so great about&amp;nbsp;commuting?&lt;/h2&gt;
 &lt;p&gt;Not so long ago &lt;em&gt;I considered commuting a waste of time&lt;/em&gt;. It took me 40-50 minutes to get to work and about the same to get back home. That&amp;#8217;s 1-2 hours not being productive, not doing anything at all actually, just changing&amp;nbsp;places.&lt;/p&gt;
@@ -1924,7 +1924,7 @@ OPTIONS (LAYER &amp;#39;A05_Vodni_nadrze&amp;#39;);
 &lt;p&gt;&lt;strong&gt;Other cyclists, skaters, people walking their dogs, little kids&lt;/strong&gt; usually don&amp;#8217;t care about you at all. You better don&amp;#8217;t get distracted if you want to get home safe and&amp;nbsp;sound.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Books are hard to read&lt;/strong&gt; on the&amp;nbsp;bike.&lt;/p&gt;
 &lt;h2&gt;Does it tell you something about your&amp;nbsp;city?&lt;/h2&gt;
-&lt;p&gt;I guess the city you see on foot or from atop a saddle is completely different than the one seen from a bus or a&amp;nbsp;car. &lt;/p&gt;
+&lt;p&gt;I guess the city you see on foot or from atop a saddle is completely different than the one seen from a bus or a&amp;nbsp;car.&lt;/p&gt;
 &lt;p&gt;Is it rather car or bike friendly? Do you feel at risk riding a bike or running? Is it faster to run/ride or drive? Does your city actually want you to leave your car at home at all, or has it been designed for&amp;nbsp;cars?&lt;/p&gt;
 &lt;p&gt;River seems to be blessing when your city has one (unless flood strikes, different story). &lt;a href="https://goo.gl/maps/T6wMLSCFzZU2"&gt;If done right&lt;/a&gt;, its shores might become one of the most beautiful parts of the city. Something Brno needs to catch up with other&amp;nbsp;cities.&lt;/p&gt;
 &lt;p&gt;I hope one day I&amp;#8217;ll get up and see Brno changing in front of me. &lt;a href="http://www.fastcoexist.com/3058685/paris-is-redesigning-its-major-intersections-for-pedestrians-not-cars"&gt;Just like Paris is right now.&lt;/a&gt; We all die in the end, so why not to take a walk before we&amp;nbsp;do?&lt;/p&gt;</content><category term="spatial"></category><category term="visualization"></category></entry><entry><title>Do You Really Need Gulp? Or Grunt? Or Bower? Or What?</title><link href="https://www.zimmi.cz/posts/2016/do-you-really-need-gulp-or-grunt-or-bower-or-what/" rel="alternate"></link><published>2016-03-20T19:15:00+01:00</published><updated>2016-03-20T19:15:00+01:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2016-03-20:/posts/2016/do-you-really-need-gulp-or-grunt-or-bower-or-what/</id><summary type="html">&lt;p&gt;&lt;strong&gt;Disclaimer:&lt;/strong&gt; I&amp;#8217;m an enthuastic developer, but I do not code for a living. I&amp;#8217;m just the ordinary guy who keeps editing a wrong file wondering why &lt;em&gt;the heck&lt;/em&gt; the changes are not being&amp;nbsp;applied.&lt;/p&gt;
@@ -2183,7 +2183,7 @@ psql &lt;span class="nv"&gt;$DATABASE&lt;/span&gt; &lt;span class="s"&gt;&amp;lt
 
 
 &lt;p&gt;With this piece of code you get a map key with checkboxes for all the categories, yet they&amp;#8217;re still kept in the single cluster on the map.&amp;nbsp;Brilliant!&lt;/p&gt;
-&lt;p&gt;&lt;img src="https://www.zimmi.cz/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/map.png" title="vozejkmap.cz data map" class="img-responsive centered"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img data-echo="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/map.png" title="vozejkmap.cz data map" class="img-responsive centered"&gt;&lt;/p&gt;
 &lt;h2&gt;Using Turf.js for&amp;nbsp;analysis&lt;/h2&gt;
 &lt;p&gt;Turf is one of those libraries I get amazed easily with, spending a week trying to find a use case, finally putting it aside with &lt;em&gt;&amp;#8220;I&amp;#8217;ll get back to it later&amp;#8221;&lt;/em&gt;. I usually don&amp;#8217;t. This time it&amp;#8217;s&amp;nbsp;different.&lt;/p&gt;
 &lt;p&gt;I use Turf to get the nearest neighbor for any marker on click. My first try ended up with the same marker being the result as it was a member of a feature collection passed to &lt;code&gt;turf.nearest()&lt;/code&gt; method. After snooping around the docs I found &lt;code&gt;turf.remove()&lt;/code&gt; method that can filter GeoJSON based on key-value&amp;nbsp;pair.&lt;/p&gt;
@@ -2214,11 +2214,11 @@ psql &lt;span class="nv"&gt;$DATABASE&lt;/span&gt; &lt;span class="s"&gt;&amp;lt
 &lt;p&gt;From what I&amp;#8217;ve tried so far, Turf seems to be incredibly fast and easy to use. I&amp;#8217;ll try to find the nearest point for any of the categories, that could take Turf some&amp;nbsp;time.&lt;/p&gt;
 &lt;h2&gt;Update&lt;/h2&gt;
 &lt;p&gt;Turf is blazing fast! I&amp;#8217;ve implemented nearest point for each of the categories and it gets done in a blink of an eye. Some screenshots below. Geolocation implemented as&amp;nbsp;well.&lt;/p&gt;
-&lt;p&gt;&lt;img src="https://www.zimmi.cz/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen1.png" title="vozejkmap.cz data map" class="img-responsive centered"&gt; You can locate the point&amp;nbsp;easily.&lt;/p&gt;
+&lt;p&gt;&lt;img data-echo="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen1.png" title="vozejkmap.cz data map" class="img-responsive centered"&gt; You can locate the point&amp;nbsp;easily.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="https://www.zimmi.cz/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen2.png" title="vozejkmap.cz data map" class="img-responsive centered"&gt; You can hide the&amp;nbsp;infobox.&lt;/p&gt;
+&lt;p&gt;&lt;img data-echo="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen2.png" title="vozejkmap.cz data map" class="img-responsive centered"&gt; You can hide the&amp;nbsp;infobox.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="https://www.zimmi.cz/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen3.png" title="vozejkmap.cz data map" class="img-responsive centered"&gt;You can jump to any of the nearest&amp;nbsp;places.&lt;/p&gt;</content><category term="postgresql"></category><category term="postgis"></category><category term="leaflet"></category><category term="javascript"></category></entry><entry><title>Twitter REST API Data Mining on OpenShift (Part I)</title><link href="https://www.zimmi.cz/posts/2015/twitter-rest-api-data-mining-on-openshift-part-i/" rel="alternate"></link><published>2015-11-06T22:00:00+01:00</published><updated>2015-11-06T22:00:00+01:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2015-11-06:/posts/2015/twitter-rest-api-data-mining-on-openshift-part-i/</id><summary type="html">&lt;p&gt;More than a year ago I wrote about &lt;a href="http://www.zimmi.cz/posts/2014/analyzing-twitter-languages-with-streaming-api/"&gt;analyzing Twitter languages with Streaming &lt;span class="caps"&gt;API&lt;/span&gt;&lt;/a&gt;. Back then I kept my laptop running for a week to download data. Not a comfortable way, especially if you decide to get more data. One year uptime doesn&amp;#8217;t sound like anything you want to …&lt;/p&gt;</summary><content type="html">&lt;p&gt;More than a year ago I wrote about &lt;a href="http://www.zimmi.cz/posts/2014/analyzing-twitter-languages-with-streaming-api/"&gt;analyzing Twitter languages with Streaming &lt;span class="caps"&gt;API&lt;/span&gt;&lt;/a&gt;. Back then I kept my laptop running for a week to download data. Not a comfortable way, especially if you decide to get more data. One year uptime doesn&amp;#8217;t sound like anything you want to be part of. &lt;a href="https://www.openshift.com/"&gt;OpenShift&lt;/a&gt; by Red Hat seems to be almost perfect replacement.&amp;nbsp;Almost.&lt;/p&gt;
+&lt;p&gt;&lt;img data-echo="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen3.png" title="vozejkmap.cz data map" class="img-responsive centered"&gt;You can jump to any of the nearest&amp;nbsp;places.&lt;/p&gt;</content><category term="postgresql"></category><category term="postgis"></category><category term="leaflet"></category><category term="javascript"></category></entry><entry><title>Twitter REST API Data Mining on OpenShift (Part I)</title><link href="https://www.zimmi.cz/posts/2015/twitter-rest-api-data-mining-on-openshift-part-i/" rel="alternate"></link><published>2015-11-06T22:00:00+01:00</published><updated>2015-11-06T22:00:00+01:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2015-11-06:/posts/2015/twitter-rest-api-data-mining-on-openshift-part-i/</id><summary type="html">&lt;p&gt;More than a year ago I wrote about &lt;a href="http://www.zimmi.cz/posts/2014/analyzing-twitter-languages-with-streaming-api/"&gt;analyzing Twitter languages with Streaming &lt;span class="caps"&gt;API&lt;/span&gt;&lt;/a&gt;. Back then I kept my laptop running for a week to download data. Not a comfortable way, especially if you decide to get more data. One year uptime doesn&amp;#8217;t sound like anything you want to …&lt;/p&gt;</summary><content type="html">&lt;p&gt;More than a year ago I wrote about &lt;a href="http://www.zimmi.cz/posts/2014/analyzing-twitter-languages-with-streaming-api/"&gt;analyzing Twitter languages with Streaming &lt;span class="caps"&gt;API&lt;/span&gt;&lt;/a&gt;. Back then I kept my laptop running for a week to download data. Not a comfortable way, especially if you decide to get more data. One year uptime doesn&amp;#8217;t sound like anything you want to be part of. &lt;a href="https://www.openshift.com/"&gt;OpenShift&lt;/a&gt; by Red Hat seems to be almost perfect replacement.&amp;nbsp;Almost.&lt;/p&gt;
 &lt;h2&gt;OpenShift&amp;nbsp;setup&lt;/h2&gt;
 &lt;p&gt;I started with Node.js application running on one small gear. Once running, you can easily &lt;code&gt;git push&lt;/code&gt; the code to your OpenShift repo and login via &lt;span class="caps"&gt;SSH&lt;/span&gt;. I quickly found simple copy-pasting my local solution wasn&amp;#8217;t going to work. and fixed it with some minor tweaks. That&amp;#8217;s where the fun&amp;nbsp;begins&amp;#8230;&lt;/p&gt;
 &lt;blockquote&gt;
@@ -2856,11 +2856,11 @@ gdalwarp -dstalpha -s_srs &lt;span class="s1"&gt;&amp;#39;EPSG:5514&amp;#39;&lt;
 &lt;p&gt;Using this multiple times for each user-specific layer is a great time&amp;nbsp;saver.&lt;/p&gt;
 &lt;h2&gt;Adjust attribute table to fit your&amp;nbsp;needs&lt;/h2&gt;
 &lt;p&gt;&lt;span class="caps"&gt;QGIS&lt;/span&gt; attribute table has so many settings you probably don&amp;#8217;t use on daily basis and yet they might be invaluable in such project. All of them are available from layer properties under the Fields&amp;nbsp;tab.&lt;/p&gt;
-&lt;p class='text-center'&gt;&lt;img src="https://www.zimmi.cz/posts/assets/qgis-tips-for-collaborative-mapping/hidden.png" width=50% class="img-responsive centered"&gt;&lt;/p&gt;
+&lt;p class='text-center'&gt;&lt;img data-echo="/posts/assets/qgis-tips-for-collaborative-mapping/hidden.png" width=50% class="img-responsive centered"&gt;&lt;/p&gt;
 
 &lt;p&gt;Sadly, our PostGIS layers are very wide in terms of column count. Not all of the columns are to be edited or even seen by operators, so it might be a good idea to hide them by setting their Edit Widget to Hidden. Those that should be seen, but not edited, might be set as not editable by unchecking that&amp;nbsp;option.&lt;/p&gt;
 &lt;p&gt;Lots of our attributes use enumerations provided by our project partner as &lt;span class="caps"&gt;CSV&lt;/span&gt; files. We use them in &lt;span class="caps"&gt;QGIS&lt;/span&gt; as value maps, so operators don&amp;#8217;t have to type them manually - we both make their work easier and eliminate mistakes they&amp;nbsp;made.&lt;/p&gt;
-&lt;p class='text-center'&gt;&lt;img src="https://www.zimmi.cz/posts/assets/qgis-tips-for-collaborative-mapping/valuemap.png" width=50% class="img-responsive centered"&gt;&lt;/p&gt;
+&lt;p class='text-center'&gt;&lt;img data-echo="/posts/assets/qgis-tips-for-collaborative-mapping/valuemap.png" width=50% class="img-responsive centered"&gt;&lt;/p&gt;
 
 &lt;p&gt;Note &lt;span class="caps"&gt;QGIS&lt;/span&gt; swallows the first row of the given &lt;span class="caps"&gt;CSV&lt;/span&gt; file as if it was a header. Don&amp;#8217;t forget about this when creating your own enumerations. Once set, operators will see a friendly combo box instead of a hostile blank input in the attribute&amp;nbsp;table.&lt;/p&gt;
 &lt;p&gt;These are just small adjustments that can make a big difference in your &lt;span class="caps"&gt;QGIS&lt;/span&gt;&amp;nbsp;workflow.&lt;/p&gt;</content><category term="qgis"></category></entry><entry><title>SSH GRASS Processing Status Check</title><link href="https://www.zimmi.cz/posts/2015/ssh-grass-processing-status-check/" rel="alternate"></link><published>2015-07-21T07:51:00+02:00</published><updated>2015-07-21T07:51:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2015-07-21:/posts/2015/ssh-grass-processing-status-check/</id><summary type="html">&lt;p&gt;I&amp;#8217;ve been running some &lt;span class="caps"&gt;GRASS&lt;/span&gt;/PostGIS computations on a remote server that were taking hours to finish. Once in a while I checked for their state by issuing &lt;code&gt;tail log_XX.log&lt;/code&gt; from my laptop to see if they were ready yet. It suddenly became pretty annoying to check five …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I&amp;#8217;ve been running some &lt;span class="caps"&gt;GRASS&lt;/span&gt;/PostGIS computations on a remote server that were taking hours to finish. Once in a while I checked for their state by issuing &lt;code&gt;tail log_XX.log&lt;/code&gt; from my laptop to see if they were ready yet. It suddenly became pretty annoying to check five different logs every ten&amp;nbsp;minutes.&lt;/p&gt;
@@ -3211,7 +3211,7 @@ COPY test2 (id, wkb_geometry) FROM stdin;
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;&lt;img src="https://www.zimmi.cz/posts/assets/postgis-count-line-self-intersections/lines.png" title="Self-intersecting lines" class="img-responsive centered"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img data-echo="/posts/assets/postgis-count-line-self-intersections/lines.png" title="Self-intersecting lines" class="img-responsive centered"&gt;&lt;/p&gt;
 &lt;p&gt;Note that those geometries are valid while not being simple, thus, &lt;code&gt;ST_IsValidReason()&lt;/code&gt; wouldn&amp;#8217;t help much. What if we compared it to their single counterparts? Those would have had vertices at intersections. Once you know the original number of vertices and the number of simple geometry vertices, it is fairly easy to subtract those&amp;nbsp;two.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;WITH noded AS (
 SELECT id, COUNT(id)
@@ -3690,7 +3690,7 @@ FROM vozejkmap AS lg ) AS f
 &lt;h2&gt;Leaflet&amp;nbsp;map&lt;/h2&gt;
 &lt;p&gt;Map JavaScript is rather simple with ~30 lines of code (not taking styles into account). Thanks to the great plugins it is easy to show ~7,600 points on the map real&amp;nbsp;quick.&lt;/p&gt;
 &lt;p&gt;I didn&amp;#8217;t do much customization apart from styling markers and binding&amp;nbsp;popups.&lt;/p&gt;
-&lt;p&gt;&lt;img src="https://www.zimmi.cz/posts/assets/postgis-case-study-vozejkmap-open-data-part-ii/map.png" title="vozejkmap.cz data map" class="img-responsive centered"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img data-echo="/posts/assets/postgis-case-study-vozejkmap-open-data-part-ii/map.png" title="vozejkmap.cz data map" class="img-responsive centered"&gt;&lt;/p&gt;
 &lt;h2&gt;What&amp;#8217;s&amp;nbsp;next&lt;/h2&gt;
 &lt;ol&gt;
 &lt;li&gt;&lt;a href="http://turfjs.org"&gt;Turf&lt;/a&gt; which means I need to think of what could be fun to do with this&amp;nbsp;data&lt;/li&gt;
@@ -4150,7 +4150,7 @@ for ($i = 0; $i &amp;lt; $size; $i++) {
 &lt;li&gt;&lt;code&gt;tileMatrixMaxX = tileMatrixMinX + tileSpanX × matrixWidth;&lt;/code&gt;&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;tileMatrixMinY = tileMatrixMaxY - tileSpanY × matrixHeight;&lt;/code&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;&lt;img src="https://www.zimmi.cz/posts/assets/wmts-few-things-i-want-to-remember/wmts.png" title="WMTS tiling schema" class="img-responsive centered"&gt;&lt;/p&gt;</content><category term="ogc"></category><category term="wmts"></category></entry><entry><title>Degrees To Decimal With Javascript</title><link href="https://www.zimmi.cz/posts/2014/degrees-to-decimal-with-javascript/" rel="alternate"></link><published>2014-09-09T20:28:00+02:00</published><updated>2014-09-09T20:28:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2014-09-09:/posts/2014/degrees-to-decimal-with-javascript/</id><summary type="html">&lt;p&gt;I have found a nice way to get decimal value from degrees of longitude and latitude&amp;nbsp;recently:&lt;/p&gt;
+&lt;p&gt;&lt;img data-echo="/posts/assets/wmts-few-things-i-want-to-remember/wmts.png" title="WMTS tiling schema" class="img-responsive centered"&gt;&lt;/p&gt;</content><category term="ogc"></category><category term="wmts"></category></entry><entry><title>Degrees To Decimal With Javascript</title><link href="https://www.zimmi.cz/posts/2014/degrees-to-decimal-with-javascript/" rel="alternate"></link><published>2014-09-09T20:28:00+02:00</published><updated>2014-09-09T20:28:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2014-09-09:/posts/2014/degrees-to-decimal-with-javascript/</id><summary type="html">&lt;p&gt;I have found a nice way to get decimal value from degrees of longitude and latitude&amp;nbsp;recently:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="nx"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;coords&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
     &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;decimal&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
         &lt;span class="nx"&gt;output&lt;/span&gt;  &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[],&lt;/span&gt;
@@ -4265,7 +4265,7 @@ for ($i = 0; $i &amp;lt; $size; $i++) {
 
 &lt;p&gt;I decided to throw away the tweets with the empty &lt;code&gt;coordinates&lt;/code&gt; field, because the accuracy of the value specified in the place field can be generally considered very low and insufficient for my purposes. You still need to account for position inaccuracies of users&amp;#8217; devices though, however that is not something that we can deal with. &lt;em&gt;Let us just assume that geotagged tweets are&amp;nbsp;accurate.&lt;/em&gt;&lt;/p&gt;
 
-&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/analyzing-twitter-languages-with-streaming-api/cr.png" width="50%" height="50%" title="Geotagged tweets" class="img-rounded"&gt;&lt;p&gt;&lt;strong&gt;Figure:&lt;/strong&gt; Twitter seems not to be very accurate when matching tweets against bounding&amp;nbsp;box.&lt;/p&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/analyzing-twitter-languages-with-streaming-api/cr.png" width="50%" height="50%" title="Geotagged tweets" class="img-rounded"&gt;&lt;p&gt;&lt;strong&gt;Figure:&lt;/strong&gt; Twitter seems not to be very accurate when matching tweets against bounding&amp;nbsp;box.&lt;/p&gt;&lt;/div&gt;
 
 &lt;p&gt;Although, as you can see in the picture, they are not. Or they are, but Twitter is not good at telling so. Besides that, none of the countries in the world is shaped like a rectangle and we would need to clip the data anyway. That is where SQLite comes in, because I have been saving incoming tweets right into the&amp;nbsp;database.&lt;/p&gt;
 
@@ -4289,7 +4289,7 @@ for ($i = 0; $i &amp;lt; $size; $i++) {
 
 &lt;p&gt;I am definitely willing to share the &lt;abbr title="Do not expect much, it was my first time with node.js"&gt;code&lt;/abbr&gt; and the final viz. Meanwhile, you can have a look at the screenshot on picture [*]. I have already implemented nationality switch (legend items are clickable) and I would like to add a day/night switch to see whether there are any differences between the peoples&amp;#8217;&amp;nbsp;behaviour. &lt;/p&gt;
 
-&lt;div class="text-center"&gt;&lt;img width="60%" height="60%" src="https://www.zimmi.cz/posts/assets/analyzing-twitter-languages-with-streaming-api/screenshot.png" title="Final geoviz using Leaflet" class="img-rounded"&gt;&lt;p&gt;&lt;strong&gt;Figure:&lt;/strong&gt; Final map screenshot. A legend is used to turn nationalities on and off. You are looking at Prague by the&amp;nbsp;way.&lt;/p&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img width="60%" height="60%" data-echo="/posts/assets/analyzing-twitter-languages-with-streaming-api/screenshot.png" title="Final geoviz using Leaflet" class="img-rounded"&gt;&lt;p&gt;&lt;strong&gt;Figure:&lt;/strong&gt; Final map screenshot. A legend is used to turn nationalities on and off. You are looking at Prague by the&amp;nbsp;way.&lt;/p&gt;&lt;/div&gt;
 
 &lt;p&gt;Obviously the most tweets were sent from the most populated places, e.g. Prague, Brno,&amp;nbsp;Ostrava. &lt;/p&gt;</content><category term="javascript"></category><category term="leaflet"></category><category term="twitter"></category></entry><entry><title>Going 3D With Space Time Cube</title><link href="https://www.zimmi.cz/posts/2014/going-3d-with-space-time-cube/" rel="alternate"></link><published>2014-09-02T17:35:00+02:00</published><updated>2014-09-02T17:35:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2014-09-02:/posts/2014/going-3d-with-space-time-cube/</id><summary type="html">&lt;p&gt;Seeing &lt;a href="http://anitagraser.com/2012/08/05/space-time-cubes-exploring-twitter-streams-3/"&gt;Anita&amp;#8217;s space-time cube&lt;/a&gt; back in 2013 was a moment of &lt;em&gt;woooow&lt;/em&gt; for me. I&amp;#8217;ve been interested in unusual ways of displaying data ever since I started studying &lt;span class="caps"&gt;GIS&lt;/span&gt; and this one was just great. &lt;em&gt;How the hell did she make it?!&lt;/em&gt;, I thought back&amp;nbsp;then.&lt;/p&gt;
 
@@ -4423,7 +4423,7 @@ y = map(time, first, last, 0, 500)
 z = map(lat, 16.59971950210866964, 63.68835804244784526, 0, height)
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;&lt;img src="http://www.processing.org/tutorials/p3d/imgs/coordinatesystem.png" title="Processing coordinate system" class="img-rounded pull-left"&gt;They define how coordinates inside the cube should be computed. As you see, &lt;code&gt;x&lt;/code&gt; is the result of mapping longitudinal extent of our area to the width of cube, the same happens to &lt;code&gt;z&lt;/code&gt; and latitude, and to &lt;code&gt;y&lt;/code&gt; (but here we map time, not&amp;nbsp;coordinates).&lt;/p&gt;
+&lt;p&gt;&lt;img data-echo="http://www.processing.org/tutorials/p3d/imgs/coordinatesystem.png" title="Processing coordinate system" class="img-rounded pull-left"&gt;They define how coordinates inside the cube should be computed. As you see, &lt;code&gt;x&lt;/code&gt; is the result of mapping longitudinal extent of our area to the width of cube, the same happens to &lt;code&gt;z&lt;/code&gt; and latitude, and to &lt;code&gt;y&lt;/code&gt; (but here we map time, not&amp;nbsp;coordinates).&lt;/p&gt;
 
 &lt;p&gt;The bounding box used in those computations is the bounding box of the basemap. Interesting thing about Processing and its 3D environment is how it defines the beginning of the coordinate system. As you can see on the left, it might be slighty different from what you could expect. That&amp;#8217;s what you need to be careful&amp;nbsp;about.&lt;/p&gt;
 
@@ -4442,11 +4442,11 @@ z = map(lat, 16.59971950210866964, 63.68835804244784526, 0, height)
 
 &lt;h3&gt;My first&amp;nbsp;control&lt;/h3&gt;
 
-&lt;p&gt;&lt;img src="https://www.zimmi.cz/posts/assets/leaflet-chmi-radar-control/google_maps.png" title="Google maps layer control" class="left"&gt;Modularity is one of the things I like the most about Leaflet. I was struggling with creating checkboxes used to toggle layers in Google Maps app, it comes ready with Leaflet. Adding a control to the map is easy as piece of cake, you do &lt;a href="http://leafletjs.com/reference.html#icontrol"&gt;&lt;code&gt;L.Control.extend({)}&lt;/code&gt;&lt;/a&gt; and that&amp;#8217;s it (almost). Since the map displays animated radar images showing the precipitation that occurred during last three hours or so I thought it would be great implementing this as a control: a button used to toggle the animation on/off and displaying the time currently shown image was created&amp;nbsp;at.&lt;/p&gt;
+&lt;p&gt;&lt;img data-echo="/posts/assets/leaflet-chmi-radar-control/google_maps.png" title="Google maps layer control" class="left"&gt;Modularity is one of the things I like the most about Leaflet. I was struggling with creating checkboxes used to toggle layers in Google Maps app, it comes ready with Leaflet. Adding a control to the map is easy as piece of cake, you do &lt;a href="http://leafletjs.com/reference.html#icontrol"&gt;&lt;code&gt;L.Control.extend({)}&lt;/code&gt;&lt;/a&gt; and that&amp;#8217;s it (almost). Since the map displays animated radar images showing the precipitation that occurred during last three hours or so I thought it would be great implementing this as a control: a button used to toggle the animation on/off and displaying the time currently shown image was created&amp;nbsp;at.&lt;/p&gt;
 
 &lt;p&gt;The image on the left side displays the old solution using Google Maps. It was using a lot of &lt;span class="caps"&gt;DOM&lt;/span&gt; manipulation, was quite hard to maintain and definitely not eye-candy. When the animation was turned on, another control popped up in the map&amp;#8217;s top left corner displaying the time the image was taken at. The animation toggle (&lt;em&gt;srážkový radar&lt;/em&gt;) was incorporated into the layer control. I decided to take it out and make it a separate feature of the&amp;nbsp;map.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="https://www.zimmi.cz/posts/assets/leaflet-chmi-radar-control/control.png" title="Leaflet radar control" class="right"&gt;You can see the result in the image below. The control is a simple button with the radar icon displaying the time when active. It is only useful for the Czech Republic and is highly dependent on the image provider (&lt;abbr title="Czech Hydrometeorogical Institute"&gt;&lt;span class="caps"&gt;CHMI&lt;/span&gt;&lt;/abbr&gt;), which means that if the &lt;span class="caps"&gt;URL&lt;/span&gt; of the images was to be changed, the whole control would&amp;nbsp;break.&lt;/p&gt;
+&lt;p&gt;&lt;img data-echo="/posts/assets/leaflet-chmi-radar-control/control.png" title="Leaflet radar control" class="right"&gt;You can see the result in the image below. The control is a simple button with the radar icon displaying the time when active. It is only useful for the Czech Republic and is highly dependent on the image provider (&lt;abbr title="Czech Hydrometeorogical Institute"&gt;&lt;span class="caps"&gt;CHMI&lt;/span&gt;&lt;/abbr&gt;), which means that if the &lt;span class="caps"&gt;URL&lt;/span&gt; of the images was to be changed, the whole control would&amp;nbsp;break.&lt;/p&gt;
 
 &lt;p&gt;You can&lt;a href="https://www.zimmi.cz/posts/assets/leaflet-chmi-radar-control/radarcontrol.zip"&gt; grab the code if you like&lt;/a&gt;. You add the control to the map as any other&amp;nbsp;control:&lt;/p&gt;
 

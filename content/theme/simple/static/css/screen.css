@@ -304,12 +304,14 @@ td {
 }
 
 img.left {
+  float: left;
   padding-bottom: .5rem;
   padding-right: .5rem;
   padding-top: .5rem;
 }
 
 img.right {
+  float: right;
   padding-bottom: .5rem;
   padding-left: .5rem;
   padding-top: .5rem;

@@ -7,7 +7,7 @@ Spatial indexes are absolutely crucial part of any spatial database and - as I t
 
 Spatial indexes are based on bounding box comparisons, which are generally very fast. Yet, there are situations when spatial indexes don't help much (or they don't help as much as they could, if you wish).
 
-<div class="text-center"><img src="{filename}/assets/subdivide-and-conquer-effective-spatial-indexes-in-postgis/index.svg" /></div>
+<div class="text-center"><img data-echo="/posts/assets/subdivide-and-conquer-effective-spatial-indexes-in-postgis/index.svg" /></div>
 
 Bounding box comparisons are effective with lots of small bounding boxes rather then few large ones. Why? See the picture above. The curved line (imagine it's a pipeline for example) clearly demonstrates when the spatial index/bounding box comparison might fall short of what you'd expect.
 

@@ -15,7 +15,7 @@ Those of you who've been following this series know all the data are set and rea
 
 The result is available at [https://www.zimmi.cz/kn-landuse-monitor](https://www.zimmi.cz/kn-landuse-monitor) and works like the gif below.
 
-<div class="text-center"><img src="{filename}/assets/plotting-the-czech-cadastre-land-use-with-d3-part-iv/screen.gif" /></div>
+<div class="text-center"><img data-echo="/posts/assets/plotting-the-czech-cadastre-land-use-with-d3-part-iv/screen.gif" /></div>
 
 ### Features
 

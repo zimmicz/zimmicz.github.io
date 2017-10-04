@@ -6,7 +6,7 @@ Image: https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/brno.pn
 
 [Wifileaks](http://www.wifileaks.cz) is a project by Jakub Čížek aimed to map the Czech wi-fi networks with Android/iOS app. The data gathered by people using the app [is available to download](http://download.wifileaks.cz/data/wifileaks_raw_170416.tar.gz) and features ~&nbsp;90,000,000 records, each representing the position of the cellphone when connecting to the network. Just about perfect to craft some maps!
 
-<div class="text-center"><img src="{filename}/assets/wifileaks-wifi-networks-dataviz/cr.png"/></div>
+<div class="text-center"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/cr.png"/></div>
 
 ## Using PostgreSQL cstore_fdw
 
@@ -89,14 +89,14 @@ To overcome these shortcomings I used `COPY` statement to spit out the slightly 
 
 <table>
     <tr>
-        <td><a href="{filename}/assets/wifileaks-wifi-networks-dataviz/brno.png"><img src="{filename}/assets/wifileaks-wifi-networks-dataviz/brno.png"></a></td>
-        <td><a href="{filename}/assets/wifileaks-wifi-networks-dataviz/praha.png"><img src="{filename}/assets/wifileaks-wifi-networks-dataviz/praha.png"></a></td>
-        <td><a href="{filename}/assets/wifileaks-wifi-networks-dataviz/olomouc.png"><img src="{filename}/assets/wifileaks-wifi-networks-dataviz/olomouc.png"></a></td>
+        <td><a href="{filename}/assets/wifileaks-wifi-networks-dataviz/brno.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"></a></td>
+        <td><a href="{filename}/assets/wifileaks-wifi-networks-dataviz/praha.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"></a></td>
+        <td><a href="{filename}/assets/wifileaks-wifi-networks-dataviz/olomouc.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"></a></td>
     </tr>
     <tr>
-        <td><a href="{filename}/assets/wifileaks-wifi-networks-dataviz/plzen.png"><img src="{filename}/assets/wifileaks-wifi-networks-dataviz/plzen.png"></a></td>
-        <td><a href="{filename}/assets/wifileaks-wifi-networks-dataviz/ostrava.png"><img src="{filename}/assets/wifileaks-wifi-networks-dataviz/ostrava.png"></a></td>
-        <td><a href="{filename}/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"><img src="{filename}/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"></a></td>
+        <td><a href="{filename}/assets/wifileaks-wifi-networks-dataviz/plzen.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"></a></td>
+        <td><a href="{filename}/assets/wifileaks-wifi-networks-dataviz/ostrava.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"></a></td>
+        <td><a href="{filename}/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"></a></td>
     </tr>
 </table>
 

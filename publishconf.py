@@ -18,7 +18,7 @@ FEED_ALL_ATOM = 'atom.xml'
 CATEGORY_FEED_ATOM = None
 FEED_ALL_RSS = 'feed.xml'
 OUTPUT_PATH = 'posts/'
-DELETE_OUTPUT_DIRECTORY = True
+DELETE_OUTPUT_DIRECTORY = False
 TYPOGRIFY = True
 
 # Following items are often useful when publishing
@@ -29,3 +29,7 @@ GOOGLE_ANALYTICS = True
 PLUGIN_PATHS = ['content/pelican-plugins']
 PLUGINS = ['neighbors', 'assets', 'optimize_images']
 
+CACHE_CONTENT = True
+LOAD_CONTENT_CACHE = True
+CACHE_PATH = 'cache'
+CHECK_MODIFIED_METHOD = 'mtime'

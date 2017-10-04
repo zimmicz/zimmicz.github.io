@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 AUTHOR = u'Michal Zimmermann'
 SITENAME = u'Michal Zimmermann'
 SITESUBTITLE = u'Pieces of knowledge from the world of GIS.'
-SITEURL = ''
+SITEURL = 'http://localhost:8000'
 OUTPUT_PATH = 'posts/'
 PATH = 'content'
 THEME = 'content/theme/simple'

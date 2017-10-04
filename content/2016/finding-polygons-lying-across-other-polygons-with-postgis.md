@@ -7,7 +7,7 @@ Doing overlays (`ST_Intersection()`) in PostGIS based on spatial relationships (
 
 Today I faced a bit more interesting task: **given two polygon layers, get me all the polygons from layer A such that they lie across the polygons from layer B and&hellip; a picture worth a thousand words, right?**
 
-<div class="text-center"><img src="{filename}/assets/finding-polygons-lying-across-other-polygons-with-postgis/polygons.svg" /></div>
+<div class="text-center"><img data-echo="/posts/assets/finding-polygons-lying-across-other-polygons-with-postgis/polygons.svg" /></div>
 
 I hope you got the idea, it is fairly simple:
 
