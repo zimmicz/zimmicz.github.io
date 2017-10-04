@@ -111,14 +111,14 @@ git clone git@github.com:citusdata/cstore_fdw.git
 <h2>Putting the networks on the&nbsp;map</h2>
 <table>
     <tr>
-        <td><a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"></a></td>
-        <td><a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"></a></td>
-        <td><a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"></a></td>
+        <td><a href="{filename}/assets/wifileaks-wifi-networks-dataviz/brno.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"></a></td>
+        <td><a href="{filename}/assets/wifileaks-wifi-networks-dataviz/praha.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"></a></td>
+        <td><a href="{filename}/assets/wifileaks-wifi-networks-dataviz/olomouc.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"></a></td>
     </tr>
     <tr>
-        <td><a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"></a></td>
-        <td><a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"></a></td>
-        <td><a href="https://www.zimmi.cz/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"></a></td>
+        <td><a href="{filename}/assets/wifileaks-wifi-networks-dataviz/plzen.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"></a></td>
+        <td><a href="{filename}/assets/wifileaks-wifi-networks-dataviz/ostrava.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"></a></td>
+        <td><a href="{filename}/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"></a></td>
     </tr>
 </table>
 
@@ -333,7 +333,7 @@ v.net <span class="nv">input</span><span class="o">=</span>network <span class="
 
 
 <p>Using <code>pgr_pointsAsPolygon</code> renders resulting nodes accessible in 10-minute walk in polygons, but weird looking ones. Not bad, could be better&nbsp;though.</p>
-<div class="text-center"><img data-echo="{filename}/assets/routing-with-pgrouting-catchment-area-calculation/area1.png" width="70%" /></div>
+<div class="text-center"><img data-echo="/assets/routing-with-pgrouting-catchment-area-calculation/area1.png" width="70%" /></div>
 
 <p>How about seeing only nodes instead of&nbsp;polygons?</p>
 <div class="highlight"><pre><span></span><span class="k">SELECT</span>
@@ -350,7 +350,7 @@ v.net <span class="nv">input</span><span class="o">=</span>network <span class="
 
 
 <p>Looks good, could be better&nbsp;though.</p>
-<div class="text-center"><img data-echo="{filename}/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png" width="70%" /></div>
+<div class="text-center"><img data-echo="/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png" width="70%" /></div>
 
 <p>How about creating concave hulls from the extracted&nbsp;nodes?</p>
 <div class="highlight"><pre><span></span><span class="k">SELECT</span>
@@ -362,7 +362,7 @@ v.net <span class="nv">input</span><span class="o">=</span>network <span class="
         <span class="n">ST_PointN</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="n">geom</span>
     <span class="k">FROM</span> <span class="p">(</span>
         <span class="k">SELECT</span>
-            <span class="n">agg_cost</span><span class="p">,</span><span class="o">&lt;</span><span class="n">div</span> <span class="k">class</span><span class="o">=</span><span class="ss">&quot;text-center&quot;</span><span class="o">&gt;&lt;</span><span class="n">img</span> <span class="k">data</span><span class="o">-</span><span class="n">echo</span><span class="o">=</span><span class="ss">&quot;{filename}/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png&quot;</span> <span class="n">width</span><span class="o">=</span><span class="ss">&quot;70%&quot;</span> <span class="o">/&gt;&lt;/</span><span class="n">div</span><span class="o">&gt;</span>
+            <span class="n">agg_cost</span><span class="p">,</span>
             <span class="n">ST_ExteriorRing</span><span class="p">((</span><span class="n">ST_Dump</span><span class="p">(</span><span class="n">geom</span><span class="p">)).</span><span class="n">geom</span><span class="p">)</span> <span class="n">geom</span><span class="p">,</span>
             <span class="n">generate_series</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">ST_NumPoints</span><span class="p">(</span><span class="n">ST_ExteriorRing</span><span class="p">((</span><span class="n">ST_Dump</span><span class="p">(</span><span class="n">geom</span><span class="p">)).</span><span class="n">geom</span><span class="p">)))</span> <span class="n">i</span>
         <span class="k">FROM</span> <span class="n">tmp</span>
@@ -374,7 +374,7 @@ v.net <span class="nv">input</span><span class="o">=</span>network <span class="
 
 
 <p>This one looks the best I&nbsp;guess.</p>
-<div class="text-center"><img data-echo="{filename}/assets/routing-with-pgrouting-catchment-area-calculation/area2.png" width="70%" /></div>
+<div class="text-center"><img data-echo="/assets/routing-with-pgrouting-catchment-area-calculation/area2.png" width="70%" /></div>
 
 <h2>Remarks</h2>
 <ul>

@@ -250,7 +250,7 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
 
 
 <p>Using <code>pgr_pointsAsPolygon</code> renders resulting nodes accessible in 10-minute walk in polygons, but weird looking ones. Not bad, could be better&nbsp;though.</p>
-<div class="text-center"><img data-echo="{filename}/assets/routing-with-pgrouting-catchment-area-calculation/area1.png" width="70%" /></div>
+<div class="text-center"><img data-echo="/assets/routing-with-pgrouting-catchment-area-calculation/area1.png" width="70%" /></div>
 
 <p>How about seeing only nodes instead of&nbsp;polygons?</p>
 <div class="highlight"><pre><span></span><span class="k">SELECT</span>
@@ -267,7 +267,7 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
 
 
 <p>Looks good, could be better&nbsp;though.</p>
-<div class="text-center"><img data-echo="{filename}/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png" width="70%" /></div>
+<div class="text-center"><img data-echo="/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png" width="70%" /></div>
 
 <p>How about creating concave hulls from the extracted&nbsp;nodes?</p>
 <div class="highlight"><pre><span></span><span class="k">SELECT</span>
@@ -279,7 +279,7 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
         <span class="n">ST_PointN</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="n">geom</span>
     <span class="k">FROM</span> <span class="p">(</span>
         <span class="k">SELECT</span>
-            <span class="n">agg_cost</span><span class="p">,</span><span class="o">&lt;</span><span class="n">div</span> <span class="k">class</span><span class="o">=</span><span class="ss">&quot;text-center&quot;</span><span class="o">&gt;&lt;</span><span class="n">img</span> <span class="k">data</span><span class="o">-</span><span class="n">echo</span><span class="o">=</span><span class="ss">&quot;{filename}/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png&quot;</span> <span class="n">width</span><span class="o">=</span><span class="ss">&quot;70%&quot;</span> <span class="o">/&gt;&lt;/</span><span class="n">div</span><span class="o">&gt;</span>
+            <span class="n">agg_cost</span><span class="p">,</span>
             <span class="n">ST_ExteriorRing</span><span class="p">((</span><span class="n">ST_Dump</span><span class="p">(</span><span class="n">geom</span><span class="p">)).</span><span class="n">geom</span><span class="p">)</span> <span class="n">geom</span><span class="p">,</span>
             <span class="n">generate_series</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">ST_NumPoints</span><span class="p">(</span><span class="n">ST_ExteriorRing</span><span class="p">((</span><span class="n">ST_Dump</span><span class="p">(</span><span class="n">geom</span><span class="p">)).</span><span class="n">geom</span><span class="p">)))</span> <span class="n">i</span>
         <span class="k">FROM</span> <span class="n">tmp</span>
@@ -291,7 +291,7 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
 
 
 <p>This one looks the best I&nbsp;guess.</p>
-<div class="text-center"><img data-echo="{filename}/assets/routing-with-pgrouting-catchment-area-calculation/area2.png" width="70%" /></div>
+<div class="text-center"><img data-echo="/assets/routing-with-pgrouting-catchment-area-calculation/area2.png" width="70%" /></div>
 
 <h2>Remarks</h2>
 <ul>

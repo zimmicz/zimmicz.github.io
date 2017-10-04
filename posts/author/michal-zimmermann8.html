@@ -47,7 +47,7 @@ unrar dem.rar -d copernicus
 
 
 <p>And here comes the&nbsp;Alps.</p>
-<p class="text-center"><img title="Hillshade" src="https://www.zimmi.cz/posts/assets/color-relief-shaded-map-using-open-data-and-open-source-software/hillshade.png" class="center"></p>
+<p class="text-center"><img title="Hillshade" src="{filename}/assets/color-relief-shaded-map-using-open-data-and-open-source-software/hillshade.png" class="center"></p>
 
 <p>To create a color relief you need a ramp of heights with colors. <a href="http://cartographicperspectives.org/index.php/journal/article/viewFile/20/70">&#8220;The Development and Rationale of Cross-blended Hypsometric Tints&#8221;</a> by T. Patterson and B. Jenny is a great read on <strong>hypsometric tints</strong>. They also give advice on what colors to choose in different environments (see the table at the last page of the article). I settled for warm humid color&nbsp;values.</p>
 <table class="center">
@@ -123,7 +123,7 @@ unrar dem.rar -d copernicus
 
 
 <p>And here comes hypsometric&nbsp;tints.</p>
-<p class="text-center"><img title="Color relief" src="https://www.zimmi.cz/posts/assets/color-relief-shaded-map-using-open-data-and-open-source-software/color_relief.png" class="center"></p>
+<p class="text-center"><img title="Color relief" src="{filename}/assets/color-relief-shaded-map-using-open-data-and-open-source-software/color_relief.png" class="center"></p>
 
 <p>Add a bit of compression and some overviews to make it smaller and load&nbsp;faster.</p>
 <div class="highlight"><pre><span></span>gdal_translate -of GTiff -co <span class="nv">TILED</span><span class="o">=</span>YES -co <span class="nv">COMPRESS</span><span class="o">=</span>DEFLATE color_relief.tif color_relief.compress.tif
@@ -139,7 +139,7 @@ gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span c
 
 <h2>Map&nbsp;composition</h2>
 <p>I chose Austria for its excessive amount of freely available datasets. What I didn&#8217;t take into consideration was my lack of knowledge when it comes to German (#fail). States come from <a href="http://data.gv.at">data.gv.at</a> and was dissolved from smaller administrative units. State capitals were downloaded from <a href="http://naturalearth.com">naturalearth.com</a>.</p>
-<p class="text-center"><a href="https://www.zimmi.cz/posts/assets/color-relief-shaded-map-using-open-data-and-open-source-software/map.pdf" title="Click for PDF version"><img title="Austria" src="https://www.zimmi.cz/posts/assets/color-relief-shaded-map-using-open-data-and-open-source-software/map.png" class="center"></a></p>
+<p class="text-center"><a href="https://www.zimmi.cz/posts/assets/color-relief-shaded-map-using-open-data-and-open-source-software/map.pdf" title="Click for PDF version"><img title="Austria" src="{filename}/assets/color-relief-shaded-map-using-open-data-and-open-source-software/map.png" class="center"></a></p>
 
 <p>I&#8217;d like to add some more thematic layers in the future. And translate the map to&nbsp;English.</p>
 <h2>Few words on <span class="caps">INSPIRE</span>&nbsp;Geoportal</h2>
@@ -288,7 +288,7 @@ gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span c
 <li><span class="caps">HR</span>, <span class="caps">VHR</span>, <span class="caps">NIR</span> imagery, orthophoto - served via <span class="caps">WMS</span></li>
 </ul>
 <p>Labels should be visible only for the featured land block (both for the land parcels and the land block itself. The whole map scales dynamically, showing small land blocks zoomed in and the large ones zoomed&nbsp;out.</p>
-<p class='text-center'><a id="desired-map" title="Desired map" href="https://www.zimmi.cz/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map.jpg"><img title="Desired map" src="https://www.zimmi.cz/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map.jpg" width=70% class="img-responsive centered"></a></p>
+<p class='text-center'><a id="desired-map" title="Desired map" href="{filename}/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map.jpg"><img title="Desired map" src="{filename}/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map.jpg" width=70% class="img-responsive centered"></a></p>
 
 <p>Every map features additional&nbsp;items:</p>
 <ul>
@@ -331,7 +331,7 @@ gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span c
 <li>fixed scale: sets the scale the same for all the&nbsp;maps</li>
 </ul>
 <p>With these settings, I get a map similar to the one below. Notice two interesting&nbsp;things:</p>
-<p class='text-center'><a title="QGIS map skeleton" href="https://www.zimmi.cz/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map_skeleton.png"><img title="QGIS map skeleton" src="https://www.zimmi.cz/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map_skeleton.png" width=70% class="img-responsive centered"></a></p>
+<p class='text-center'><a title="QGIS map skeleton" href="{filename}/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map_skeleton.png"><img title="QGIS map skeleton" src="{filename}/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map_skeleton.png" width=70% class="img-responsive centered"></a></p>
 
 <ul>
 <li>Scale uses decimal places, which I find <em>a huge failure</em>. Has anyone ever seen a map with such scale? The worst is there is no easy way to hide these, or at least I didn&#8217;t find&nbsp;one.</li>
@@ -355,7 +355,7 @@ gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span c
 
 
 <p>With this simple expression, I get labels only for those land parcels that are part of the mapped land block. Even the <strong>layer style</strong> can be controlled with atlas feature. Land parcels inside the land block have blue borders, the rest is yellowish, remember? It&#8217;s a piece of cake with rule-based&nbsp;styling.</p>
-<p class='text-center'><a title="Layer style based on atlas feature" href="https://www.zimmi.cz/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/atlas_feature_style.png"><img title="Layer style based on atlas feature" src="https://www.zimmi.cz/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/atlas_feature_style.png" width=70% class="img-responsive centered"></a></p>
+<p class='text-center'><a title="Layer style based on atlas feature" href="{filename}/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/atlas_feature_style.png"><img title="Layer style based on atlas feature" src="{filename}/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/atlas_feature_style.png" width=70% class="img-responsive centered"></a></p>
 
 <h3>Atlas&nbsp;generation</h3>
 <p>When you&#8217;re set, atlas can be created with a single button. I used <span class="caps">SVG</span> as an output format to easily manipulate the map content afterwards. The resulting maps look like the one in <a href="#desired-map">the first picture</a> without the text in the red rectangle. A Python script appends this to each map&nbsp;afterwards.</p>

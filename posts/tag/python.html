@@ -358,7 +358,7 @@
     </aside>
     <p><a href="https://www.liftago.com/cs">Liftago</a> (the Czech analogy of Uber) has recently <a href="http://try.liftago.com/info-wants-to-be-free/">released a sample of its data</a> covering four weeks of driver/pasenger&nbsp;interactions.</p>
 <p>Have a look at my infographics created with PostGIS, Inkscape, Python and&nbsp;pygal.</p>
-<p class="text-center"><a href="https://www.zimmi.cz/posts/assets/liftago-open-dataset-infographics/liftago.pdf"><img title="Liftago infographics" src="https://www.zimmi.cz/posts/assets/liftago-open-dataset-infographics/liftago.png" class="img-responsive centered"></a></p>
+<p class="text-center"><a href="https://www.zimmi.cz/posts/assets/liftago-open-dataset-infographics/liftago.pdf"><img title="Liftago infographics" src="{filename}/assets/liftago-open-dataset-infographics/liftago.png" class="img-responsive centered"></a></p>
 </article>
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/" rel="bookmark" title="Permalink to Automated Map Creation With QGIS, PostGIS, Python, SVG and ImageMagick">Automated Map Creation With <span class="caps">QGIS</span>, PostGIS, Python, <span class="caps">SVG</span> and&nbsp;ImageMagick</a></h1>
@@ -383,7 +383,7 @@
 <li><span class="caps">HR</span>, <span class="caps">VHR</span>, <span class="caps">NIR</span> imagery, orthophoto - served via <span class="caps">WMS</span></li>
 </ul>
 <p>Labels should be visible only for the featured land block (both for the land parcels and the land block itself. The whole map scales dynamically, showing small land blocks zoomed in and the large ones zoomed&nbsp;out.</p>
-<p class='text-center'><a id="desired-map" title="Desired map" href="https://www.zimmi.cz/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map.jpg"><img title="Desired map" src="https://www.zimmi.cz/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map.jpg" width=70% class="img-responsive centered"></a></p>
+<p class='text-center'><a id="desired-map" title="Desired map" href="{filename}/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map.jpg"><img title="Desired map" src="{filename}/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map.jpg" width=70% class="img-responsive centered"></a></p>
 
 <p>Every map features additional&nbsp;items:</p>
 <ul>
@@ -426,7 +426,7 @@
 <li>fixed scale: sets the scale the same for all the&nbsp;maps</li>
 </ul>
 <p>With these settings, I get a map similar to the one below. Notice two interesting&nbsp;things:</p>
-<p class='text-center'><a title="QGIS map skeleton" href="https://www.zimmi.cz/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map_skeleton.png"><img title="QGIS map skeleton" src="https://www.zimmi.cz/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map_skeleton.png" width=70% class="img-responsive centered"></a></p>
+<p class='text-center'><a title="QGIS map skeleton" href="{filename}/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map_skeleton.png"><img title="QGIS map skeleton" src="{filename}/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map_skeleton.png" width=70% class="img-responsive centered"></a></p>
 
 <ul>
 <li>Scale uses decimal places, which I find <em>a huge failure</em>. Has anyone ever seen a map with such scale? The worst is there is no easy way to hide these, or at least I didn&#8217;t find&nbsp;one.</li>
@@ -450,7 +450,7 @@
 
 
 <p>With this simple expression, I get labels only for those land parcels that are part of the mapped land block. Even the <strong>layer style</strong> can be controlled with atlas feature. Land parcels inside the land block have blue borders, the rest is yellowish, remember? It&#8217;s a piece of cake with rule-based&nbsp;styling.</p>
-<p class='text-center'><a title="Layer style based on atlas feature" href="https://www.zimmi.cz/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/atlas_feature_style.png"><img title="Layer style based on atlas feature" src="https://www.zimmi.cz/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/atlas_feature_style.png" width=70% class="img-responsive centered"></a></p>
+<p class='text-center'><a title="Layer style based on atlas feature" href="{filename}/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/atlas_feature_style.png"><img title="Layer style based on atlas feature" src="{filename}/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/atlas_feature_style.png" width=70% class="img-responsive centered"></a></p>
 
 <h3>Atlas&nbsp;generation</h3>
 <p>When you&#8217;re set, atlas can be created with a single button. I used <span class="caps">SVG</span> as an output format to easily manipulate the map content afterwards. The resulting maps look like the one in <a href="#desired-map">the first picture</a> without the text in the red rectangle. A Python script appends this to each map&nbsp;afterwards.</p>
