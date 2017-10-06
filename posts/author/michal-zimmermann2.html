@@ -26,8 +26,8 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2017/wifileaks-wi-fi-networks-dataviz/" rel="bookmark" title="Permalink to Wifileaks Wi-Fi Networks Dataviz">Wifileaks Wi-Fi Networks&nbsp;Dataviz</a></h1>
     <aside><span>May 2, 2017</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>     <a href="https://www.zimmi.cz/posts/tag/visualization.html">visualization</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/visualization.html">visualization</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
     </aside>
     <p><a href="http://www.wifileaks.cz">Wifileaks</a> is a project by Jakub Čížek aimed to map the Czech wi-fi networks with Android/iOS app. The data gathered by people using the app <a href="http://download.wifileaks.cz/data/wifileaks_raw_170416.tar.gz">is available to download</a> and features ~&nbsp;90,000,000 records, each representing the position of the cellphone when connecting to the network. Just about perfect to craft some&nbsp;maps!</p>
 <div class="text-center"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/cr.png"/></div>
@@ -141,8 +141,8 @@ git clone git@github.com:citusdata/cstore_fdw.git
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2017/routing-with-grass-gis-catchment-area-calculation/" rel="bookmark" title="Permalink to Routing with GRASS GIS: Catchment Area Calculation">Routing with <span class="caps">GRASS</span> <span class="caps">GIS</span>: Catchment Area&nbsp;Calculation</a></h1>
     <aside><span>Apr 20, 2017</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/grass.html">grass</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/grass.html">grass</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
     </aside>
     <p>I got my hands on <a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/">pgRouting</a> in the last post and I&#8217;m about to do the same with <span class="caps">GRASS</span> <span class="caps">GIS</span> in this&nbsp;one.</p>
 <p><span class="caps">GRASS</span> <span class="caps">GIS</span> stores the topology for the native vector format by default, which makes it easy to use for the network analysis. All the commands associated with the network analysis can be found in the <code>v.net</code> family. The ones I&#8217;m going to discuss in this post are <code>v.net</code> itself, <code>v.net.path</code>, <code>.v.net.alloc</code> and <code>v.net.iso</code>,&nbsp;respectively.</p>
@@ -213,8 +213,8 @@ v.net <span class="nv">input</span><span class="o">=</span>network <span class="
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/" rel="bookmark" title="Permalink to Routing with pgRouting: Catchment Area Calculation">Routing with pgRouting: Catchment Area&nbsp;Calculation</a></h1>
     <aside><span>Apr 14, 2017</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a href="https://www.zimmi.cz/posts/tag/pgrouting.html">pgrouting</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/pgrouting.html">pgrouting</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p>For a long time I&#8217;ve wanted to play with <a href="http://pgrouting.org/">pgRouting</a> and that time has finally come. Among many other routing functions there is one that caught my eye, called <code>pgr_drivingdistance</code>. As the documentation says, it <em>returns the driving distance from a start node</em> using Dijkstra algorithm. The aforementioned distance doesn&#8217;t need to be defined in Euclidean space (the real distance between two points), it might be calculated in units of time, slopeness etc. How to get it&nbsp;going?</p>
 <h2>Data</h2>
@@ -388,8 +388,8 @@ v.net <span class="nv">input</span><span class="o">=</span>network <span class="
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2017/exploiting-prague-open-data-without-api/" rel="bookmark" title="Permalink to Exploiting Prague Open Data without API">Exploiting Prague Open Data without <span class="caps">API</span></a></h1>
     <aside><span>Apr 3, 2017</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/data.html">data</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/data.html">data</a></span>
     </aside>
     <p>Speaking the Czech Republic, <a href="http://www.geoportalpraha.cz">Prague is an undoubted leader in open data publishing</a>. However, there is no public <span class="caps">API</span> to explore/search existing&nbsp;datasets.</p>
 <p>I wanted to download the <span class="caps">ESRI</span> Shapefile of the city urban plan that <a href="http://www.geoportalpraha.cz/cs/opendata/21733E1F-21B7-4ABC-B1C2-DC19C0237380#.WOKHMbmFvVM">is divided into more than a hundred files</a> (a file representing a cadastral&nbsp;area).</p>
@@ -423,8 +423,8 @@ find -type f -not -path <span class="s1">&#39;./PVP_fvu_p_Bechovice_SHP*&#39;</s
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2017/upgrading-postgresql-95-to-postgresql-96-with-postgis/" rel="bookmark" title="Permalink to Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with PostGIS">Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with&nbsp;PostGIS</a></h1>
     <aside><span>Mar 1, 2017</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p>Thanks to <code>pg_upgrade</code> tool the PostgreSQL upgrade on Ubuntu is pretty straightforward. Different PostGIS versions might cause troubles though. This post covers PostgreSQL 9.5, PostGIS 2.2 to PostgreSQL 9.6, PostGIS 2.3&nbsp;migration.</p>
 <p>First of all, install the PostgreSQL 9.6 with PostGIS&nbsp;2.3.</p>

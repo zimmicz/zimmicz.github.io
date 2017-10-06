@@ -32,8 +32,8 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/postgis-rectangular-grid-creation/" rel="bookmark" title="Permalink to PostGIS: Rectangular Grid Creation">PostGIS: Rectangular Grid&nbsp;Creation</a></h1>
     <aside><span>Mar 24, 2015</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
 <p>Creating a rectangular grid to cover a given extent with same sized cells is one of the basic <span class="caps">GIS</span> tasks I&#8217;ve had to solve several times so far. I used <span class="caps">QGIS</span> or some Python to give me a bunch of <code>INSERT</code> statements to run in PostGIS database, now I&#8217;ve come with a final solution at&nbsp;last.</p>
 <div class="highlight"><pre><span></span>CREATE OR REPLACE FUNCTION cm_grid(

@@ -31,8 +31,8 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2016/ogrinfo-output-formatting/" rel="bookmark" title="Permalink to Ogrinfo Output Formatting">Ogrinfo Output&nbsp;Formatting</a></h1>
     <aside><span>Oct 21, 2016</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
     </aside>
 <p>Today my workmate asked if there was a way to see an attribute table other than importing spatial data into a PostGIS database. I told him about <span class="caps">QGIS</span> and while talking about other <span class="caps">GIS</span> stuff, I started thinking about <em>pipes</em> and how awesome it would be to actually format the output of the <code>ogrinfo</code> command.</p>
 <p>Here it is. It is just a much longer way to do <code>ogr2ogr -f "CSV" dest source</code>, but sometimes you just have to experiment a&nbsp;bit.</p>

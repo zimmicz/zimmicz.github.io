@@ -32,8 +32,8 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2016/counting-substring-occurrences-in-postgresql/" rel="bookmark" title="Permalink to Counting substring occurrences in PostgreSQL">Counting substring occurrences in&nbsp;PostgreSQL</a></h1>
     <aside><span>Dec 19, 2016</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
 <p>I got to count occurrences of <em>/</em> character today and found out no built-in function exists in PostgreSQL, so here&#8217;s my shot at it. Pretty simple, yet&nbsp;useful.</p>
 <div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">OR</span> <span class="k">REPLACE</span> <span class="k">FUNCTION</span> <span class="n">how_many</span><span class="p">(</span><span class="k">IN</span> <span class="nb">text</span><span class="p">,</span> <span class="k">IN</span> <span class="nb">varchar</span><span class="p">,</span> <span class="k">OUT</span> <span class="nb">integer</span><span class="p">)</span>

@@ -25,8 +25,8 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2016/testing-postgresql-ogr-fdw/" rel="bookmark" title="Permalink to Testing PostgreSQL OGR FDW">Testing PostgreSQL <span class="caps">OGR</span> <span class="caps">FDW</span></a></h1>
     <aside><span>Jul 1, 2016</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p><a href="https://wiki.postgresql.org/wiki/Foreign_data_wrappers">PostgreSQL foreign data wrappers</a> are used to connect PostgreSQL database to different datasources, e.g. other <span class="caps">SQL</span> databases, <span class="caps">CSV</span> files, <span class="caps">XLS</span>&nbsp;spreadsheets&times;</p>
 <p>The one I&#8217;ve been interested in for several months is <a href="https://github.com/pramsey/pgsql-ogr-fdw">Paul Ramsey&#8217;s <span class="caps">OGR</span> <span class="caps">FDW</span></a> - it gives you access to <span class="caps">OGR</span> supported spatial formats directly from your database. <em>No more shapefiles lying&nbsp;around?</em></p>
@@ -101,8 +101,8 @@ OPTIONS (LAYER &#39;A05_Vodni_nadrze&#39;);
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2016/a-month-of-commuting-on-my-own/" rel="bookmark" title="Permalink to A Month of Commuting on My Own">A Month of Commuting on My&nbsp;Own</a></h1>
     <aside><span>Apr 9, 2016</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/spatial.html">spatial</a>     <a href="https://www.zimmi.cz/posts/tag/visualization.html">visualization</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/space.html">space</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/spatial.html">spatial</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/visualization.html">visualization</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/space.html">space</a></span>
     </aside>
     <p>I&#8217;ve been sort of living in Brno for the last 7 years (college included). It&#8217;s quite a hilly city, with lots of cars, very good public transportation system and ever-improving cycling infrastructure. All these years I was using trams, buses and trolleybuses to get myself from one place to&nbsp;another.</p>
 <p>These are all great,&nbsp;because:</p>
@@ -146,8 +146,8 @@ OPTIONS (LAYER &#39;A05_Vodni_nadrze&#39;);
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2016/do-you-really-need-gulp-or-grunt-or-bower-or-what/" rel="bookmark" title="Permalink to Do You Really Need Gulp? Or Grunt? Or Bower? Or What?">Do You Really Need Gulp? Or Grunt? Or Bower? Or&nbsp;What?</a></h1>
     <aside><span>Mar 20, 2016</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
     </aside>
     <p><strong>Disclaimer:</strong> I&#8217;m an enthuastic developer, but I do not code for a living. I&#8217;m just the ordinary guy who keeps editing a wrong file wondering why <em>the heck</em> the changes are not being&nbsp;applied.</p>
 <p><strong><span class="caps">TL</span>;<span class="caps">DR</span>:</strong> I do think <code>npm</code> might be the&nbsp;answer.</p>
@@ -192,8 +192,8 @@ node_modules/webpack-dev-server/bin/webpack-dev-server.js --quiet --inline --hot
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2016/how-to-convert-dgn-to-tiff-with-gdal/" rel="bookmark" title="Permalink to How to convert DGN to Tiff with GDAL">How to convert <span class="caps">DGN</span> to Tiff with <span class="caps">GDAL</span></a></h1>
     <aside><span>Feb 21, 2016</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
     </aside>
     <p>We have to deal with <span class="caps">DGN</span> drawings quite often at <a href="http://www.clevermaps.cz">CleverMaps</a> - heavily used for infrastructure projects (highways, roads, pipelines), they are a pure nightmare to the <span class="caps">GIS</span> person inside me. Right now, I&#8217;m only capable of converting it into a raster file and serve it with Geoserver. The transformation from <span class="caps">DGN</span> to <span class="caps">PDF</span> to <span class="caps">PNG</span> to Tiff is not something that makes me utterly happy&nbsp;though.</p>
 <p>All you need to do the same is <a href="https://www.zimmi.cz/posts/tag/gdal.html"><span class="caps">GDAL</span></a>, ImageMagick, some <span class="caps">PDF</span> documents created out of <span class="caps">DGN</span> files - something MicroStation can help you with - and their upper left and lower right corner&nbsp;coordinates.</p>
@@ -240,8 +240,8 @@ gdaladdo <span class="si">${</span><span class="nv">OUTPUTPATH</span><span class
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2016/looking-for-the-next-row-with-postgresql/" rel="bookmark" title="Permalink to Looking for the Next Row with PostgreSQL">Looking for the Next Row with&nbsp;PostgreSQL</a></h1>
     <aside><span>Jan 23, 2016</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <h2>Using <span class="caps">JOIN</span>&nbsp;clause</h2>
 <p>All my <span class="caps">GIS</span> life I&#8217;ve been using a simple <code>JOIN</code> clause to find a row with an <code>id = previous_id + 1</code>. In other words, imagine a simple table with no&nbsp;indices:</p>

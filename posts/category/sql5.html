@@ -26,8 +26,8 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-ii/" rel="bookmark" title="Permalink to PostGIS Case Study: Vozejkmap Open Data (Part II)">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">II</span>)</a></h1>
     <aside><span>Feb 21, 2015</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p><a href="{{ pcposturl(2014, 12, 02, 'postgis-case-study-vozejkmap-open-data-part-i') }}">In the first part of my little case study</a> I downloaded <a href="http://vozejkmap.cz">vozejkmap.cz</a> dataset and imported it into the PostGIS database. Having spatial data safely stored the time comes to get it onto the map. Libraries used&nbsp;are:</p>
 <ul>
@@ -94,8 +94,8 @@ FROM vozejkmap AS lg ) AS f
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/using-postgresql-to-update-outdated-map-links/" rel="bookmark" title="Permalink to Using PostgreSQL To Update Outdated Map Links">Using PostgreSQL To Update Outdated Map&nbsp;Links</a></h1>
     <aside><span>Feb 16, 2015</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/regex.html">regex</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/regex.html">regex</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p><a href="http://www.edpp.cz/pdb_mapa-povodnoveho-planu-mesta/">We&#8217;ve rolled out</a> completely new map <span class="caps">GUI</span> at <a href="http://edpp.cz">edpp.cz</a> built on top of <a href="http://ol3js.org">OpenLayers 3</a>. It looks great and has lots of functions both for <span class="caps">BFU</span> and power users. The only pitfall that came with moving away from OpenLayers 2 were remarkable differences in zoom levels between the old map and the new&nbsp;one.</p>
 <p>Each of our maps is defined by our admins (center, zoom level, layers) at the map creation. Lots of links calling different views of map are created as well. They take form of <code>http://edpp.cz/some-map?0=0&amp;1=0...zoom=5</code>. That <code>zoom=&lt;Number&gt;</code> started causing troubles immediately after the map switch. No way my workmates would update them one by one as there were ~4,500 of them. Sounds like a task for little bit of regular expressions and some <span class="caps">SQL</span>&nbsp;updates.</p>
@@ -118,8 +118,8 @@ FROM vozejkmap AS lg ) AS f
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2014/postgis-case-study-vozejkmap-open-data-part-i/" rel="bookmark" title="Permalink to PostGIS Case Study: VozejkMap Open Data (Part I)">PostGIS Case Study: VozejkMap Open Data (Part&nbsp;I)</a></h1>
     <aside><span>Dec 2, 2014</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p><a href="http://www.vozejkmap.cz">VozejkMap.cz</a> is a Czech <strong>open data</strong> iniatitive that collects data about wheelchair accessible places, e.g. pubs, toilets, cafes etc. As part of being open, they offer a <a href="http://www.vozejkmap.cz/opendata/"><span class="caps">JSON</span> data download</a>. <span class="caps">JSON</span> is a great text format, not so great spatial format (leaving GeoJSON aside) though. Anyway, nothing that <a href="http://posts.zimmi.cz/tag/postgis/">PostGIS</a> wouldn&#8217;t be able to take care&nbsp;of.</p>
 <h3>Let&#8217;s get some&nbsp;data</h3>
@@ -287,8 +287,8 @@ UPDATE vozejkmap SET geom = ST_SetSRID(ST_MakePoint(lng, lat), 4326);
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2014/postgis-spatial-indexing-with-st_intersects/" rel="bookmark" title="Permalink to PostGIS Spatial Indexing With ST_Intersects">PostGIS Spatial Indexing With&nbsp;ST_Intersects</a></h1>
     <aside><span>Nov 23, 2014</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p><a href="http://postgis.net/docs/ST_Intersects.html">PostGIS docs</a> clearly states that:
     &gt; This function call will automatically include a bounding box comparison that will make use of any indexes that are available on the&nbsp;geometries.</p>

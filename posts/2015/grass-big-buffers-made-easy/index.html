@@ -31,8 +31,8 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/grass-big-buffers-made-easy/" rel="bookmark" title="Permalink to GRASS: Big Buffers Made Easy"><span class="caps">GRASS</span>: Big Buffers Made&nbsp;Easy</a></h1>
     <aside><span>Apr 20, 2015</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/grass.html">grass</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/grass.html">grass</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
     </aside>
 <p>Recently I&#8217;ve written about <a href="/2015/postgis-buffers-intersections-differences-and-collections/">struggling with fairly complex geometries in PostGIS</a>. Lesson learned from the last time was to use more smaller geometries instead of several really huge. You can obtain the small ones from the big by <a href="/2015/postgis-rectangular-grid-creation/">cutting it with a grid</a>.</p>
 <p>A supervisor of a project I&#8217;ve been working on came up with a task that totally buried the previous process in a blink of an eye: <strong>Give me the buffer (diffed with original geometries) that is smoothed on the outer bounds so there are no edges shorter than 10 cm.</strong> I sighed. Then, I cursed. Then, I gave it a try with PostGIS. Achieving this goal involves these&nbsp;steps:</p>

@@ -26,8 +26,8 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2017/fighting-raster-geopackage-with-gdal/" rel="bookmark" title="Permalink to Fighting Raster GeoPackage with GDAL">Fighting Raster GeoPackage with <span class="caps">GDAL</span></a></h1>
     <aside><span>Jul 19, 2017</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>     <a href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
     </aside>
     <p>As I&#8217;m still running Ubuntu 16.04 based Linux Mint, I have no access to <span class="caps">GDAL</span> 2.x repositories (except for ubuntugis, that I really don&#8217;t like to use). Provided with a GeoPackage raster file recently, I had to find a way to load it into <span class="caps">QGIS</span>, somehow. The solution is simple: Docker with&nbsp;gdal_translate.</p>
 <h2>Preparing the Docker&nbsp;container</h2>
@@ -87,8 +87,8 @@ RUN apt install -y gdal-bin
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2017/mapping-north-america-with-qgis-tips-and-tricks" rel="bookmark" title="Permalink to Mapping North America with QGIS: Tips and Tricks">Mapping North America with <span class="caps">QGIS</span>: Tips and&nbsp;Tricks</a></h1>
     <aside><span>May 21, 2017</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>     <a href="https://www.zimmi.cz/posts/tag/visualization.html">visualization</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/visualization.html">visualization</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
     </aside>
     <p>Recently I&#8217;ve bought a book called <em>Maps</em> by Aleksandra Mizielinska and Daniel Mizielinski to my nephew. The book&#8217;s absolutely wonderful and made me want to try crafting a map with similar looks. I don&#8217;t do maps much at <a href="https://clevermaps.cz">CleverMaps</a>, so this was a great opportunity to find out what new features became available during the last months of <span class="caps">QGIS</span>&nbsp;development.</p>
 <h2>Result</h2>
@@ -135,8 +135,8 @@ RUN apt install -y gdal-bin
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2017/wifileaks-wi-fi-networks-dataviz/" rel="bookmark" title="Permalink to Wifileaks Wi-Fi Networks Dataviz">Wifileaks Wi-Fi Networks&nbsp;Dataviz</a></h1>
     <aside><span>May 2, 2017</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>     <a href="https://www.zimmi.cz/posts/tag/visualization.html">visualization</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/visualization.html">visualization</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
     </aside>
     <p><a href="http://www.wifileaks.cz">Wifileaks</a> is a project by Jakub Čížek aimed to map the Czech wi-fi networks with Android/iOS app. The data gathered by people using the app <a href="http://download.wifileaks.cz/data/wifileaks_raw_170416.tar.gz">is available to download</a> and features ~&nbsp;90,000,000 records, each representing the position of the cellphone when connecting to the network. Just about perfect to craft some&nbsp;maps!</p>
 <div class="text-center"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/cr.png"/></div>
@@ -250,8 +250,8 @@ git clone git@github.com:citusdata/cstore_fdw.git
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2017/routing-with-grass-gis-catchment-area-calculation/" rel="bookmark" title="Permalink to Routing with GRASS GIS: Catchment Area Calculation">Routing with <span class="caps">GRASS</span> <span class="caps">GIS</span>: Catchment Area&nbsp;Calculation</a></h1>
     <aside><span>Apr 20, 2017</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/grass.html">grass</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/grass.html">grass</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
     </aside>
     <p>I got my hands on <a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/">pgRouting</a> in the last post and I&#8217;m about to do the same with <span class="caps">GRASS</span> <span class="caps">GIS</span> in this&nbsp;one.</p>
 <p><span class="caps">GRASS</span> <span class="caps">GIS</span> stores the topology for the native vector format by default, which makes it easy to use for the network analysis. All the commands associated with the network analysis can be found in the <code>v.net</code> family. The ones I&#8217;m going to discuss in this post are <code>v.net</code> itself, <code>v.net.path</code>, <code>.v.net.alloc</code> and <code>v.net.iso</code>,&nbsp;respectively.</p>

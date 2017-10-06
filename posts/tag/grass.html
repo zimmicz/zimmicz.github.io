@@ -26,8 +26,8 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2017/routing-with-grass-gis-catchment-area-calculation/" rel="bookmark" title="Permalink to Routing with GRASS GIS: Catchment Area Calculation">Routing with <span class="caps">GRASS</span> <span class="caps">GIS</span>: Catchment Area&nbsp;Calculation</a></h1>
     <aside><span>Apr 20, 2017</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/grass.html">grass</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/grass.html">grass</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
     </aside>
     <p>I got my hands on <a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/">pgRouting</a> in the last post and I&#8217;m about to do the same with <span class="caps">GRASS</span> <span class="caps">GIS</span> in this&nbsp;one.</p>
 <p><span class="caps">GRASS</span> <span class="caps">GIS</span> stores the topology for the native vector format by default, which makes it easy to use for the network analysis. All the commands associated with the network analysis can be found in the <code>v.net</code> family. The ones I&#8217;m going to discuss in this post are <code>v.net</code> itself, <code>v.net.path</code>, <code>.v.net.alloc</code> and <code>v.net.iso</code>,&nbsp;respectively.</p>
@@ -98,8 +98,8 @@ v.net <span class="nv">input</span><span class="o">=</span>network <span class="
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/grass-big-buffers-made-easy/" rel="bookmark" title="Permalink to GRASS: Big Buffers Made Easy"><span class="caps">GRASS</span>: Big Buffers Made&nbsp;Easy</a></h1>
     <aside><span>Apr 20, 2015</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/grass.html">grass</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/grass.html">grass</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
     </aside>
     <p>Recently I&#8217;ve written about <a href="/2015/postgis-buffers-intersections-differences-and-collections/">struggling with fairly complex geometries in PostGIS</a>. Lesson learned from the last time was to use more smaller geometries instead of several really huge. You can obtain the small ones from the big by <a href="/2015/postgis-rectangular-grid-creation/">cutting it with a grid</a>.</p>
 <p>A supervisor of a project I&#8217;ve been working on came up with a task that totally buried the previous process in a blink of an eye: <strong>Give me the buffer (diffed with original geometries) that is smoothed on the outer bounds so there are no edges shorter than 10 cm.</strong> I sighed. Then, I cursed. Then, I gave it a try with PostGIS. Achieving this goal involves these&nbsp;steps:</p>

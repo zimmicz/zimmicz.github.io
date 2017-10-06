@@ -26,8 +26,8 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2017/postgresql-dollar-quoting-inside-bash-heredoc/" rel="bookmark" title="Permalink to PostgreSQL Dollar Quoting inside Bash Heredoc">PostgreSQL Dollar Quoting inside Bash&nbsp;Heredoc</a></h1>
     <aside><span>Sep 22, 2017</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p>Yesterday I spent two very unpleasant hours debugging the weirdest <span class="caps">SQL</span> error I&#8217;ve seen in my life, running the below query (simplified for this&nbsp;post).</p>
 <div class="highlight"><pre><span></span><span class="n">psql</span> <span class="o">-</span><span class="n">qAt</span> <span class="c1">--no-psqlrc &lt;&lt;BACKUP</span>
@@ -71,8 +71,8 @@ LINE <span class="m">2</span>: <span class="m">1111</span><span class="p">;</spa
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2017/postgresql-development-history-revealed-with-postgresql/" rel="bookmark" title="Permalink to PostgreSQL Development History Revealed with PostgreSQL">PostgreSQL Development History Revealed with&nbsp;PostgreSQL</a></h1>
     <aside><span>Aug 9, 2017</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/python.html">python</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p>I spend a lot of time reading <a href="https://www.postgresql.org/docs/manuals/">PostgreSQL docs</a>. It occurred to me just a few weeks ago that those versioned manuals are great opportunity to get an insight into PostgreSQL development history. Using PostgreSQL, of&nbsp;course.</p>
 <h2><span class="caps">TOP</span> 5 functions with the most verbose docs in each&nbsp;version</h2>
@@ -398,8 +398,8 @@ LINE <span class="m">2</span>: <span class="m">1111</span><span class="p">;</spa
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2017/upgrading-postgresql-95-to-postgresql-96-with-postgis/" rel="bookmark" title="Permalink to Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with PostGIS">Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with&nbsp;PostGIS</a></h1>
     <aside><span>Mar 1, 2017</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p>Thanks to <code>pg_upgrade</code> tool the PostgreSQL upgrade on Ubuntu is pretty straightforward. Different PostGIS versions might cause troubles though. This post covers PostgreSQL 9.5, PostGIS 2.2 to PostgreSQL 9.6, PostGIS 2.3&nbsp;migration.</p>
 <p>First of all, install the PostgreSQL 9.6 with PostGIS&nbsp;2.3.</p>
@@ -498,8 +498,8 @@ Running this script will delete the old cluster<span class="err">&#39;</span>s d
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2017/executing-dynamic-sql-query-right-away/" rel="bookmark" title="Permalink to Executing dynamic SQL query right away">Executing dynamic <span class="caps">SQL</span> query right&nbsp;away</a></h1>
     <aside><span>Feb 28, 2017</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p>PostgreSQL 9.6 comes with a handy <code>psql</code> command called <code>\gexec</code> that <em>sends the current query input buffer to the server and treats the result as a <span class="caps">SQL</span> statement to be executed</em> (right, whatever). What that means is that instead of doing&nbsp;this</p>
 <div class="highlight"><pre><span></span>psql -c <span class="s2">&quot;SELECT &#39;DROP TABLE &#39; || tablename FROM information_schema.tables WHERE table_name LIKE &#39;%to_be_dropped%&quot;</span> <span class="p">|</span> psql
@@ -516,8 +516,8 @@ Running this script will delete the old cluster<span class="err">&#39;</span>s d
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2017/subdivide-and-conquer-effective-spatial-indexes-in-postgis/" rel="bookmark" title="Permalink to Subdivide and Conquer: Effective Spatial Indexes in PostGIS">Subdivide and Conquer: Effective Spatial Indexes in&nbsp;PostGIS</a></h1>
     <aside><span>Jan 10, 2017</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p>Spatial indexes are absolutely crucial part of any spatial database and - as I tend to say quite often - only a fool would try to query spatial data without building spatial indexes&nbsp;beforehand.</p>
 <p>Spatial indexes are based on bounding box comparisons, which are generally very fast. Yet, there are situations when spatial indexes don&#8217;t help much (or they don&#8217;t help as much as they could, if you&nbsp;wish).</p>

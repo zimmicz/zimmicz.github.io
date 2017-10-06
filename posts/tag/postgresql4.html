@@ -26,8 +26,8 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2016/looking-for-the-next-row-with-postgresql/" rel="bookmark" title="Permalink to Looking for the Next Row with PostgreSQL">Looking for the Next Row with&nbsp;PostgreSQL</a></h1>
     <aside><span>Jan 23, 2016</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <h2>Using <span class="caps">JOIN</span>&nbsp;clause</h2>
 <p>All my <span class="caps">GIS</span> life I&#8217;ve been using a simple <code>JOIN</code> clause to find a row with an <code>id = previous_id + 1</code>. In other words, imagine a simple table with no&nbsp;indices:</p>
@@ -101,8 +101,8 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-iii/" rel="bookmark" title="Permalink to PostGIS Case Study: Vozejkmap Open Data (Part III)">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">III</span>)</a></h1>
     <aside><span>Nov 14, 2015</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a href="https://www.zimmi.cz/posts/tag/leaflet.html">leaflet</a>     <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/web-maps.html">web maps</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/leaflet.html">leaflet</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/web-maps.html">web maps</a></span>
     </aside>
     <p>After a while I got back to my <a href="https://www.zimmi.cz/posts/2014/postgis-case-study-vozejkmap-open-data-part-i/">PostGIS open data</a> <a href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-ii/">case study</a>. Last time I left it with clustering implemented, looking forward to incorporate <a href="http://turfjs.org">Turf.js</a> in the future. <em>And the future is now.</em> <a href="https://github.com/zimmicz/vozejkmap-to-postgis">The code is still available on&nbsp;GitHub.</a></p>
 <h2>Subgroup&nbsp;clustering</h2>
@@ -167,8 +167,8 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/" rel="bookmark" title="Permalink to Installing PostGIS 2.2 with SFCGAL on Ubuntu-based OS">Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span></a></h1>
     <aside><span>Oct 29, 2015</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
     </aside>
     <p>I&#8217;ve seen a bunch of questions on <span class="caps">GIS</span> StackExchange recently related to <a href="http://sfcgal.org/"><span class="caps">SFCGAL</span></a> extension for <a href="http://postgis.net">PostGIS 2.2</a>. Great news are it can be installed with one simple query <code>CREATE EXTENSION postgis_sfcgal</code>. Not so great news are you have to compile it from source for Ubuntu-based <span class="caps">OS</span> (14.04) as recent versions of required packages are not available in the&nbsp;repositories.</p>
 <p>I tested my solution on elementary <span class="caps">OS</span> 0.3.1 based on Ubuntu 14.04. <strong>And it works!</strong> It installs PostgreSQL 9.4 from repositories together with <span class="caps">GDAL</span> and <span class="caps">GEOS</span> and some other libs PostGIS depends on. PostGIS itself, <span class="caps">CGAL</span>, Boost, <span class="caps">MPFR</span> and <span class="caps">GMP</span> are built from&nbsp;source.</p>
@@ -272,8 +272,8 @@ sudo -u postgres psql -d spatial_template -c <span class="s2">&quot;SELECT postg
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/postgis-finding-biggest-land-users-nearby/" rel="bookmark" title="Permalink to PostGIS: Finding Biggest Land Users Nearby">PostGIS: Finding Biggest Land Users&nbsp;Nearby</a></h1>
     <aside><span>Apr 3, 2015</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p>At <a href="http://clevermaps.cz">CleverMaps</a> we heavily rely on the cadastre of real estate, which is probably the biggest data source in my country. Using their excellent knowledge of this data set, my teammates often supply me with all kinds of weird&nbsp;challenges.</p>
 <h2>Give me the biggest land users&nbsp;nearby</h2>
@@ -332,8 +332,8 @@ JOIN ints
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/postgis-count-line-self-intersections/" rel="bookmark" title="Permalink to PostGIS: Count Line Self-Intersections">PostGIS: Count Line&nbsp;Self-Intersections</a></h1>
     <aside><span>Mar 30, 2015</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p><a href="https://gis.stackexchange.com/questions/107927/counting-self-intersections-of-linestring-using-postgis/140674#140674">Is there a way of using PostgreSQL + PostGIS for finding the number of self intersections in a linestring?</a> was a question that made me think of this problem. I came up with a solution that takes just a few lines of&nbsp;code.</p>
 <p>Assume the following&nbsp;geometries:</p>

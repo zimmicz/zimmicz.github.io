@@ -25,8 +25,8 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/postgis-finding-biggest-land-users-nearby/" rel="bookmark" title="Permalink to PostGIS: Finding Biggest Land Users Nearby">PostGIS: Finding Biggest Land Users&nbsp;Nearby</a></h1>
     <aside><span>Apr 3, 2015</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p>At <a href="http://clevermaps.cz">CleverMaps</a> we heavily rely on the cadastre of real estate, which is probably the biggest data source in my country. Using their excellent knowledge of this data set, my teammates often supply me with all kinds of weird&nbsp;challenges.</p>
 <h2>Give me the biggest land users&nbsp;nearby</h2>
@@ -85,8 +85,8 @@ JOIN ints
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/postgis-count-line-self-intersections/" rel="bookmark" title="Permalink to PostGIS: Count Line Self-Intersections">PostGIS: Count Line&nbsp;Self-Intersections</a></h1>
     <aside><span>Mar 30, 2015</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p><a href="https://gis.stackexchange.com/questions/107927/counting-self-intersections-of-linestring-using-postgis/140674#140674">Is there a way of using PostgreSQL + PostGIS for finding the number of self intersections in a linestring?</a> was a question that made me think of this problem. I came up with a solution that takes just a few lines of&nbsp;code.</p>
 <p>Assume the following&nbsp;geometries:</p>
@@ -142,8 +142,8 @@ SELECT noded.id, noded.count - test.count cnt FROM noded JOIN test USING (id);
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/postgis-rectangular-grid-creation/" rel="bookmark" title="Permalink to PostGIS: Rectangular Grid Creation">PostGIS: Rectangular Grid&nbsp;Creation</a></h1>
     <aside><span>Mar 24, 2015</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p>Creating a rectangular grid to cover a given extent with same sized cells is one of the basic <span class="caps">GIS</span> tasks I&#8217;ve had to solve several times so far. I used <span class="caps">QGIS</span> or some Python to give me a bunch of <code>INSERT</code> statements to run in PostGIS database, now I&#8217;ve come with a final solution at&nbsp;last.</p>
 <div class="highlight"><pre><span></span>CREATE OR REPLACE FUNCTION cm_grid(
@@ -244,8 +244,8 @@ FROM cm_grid(-675593.69, -1057711.19, -672254.69, -1054849.19, 333.47, 333.47);
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/postgis-buffers-intersections-differences-and-collections/" rel="bookmark" title="Permalink to PostGIS: Buffers, Intersections, Differences And Collections">PostGIS: Buffers, Intersections, Differences And&nbsp;Collections</a></h1>
     <aside><span>Mar 19, 2015</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p>Being part of <a href="http://clevermaps.cz">CleverMaps</a> means doing lot of nasty work with PostGIS. Recently, I&#8217;ve been given a following task that needed to be done for a really big project dealing with agricultural&nbsp;parcels:</p>
 <ul>
@@ -423,8 +423,8 @@ ALTER TABLE uni ADD PRIMARY KEY(id);
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/wms-download-for-future-offline-use/" rel="bookmark" title="Permalink to WMS Download For Future Offline Use"><span class="caps">WMS</span> Download For Future Offline&nbsp;Use</a></h1>
     <aside><span>Mar 15, 2015</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/ogc.html">ogc</a>     <a href="https://www.zimmi.cz/posts/tag/python.html">python</a>     <a href="https://www.zimmi.cz/posts/tag/wms.html">wms</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/ogc.html">ogc</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/wms.html">wms</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
     </aside>
     <p>Using <span class="caps">WMS</span> in real time might easily become pain in the ass due to low connection speed or slow server response. Downloading images beforehand seems to be a reasonable choice both to avoid any slowdowns and to improve user experience when working with <span class="caps">WMS</span>&nbsp;layers.</p>
 <p><a href="https://geopython.github.io/OWSLib/">OWSLib</a> is a great tool to help you get images from <span class="caps">WMS</span> server. Code and some comments&nbsp;follow.</p>

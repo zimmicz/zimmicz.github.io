@@ -26,8 +26,8 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2017/postgresql-dollar-quoting-inside-bash-heredoc/" rel="bookmark" title="Permalink to PostgreSQL Dollar Quoting inside Bash Heredoc">PostgreSQL Dollar Quoting inside Bash&nbsp;Heredoc</a></h1>
     <aside><span>Sep 22, 2017</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p>Yesterday I spent two very unpleasant hours debugging the weirdest <span class="caps">SQL</span> error I&#8217;ve seen in my life, running the below query (simplified for this&nbsp;post).</p>
 <div class="highlight"><pre><span></span><span class="n">psql</span> <span class="o">-</span><span class="n">qAt</span> <span class="c1">--no-psqlrc &lt;&lt;BACKUP</span>
@@ -71,8 +71,8 @@ LINE <span class="m">2</span>: <span class="m">1111</span><span class="p">;</spa
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2017/postgresql-development-history-revealed-with-postgresql/" rel="bookmark" title="Permalink to PostgreSQL Development History Revealed with PostgreSQL">PostgreSQL Development History Revealed with&nbsp;PostgreSQL</a></h1>
     <aside><span>Aug 9, 2017</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/python.html">python</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p>I spend a lot of time reading <a href="https://www.postgresql.org/docs/manuals/">PostgreSQL docs</a>. It occurred to me just a few weeks ago that those versioned manuals are great opportunity to get an insight into PostgreSQL development history. Using PostgreSQL, of&nbsp;course.</p>
 <h2><span class="caps">TOP</span> 5 functions with the most verbose docs in each&nbsp;version</h2>
@@ -398,8 +398,8 @@ LINE <span class="m">2</span>: <span class="m">1111</span><span class="p">;</spa
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2017/postgis-as-a-mapbox-vector-tiles-generator/" rel="bookmark" title="Permalink to PostGIS as a Mapbox Vector Tiles generator">PostGIS as a Mapbox Vector Tiles&nbsp;generator</a></h1>
     <aside><span>Aug 6, 2017</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/docker.html">docker</a>     <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/docker.html">docker</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p><a href="http://postgis.net/2017/08/05/postgis-2.4.0alpha/">PostGIS 2.4.0</a> was released recently bringing the possibilities to generate <strong>Mapbox Vector Tiles</strong> without any third party tools. I got a shot at it with Node.js and docker. Even if it&#8217;s not as straightforward as solely using <a href="https://postgis.net/docs/manual-dev/ST_AsMVT.html">ST_AsMVT</a>, it still looks pretty&nbsp;great.</p>
 <h2>Docker&nbsp;container</h2>
@@ -502,8 +502,8 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/" rel="bookmark" title="Permalink to Routing with pgRouting: Catchment Area Calculation">Routing with pgRouting: Catchment Area&nbsp;Calculation</a></h1>
     <aside><span>Apr 14, 2017</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a href="https://www.zimmi.cz/posts/tag/pgrouting.html">pgrouting</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/pgrouting.html">pgrouting</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p>For a long time I&#8217;ve wanted to play with <a href="http://pgrouting.org/">pgRouting</a> and that time has finally come. Among many other routing functions there is one that caught my eye, called <code>pgr_drivingdistance</code>. As the documentation says, it <em>returns the driving distance from a start node</em> using Dijkstra algorithm. The aforementioned distance doesn&#8217;t need to be defined in Euclidean space (the real distance between two points), it might be calculated in units of time, slopeness etc. How to get it&nbsp;going?</p>
 <h2>Data</h2>
@@ -677,8 +677,8 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2017/upgrading-postgresql-95-to-postgresql-96-with-postgis/" rel="bookmark" title="Permalink to Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with PostGIS">Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with&nbsp;PostGIS</a></h1>
     <aside><span>Mar 1, 2017</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p>Thanks to <code>pg_upgrade</code> tool the PostgreSQL upgrade on Ubuntu is pretty straightforward. Different PostGIS versions might cause troubles though. This post covers PostgreSQL 9.5, PostGIS 2.2 to PostgreSQL 9.6, PostGIS 2.3&nbsp;migration.</p>
 <p>First of all, install the PostgreSQL 9.6 with PostGIS&nbsp;2.3.</p>

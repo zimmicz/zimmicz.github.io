@@ -32,8 +32,8 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/how-to-use-queue-with-rsync/" rel="bookmark" title="Permalink to How to Use Queue with Rsync">How to Use Queue with&nbsp;Rsync</a></h1>
     <aside><span>Oct 1, 2015</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>     <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
     </aside>
 <p>Having more than 120K <span class="caps">5MB</span>+ images that should be moved to the server is a great oportunity for some automatic bash processing. It might be good idea to use <a href="http://www.imagemagick.org/script/index.php">ImageMagick</a> <a href="http://www.imagemagick.org/script/convert.php">convert tool</a> to make images smaller in a simple for loop. <a href="http://www.gnu.org/software/parallel/"><span class="caps">GNU</span> Parallel</a> can significantly increase the performance by running one job per <span class="caps">CPU</span>&nbsp;core.</p>
 <div class="highlight"><pre><span></span>parallel --verbose convert <span class="o">{}</span> -quality <span class="m">40</span>% <span class="o">{}</span> ::: *.jpg

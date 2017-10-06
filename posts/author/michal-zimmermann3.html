@@ -26,8 +26,8 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2017/executing-dynamic-sql-query-right-away/" rel="bookmark" title="Permalink to Executing dynamic SQL query right away">Executing dynamic <span class="caps">SQL</span> query right&nbsp;away</a></h1>
     <aside><span>Feb 28, 2017</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p>PostgreSQL 9.6 comes with a handy <code>psql</code> command called <code>\gexec</code> that <em>sends the current query input buffer to the server and treats the result as a <span class="caps">SQL</span> statement to be executed</em> (right, whatever). What that means is that instead of doing&nbsp;this</p>
 <div class="highlight"><pre><span></span>psql -c <span class="s2">&quot;SELECT &#39;DROP TABLE &#39; || tablename FROM information_schema.tables WHERE table_name LIKE &#39;%to_be_dropped%&quot;</span> <span class="p">|</span> psql
@@ -44,8 +44,8 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2017/subdivide-and-conquer-effective-spatial-indexes-in-postgis/" rel="bookmark" title="Permalink to Subdivide and Conquer: Effective Spatial Indexes in PostGIS">Subdivide and Conquer: Effective Spatial Indexes in&nbsp;PostGIS</a></h1>
     <aside><span>Jan 10, 2017</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p>Spatial indexes are absolutely crucial part of any spatial database and - as I tend to say quite often - only a fool would try to query spatial data without building spatial indexes&nbsp;beforehand.</p>
 <p>Spatial indexes are based on bounding box comparisons, which are generally very fast. Yet, there are situations when spatial indexes don&#8217;t help much (or they don&#8217;t help as much as they could, if you&nbsp;wish).</p>
@@ -114,8 +114,8 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2016/counting-substring-occurrences-in-postgresql/" rel="bookmark" title="Permalink to Counting substring occurrences in PostgreSQL">Counting substring occurrences in&nbsp;PostgreSQL</a></h1>
     <aside><span>Dec 19, 2016</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p>I got to count occurrences of <em>/</em> character today and found out no built-in function exists in PostgreSQL, so here&#8217;s my shot at it. Pretty simple, yet&nbsp;useful.</p>
 <div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">OR</span> <span class="k">REPLACE</span> <span class="k">FUNCTION</span> <span class="n">how_many</span><span class="p">(</span><span class="k">IN</span> <span class="nb">text</span><span class="p">,</span> <span class="k">IN</span> <span class="nb">varchar</span><span class="p">,</span> <span class="k">OUT</span> <span class="nb">integer</span><span class="p">)</span>
@@ -133,8 +133,8 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2016/plotting-the-czech-cadastre-land-use-with-d3-data-viz-part-iv/" rel="bookmark" title="Permalink to Plotting the Czech Cadastre Land Use with d3: Data Viz (part IV)">Plotting the Czech Cadastre Land Use with d3: Data Viz (part <span class="caps">IV</span>)</a></h1>
     <aside><span>Nov 20, 2016</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/d3.html">d3</a>     <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>     <a href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/data.html">data</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/d3.html">d3</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/data.html">data</a></span>
     </aside>
     <p>This post is the fourth part of the series summarizing the process of visualizing land use data with bash, PostgreSQL and d3.js. Read other&nbsp;parts:</p>
 <ol>
@@ -184,8 +184,8 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/" rel="bookmark" title="Permalink to Plotting the Czech Cadastre Land Use with d3: Data Load (part III)">Plotting the Czech Cadastre Land Use with d3: Data Load (part <span class="caps">III</span>)</a></h1>
     <aside><span>Nov 15, 2016</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/d3.html">d3</a>     <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>     <a href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/data.html">data</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/d3.html">d3</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/data.html">data</a></span>
     </aside>
     <p>This post is the third part of the series summarizing the process of visualizing landuse data with bash, PostgreSQL and d3.js. Read other&nbsp;parts:</p>
 <ol>

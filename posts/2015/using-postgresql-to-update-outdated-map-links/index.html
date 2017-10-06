@@ -32,8 +32,8 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/using-postgresql-to-update-outdated-map-links/" rel="bookmark" title="Permalink to Using PostgreSQL To Update Outdated Map Links">Using PostgreSQL To Update Outdated Map&nbsp;Links</a></h1>
     <aside><span>Feb 16, 2015</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/regex.html">regex</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/regex.html">regex</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
 <p><a href="http://www.edpp.cz/pdb_mapa-povodnoveho-planu-mesta/">We&#8217;ve rolled out</a> completely new map <span class="caps">GUI</span> at <a href="http://edpp.cz">edpp.cz</a> built on top of <a href="http://ol3js.org">OpenLayers 3</a>. It looks great and has lots of functions both for <span class="caps">BFU</span> and power users. The only pitfall that came with moving away from OpenLayers 2 were remarkable differences in zoom levels between the old map and the new&nbsp;one.</p>
 <p>Each of our maps is defined by our admins (center, zoom level, layers) at the map creation. Lots of links calling different views of map are created as well. They take form of <code>http://edpp.cz/some-map?0=0&amp;1=0...zoom=5</code>. That <code>zoom=&lt;Number&gt;</code> started causing troubles immediately after the map switch. No way my workmates would update them one by one as there were ~4,500 of them. Sounds like a task for little bit of regular expressions and some <span class="caps">SQL</span>&nbsp;updates.</p>

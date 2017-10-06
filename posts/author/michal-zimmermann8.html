@@ -26,8 +26,8 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/color-relief-shaded-map-using-open-data-with-open-source-software/" rel="bookmark" title="Permalink to Color Relief Shaded Map Using Open Data with Open Source Software">Color Relief Shaded Map Using Open Data with Open Source&nbsp;Software</a></h1>
     <aside><span>Oct 25, 2015</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>     <a href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>     <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>     <a href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
     </aside>
     <p>The Digital Elevation Model over Europe (<span class="caps">EU</span>-<span class="caps">DEM</span>) has been recently released for public usage at <a href="http://land.copernicus.eu/in-situ/eu-dem">Copernicus Land Monitoring Services homepage</a>. Strictly speaking, it is a <strong>digital surface model</strong> coming from weighted average of <span class="caps">SRTM</span> and <span class="caps">ASTER</span> <span class="caps">GDEM</span> with geographic accuracy of 25 m. Data are provided as GeoTIFF files projected in 1 degree by 1 degree tiles (projected to <span class="caps">EPSG</span>:3035), so they correspond to the <span class="caps">SRTM</span> naming&nbsp;convention.</p>
 <p>If you can&#8217;t see the map to choose the data to download, make sure you&#8217;re not using <span class="caps">HTTPS</span> Everywhere or similar browser&nbsp;plugin.</p>
@@ -148,8 +148,8 @@ gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span c
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/postgresql-in-vs-exists/" rel="bookmark" title="Permalink to PostgreSQL IN vs EXISTS">PostgreSQL <span class="caps">IN</span> vs <span class="caps">EXISTS</span></a></h1>
     <aside><span>Oct 9, 2015</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
     </aside>
     <p>Until recently, <span class="caps">SQL</span> <code>IN</code> and <code>EXISTS</code> were almost exactly the same to me. There is a significant difference both in execution plans and time of execution though, as I found out after not being able to speed up my workmate&#8217;s&nbsp;query.</p>
 <p>Assume two not-as-small-as-they-might-be&nbsp;tables:</p>
@@ -243,8 +243,8 @@ gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span c
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/how-to-use-queue-with-rsync/" rel="bookmark" title="Permalink to How to Use Queue with Rsync">How to Use Queue with&nbsp;Rsync</a></h1>
     <aside><span>Oct 1, 2015</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>     <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
     </aside>
     <p>Having more than 120K <span class="caps">5MB</span>+ images that should be moved to the server is a great oportunity for some automatic bash processing. It might be good idea to use <a href="http://www.imagemagick.org/script/index.php">ImageMagick</a> <a href="http://www.imagemagick.org/script/convert.php">convert tool</a> to make images smaller in a simple for loop. <a href="http://www.gnu.org/software/parallel/"><span class="caps">GNU</span> Parallel</a> can significantly increase the performance by running one job per <span class="caps">CPU</span>&nbsp;core.</p>
 <div class="highlight"><pre><span></span>parallel --verbose convert <span class="o">{}</span> -quality <span class="m">40</span>% <span class="o">{}</span> ::: *.jpg
@@ -268,8 +268,8 @@ gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span c
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/" rel="bookmark" title="Permalink to Automated Map Creation With QGIS, PostGIS, Python, SVG and ImageMagick">Automated Map Creation With <span class="caps">QGIS</span>, PostGIS, Python, <span class="caps">SVG</span> and&nbsp;ImageMagick</a></h1>
     <aside><span>Aug 9, 2015</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>     <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a href="https://www.zimmi.cz/posts/tag/python.html">python</a>     <a href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>     <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
     </aside>
     <p>As mentioned in <a href="https://www.zimmi.cz/posts/2015/qgis-tips-for-collaborative-mapping/"><span class="caps">QGIS</span> Tips For Collaborative Mapping</a> we&#8217;re in the middle of crop evaluation project at <a href="http://www.clevermaps.cz/">CleverMaps</a>.</p>
 <p>With the <span class="caps">QGIS</span> workflow up and running, I&#8217;ve been focused on different <span class="caps">QGIS</span> related task: <strong>automatic map generation</strong> for land blocks that meet certain conditions. The logic behind identifying such land blocks is as&nbsp;follows:</p>
@@ -413,8 +413,8 @@ gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span c
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/clip-raster-with-vector-using-gdal/" rel="bookmark" title="Permalink to Clip Raster With Vector Using GDAL">Clip Raster With Vector Using <span class="caps">GDAL</span></a></h1>
     <aside><span>Jul 21, 2015</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>     <a href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
     </aside>
     <p>Recently I needed to clip several raster files with polygonal layer of municipalities. A solution to this task is pretty straightforward using <a href="http://gdal.org/"><span class="caps">GDAL</span></a> and a bit of Bash and <span class="caps">QGIS</span> thrown&nbsp;in.</p>
 <p>The necessary steps&nbsp;are:</p>

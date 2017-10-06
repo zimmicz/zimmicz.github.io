@@ -25,8 +25,8 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/filtering-points-by-distance-in-postgis/" rel="bookmark" title="Permalink to Filtering points by distance in PostGIS">Filtering points by distance in&nbsp;PostGIS</a></h1>
     <aside><span>Jul 21, 2015</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p>Filtering really big (millions of rows) point datasets by distance might get catchy when solved with wrong PostGIS functions. Without spatial indexes PostGIS would take ages to finish such&nbsp;task.</p>
 <p><a href="https://gis.stackexchange.com/questions/148184/why-the-execution-of-a-query-is-very-slow-using-postgis">Someone over StackExchange asked</a> why the next query had been running for 15 hours (!) with no&nbsp;result:</p>
@@ -83,8 +83,8 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/qgis-tips-for-collaborative-mapping/" rel="bookmark" title="Permalink to QGIS Tips For Collaborative Mapping"><span class="caps">QGIS</span> Tips For Collaborative&nbsp;Mapping</a></h1>
     <aside><span>Jul 21, 2015</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/tools.html">Tools</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/tools.html">Tools</a></span>
     </aside>
     <p>Right now I&#8217;m setting up a project aimed at crop evaluation over ortophotos, <span class="caps">HR</span> and <span class="caps">VHR</span> imagery. All the steps of evaluation will be done in <span class="caps">QGIS</span> with PostGIS used for data storage and&nbsp;post-processing.</p>
 <p>In the initial phase, fifteen <span class="caps">GIS</span> operators will be using <span class="caps">QGIS</span> to reshape geometries and fill attribute data accordingly. Fifteen are not so many, but it is enough to be a possible source of errors. Luckily, there are many things you can do with <span class="caps">QGIS</span> to prevent people from making&nbsp;mistakes.</p>
@@ -111,8 +111,8 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/ssh-grass-processing-status-check/" rel="bookmark" title="Permalink to SSH GRASS Processing Status Check"><span class="caps">SSH</span> <span class="caps">GRASS</span> Processing Status&nbsp;Check</a></h1>
     <aside><span>Jul 21, 2015</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>     <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
     </aside>
     <p>I&#8217;ve been running some <span class="caps">GRASS</span>/PostGIS computations on a remote server that were taking hours to finish. Once in a while I checked for their state by issuing <code>tail log_XX.log</code> from my laptop to see if they were ready yet. It suddenly became pretty annoying to check five different logs every ten&nbsp;minutes.</p>
 <p>Instead of waiting and checking the logs, I thought it would be great to automate this. And it would be awesome if checking was fun. So I wrote a simple routine that takes log number as an argument (every process logs to a separate logfile) and checks it every minute until it says <em>done</em>. Right after that <code>notify-send</code> gives me a neat popup and Queen starts playing their <em>We are the champions</em> thanks to <code>mpg123</code>.</p>
@@ -140,8 +140,8 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/animating-svg-maps-with-smil/" rel="bookmark" title="Permalink to Animating SVG Maps With SMIL">Animating <span class="caps">SVG</span> Maps With <span class="caps">SMIL</span></a></h1>
     <aside><span>Apr 29, 2015</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>     <a href="https://www.zimmi.cz/posts/tag/smil.html">smil</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/web-maps.html">web maps</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/smil.html">smil</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/web-maps.html">web maps</a></span>
     </aside>
     <p>Using <span class="caps">SVG</span> to build web maps have both pros and cons and to be honest I don&#8217;t know any <em>serious</em> map/<span class="caps">GIS</span> project built on top of <span class="caps">SVG</span>. However, as a part of my job at university, I was forced to use both <span class="caps">SVG</span> and <span class="caps">SMIL</span> to produce animated web map (see the small version below or the big one at <a href="https://zimmicz.github.io/svg-smil-airplanes/map.svg">GitHub</a>) and I&#8217;d like to share my&nbsp;findings.</p>
 <p><object width="400" data="https://zimmicz.github.io/svg-smil-airplanes/map.svg" type="image/svg+xml"></object></p>
@@ -341,8 +341,8 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/grass-big-buffers-made-easy/" rel="bookmark" title="Permalink to GRASS: Big Buffers Made Easy"><span class="caps">GRASS</span>: Big Buffers Made&nbsp;Easy</a></h1>
     <aside><span>Apr 20, 2015</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/grass.html">grass</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/grass.html">grass</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
     </aside>
     <p>Recently I&#8217;ve written about <a href="/2015/postgis-buffers-intersections-differences-and-collections/">struggling with fairly complex geometries in PostGIS</a>. Lesson learned from the last time was to use more smaller geometries instead of several really huge. You can obtain the small ones from the big by <a href="/2015/postgis-rectangular-grid-creation/">cutting it with a grid</a>.</p>
 <p>A supervisor of a project I&#8217;ve been working on came up with a task that totally buried the previous process in a blink of an eye: <strong>Give me the buffer (diffed with original geometries) that is smoothed on the outer bounds so there are no edges shorter than 10 cm.</strong> I sighed. Then, I cursed. Then, I gave it a try with PostGIS. Achieving this goal involves these&nbsp;steps:</p>

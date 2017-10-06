@@ -26,8 +26,8 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/hosting-website-on-openshift/" rel="bookmark" title="Permalink to Hosting Website On Openshift">Hosting Website On&nbsp;Openshift</a></h1>
     <aside><span>Feb 23, 2015</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/openshift.html">openshift</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/openshift.html">openshift</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
     </aside>
     <p>I decided to migrate <a href="http://www.zimmi.cz">my web</a> to <a href="http://openshift.com">OpenShift</a>. It was a bit frustrating but I got it working&nbsp;eventually.</p>
 <h2>Things to know before taking the&nbsp;leap</h2>
@@ -54,8 +54,8 @@ www.posts.zimmi.cz CNAME posts-zimmi.rhcloud.com
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-ii/" rel="bookmark" title="Permalink to PostGIS Case Study: Vozejkmap Open Data (Part II)">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">II</span>)</a></h1>
     <aside><span>Feb 21, 2015</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p><a href="{{ pcposturl(2014, 12, 02, 'postgis-case-study-vozejkmap-open-data-part-i') }}">In the first part of my little case study</a> I downloaded <a href="http://vozejkmap.cz">vozejkmap.cz</a> dataset and imported it into the PostGIS database. Having spatial data safely stored the time comes to get it onto the map. Libraries used&nbsp;are:</p>
 <ul>
@@ -122,8 +122,8 @@ FROM vozejkmap AS lg ) AS f
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/using-postgresql-to-update-outdated-map-links/" rel="bookmark" title="Permalink to Using PostgreSQL To Update Outdated Map Links">Using PostgreSQL To Update Outdated Map&nbsp;Links</a></h1>
     <aside><span>Feb 16, 2015</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/regex.html">regex</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/regex.html">regex</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p><a href="http://www.edpp.cz/pdb_mapa-povodnoveho-planu-mesta/">We&#8217;ve rolled out</a> completely new map <span class="caps">GUI</span> at <a href="http://edpp.cz">edpp.cz</a> built on top of <a href="http://ol3js.org">OpenLayers 3</a>. It looks great and has lots of functions both for <span class="caps">BFU</span> and power users. The only pitfall that came with moving away from OpenLayers 2 were remarkable differences in zoom levels between the old map and the new&nbsp;one.</p>
 <p>Each of our maps is defined by our admins (center, zoom level, layers) at the map creation. Lots of links calling different views of map are created as well. They take form of <code>http://edpp.cz/some-map?0=0&amp;1=0...zoom=5</code>. That <code>zoom=&lt;Number&gt;</code> started causing troubles immediately after the map switch. No way my workmates would update them one by one as there were ~4,500 of them. Sounds like a task for little bit of regular expressions and some <span class="caps">SQL</span>&nbsp;updates.</p>
@@ -146,16 +146,16 @@ FROM vozejkmap AS lg ) AS f
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/leaflet-with-custom-crs-epsg5514/" rel="bookmark" title="Permalink to Leaflet With Custom CRS (EPSG:5514)">Leaflet With Custom <span class="caps">CRS</span> (<span class="caps">EPSG</span>:5514)</a></h1>
     <aside><span>Jan 15, 2015</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>     <a href="https://www.zimmi.cz/posts/tag/leaflet.html">leaflet</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/leaflet.html">leaflet</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
     </aside>
     <p>If you ever find yourself in need to use custom projection with Leaflet, feel free to start with this example of <a href="https://github.com/zimmicz/leaflet-custom-crs-jtsk">Czech national coordinate system</a>. All you need is <a href="http://leafletjs.com">Leaflet</a>, <a href="http://proj4js.org/">proj4.js</a> and <a href="https://github.com/kartena/Proj4Leaflet">proj4 for Leaflet plugin</a>. I&#8217;m still not sure how <code>origin</code> coordinates work&nbsp;though.</p>
 </article>
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2014/postgis-case-study-vozejkmap-open-data-part-i/" rel="bookmark" title="Permalink to PostGIS Case Study: VozejkMap Open Data (Part I)">PostGIS Case Study: VozejkMap Open Data (Part&nbsp;I)</a></h1>
     <aside><span>Dec 2, 2014</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p><a href="http://www.vozejkmap.cz">VozejkMap.cz</a> is a Czech <strong>open data</strong> iniatitive that collects data about wheelchair accessible places, e.g. pubs, toilets, cafes etc. As part of being open, they offer a <a href="http://www.vozejkmap.cz/opendata/"><span class="caps">JSON</span> data download</a>. <span class="caps">JSON</span> is a great text format, not so great spatial format (leaving GeoJSON aside) though. Anyway, nothing that <a href="http://posts.zimmi.cz/tag/postgis/">PostGIS</a> wouldn&#8217;t be able to take care&nbsp;of.</p>
 <h3>Let&#8217;s get some&nbsp;data</h3>

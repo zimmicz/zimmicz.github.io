@@ -26,8 +26,8 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2017/fighting-raster-geopackage-with-gdal/" rel="bookmark" title="Permalink to Fighting Raster GeoPackage with GDAL">Fighting Raster GeoPackage with <span class="caps">GDAL</span></a></h1>
     <aside><span>Jul 19, 2017</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>     <a href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
     </aside>
     <p>As I&#8217;m still running Ubuntu 16.04 based Linux Mint, I have no access to <span class="caps">GDAL</span> 2.x repositories (except for ubuntugis, that I really don&#8217;t like to use). Provided with a GeoPackage raster file recently, I had to find a way to load it into <span class="caps">QGIS</span>, somehow. The solution is simple: Docker with&nbsp;gdal_translate.</p>
 <h2>Preparing the Docker&nbsp;container</h2>
@@ -87,8 +87,8 @@ RUN apt install -y gdal-bin
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2016/ogrinfo-output-formatting/" rel="bookmark" title="Permalink to Ogrinfo Output Formatting">Ogrinfo Output&nbsp;Formatting</a></h1>
     <aside><span>Oct 21, 2016</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
     </aside>
     <p>Today my workmate asked if there was a way to see an attribute table other than importing spatial data into a PostGIS database. I told him about <span class="caps">QGIS</span> and while talking about other <span class="caps">GIS</span> stuff, I started thinking about <em>pipes</em> and how awesome it would be to actually format the output of the <code>ogrinfo</code> command.</p>
 <p>Here it is. It is just a much longer way to do <code>ogr2ogr -f "CSV" dest source</code>, but sometimes you just have to experiment a&nbsp;bit.</p>
@@ -122,8 +122,8 @@ RUN apt install -y gdal-bin
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2016/testing-postgresql-ogr-fdw/" rel="bookmark" title="Permalink to Testing PostgreSQL OGR FDW">Testing PostgreSQL <span class="caps">OGR</span> <span class="caps">FDW</span></a></h1>
     <aside><span>Jul 1, 2016</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p><a href="https://wiki.postgresql.org/wiki/Foreign_data_wrappers">PostgreSQL foreign data wrappers</a> are used to connect PostgreSQL database to different datasources, e.g. other <span class="caps">SQL</span> databases, <span class="caps">CSV</span> files, <span class="caps">XLS</span>&nbsp;spreadsheets&times;</p>
 <p>The one I&#8217;ve been interested in for several months is <a href="https://github.com/pramsey/pgsql-ogr-fdw">Paul Ramsey&#8217;s <span class="caps">OGR</span> <span class="caps">FDW</span></a> - it gives you access to <span class="caps">OGR</span> supported spatial formats directly from your database. <em>No more shapefiles lying&nbsp;around?</em></p>
@@ -198,8 +198,8 @@ OPTIONS (LAYER &#39;A05_Vodni_nadrze&#39;);
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2016/how-to-convert-dgn-to-tiff-with-gdal/" rel="bookmark" title="Permalink to How to convert DGN to Tiff with GDAL">How to convert <span class="caps">DGN</span> to Tiff with <span class="caps">GDAL</span></a></h1>
     <aside><span>Feb 21, 2016</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
     </aside>
     <p>We have to deal with <span class="caps">DGN</span> drawings quite often at <a href="http://www.clevermaps.cz">CleverMaps</a> - heavily used for infrastructure projects (highways, roads, pipelines), they are a pure nightmare to the <span class="caps">GIS</span> person inside me. Right now, I&#8217;m only capable of converting it into a raster file and serve it with Geoserver. The transformation from <span class="caps">DGN</span> to <span class="caps">PDF</span> to <span class="caps">PNG</span> to Tiff is not something that makes me utterly happy&nbsp;though.</p>
 <p>All you need to do the same is <a href="https://www.zimmi.cz/posts/tag/gdal.html"><span class="caps">GDAL</span></a>, ImageMagick, some <span class="caps">PDF</span> documents created out of <span class="caps">DGN</span> files - something MicroStation can help you with - and their upper left and lower right corner&nbsp;coordinates.</p>
@@ -246,8 +246,8 @@ gdaladdo <span class="si">${</span><span class="nv">OUTPUTPATH</span><span class
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/color-relief-shaded-map-using-open-data-with-open-source-software/" rel="bookmark" title="Permalink to Color Relief Shaded Map Using Open Data with Open Source Software">Color Relief Shaded Map Using Open Data with Open Source&nbsp;Software</a></h1>
     <aside><span>Oct 25, 2015</span>
-    <span>    <a href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>     <a href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>     <a href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>     <a href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>    </span>
-    <span><a href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
     </aside>
     <p>The Digital Elevation Model over Europe (<span class="caps">EU</span>-<span class="caps">DEM</span>) has been recently released for public usage at <a href="http://land.copernicus.eu/in-situ/eu-dem">Copernicus Land Monitoring Services homepage</a>. Strictly speaking, it is a <strong>digital surface model</strong> coming from weighted average of <span class="caps">SRTM</span> and <span class="caps">ASTER</span> <span class="caps">GDEM</span> with geographic accuracy of 25 m. Data are provided as GeoTIFF files projected in 1 degree by 1 degree tiles (projected to <span class="caps">EPSG</span>:3035), so they correspond to the <span class="caps">SRTM</span> naming&nbsp;convention.</p>
 <p>If you can&#8217;t see the map to choose the data to download, make sure you&#8217;re not using <span class="caps">HTTPS</span> Everywhere or similar browser&nbsp;plugin.</p>
