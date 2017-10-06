@@ -2,4 +2,4 @@
 *.pyc
 content/**/*.pyc
 content/pelican-plugins
-
+output
