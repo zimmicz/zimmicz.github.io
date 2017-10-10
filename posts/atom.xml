@@ -525,7 +525,7 @@ RUN apt install -y gdal-bin
 &lt;p&gt;After the GeoTiff is written to hard drive, &lt;a href="https://www.zimmi.cz/posts/2015/how-to-use-queue-with-rsync/"&gt;inotifywait&lt;/a&gt; can be used to generate overviews. And with ease of calling &lt;code&gt;gdal_polygonize.py&lt;/code&gt; on each of GeoTiffs&amp;hellip;vector layer, at you&amp;nbsp;service.&lt;/p&gt;</content><category term="bash"></category><category term="gdal"></category></entry><entry><title>Mapping North America with QGIS: Tips and Tricks</title><link href="https://www.zimmi.cz/posts/2017/mapping-north-america-with-qgis-tips-and-tricks" rel="alternate"></link><published>2017-05-21T15:30:00+02:00</published><updated>2017-05-21T15:30:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-05-21:/posts/2017/mapping-north-america-with-qgis-tips-and-tricks</id><summary type="html">&lt;p&gt;Recently I&amp;#8217;ve bought a book called &lt;em&gt;Maps&lt;/em&gt; by Aleksandra Mizielinska and Daniel Mizielinski to my nephew. The book&amp;#8217;s absolutely wonderful and made me want to try crafting a map with similar looks. I don&amp;#8217;t do maps much at &lt;a href="https://clevermaps.cz"&gt;CleverMaps&lt;/a&gt;, so this was a great opportunity to find …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Recently I&amp;#8217;ve bought a book called &lt;em&gt;Maps&lt;/em&gt; by Aleksandra Mizielinska and Daniel Mizielinski to my nephew. The book&amp;#8217;s absolutely wonderful and made me want to try crafting a map with similar looks. I don&amp;#8217;t do maps much at &lt;a href="https://clevermaps.cz"&gt;CleverMaps&lt;/a&gt;, so this was a great opportunity to find out what new features became available during the last months of &lt;span class="caps"&gt;QGIS&lt;/span&gt;&amp;nbsp;development.&lt;/p&gt;
 &lt;h2&gt;Result&lt;/h2&gt;
 &lt;p&gt;A map of North America in scale of 1:22,000,000 featuring the biggest lakes, rivers, mountain ranges and basic administrative units for the North American countries. I aimed for visually appealing overview map rather than perfectly correct topographic&amp;nbsp;one.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;a href="{filename}/assets/mapping-north-america-with-qgis-tips-and-tricks/map.png" title="Click for the full size (3 MB)"&gt;&lt;img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/map.min.png"/&gt;&lt;/a&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;a href="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/map.png" title="Click for the full size (3 MB)"&gt;&lt;img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/map.min.png"/&gt;&lt;/a&gt;&lt;/div&gt;
 
 &lt;h2&gt;Data&lt;/h2&gt;
 &lt;p&gt;I used my beloved &lt;a href="http://www.naturalearthdata.com"&gt;Natural Earth dataset&lt;/a&gt; for both cultural (boundaries, cities) and physical (rivers, lakes) map features. Different scales came to play for different map layers as they seemed a bit too/few simplified for the given&amp;nbsp;scale.&lt;/p&gt;
@@ -644,14 +644,14 @@ git clone git@github.com:citusdata/cstore_fdw.git
 &lt;h2&gt;Putting the networks on the&amp;nbsp;map&lt;/h2&gt;
 &lt;table&gt;
     &lt;tr&gt;
-        &lt;td&gt;&lt;a href="{filename}/assets/wifileaks-wifi-networks-dataviz/brno.png"&gt;&lt;img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"&gt;&lt;/a&gt;&lt;/td&gt;
-        &lt;td&gt;&lt;a href="{filename}/assets/wifileaks-wifi-networks-dataviz/praha.png"&gt;&lt;img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"&gt;&lt;/a&gt;&lt;/td&gt;
-        &lt;td&gt;&lt;a href="{filename}/assets/wifileaks-wifi-networks-dataviz/olomouc.png"&gt;&lt;img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href="/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"&gt;&lt;img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href="/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"&gt;&lt;img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href="/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"&gt;&lt;img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"&gt;&lt;/a&gt;&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
-        &lt;td&gt;&lt;a href="{filename}/assets/wifileaks-wifi-networks-dataviz/plzen.png"&gt;&lt;img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"&gt;&lt;/a&gt;&lt;/td&gt;
-        &lt;td&gt;&lt;a href="{filename}/assets/wifileaks-wifi-networks-dataviz/ostrava.png"&gt;&lt;img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"&gt;&lt;/a&gt;&lt;/td&gt;
-        &lt;td&gt;&lt;a href="{filename}/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"&gt;&lt;img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href="/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"&gt;&lt;img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href="/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"&gt;&lt;img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href="/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"&gt;&lt;img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"&gt;&lt;/a&gt;&lt;/td&gt;
     &lt;/tr&gt;
 &lt;/table&gt;
 
