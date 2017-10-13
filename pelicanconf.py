@@ -47,6 +47,6 @@ CATEGORIES_SAVE_AS = 'categories/index.html'
 TAGS_SAVE_AS = 'tags/index.html'
 
 PLUGIN_PATHS = ['content/pelican-plugins']
-PLUGINS = ['neighbors', 'assets']
+PLUGINS = ['neighbors', 'assets', "related_posts"]
 
 IGNORE_FILES = ['*.rst', 'pelican-plugins/**/*.md']

@@ -16,7 +16,7 @@
   <meta property="og:title" content="Dead Simple Random Points in Polygons with PostGIS" />
   <meta property="og:description" content="Since PostgreSQL 9.3 there has been a handy little keyword called LATERAL, which - combined with JOIN - might rock your GIS world in a second. To keep it simple, a LATERAL JOIN enables a subquery in the FROM part of a query to reference columns from..." />
   <meta property="og:url" content="https://www.zimmi.cz/posts/2016/dead-simple-random-points-in-polygons-with-postgis/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?38b6b69e">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?a4089d0f">
 </head>
 <body>
     <nav role="navigation">
@@ -111,19 +111,14 @@
 <p>Note all the points fall inside the polygons by accident, because they are <strong>square</strong>. Otherwise a <code>ST_Contains</code> or <code>ST_Within</code> should be used inside the outermost <code>WHERE</code> query to filter outliers. This part could use some&nbsp;tweaking.</p>
 <aside>
 <h3>More reading</h3>
-<ul>
-    <li>
-        <a class="neighbor" href="https://www.zimmi.cz/posts/2016/syncing-two-postgresql-databases-faster/">
-             Syncing Two PostgreSQL Databases&nbsp;Faster
-        </a>
-    </li>
-     <li>
-         <a class="neighbor" href="https://www.zimmi.cz/posts/2016/finding-polygons-lying-across-other-polygons-with-postgis/">
-             Finding Polygons Lying across Other Polygons with&nbsp;PostGIS
-         </a>
-     </li>
-    </li>
-</ul><!-- Start of Async Drift Code -->
+    <ul>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-polygon-from-centroid/">PostGIS Custom Function to Create Polygon from&nbsp;Centroid</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-wind-rose/">PostGIS Custom Function to Create Wind&nbsp;Rose</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/finding-polygons-lying-across-other-polygons-with-postgis/">Finding Polygons Lying across Other Polygons with&nbsp;PostGIS</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/subdivide-and-conquer-effective-spatial-indexes-in-postgis/">Subdivide and Conquer: Effective Spatial Indexes in&nbsp;PostGIS</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/counting-substring-occurrences-in-postgresql/">Counting substring occurrences in&nbsp;PostgreSQL</a></li>
+    </ul>
+<!-- Start of Async Drift Code -->
 <script>
     !function () {
         var t;

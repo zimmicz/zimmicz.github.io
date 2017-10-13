@@ -15,7 +15,7 @@
   <meta property="og:title" content="PostGIS Case Study: VozejkMap Open Data (Part I)" />
   <meta property="og:description" content="VozejkMap.cz is a Czech open data iniatitive that collects data about wheelchair accessible places, e.g. pubs, toilets, cafes etc. As part of being open, they offer a JSON data download. JSON is a great text format, not so great spatial format..." />
   <meta property="og:url" content="https://www.zimmi.cz/posts/2014/postgis-case-study-vozejkmap-open-data-part-i/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?38b6b69e">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?a4089d0f">
 </head>
 <body>
     <nav role="navigation">
@@ -199,24 +199,14 @@ UPDATE vozejkmap SET geom = ST_SetSRID(ST_MakePoint(lng, lat), 4326);
 <p>Feel free to <a href="https://github.com/zimmicz/vozejkmap-to-postgis">grab the code</a> at&nbsp;GitHub.</p>
 <aside>
 <h3>More reading</h3>
-<ul>
-    <li>
-        <a class="neighbor" href="https://www.zimmi.cz/posts/2014/postgis-spatial-indexing-with-st_intersects/">
-             PostGIS Spatial Indexing With&nbsp;ST_Intersects
-        </a>
-    </li>
-     <li>
-         <a class="neighbor" href="https://www.zimmi.cz/posts/2015/leaflet-with-custom-crs-epsg5514/">
-             Leaflet With Custom <span class="caps">CRS</span> (<span class="caps">EPSG</span>:5514)
-         </a>
-     </li>
-     <li>
-         <a class="neighbor" href="https://www.zimmi.cz/posts/2015/using-postgresql-to-update-outdated-map-links/">
-             Using PostgreSQL To Update Outdated Map&nbsp;Links
-         </a>
-     </li>
-    </li>
-</ul><!-- Start of Async Drift Code -->
+    <ul>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-ii/">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">II</span>)</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/">Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span></a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-rectangular-grid-creation/">PostGIS: Rectangular Grid&nbsp;Creation</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-polygon-from-centroid/">PostGIS Custom Function to Create Polygon from&nbsp;Centroid</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-count-line-self-intersections/">PostGIS: Count Line&nbsp;Self-Intersections</a></li>
+    </ul>
+<!-- Start of Async Drift Code -->
 <script>
     !function () {
         var t;
