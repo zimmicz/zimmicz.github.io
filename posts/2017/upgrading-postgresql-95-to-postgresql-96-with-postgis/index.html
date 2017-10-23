@@ -15,7 +15,7 @@
   <meta property="og:title" content="Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with PostGIS" />
   <meta property="og:description" content="Thanks to pg_upgrade tool the PostgreSQL upgrade on Ubuntu is pretty straightforward. Different PostGIS versions might cause troubles though. This post covers PostgreSQL 9.5, PostGIS 2.2 to PostgreSQL 9.6, PostGIS 2.3 migration. First of all, install..." />
   <meta property="og:url" content="https://www.zimmi.cz/posts/2017/upgrading-postgresql-95-to-postgresql-96-with-postgis/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?38b6b69e">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?a4089d0f">
 </head>
 <body>
     <nav role="navigation">
@@ -130,24 +130,14 @@ Running this script will delete the old cluster<span class="err">&#39;</span>s d
 <p>The old cluster can be removed and the new one switched back to port <code>5432</code>. Run <code>/usr/lib/postgresql/9.6/bin/vacuumdb -p 5433 --all --analyze-in-stages</code> to collect&nbsp;statistics.</p>
 <aside>
 <h3>More reading</h3>
-<ul>
-    <li>
-        <a class="neighbor" href="https://www.zimmi.cz/posts/2017/executing-dynamic-sql-query-right-away/">
-             Executing dynamic <span class="caps">SQL</span> query right&nbsp;away
-        </a>
-    </li>
-     <li>
-         <a class="neighbor" href="https://www.zimmi.cz/posts/2017/exploiting-prague-open-data-without-api/">
-             Exploiting Prague Open Data without <span class="caps">API</span>
-         </a>
-     </li>
-     <li>
-         <a class="neighbor" href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/">
-             Routing with pgRouting: Catchment Area&nbsp;Calculation
-         </a>
-     </li>
-    </li>
-</ul><!-- Start of Async Drift Code -->
+    <ul>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/counting-substring-occurrences-in-postgresql/">Counting substring occurrences in&nbsp;PostgreSQL</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-polygon-from-centroid/">PostGIS Custom Function to Create Polygon from&nbsp;Centroid</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/dead-simple-random-points-in-polygons-with-postgis/">Dead Simple Random Points in Polygons with&nbsp;PostGIS</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/executing-dynamic-sql-query-right-away/">Executing dynamic <span class="caps">SQL</span> query right&nbsp;away</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-wind-rose/">PostGIS Custom Function to Create Wind&nbsp;Rose</a></li>
+    </ul>
+<!-- Start of Async Drift Code -->
 <script>
     !function () {
         var t;

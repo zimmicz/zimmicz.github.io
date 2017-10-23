@@ -220,6 +220,7 @@ article aside:last-child {
 
 article aside:last-child h3 {
   flex: 1 0 100%;
+  margin-bottom: 0;
 }
 
 article aside span {

@@ -11,7 +11,7 @@ Recently I've bought a book called *Maps* by Aleksandra Mizielinska and Daniel M
 
 A map of North America in scale of 1:22,000,000 featuring the biggest lakes, rivers, mountain ranges and basic administrative units for the North American countries. I aimed for visually appealing overview map rather than perfectly correct topographic one.
 
-<div class="text-center"><a href="{filename}/assets/mapping-north-america-with-qgis-tips-and-tricks/map.png" title="Click for the full size (3 MB)"><img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/map.min.png"/></a></div>
+<div class="text-center"><a href="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/map.png" title="Click for the full size (3 MB)"><img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/map.min.png"/></a></div>
 
 ## Data
 
