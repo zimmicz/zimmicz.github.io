@@ -23,6 +23,100 @@
     <main>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2016/syncing-two-postgresql-databases-faster/" rel="bookmark" title="Permalink to Syncing Two PostgreSQL Databases Faster">Syncing Two PostgreSQL Databases&nbsp;Faster</a></h1>
+    <aside><span>Jul 17, 2016</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p>Imagine you run two database machines hosting structurally the same databases on two separate servers and you need to transfer data from one to another. Not very often, let&#8217;s say once a month. Your tables aren&#8217;t small nor huge, let&#8217;s say millions rows in&nbsp;general.</p>
+<p>You&#8217;re going to use <code>pg_dump</code> and pipe it to <code>psql</code>, but the indices on your tables will slow you down a&nbsp;lot.</p>
+<p>That&#8217;s why you&#8217;ll want to drop all indices and constraints (<code>drop_indices_constraints.sql</code>):</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="s1">&#39;ALTER TABLE &#39;</span> <span class="o">||</span>
+    <span class="n">tc</span><span class="p">.</span><span class="n">table_schema</span> <span class="o">||</span>
+    <span class="s1">&#39;.&#39;</span> <span class="o">||</span>
+    <span class="n">tc</span><span class="p">.</span><span class="k">table_name</span> <span class="o">||</span>
+    <span class="s1">&#39; DROP CONSTRAINT &#39;</span> <span class="o">||</span>
+    <span class="n">tc</span><span class="p">.</span><span class="k">constraint_name</span>  <span class="o">||</span>
+    <span class="s1">&#39;;&#39;</span>
+<span class="k">FROM</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">table_constraints</span> <span class="n">tc</span>
+<span class="k">JOIN</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">constraint_column_usage</span> <span class="n">ccu</span> <span class="k">ON</span> <span class="p">(</span><span class="n">tc</span><span class="p">.</span><span class="k">constraint_catalog</span> <span class="o">=</span> <span class="n">ccu</span><span class="p">.</span><span class="k">constraint_catalog</span> <span class="k">AND</span> <span class="n">tc</span><span class="p">.</span><span class="k">constraint_schema</span> <span class="o">=</span> <span class="n">ccu</span><span class="p">.</span><span class="k">constraint_schema</span> <span class="k">AND</span> <span class="n">tc</span><span class="p">.</span><span class="k">constraint_name</span> <span class="o">=</span> <span class="n">ccu</span><span class="p">.</span><span class="k">constraint_name</span><span class="p">)</span>
+<span class="k">WHERE</span> <span class="n">tc</span><span class="p">.</span><span class="n">table_schema</span> <span class="k">IN</span> <span class="p">(</span><span class="k">SELECT</span> <span class="k">unnest</span><span class="p">(</span><span class="n">string_to_array</span><span class="p">(:</span><span class="s1">&#39;schemas&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">)))</span>
+<span class="k">UNION</span> <span class="k">ALL</span>
+<span class="k">SELECT</span>
+    <span class="s1">&#39;DROP INDEX IF EXISTS &#39;</span> <span class="o">||</span> <span class="n">schemaname</span> <span class="o">||</span> <span class="s1">&#39;.&#39;</span> <span class="o">||</span> <span class="n">indexname</span> <span class="o">||</span> <span class="s1">&#39;;&#39;</span>
+<span class="k">FROM</span> <span class="n">pg_indexes</span>
+<span class="k">WHERE</span> <span class="n">schemaname</span> <span class="k">IN</span> <span class="p">(</span><span class="k">SELECT</span> <span class="k">unnest</span><span class="p">(</span><span class="n">string_to_array</span><span class="p">(:</span><span class="s1">&#39;schemas&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">)));</span>
+</pre></div>
+
+
+<p>Then you will transfer the&nbsp;data:</p>
+<div class="highlight"><pre><span></span>pg_dump -a -t <span class="s2">&quot;schema1.*&quot;</span> -t <span class="s2">&quot;schema2.*&quot;</span> -O -d <span class="nb">source</span> -v <span class="p">|</span> psql -h localhost -d target
+</pre></div>
+
+
+<p>And restore the already dropped indices and constraints (<code>create_indices_constraints.sql</code>):</p>
+<div class="highlight"><pre><span></span><span class="k">WITH</span> <span class="k">constraints</span> <span class="k">AS</span> <span class="p">(</span>
+<span class="k">SELECT</span> <span class="s1">&#39;ALTER TABLE &#39;</span> <span class="o">||</span>
+    <span class="n">tc</span><span class="p">.</span><span class="n">table_schema</span> <span class="o">||</span>
+    <span class="s1">&#39;.&#39;</span> <span class="o">||</span>
+    <span class="n">tc</span><span class="p">.</span><span class="k">table_name</span> <span class="o">||</span>
+    <span class="s1">&#39; ADD CONSTRAINT &#39;</span> <span class="o">||</span>
+    <span class="n">tc</span><span class="p">.</span><span class="k">constraint_name</span> <span class="o">||</span>
+    <span class="s1">&#39; &#39;</span> <span class="o">||</span>
+    <span class="n">tc</span><span class="p">.</span><span class="n">constraint_type</span> <span class="o">||</span>
+    <span class="s1">&#39;(&#39;</span> <span class="o">||</span>
+    <span class="n">string_agg</span><span class="p">(</span><span class="n">ccu</span><span class="p">.</span><span class="k">column_name</span><span class="p">::</span><span class="nb">text</span><span class="p">,</span> <span class="s1">&#39;, &#39;</span><span class="p">)</span><span class="o">||</span> <span class="c1">-- column order should be taken into account here</span>
+    <span class="s1">&#39;);&#39;</span> <span class="n">def</span><span class="p">,</span>
+    <span class="n">tc</span><span class="p">.</span><span class="n">table_schema</span><span class="p">,</span>
+    <span class="n">tc</span><span class="p">.</span><span class="k">table_name</span><span class="p">,</span>
+    <span class="n">tc</span><span class="p">.</span><span class="k">constraint_name</span>
+<span class="k">FROM</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">table_constraints</span> <span class="n">tc</span>
+<span class="k">JOIN</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">constraint_column_usage</span> <span class="n">ccu</span> <span class="k">ON</span> <span class="p">(</span><span class="n">tc</span><span class="p">.</span><span class="k">constraint_catalog</span> <span class="o">=</span> <span class="n">ccu</span><span class="p">.</span><span class="k">constraint_catalog</span> <span class="k">AND</span> <span class="n">tc</span><span class="p">.</span><span class="k">constraint_schema</span> <span class="o">=</span> <span class="n">ccu</span><span class="p">.</span><span class="k">constraint_schema</span> <span class="k">AND</span> <span class="n">tc</span><span class="p">.</span><span class="k">constraint_name</span> <span class="o">=</span> <span class="n">ccu</span><span class="p">.</span><span class="k">constraint_name</span><span class="p">)</span>
+<span class="k">WHERE</span> <span class="n">tc</span><span class="p">.</span><span class="n">table_schema</span> <span class="k">IN</span> <span class="p">(</span><span class="k">SELECT</span> <span class="k">unnest</span><span class="p">(</span><span class="n">string_to_array</span><span class="p">(:</span><span class="s1">&#39;schemas&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">)))</span>
+    <span class="k">AND</span> <span class="n">tc</span><span class="p">.</span><span class="n">constraint_type</span> <span class="o">=</span> <span class="s1">&#39;PRIMARY KEY&#39;</span>
+<span class="k">GROUP</span> <span class="k">BY</span>
+    <span class="n">tc</span><span class="p">.</span><span class="n">table_schema</span><span class="p">,</span>
+    <span class="n">tc</span><span class="p">.</span><span class="k">table_name</span><span class="p">,</span>
+    <span class="n">tc</span><span class="p">.</span><span class="k">constraint_name</span><span class="p">,</span>
+    <span class="n">tc</span><span class="p">.</span><span class="n">constraint_type</span>
+<span class="p">)</span>
+<span class="k">SELECT</span> <span class="n">def</span> <span class="k">FROM</span> <span class="k">constraints</span>
+<span class="k">UNION</span> <span class="k">ALL</span>
+<span class="k">SELECT</span> <span class="n">indexdef</span> <span class="o">||</span> <span class="s1">&#39;;&#39;</span>
+<span class="k">FROM</span> <span class="n">pg_indexes</span>
+<span class="k">WHERE</span> <span class="n">schemaname</span> <span class="k">IN</span> <span class="p">(</span><span class="k">SELECT</span> <span class="k">unnest</span><span class="p">(</span><span class="n">string_to_array</span><span class="p">(:</span><span class="s1">&#39;schemas&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">)))</span> 
+<span class="k">AND</span> <span class="k">NOT</span> <span class="k">EXISTS</span> <span class="p">(</span>
+    <span class="k">SELECT</span> <span class="mi">1</span> <span class="k">FROM</span>
+    <span class="k">constraints</span> <span class="k">c</span>
+    <span class="k">WHERE</span> <span class="n">pg_indexes</span><span class="p">.</span><span class="n">schemaname</span> <span class="o">=</span> <span class="k">c</span><span class="p">.</span><span class="n">table_schema</span>
+        <span class="k">AND</span> <span class="n">pg_indexes</span><span class="p">.</span><span class="n">tablename</span> <span class="o">=</span> <span class="k">c</span><span class="p">.</span><span class="k">table_name</span>
+        <span class="k">AND</span> <span class="n">pg_indexes</span><span class="p">.</span><span class="n">indexname</span> <span class="o">=</span> <span class="k">c</span><span class="p">.</span><span class="k">constraint_name</span>
+<span class="p">);</span>
+</pre></div>
+
+
+<h2>Few&nbsp;sidenotes</h2>
+<ol>
+<li>Run the second piece of code first. If you forget, run that code on the source&nbsp;database.</li>
+<li>Notice the <code>:schemas</code>. Variable assignment is one of the <code>psql</code> features I really&nbsp;like.</li>
+<li>Notice <code>DROP INDEX IF EXISTS</code> and the <span class="caps">CTE</span> used in the drop code - that&#8217;s due to the fact that dropping the constraint obviously drops the underlying index as well and you don&#8217;t want to dropping something that doesn&#8217;t exist or creating something that exists&nbsp;already.</li>
+</ol>
+<p>The bash script proposal might look as&nbsp;follows:</p>
+<div class="highlight"><pre><span></span><span class="c1"># store indices and constraint definitions</span>
+psql -qAt -d target -v <span class="nv">schemas</span><span class="o">=</span><span class="s1">&#39;schema1&#39;</span>,<span class="s1">&#39;schema2&#39;</span> -f create_indices_constraints.sql &gt; create.sql
+
+<span class="c1"># drop indices and constraints</span>
+psql -qAt -d target -v <span class="nv">schemas</span><span class="o">=</span><span class="s1">&#39;schema1&#39;</span>,<span class="s1">&#39;schema2&#39;</span> -f drop_indices_constraints.sql <span class="p">|</span> psql -d target
+
+​# load data
+pg_dump -a -t <span class="s2">&quot;schema1.*&quot;</span> -t <span class="s2">&quot;schema2.*&quot;</span> -O -d <span class="nb">source</span> -v <span class="p">|</span> psql -h localhost -d target
+
+<span class="c1">#renew indices and constraints</span>
+psql -qAt -d target -f create.sql
+​
+</pre></div>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2016/testing-postgresql-ogr-fdw/" rel="bookmark" title="Permalink to Testing PostgreSQL OGR FDW">Testing PostgreSQL <span class="caps">OGR</span> <span class="caps">FDW</span></a></h1>
     <aside><span>Jul 1, 2016</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
@@ -236,81 +330,6 @@ gdaladdo <span class="si">${</span><span class="nv">OUTPUTPATH</span><span class
 
 
 <p>And you&#8217;re done. The <code>.wld</code> file will be present for each resulting file. I rename it manually to match the name of a GeoTiff - that should be probably done automatically as&nbsp;well.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2016/looking-for-the-next-row-with-postgresql/" rel="bookmark" title="Permalink to Looking for the Next Row with PostgreSQL">Looking for the Next Row with&nbsp;PostgreSQL</a></h1>
-    <aside><span>Jan 23, 2016</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <h2>Using <span class="caps">JOIN</span>&nbsp;clause</h2>
-<p>All my <span class="caps">GIS</span> life I&#8217;ve been using a simple <code>JOIN</code> clause to find a row with an <code>id = previous_id + 1</code>. In other words, imagine a simple table with no&nbsp;indices:</p>
-<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">test</span> <span class="p">(</span><span class="n">id</span> <span class="nb">integer</span><span class="p">);</span>
-<span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">test</span> <span class="k">SELECT</span> <span class="n">i</span> <span class="k">FROM</span> <span class="n">generate_series</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">10000000</span><span class="p">)</span> <span class="n">i</span><span class="p">;</span>
-</pre></div>
-
-
-<p>Let&#8217;s retrieve next row for each row in that&nbsp;table:</p>
-<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">a</span><span class="p">.</span><span class="n">id</span><span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">id</span>
-<span class="k">FROM</span> <span class="n">test</span> <span class="n">a</span>
-<span class="k">LEFT</span> <span class="k">JOIN</span> <span class="n">test</span> <span class="n">b</span> <span class="k">ON</span> <span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">id</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">=</span> <span class="n">b</span><span class="p">.</span><span class="n">id</span><span class="p">);</span> <span class="c1">-- note the LEFT JOIN is needed to get the last row as well</span>
-</pre></div>
-
-
-<p>Execution plan looks like&nbsp;this:</p>
-<div class="highlight"><pre><span></span><span class="n">Hash</span> <span class="k">Join</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">311087</span><span class="p">.</span><span class="mi">17</span><span class="p">..</span><span class="mi">953199</span><span class="p">.</span><span class="mi">41</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10088363</span> <span class="n">width</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">25440</span><span class="p">.</span><span class="mi">770</span><span class="p">..</span><span class="mi">79591</span><span class="p">.</span><span class="mi">869</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000000</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-   <span class="n">Hash</span> <span class="n">Cond</span><span class="p">:</span> <span class="p">((</span><span class="n">a</span><span class="p">.</span><span class="n">id</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">b</span><span class="p">.</span><span class="n">id</span><span class="p">)</span>
-   <span class="o">-&gt;</span>  <span class="n">Seq</span> <span class="n">Scan</span> <span class="k">on</span> <span class="n">test</span> <span class="n">a</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">00</span><span class="p">..</span><span class="mi">145574</span><span class="p">.</span><span class="mi">63</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10088363</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">588</span><span class="p">..</span><span class="mi">10801</span><span class="p">.</span><span class="mi">584</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-   <span class="o">-&gt;</span>  <span class="n">Hash</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">145574</span><span class="p">.</span><span class="mi">63</span><span class="p">..</span><span class="mi">145574</span><span class="p">.</span><span class="mi">63</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10088363</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">25415</span><span class="p">.</span><span class="mi">282</span><span class="p">..</span><span class="mi">25415</span><span class="p">.</span><span class="mi">282</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-         <span class="n">Buckets</span><span class="p">:</span> <span class="mi">16384</span>  <span class="n">Batches</span><span class="p">:</span> <span class="mi">128</span>  <span class="n">Memory</span> <span class="k">Usage</span><span class="p">:</span> <span class="mi">2778</span><span class="n">kB</span>
-         <span class="o">-&gt;</span>  <span class="n">Seq</span> <span class="n">Scan</span> <span class="k">on</span> <span class="n">test</span> <span class="n">b</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">00</span><span class="p">..</span><span class="mi">145574</span><span class="p">.</span><span class="mi">63</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10088363</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">422</span><span class="p">..</span><span class="mi">11356</span><span class="p">.</span><span class="mi">108</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
- <span class="n">Planning</span> <span class="n">time</span><span class="p">:</span> <span class="mi">0</span><span class="p">.</span><span class="mi">155</span> <span class="n">ms</span>
- <span class="n">Execution</span> <span class="n">time</span><span class="p">:</span> <span class="mi">90134</span><span class="p">.</span><span class="mi">248</span> <span class="n">ms</span>
-</pre></div>
-
-
-<p>If we add an index with <code>CREATE INDEX ON test (id)</code>, the plan&nbsp;changes:</p>
-<div class="highlight"><pre><span></span><span class="n">Merge</span> <span class="k">Join</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">87</span><span class="p">..</span><span class="mi">669369</span><span class="p">.</span><span class="mi">85</span> <span class="k">rows</span><span class="o">=</span><span class="mi">9999844</span> <span class="n">width</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">035</span><span class="p">..</span><span class="mi">56219</span><span class="p">.</span><span class="mi">294</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-   <span class="n">Merge</span> <span class="n">Cond</span><span class="p">:</span> <span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">b</span><span class="p">.</span><span class="n">id</span><span class="p">)</span>
-   <span class="o">-&gt;</span>  <span class="k">Index</span> <span class="k">Only</span> <span class="n">Scan</span> <span class="k">using</span> <span class="n">test_id_idx</span> <span class="k">on</span> <span class="n">test</span> <span class="n">a</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">43</span><span class="p">..</span><span class="mi">259686</span><span class="p">.</span><span class="mi">10</span> <span class="k">rows</span><span class="o">=</span><span class="mi">9999844</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">015</span><span class="p">..</span><span class="mi">11101</span><span class="p">.</span><span class="mi">937</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-         <span class="n">Heap</span> <span class="n">Fetches</span><span class="p">:</span> <span class="mi">0</span>
-   <span class="o">-&gt;</span>  <span class="k">Index</span> <span class="k">Only</span> <span class="n">Scan</span> <span class="k">using</span> <span class="n">test_id_idx</span> <span class="k">on</span> <span class="n">test</span> <span class="n">b</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">43</span><span class="p">..</span><span class="mi">259686</span><span class="p">.</span><span class="mi">10</span> <span class="k">rows</span><span class="o">=</span><span class="mi">9999844</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">012</span><span class="p">..</span><span class="mi">11827</span><span class="p">.</span><span class="mi">895</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-         <span class="n">Heap</span> <span class="n">Fetches</span><span class="p">:</span> <span class="mi">0</span>
- <span class="n">Planning</span> <span class="n">time</span><span class="p">:</span> <span class="mi">0</span><span class="p">.</span><span class="mi">244</span> <span class="n">ms</span>
- <span class="n">Execution</span> <span class="n">time</span><span class="p">:</span> <span class="mi">65973</span><span class="p">.</span><span class="mi">421</span> <span class="n">ms</span>
-</pre></div>
-
-
-<p>Not&nbsp;bad.</p>
-<h2>Using window&nbsp;function</h2>
-<p><a href="http://www.postgresql.org/docs/9.4/static/functions-window.html">Window functions</a> are real fun. They&#8217;re great if you&#8217;re doing counts, sums or ranks by groups. And, to my surprise, they&#8217;re great in finding next rows as&nbsp;well.</p>
-<p>With the same <code>test</code> table, we retrieve next row for each row with the following&nbsp;query:</p>
-<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">id</span><span class="p">,</span> <span class="n">lead</span><span class="p">(</span><span class="n">id</span><span class="p">)</span> <span class="n">OVER</span> <span class="p">(</span><span class="k">ORDER</span> <span class="k">BY</span> <span class="n">id</span><span class="p">)</span>
-<span class="k">FROM</span> <span class="n">test</span><span class="p">.</span><span class="n">test</span><span class="p">;</span>
-</pre></div>
-
-
-<p>How does that score without an index? Better than the <code>JOIN</code> clause.</p>
-<div class="highlight"><pre><span></span><span class="n">WindowAgg</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">1581246</span><span class="p">.</span><span class="mi">90</span><span class="p">..</span><span class="mi">1756294</span><span class="p">.</span><span class="mi">50</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10002720</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">28785</span><span class="p">.</span><span class="mi">388</span><span class="p">..</span><span class="mi">63819</span><span class="p">.</span><span class="mi">071</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-   <span class="o">-&gt;</span>  <span class="n">Sort</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">1581246</span><span class="p">.</span><span class="mi">90</span><span class="p">..</span><span class="mi">1606253</span><span class="p">.</span><span class="mi">70</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10002720</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">28785</span><span class="p">.</span><span class="mi">354</span><span class="p">..</span><span class="mi">40117</span><span class="p">.</span><span class="mi">899</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-         <span class="n">Sort</span> <span class="k">Key</span><span class="p">:</span> <span class="n">id</span>
-         <span class="n">Sort</span> <span class="k">Method</span><span class="p">:</span> <span class="k">external</span> <span class="n">merge</span>  <span class="n">Disk</span><span class="p">:</span> <span class="mi">136848</span><span class="n">kB</span>
-         <span class="o">-&gt;</span>  <span class="n">Seq</span> <span class="n">Scan</span> <span class="k">on</span> <span class="n">test</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">00</span><span class="p">..</span><span class="mi">144718</span><span class="p">.</span><span class="mi">20</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10002720</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">020</span><span class="p">..</span><span class="mi">10797</span><span class="p">.</span><span class="mi">961</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
- <span class="n">Planning</span> <span class="n">time</span><span class="p">:</span> <span class="mi">0</span><span class="p">.</span><span class="mi">242</span> <span class="n">ms</span>
- <span class="n">Execution</span> <span class="n">time</span><span class="p">:</span> <span class="mi">73391</span><span class="p">.</span><span class="mi">024</span> <span class="n">ms</span>
-</pre></div>
-
-
-<p>And it works even better if indexed. It&#8217;s actually ~1,5&times; faster than the <code>JOIN</code> way.</p>
-<div class="highlight"><pre><span></span><span class="n">WindowAgg</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">43</span><span class="p">..</span><span class="mi">409770</span><span class="p">.</span><span class="mi">03</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10002720</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">087</span><span class="p">..</span><span class="mi">35647</span><span class="p">.</span><span class="mi">815</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-   <span class="o">-&gt;</span>  <span class="k">Index</span> <span class="k">Only</span> <span class="n">Scan</span> <span class="k">using</span> <span class="n">test_id_idx</span> <span class="k">on</span> <span class="n">test</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">43</span><span class="p">..</span><span class="mi">259729</span><span class="p">.</span><span class="mi">23</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10002720</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">059</span><span class="p">..</span><span class="mi">11310</span><span class="p">.</span><span class="mi">879</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-         <span class="n">Heap</span> <span class="n">Fetches</span><span class="p">:</span> <span class="mi">0</span>
- <span class="n">Planning</span> <span class="n">time</span><span class="p">:</span> <span class="mi">0</span><span class="p">.</span><span class="mi">247</span> <span class="n">ms</span>
- <span class="n">Execution</span> <span class="n">time</span><span class="p">:</span> <span class="mi">45388</span><span class="p">.</span><span class="mi">202</span> <span class="n">ms</span>
-</pre></div>
-
-
-<p>It reads well and the purpose of such a query is pretty&nbsp;obvious.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/index5.html">&laquo; Previous page</a>

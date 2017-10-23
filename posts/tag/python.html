@@ -24,6 +24,139 @@
 <h2 class="text-center">Articles tagged with python tag</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2017/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/" rel="bookmark" title="Permalink to Serving Mapbox Vector Tiles with PostGIS, Nginx and Python Backend">Serving Mapbox Vector Tiles with PostGIS, Nginx and Python&nbsp;Backend</a></h1>
+    <aside><span>Oct 23, 2017</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p><a href="({filename}../2017/postgis-as-a-mapbox-vector-tiles-generator.md)">Since version 2.4.0, PostGIS can serve <span class="caps">MVT</span></a> data directly. <span class="caps">MVT</span> returning queries put heavy workload on the database though. On top of that, each of the query has to be run again every time a client demands the data. This leaves us with plenty of room to optimize the&nbsp;process.</p>
+<div class="text-center"><img data-echo="/posts/assets/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/election.gif"/></div>
+
+<p>During the last week, while working on the Czech parlamental election data visualization, I&#8217;ve struggled with the server becoming unresponsive far too often due to the issues mentioned&nbsp;above.</p>
+<div class="text-center"><img data-echo="/posts/assets/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/schema.png"/></div>
+
+<p>According to the schema, the first client to come to the&nbsp;server:</p>
+<ul>
+<li>goes through filesystem unstopped, because there are no cached files&nbsp;yet,</li>
+<li>continues to the Flask backend and asks for a file at <code>{z}/{x}/{y}</code>,</li>
+<li>Flask backend asks the database to return the <span class="caps">MVT</span> for the given&nbsp;tile,</li>
+<li>Flask backend writes the response to the filesystem and sends it to the&nbsp;client.</li>
+</ul>
+<p>Other clients get tiles directly from the filesystem, leaving the database at&nbsp;ease.</p>
+<h2>Nginx</h2>
+<p>Nginx is fairly simple to set up, once you know what you&#8217;re doing. The <code>/volby-2017/municipality/</code> location serves static <span class="caps">MVT</span> from the given alias directory. If not found, the request is passed to <code>@postgis</code> location, that asks the Flask backend for the&nbsp;response.</p>
+<div class="highlight"><pre><span></span>server election <span class="o">{</span>
+    location /volby-2017/municipality <span class="o">{</span>
+            <span class="nb">alias</span> /opt/volby-cz-2017/server/cache/<span class="p">;</span>
+            try_files <span class="nv">$uri</span> @postgis<span class="p">;</span>
+    <span class="o">}</span>
+
+    location @postgis <span class="o">{</span>
+            include uwsgi_params<span class="p">;</span>
+            uwsgi_pass <span class="m">127</span>.0.0.1:5000<span class="p">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<h2>Flask&nbsp;backend</h2>
+<script src="https://gist.github.com/zimmicz/46485676e1cf3d6566f0aaa7f93f055b.js"></script>
+
+<h2>Generating static <span class="caps">MVT</span> in&nbsp;advance</h2>
+<p>If you&#8217;re going to serve static tiles that don&#8217;t change often, it might be a good idea to use PostGIS to create files in advance and serve them with&nbsp;Nginx.</p>
+<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">tiles</span> <span class="p">(</span>
+    <span class="n">x</span> <span class="nb">integer</span><span class="p">,</span>
+    <span class="n">y</span> <span class="nb">integer</span><span class="p">,</span>
+    <span class="n">z</span> <span class="nb">integer</span><span class="p">,</span>
+    <span class="n">west</span> <span class="nb">numeric</span><span class="p">,</span>
+    <span class="n">south</span> <span class="nb">numeric</span><span class="p">,</span>
+    <span class="n">east</span> <span class="nb">numeric</span><span class="p">,</span>
+    <span class="n">north</span> <span class="nb">numeric</span><span class="p">,</span>
+    <span class="n">geom</span> <span class="n">geometry</span><span class="p">(</span><span class="n">POLYGON</span><span class="p">,</span> <span class="mi">3857</span><span class="p">)</span>
+<span class="p">);</span>
+</pre></div>
+
+
+<p>Using <a href="https://github.com/mapbox/mercantile">mercantile</a>, you can create the <code>tiles</code> table holding the bounding boxes of the tiles you need. PostGIS them inserts the actual <span class="caps">MVT</span> into the <code>mvt</code> table.</p>
+<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">TEMPORARY</span> <span class="k">TABLE</span> <span class="n">tmp_tiles</span> <span class="k">AS</span>
+    <span class="k">SELECT</span>
+        <span class="n">muni</span><span class="p">.</span><span class="n">muni_id</span><span class="p">,</span>
+        <span class="n">prc</span><span class="p">.</span><span class="k">data</span><span class="p">,</span>
+        <span class="n">ST_AsMVTGeom</span><span class="p">(</span>
+            <span class="n">muni</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span>
+            <span class="n">TileBBox</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">x</span> <span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="mi">3857</span><span class="p">),</span>
+            <span class="mi">4096</span><span class="p">,</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="k">false</span>
+        <span class="p">)</span> <span class="n">geom</span><span class="p">,</span>
+        <span class="n">x</span><span class="p">,</span>
+        <span class="n">y</span><span class="p">,</span>
+        <span class="n">z</span>
+    <span class="k">FROM</span> <span class="n">muni</span>
+    <span class="k">JOIN</span> <span class="p">(</span>
+        <span class="k">SELECT</span>
+            <span class="n">x</span><span class="p">,</span>
+            <span class="n">y</span><span class="p">,</span>
+            <span class="n">z</span><span class="p">,</span>
+            <span class="n">geom</span>
+        <span class="k">FROM</span> <span class="n">tiles</span>
+    <span class="p">)</span> <span class="n">bbox</span> <span class="k">ON</span> <span class="p">(</span><span class="n">ST_Intersects</span><span class="p">(</span><span class="n">muni</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">bbox</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span>
+    <span class="k">JOIN</span> <span class="n">party_results_cur</span> <span class="n">prc</span> <span class="k">ON</span> <span class="p">(</span><span class="n">muni</span><span class="p">.</span><span class="n">muni_id</span> <span class="o">=</span> <span class="n">prc</span><span class="p">.</span><span class="n">muni_id</span><span class="p">);</span>
+<span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">mvt</span> <span class="p">(</span><span class="n">mvt</span> <span class="n">bytea</span><span class="p">,</span> <span class="n">x</span> <span class="nb">integer</span><span class="p">,</span> <span class="n">y</span> <span class="nb">integer</span><span class="p">,</span> <span class="n">z</span> <span class="nb">integer</span><span class="p">);</span>
+<span class="k">DO</span>
+<span class="err">$$</span>
+<span class="k">DECLARE</span> <span class="n">r</span> <span class="n">record</span><span class="p">;</span>
+<span class="k">BEGIN</span>
+<span class="k">FOR</span> <span class="n">r</span> <span class="k">in</span> <span class="k">SELECT</span> <span class="k">DISTINCT</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="k">FROM</span> <span class="n">tmp_tiles</span> <span class="n">LOOP</span>
+    <span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">mvt</span>
+    <span class="k">SELECT</span> <span class="n">ST_AsMVT</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="s1">&#39;municipality&#39;</span><span class="p">,</span> <span class="mi">4096</span><span class="p">,</span> <span class="s1">&#39;geom&#39;</span><span class="p">),</span> <span class="n">r</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">r</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="n">r</span><span class="p">.</span><span class="n">z</span>
+    <span class="k">FROM</span> <span class="p">(</span>
+        <span class="k">SELECT</span>
+            <span class="n">muni_id</span><span class="p">,</span>
+            <span class="k">data</span><span class="p">,</span>
+            <span class="n">geom</span>
+        <span class="k">FROM</span> <span class="n">tmp_tiles</span>
+        <span class="k">WHERE</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">r</span><span class="p">)</span>
+    <span class="p">)</span> <span class="n">q</span><span class="p">;</span>
+    <span class="n">RAISE</span> <span class="n">INFO</span> <span class="s1">&#39;%&#39;</span><span class="p">,</span> <span class="n">r</span><span class="p">;</span>
+<span class="k">END</span> <span class="n">LOOP</span><span class="p">;</span>
+<span class="k">END</span><span class="p">;</span>
+<span class="err">$$</span><span class="p">;</span>
+</pre></div>
+
+
+<p>Once filled, the table rows can be written to the filesystem with the simple piece of Python&nbsp;code.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">create_engine</span><span class="p">,</span> <span class="n">text</span>
+
+<span class="n">CACHE_PATH</span><span class="o">=</span><span class="s2">&quot;cache/&quot;</span>
+
+<span class="n">e</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s1">&#39;postgresql:///&#39;</span><span class="p">)</span>
+<span class="n">conn</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="n">sql</span><span class="o">=</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;SELECT mvt, x, y, z FROM mvt&quot;</span><span class="p">)</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+    <span class="n">cachefile</span> <span class="o">=</span> <span class="s2">&quot;{}/{}/{}/{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">CACHE_PATH</span><span class="p">,</span> <span class="n">d</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">cachefile</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s2">&quot;{}/{}/{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">CACHE_PATH</span><span class="p">,</span> <span class="n">d</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">])):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s2">&quot;{}/{}/{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">CACHE_PATH</span><span class="p">,</span> <span class="n">d</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cachefile</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+</pre></div>
+
+
+<h2>Conclusion</h2>
+<p>PostGIS is a brilliant tool for generating Mapbox vector tiles. Combined with Python powered static file generator and Nginx, it seems to become the only tool needed to get you&nbsp;going.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2017/postgresql-development-history-revealed-with-postgresql/" rel="bookmark" title="Permalink to PostgreSQL Development History Revealed with PostgreSQL">PostgreSQL Development History Revealed with&nbsp;PostgreSQL</a></h1>
     <aside><span>Aug 9, 2017</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>    </span>
@@ -605,38 +738,6 @@
 <li>Derive image width (<span class="caps">CRS</span>, pixels) from the saved image, thus getting the same zoom level you were using in <span class="caps">QGIS</span>.</li>
 </ol>
 <p>Code given is not bulletproof, it will fail on any network error. However, if you restart it after such a crash, it checks for existing files and starts with the first missing, so you don&#8217;t have to download all the tiles&nbsp;again.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2014/migrating-geoserver-and-checking-for-missing-data/" rel="bookmark" title="Permalink to Migrating Geoserver And Checking For Missing Data">Migrating Geoserver And Checking For Missing&nbsp;Data</a></h1>
-    <aside><span>Oct 29, 2014</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/geoserver.html">geoserver</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
-    </aside>
-    <p>I&#8217;ve upgraded a handful of Geoserver installations and it has never been flawless. If you&#8217;re lucky you end up with just <em>some</em> layers missing, if you&#8217;re not, you&#8217;ll miss a bunch of them (together with layergroups, some stores, workspaces might screw up&nbsp;etc.).</p>
-<p>But how do you check for missing data before switching to the newer version? Thanks to the <a href="http://docs.geoserver.org/stable/en/user/rest/api/index.html"><span class="caps">REST</span> <span class="caps">API</span> implemented within Geoserver</a>, it&#8217;s rather&nbsp;easy.</p>
-<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
-<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
-<span class="kn">from</span> <span class="nn">requests.auth</span> <span class="kn">import</span> <span class="n">HTTPBasicAuth</span>
-
-<span class="n">req</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;http://example.com/geoserver/rest/layers&#39;</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="n">HTTPBasicAuth</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">))</span>
-
-<span class="n">html</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
-<span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="k">for</span> <span class="n">link</span> <span class="ow">in</span> <span class="n">html</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">):</span>
-    <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
-    <span class="n">href</span> <span class="o">=</span> <span class="n">link</span><span class="o">.</span><span class="n">get_text</span><span class="p">()</span>
-    <span class="k">print</span> <span class="n">i</span>
-
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;list.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">href</span><span class="p">)</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-</pre></div>
-
-
-<p>We needed to migrate ~ 17,000 layers last week, and yes, we could have just shut the door and spend couple of nights checking one after another, if we were the dumbest <span class="caps">GIS</span> company&nbsp;ever.</p>
-<p>As I wanted to make it a bit easier I wrote the simple Python script (see above) that just authenticates against Geoserver and downloads the list of layers. I actually had to do that twice - both old and new instance. A <a href="https://www.diffchecker.com/">simple file comparison</a> followed and I got a list of missing layers in less than two&nbsp;minutes.</p>
-<p>If you do the same to workspaces, stores and layergroups, your chances of not losing some data after the switch are pretty&nbsp;high.</p>
-<p>I guess it&#8217;s reasonable to check your maps by hand as well, but this gives you the picture of the current state of your data real&nbsp;quick.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/tag/python2.html">Next page &raquo;</a>

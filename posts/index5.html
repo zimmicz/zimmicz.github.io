@@ -23,6 +23,41 @@
     <main>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2016/ogrinfo-output-formatting/" rel="bookmark" title="Permalink to Ogrinfo Output Formatting">Ogrinfo Output&nbsp;Formatting</a></h1>
+    <aside><span>Oct 21, 2016</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
+    </aside>
+    <p>Today my workmate asked if there was a way to see an attribute table other than importing spatial data into a PostGIS database. I told him about <span class="caps">QGIS</span> and while talking about other <span class="caps">GIS</span> stuff, I started thinking about <em>pipes</em> and how awesome it would be to actually format the output of the <code>ogrinfo</code> command.</p>
+<p>Here it is. It is just a much longer way to do <code>ogr2ogr -f "CSV" dest source</code>, but sometimes you just have to experiment a&nbsp;bit.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="nv">FILE</span><span class="o">=</span><span class="nv">$1</span>
+
+<span class="k">function</span> columns <span class="o">{</span>
+    ogrinfo <span class="nv">$FILE</span> -al -so <span class="p">|</span> <span class="se">\</span>
+    sed <span class="s1">&#39;/Column/,$!d&#39;</span> <span class="p">|</span> <span class="se">\</span>
+    sed <span class="s1">&#39;/Geometry Column/d&#39;</span> <span class="p">|</span> <span class="se">\</span>
+    sed -e <span class="s1">&#39;s/Column =/\:/g&#39;</span> <span class="p">|</span> <span class="se">\</span>
+    awk -F: <span class="s1">&#39;{print $1}&#39;</span> <span class="p">|</span> <span class="se">\</span>
+    awk -v <span class="nv">RS</span><span class="o">=</span> -v <span class="nv">OFS</span><span class="o">=</span><span class="s2">&quot;|&quot;</span> <span class="s1">&#39;{$1 = $1} 1&#39;</span>
+<span class="o">}</span>
+
+<span class="k">function</span> data <span class="o">{</span>
+   ogrinfo <span class="nv">$FILE</span> -al <span class="p">|</span> <span class="se">\</span>
+   sed <span class="s1">&#39;/OGRFeature/,$!d&#39;</span> <span class="p">|</span> <span class="se">\</span>
+   sed <span class="s1">&#39;/POLYGON\|LINESTRING\|POINT/ d&#39;</span> <span class="p">|</span> <span class="se">\</span>
+   sed -e <span class="s1">&#39;s/OGRFeature\(.*\)\://g&#39;</span> <span class="p">|</span> <span class="se">\</span>
+   sed -e <span class="s1">&#39;s/.*\s*\(.*\)\s*=\s*//g&#39;</span> <span class="p">|</span> <span class="se">\</span>
+   awk -v <span class="nv">RS</span><span class="o">=</span> -v <span class="nv">OFS</span><span class="o">=</span><span class="s2">&quot;|&quot;</span> <span class="s1">&#39;{$1 = $1} 1&#39;</span>
+<span class="o">}</span>
+
+<span class="o">{</span> columns<span class="p">;</span> data<span class="p">;</span> <span class="o">}</span>
+</pre></div>
+
+
+<p>The result can be piped to other <code>bash</code> functions, such as <code>less</code> or <code>more</code>. I call it <code>ogrinfotable</code>.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-wind-rose/" rel="bookmark" title="Permalink to PostGIS Custom Function to Create Wind Rose">PostGIS Custom Function to Create Wind&nbsp;Rose</a></h1>
     <aside><span>Sep 1, 2016</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>    </span>
@@ -272,100 +307,6 @@
 
 <p>The inner <code>SELECT</code> calculates random points based on the extent of the polygon. Note it directly calls <code>a.geom</code>, a value that comes from the previous <code>SELECT</code>! The <code>LATERAL JOIN</code> part is thus run for every row of the previous <code>SELECT</code> statement inside <code>FROM</code> part of the query. This means it will return 201 points for each of the two polygons (run the query inside <span class="caps">QGIS</span> to see the&nbsp;result).</p>
 <p>Note all the points fall inside the polygons by accident, because they are <strong>square</strong>. Otherwise a <code>ST_Contains</code> or <code>ST_Within</code> should be used inside the outermost <code>WHERE</code> query to filter outliers. This part could use some&nbsp;tweaking.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2016/syncing-two-postgresql-databases-faster/" rel="bookmark" title="Permalink to Syncing Two PostgreSQL Databases Faster">Syncing Two PostgreSQL Databases&nbsp;Faster</a></h1>
-    <aside><span>Jul 17, 2016</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p>Imagine you run two database machines hosting structurally the same databases on two separate servers and you need to transfer data from one to another. Not very often, let&#8217;s say once a month. Your tables aren&#8217;t small nor huge, let&#8217;s say millions rows in&nbsp;general.</p>
-<p>You&#8217;re going to use <code>pg_dump</code> and pipe it to <code>psql</code>, but the indices on your tables will slow you down a&nbsp;lot.</p>
-<p>That&#8217;s why you&#8217;ll want to drop all indices and constraints (<code>drop_indices_constraints.sql</code>):</p>
-<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="s1">&#39;ALTER TABLE &#39;</span> <span class="o">||</span>
-    <span class="n">tc</span><span class="p">.</span><span class="n">table_schema</span> <span class="o">||</span>
-    <span class="s1">&#39;.&#39;</span> <span class="o">||</span>
-    <span class="n">tc</span><span class="p">.</span><span class="k">table_name</span> <span class="o">||</span>
-    <span class="s1">&#39; DROP CONSTRAINT &#39;</span> <span class="o">||</span>
-    <span class="n">tc</span><span class="p">.</span><span class="k">constraint_name</span>  <span class="o">||</span>
-    <span class="s1">&#39;;&#39;</span>
-<span class="k">FROM</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">table_constraints</span> <span class="n">tc</span>
-<span class="k">JOIN</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">constraint_column_usage</span> <span class="n">ccu</span> <span class="k">ON</span> <span class="p">(</span><span class="n">tc</span><span class="p">.</span><span class="k">constraint_catalog</span> <span class="o">=</span> <span class="n">ccu</span><span class="p">.</span><span class="k">constraint_catalog</span> <span class="k">AND</span> <span class="n">tc</span><span class="p">.</span><span class="k">constraint_schema</span> <span class="o">=</span> <span class="n">ccu</span><span class="p">.</span><span class="k">constraint_schema</span> <span class="k">AND</span> <span class="n">tc</span><span class="p">.</span><span class="k">constraint_name</span> <span class="o">=</span> <span class="n">ccu</span><span class="p">.</span><span class="k">constraint_name</span><span class="p">)</span>
-<span class="k">WHERE</span> <span class="n">tc</span><span class="p">.</span><span class="n">table_schema</span> <span class="k">IN</span> <span class="p">(</span><span class="k">SELECT</span> <span class="k">unnest</span><span class="p">(</span><span class="n">string_to_array</span><span class="p">(:</span><span class="s1">&#39;schemas&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">)))</span>
-<span class="k">UNION</span> <span class="k">ALL</span>
-<span class="k">SELECT</span>
-    <span class="s1">&#39;DROP INDEX IF EXISTS &#39;</span> <span class="o">||</span> <span class="n">schemaname</span> <span class="o">||</span> <span class="s1">&#39;.&#39;</span> <span class="o">||</span> <span class="n">indexname</span> <span class="o">||</span> <span class="s1">&#39;;&#39;</span>
-<span class="k">FROM</span> <span class="n">pg_indexes</span>
-<span class="k">WHERE</span> <span class="n">schemaname</span> <span class="k">IN</span> <span class="p">(</span><span class="k">SELECT</span> <span class="k">unnest</span><span class="p">(</span><span class="n">string_to_array</span><span class="p">(:</span><span class="s1">&#39;schemas&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">)));</span>
-</pre></div>
-
-
-<p>Then you will transfer the&nbsp;data:</p>
-<div class="highlight"><pre><span></span>pg_dump -a -t <span class="s2">&quot;schema1.*&quot;</span> -t <span class="s2">&quot;schema2.*&quot;</span> -O -d <span class="nb">source</span> -v <span class="p">|</span> psql -h localhost -d target
-</pre></div>
-
-
-<p>And restore the already dropped indices and constraints (<code>create_indices_constraints.sql</code>):</p>
-<div class="highlight"><pre><span></span><span class="k">WITH</span> <span class="k">constraints</span> <span class="k">AS</span> <span class="p">(</span>
-<span class="k">SELECT</span> <span class="s1">&#39;ALTER TABLE &#39;</span> <span class="o">||</span>
-    <span class="n">tc</span><span class="p">.</span><span class="n">table_schema</span> <span class="o">||</span>
-    <span class="s1">&#39;.&#39;</span> <span class="o">||</span>
-    <span class="n">tc</span><span class="p">.</span><span class="k">table_name</span> <span class="o">||</span>
-    <span class="s1">&#39; ADD CONSTRAINT &#39;</span> <span class="o">||</span>
-    <span class="n">tc</span><span class="p">.</span><span class="k">constraint_name</span> <span class="o">||</span>
-    <span class="s1">&#39; &#39;</span> <span class="o">||</span>
-    <span class="n">tc</span><span class="p">.</span><span class="n">constraint_type</span> <span class="o">||</span>
-    <span class="s1">&#39;(&#39;</span> <span class="o">||</span>
-    <span class="n">string_agg</span><span class="p">(</span><span class="n">ccu</span><span class="p">.</span><span class="k">column_name</span><span class="p">::</span><span class="nb">text</span><span class="p">,</span> <span class="s1">&#39;, &#39;</span><span class="p">)</span><span class="o">||</span> <span class="c1">-- column order should be taken into account here</span>
-    <span class="s1">&#39;);&#39;</span> <span class="n">def</span><span class="p">,</span>
-    <span class="n">tc</span><span class="p">.</span><span class="n">table_schema</span><span class="p">,</span>
-    <span class="n">tc</span><span class="p">.</span><span class="k">table_name</span><span class="p">,</span>
-    <span class="n">tc</span><span class="p">.</span><span class="k">constraint_name</span>
-<span class="k">FROM</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">table_constraints</span> <span class="n">tc</span>
-<span class="k">JOIN</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">constraint_column_usage</span> <span class="n">ccu</span> <span class="k">ON</span> <span class="p">(</span><span class="n">tc</span><span class="p">.</span><span class="k">constraint_catalog</span> <span class="o">=</span> <span class="n">ccu</span><span class="p">.</span><span class="k">constraint_catalog</span> <span class="k">AND</span> <span class="n">tc</span><span class="p">.</span><span class="k">constraint_schema</span> <span class="o">=</span> <span class="n">ccu</span><span class="p">.</span><span class="k">constraint_schema</span> <span class="k">AND</span> <span class="n">tc</span><span class="p">.</span><span class="k">constraint_name</span> <span class="o">=</span> <span class="n">ccu</span><span class="p">.</span><span class="k">constraint_name</span><span class="p">)</span>
-<span class="k">WHERE</span> <span class="n">tc</span><span class="p">.</span><span class="n">table_schema</span> <span class="k">IN</span> <span class="p">(</span><span class="k">SELECT</span> <span class="k">unnest</span><span class="p">(</span><span class="n">string_to_array</span><span class="p">(:</span><span class="s1">&#39;schemas&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">)))</span>
-    <span class="k">AND</span> <span class="n">tc</span><span class="p">.</span><span class="n">constraint_type</span> <span class="o">=</span> <span class="s1">&#39;PRIMARY KEY&#39;</span>
-<span class="k">GROUP</span> <span class="k">BY</span>
-    <span class="n">tc</span><span class="p">.</span><span class="n">table_schema</span><span class="p">,</span>
-    <span class="n">tc</span><span class="p">.</span><span class="k">table_name</span><span class="p">,</span>
-    <span class="n">tc</span><span class="p">.</span><span class="k">constraint_name</span><span class="p">,</span>
-    <span class="n">tc</span><span class="p">.</span><span class="n">constraint_type</span>
-<span class="p">)</span>
-<span class="k">SELECT</span> <span class="n">def</span> <span class="k">FROM</span> <span class="k">constraints</span>
-<span class="k">UNION</span> <span class="k">ALL</span>
-<span class="k">SELECT</span> <span class="n">indexdef</span> <span class="o">||</span> <span class="s1">&#39;;&#39;</span>
-<span class="k">FROM</span> <span class="n">pg_indexes</span>
-<span class="k">WHERE</span> <span class="n">schemaname</span> <span class="k">IN</span> <span class="p">(</span><span class="k">SELECT</span> <span class="k">unnest</span><span class="p">(</span><span class="n">string_to_array</span><span class="p">(:</span><span class="s1">&#39;schemas&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">)))</span> 
-<span class="k">AND</span> <span class="k">NOT</span> <span class="k">EXISTS</span> <span class="p">(</span>
-    <span class="k">SELECT</span> <span class="mi">1</span> <span class="k">FROM</span>
-    <span class="k">constraints</span> <span class="k">c</span>
-    <span class="k">WHERE</span> <span class="n">pg_indexes</span><span class="p">.</span><span class="n">schemaname</span> <span class="o">=</span> <span class="k">c</span><span class="p">.</span><span class="n">table_schema</span>
-        <span class="k">AND</span> <span class="n">pg_indexes</span><span class="p">.</span><span class="n">tablename</span> <span class="o">=</span> <span class="k">c</span><span class="p">.</span><span class="k">table_name</span>
-        <span class="k">AND</span> <span class="n">pg_indexes</span><span class="p">.</span><span class="n">indexname</span> <span class="o">=</span> <span class="k">c</span><span class="p">.</span><span class="k">constraint_name</span>
-<span class="p">);</span>
-</pre></div>
-
-
-<h2>Few&nbsp;sidenotes</h2>
-<ol>
-<li>Run the second piece of code first. If you forget, run that code on the source&nbsp;database.</li>
-<li>Notice the <code>:schemas</code>. Variable assignment is one of the <code>psql</code> features I really&nbsp;like.</li>
-<li>Notice <code>DROP INDEX IF EXISTS</code> and the <span class="caps">CTE</span> used in the drop code - that&#8217;s due to the fact that dropping the constraint obviously drops the underlying index as well and you don&#8217;t want to dropping something that doesn&#8217;t exist or creating something that exists&nbsp;already.</li>
-</ol>
-<p>The bash script proposal might look as&nbsp;follows:</p>
-<div class="highlight"><pre><span></span><span class="c1"># store indices and constraint definitions</span>
-psql -qAt -d target -v <span class="nv">schemas</span><span class="o">=</span><span class="s1">&#39;schema1&#39;</span>,<span class="s1">&#39;schema2&#39;</span> -f create_indices_constraints.sql &gt; create.sql
-
-<span class="c1"># drop indices and constraints</span>
-psql -qAt -d target -v <span class="nv">schemas</span><span class="o">=</span><span class="s1">&#39;schema1&#39;</span>,<span class="s1">&#39;schema2&#39;</span> -f drop_indices_constraints.sql <span class="p">|</span> psql -d target
-
-​# load data
-pg_dump -a -t <span class="s2">&quot;schema1.*&quot;</span> -t <span class="s2">&quot;schema2.*&quot;</span> -O -d <span class="nb">source</span> -v <span class="p">|</span> psql -h localhost -d target
-
-<span class="c1">#renew indices and constraints</span>
-psql -qAt -d target -f create.sql
-​
-</pre></div>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/index4.html">&laquo; Previous page</a>

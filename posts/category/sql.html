@@ -24,6 +24,139 @@
 <h2 class="text-center">Articles in the SQL category</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2017/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/" rel="bookmark" title="Permalink to Serving Mapbox Vector Tiles with PostGIS, Nginx and Python Backend">Serving Mapbox Vector Tiles with PostGIS, Nginx and Python&nbsp;Backend</a></h1>
+    <aside><span>Oct 23, 2017</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p><a href="({filename}../2017/postgis-as-a-mapbox-vector-tiles-generator.md)">Since version 2.4.0, PostGIS can serve <span class="caps">MVT</span></a> data directly. <span class="caps">MVT</span> returning queries put heavy workload on the database though. On top of that, each of the query has to be run again every time a client demands the data. This leaves us with plenty of room to optimize the&nbsp;process.</p>
+<div class="text-center"><img data-echo="/posts/assets/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/election.gif"/></div>
+
+<p>During the last week, while working on the Czech parlamental election data visualization, I&#8217;ve struggled with the server becoming unresponsive far too often due to the issues mentioned&nbsp;above.</p>
+<div class="text-center"><img data-echo="/posts/assets/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/schema.png"/></div>
+
+<p>According to the schema, the first client to come to the&nbsp;server:</p>
+<ul>
+<li>goes through filesystem unstopped, because there are no cached files&nbsp;yet,</li>
+<li>continues to the Flask backend and asks for a file at <code>{z}/{x}/{y}</code>,</li>
+<li>Flask backend asks the database to return the <span class="caps">MVT</span> for the given&nbsp;tile,</li>
+<li>Flask backend writes the response to the filesystem and sends it to the&nbsp;client.</li>
+</ul>
+<p>Other clients get tiles directly from the filesystem, leaving the database at&nbsp;ease.</p>
+<h2>Nginx</h2>
+<p>Nginx is fairly simple to set up, once you know what you&#8217;re doing. The <code>/volby-2017/municipality/</code> location serves static <span class="caps">MVT</span> from the given alias directory. If not found, the request is passed to <code>@postgis</code> location, that asks the Flask backend for the&nbsp;response.</p>
+<div class="highlight"><pre><span></span>server election <span class="o">{</span>
+    location /volby-2017/municipality <span class="o">{</span>
+            <span class="nb">alias</span> /opt/volby-cz-2017/server/cache/<span class="p">;</span>
+            try_files <span class="nv">$uri</span> @postgis<span class="p">;</span>
+    <span class="o">}</span>
+
+    location @postgis <span class="o">{</span>
+            include uwsgi_params<span class="p">;</span>
+            uwsgi_pass <span class="m">127</span>.0.0.1:5000<span class="p">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<h2>Flask&nbsp;backend</h2>
+<script src="https://gist.github.com/zimmicz/46485676e1cf3d6566f0aaa7f93f055b.js"></script>
+
+<h2>Generating static <span class="caps">MVT</span> in&nbsp;advance</h2>
+<p>If you&#8217;re going to serve static tiles that don&#8217;t change often, it might be a good idea to use PostGIS to create files in advance and serve them with&nbsp;Nginx.</p>
+<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">tiles</span> <span class="p">(</span>
+    <span class="n">x</span> <span class="nb">integer</span><span class="p">,</span>
+    <span class="n">y</span> <span class="nb">integer</span><span class="p">,</span>
+    <span class="n">z</span> <span class="nb">integer</span><span class="p">,</span>
+    <span class="n">west</span> <span class="nb">numeric</span><span class="p">,</span>
+    <span class="n">south</span> <span class="nb">numeric</span><span class="p">,</span>
+    <span class="n">east</span> <span class="nb">numeric</span><span class="p">,</span>
+    <span class="n">north</span> <span class="nb">numeric</span><span class="p">,</span>
+    <span class="n">geom</span> <span class="n">geometry</span><span class="p">(</span><span class="n">POLYGON</span><span class="p">,</span> <span class="mi">3857</span><span class="p">)</span>
+<span class="p">);</span>
+</pre></div>
+
+
+<p>Using <a href="https://github.com/mapbox/mercantile">mercantile</a>, you can create the <code>tiles</code> table holding the bounding boxes of the tiles you need. PostGIS them inserts the actual <span class="caps">MVT</span> into the <code>mvt</code> table.</p>
+<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">TEMPORARY</span> <span class="k">TABLE</span> <span class="n">tmp_tiles</span> <span class="k">AS</span>
+    <span class="k">SELECT</span>
+        <span class="n">muni</span><span class="p">.</span><span class="n">muni_id</span><span class="p">,</span>
+        <span class="n">prc</span><span class="p">.</span><span class="k">data</span><span class="p">,</span>
+        <span class="n">ST_AsMVTGeom</span><span class="p">(</span>
+            <span class="n">muni</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span>
+            <span class="n">TileBBox</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">x</span> <span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="mi">3857</span><span class="p">),</span>
+            <span class="mi">4096</span><span class="p">,</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="k">false</span>
+        <span class="p">)</span> <span class="n">geom</span><span class="p">,</span>
+        <span class="n">x</span><span class="p">,</span>
+        <span class="n">y</span><span class="p">,</span>
+        <span class="n">z</span>
+    <span class="k">FROM</span> <span class="n">muni</span>
+    <span class="k">JOIN</span> <span class="p">(</span>
+        <span class="k">SELECT</span>
+            <span class="n">x</span><span class="p">,</span>
+            <span class="n">y</span><span class="p">,</span>
+            <span class="n">z</span><span class="p">,</span>
+            <span class="n">geom</span>
+        <span class="k">FROM</span> <span class="n">tiles</span>
+    <span class="p">)</span> <span class="n">bbox</span> <span class="k">ON</span> <span class="p">(</span><span class="n">ST_Intersects</span><span class="p">(</span><span class="n">muni</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">bbox</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span>
+    <span class="k">JOIN</span> <span class="n">party_results_cur</span> <span class="n">prc</span> <span class="k">ON</span> <span class="p">(</span><span class="n">muni</span><span class="p">.</span><span class="n">muni_id</span> <span class="o">=</span> <span class="n">prc</span><span class="p">.</span><span class="n">muni_id</span><span class="p">);</span>
+<span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">mvt</span> <span class="p">(</span><span class="n">mvt</span> <span class="n">bytea</span><span class="p">,</span> <span class="n">x</span> <span class="nb">integer</span><span class="p">,</span> <span class="n">y</span> <span class="nb">integer</span><span class="p">,</span> <span class="n">z</span> <span class="nb">integer</span><span class="p">);</span>
+<span class="k">DO</span>
+<span class="err">$$</span>
+<span class="k">DECLARE</span> <span class="n">r</span> <span class="n">record</span><span class="p">;</span>
+<span class="k">BEGIN</span>
+<span class="k">FOR</span> <span class="n">r</span> <span class="k">in</span> <span class="k">SELECT</span> <span class="k">DISTINCT</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="k">FROM</span> <span class="n">tmp_tiles</span> <span class="n">LOOP</span>
+    <span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">mvt</span>
+    <span class="k">SELECT</span> <span class="n">ST_AsMVT</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="s1">&#39;municipality&#39;</span><span class="p">,</span> <span class="mi">4096</span><span class="p">,</span> <span class="s1">&#39;geom&#39;</span><span class="p">),</span> <span class="n">r</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">r</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="n">r</span><span class="p">.</span><span class="n">z</span>
+    <span class="k">FROM</span> <span class="p">(</span>
+        <span class="k">SELECT</span>
+            <span class="n">muni_id</span><span class="p">,</span>
+            <span class="k">data</span><span class="p">,</span>
+            <span class="n">geom</span>
+        <span class="k">FROM</span> <span class="n">tmp_tiles</span>
+        <span class="k">WHERE</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">r</span><span class="p">)</span>
+    <span class="p">)</span> <span class="n">q</span><span class="p">;</span>
+    <span class="n">RAISE</span> <span class="n">INFO</span> <span class="s1">&#39;%&#39;</span><span class="p">,</span> <span class="n">r</span><span class="p">;</span>
+<span class="k">END</span> <span class="n">LOOP</span><span class="p">;</span>
+<span class="k">END</span><span class="p">;</span>
+<span class="err">$$</span><span class="p">;</span>
+</pre></div>
+
+
+<p>Once filled, the table rows can be written to the filesystem with the simple piece of Python&nbsp;code.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">create_engine</span><span class="p">,</span> <span class="n">text</span>
+
+<span class="n">CACHE_PATH</span><span class="o">=</span><span class="s2">&quot;cache/&quot;</span>
+
+<span class="n">e</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s1">&#39;postgresql:///&#39;</span><span class="p">)</span>
+<span class="n">conn</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="n">sql</span><span class="o">=</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;SELECT mvt, x, y, z FROM mvt&quot;</span><span class="p">)</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+    <span class="n">cachefile</span> <span class="o">=</span> <span class="s2">&quot;{}/{}/{}/{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">CACHE_PATH</span><span class="p">,</span> <span class="n">d</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">cachefile</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s2">&quot;{}/{}/{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">CACHE_PATH</span><span class="p">,</span> <span class="n">d</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">])):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s2">&quot;{}/{}/{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">CACHE_PATH</span><span class="p">,</span> <span class="n">d</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cachefile</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+</pre></div>
+
+
+<h2>Conclusion</h2>
+<p>PostGIS is a brilliant tool for generating Mapbox vector tiles. Combined with Python powered static file generator and Nginx, it seems to become the only tool needed to get you&nbsp;going.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2017/postgresql-dollar-quoting-inside-bash-heredoc/" rel="bookmark" title="Permalink to PostgreSQL Dollar Quoting inside Bash Heredoc">PostgreSQL Dollar Quoting inside Bash&nbsp;Heredoc</a></h1>
     <aside><span>Sep 22, 2017</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>    </span>
@@ -673,106 +806,6 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
 <li>Pedestrians usually don&#8217;t follow the road&nbsp;network.</li>
 <li>Bridges and tunnels might be an&nbsp;issue.</li>
 </ul>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2017/upgrading-postgresql-95-to-postgresql-96-with-postgis/" rel="bookmark" title="Permalink to Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with PostGIS">Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with&nbsp;PostGIS</a></h1>
-    <aside><span>Mar 1, 2017</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p>Thanks to <code>pg_upgrade</code> tool the PostgreSQL upgrade on Ubuntu is pretty straightforward. Different PostGIS versions might cause troubles though. This post covers PostgreSQL 9.5, PostGIS 2.2 to PostgreSQL 9.6, PostGIS 2.3&nbsp;migration.</p>
-<p>First of all, install the PostgreSQL 9.6 with PostGIS&nbsp;2.3.</p>
-<div class="highlight"><pre><span></span>apt install postgresql-9.6 postgresql-9.6-postgis-2.3
-</pre></div>
-
-
-<p>Mind that newly installed database cluster runs on port <code>5433</code>.</p>
-<p>If you run <code>pg_upgrade</code> at this stage, it will fail with the following&nbsp;error.</p>
-<div class="highlight"><pre><span></span>could not load library <span class="s2">&quot;</span><span class="nv">$libdir</span><span class="s2">/postgis_topology-2.2&quot;</span>:
-ERROR:  could not access file <span class="s2">&quot;</span><span class="nv">$libdir</span><span class="s2">/postgis_topology-2.2&quot;</span>: No such file or directory
-</pre></div>
-
-
-<p><code>pg_upgrade</code> can&#8217;t run the upgrade because PostGIS versions don&#8217;t match. Install the PostGIS 2.3 for PostgreSQL 9.5 and update extensions in all your&nbsp;databases.</p>
-<div class="highlight"><pre><span></span>apt install postgresql-9.5-postgis-2.3
-
-:::sql
-ALTER EXTENSION postgis UPDATE<span class="p">;</span>
-</pre></div>
-
-
-<p>With both clusters using the same PostGIS version, the upgrade can begin. First, stop them&nbsp;with</p>
-<div class="highlight"><pre><span></span>service postgresql stop
-</pre></div>
-
-
-<p>Then, run the actual <code>pg_upgrade</code> command as <code>postgres</code> user. Make sure the <code>pg_hba.conf</code> file is set to allow local&nbsp;connections.</p>
-<div class="highlight"><pre><span></span>/usr/lib/postgresql/9.6/bin/pg_upgrade <span class="se">\</span>
--b /usr/lib/postgresql/9.5/bin/ <span class="se">\</span>
--B /usr/lib/postgresql/9.6/bin/ <span class="se">\</span>
--d /var/lib/postgresql/9.5/main <span class="se">\</span>
--D /var/lib/postgresql/9.6/main <span class="se">\</span>
--o <span class="s1">&#39; -c config_file=/etc/postgresql/9.5/main/postgresql.conf&#39;</span> <span class="se">\</span>
--O <span class="s1">&#39; -c config_file=/etc/postgresql/9.6/main/postgresql.conf&#39;</span>
-</pre></div>
-
-
-<p>The following result means the upgrade was&nbsp;smooth.</p>
-<div class="highlight"><pre><span></span>Performing Consistency Checks
------------------------------
-Checking cluster versions                                   ok
-Checking database user is the install user                  ok
-Checking database connection settings                       ok
-Checking <span class="k">for</span> prepared transactions                          ok
-Checking <span class="k">for</span> reg* system OID user data types                ok
-Checking <span class="k">for</span> contrib/isn with bigint-passing mismatch       ok
-Checking <span class="k">for</span> roles starting with <span class="s1">&#39;pg_&#39;</span>                      ok
-Creating dump of global objects                             ok
-Creating dump of database schemas
-                                                            ok
-Checking <span class="k">for</span> presence of required libraries                 ok
-Checking database user is the install user                  ok
-Checking <span class="k">for</span> prepared transactions                          ok
-
-If pg_upgrade fails after this point, you must re-initdb the
-new cluster before continuing.
-
-Performing Upgrade
-------------------
-Analyzing all rows in the new cluster                       ok
-Freezing all rows on the new cluster                        ok
-Deleting files from new pg_clog                             ok
-Copying old pg_clog to new server                           ok
-Setting next transaction ID and epoch <span class="k">for</span> new cluster       ok
-Deleting files from new pg_multixact/offsets                ok
-Copying old pg_multixact/offsets to new server              ok
-Deleting files from new pg_multixact/members                ok
-Copying old pg_multixact/members to new server              ok
-Setting next multixact ID and offset <span class="k">for</span> new cluster        ok
-Resetting WAL archives                                      ok
-Setting frozenxid and minmxid counters in new cluster       ok
-Restoring global objects in the new cluster                 ok
-Restoring database schemas in the new cluster
-                                                            ok
-Copying user relation files
-                                                            ok
-Setting next OID <span class="k">for</span> new cluster                            ok
-Sync data directory to disk                                 ok
-Creating script to analyze new cluster                      ok
-Creating script to delete old cluster                       ok
-
-Upgrade Complete
-----------------
-Optimizer statistics are not transferred by pg_upgrade so,
-once you start the new server, consider running:
-    ./analyze_new_cluster.sh
-
-Running this script will delete the old cluster<span class="err">&#39;</span>s data files:
-    ./delete_old_cluster.sh
-</pre></div>
-
-
-<p>The old cluster can be removed and the new one switched back to port <code>5432</code>. Run <code>/usr/lib/postgresql/9.6/bin/vacuumdb -p 5433 --all --analyze-in-stages</code> to collect&nbsp;statistics.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/category/sql2.html">Next page &raquo;</a>

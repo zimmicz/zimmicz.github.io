@@ -23,6 +23,46 @@
     <main>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2014/wmts-few-things-i-want-to-remember/" rel="bookmark" title="Permalink to WMTS: Few Things I Want To Remember"><span class="caps">WMTS</span>: Few Things I Want To&nbsp;Remember</a></h1>
+    <aside><span>Sep 10, 2014</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/ogc.html">ogc</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/wmts.html">wmts</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/web-maps.html">web maps</a></span>
+    </aside>
+    <ul>
+<li>Used to serve prepared rectangular tiles; this means you are limited by web server speed rather than map server&nbsp;speed</li>
+<li>Several ways to retrieve tiles are defined: <span class="caps">KVP</span> and <span class="caps">REST</span> are mandatory, <span class="caps">SOAP</span> is&nbsp;optional</li>
+<li>Does not allow layer combination; additional tile matrix would have to be&nbsp;created</li>
+<li>GetCapabilities, GetTile and GetFeatureInfo requests are&nbsp;defined</li>
+<li><strong>tile</strong></li>
+<li>rectangular representation of&nbsp;space</li>
+<li>defined by tile and row&nbsp;indices</li>
+<li><strong>tile&nbsp;matrix</strong></li>
+<li>set of tiles for a given&nbsp;scale</li>
+<li><em>defined with:</em><ul>
+<li>tile size derived from standardized pixel size (0.28 &times; 0.28&nbsp;mm)</li>
+<li>tile width and tile height&nbsp;(px)</li>
+<li>left upper corner&nbsp;coordinates</li>
+<li>matrix width and height as number of&nbsp;tiles</li>
+</ul>
+</li>
+<li><strong>tile matrix&nbsp;set</strong></li>
+<li>set of tile matrices for different&nbsp;scales</li>
+</ul>
+<h3>Total count of tile&nbsp;matrices</h3>
+<p><em><code>nTileMatrices × nTiledStyles × nTiledFormats (if no dimensions are defined)</code></em></p>
+<h3>Total count of tiles in a tile&nbsp;matrix</h3>
+<p><em><code>matrixWidth × matrixHeight</code></em></p>
+<h3>Other&nbsp;equations</h3>
+<ul>
+<li><code>pixelSpan = scaleDenominator × 0.28 10<sup>3</sup> / metersPerUnit(crs);</code></li>
+<li><code>tileSpanX = tileWidth × pixelSpan;</code></li>
+<li><code>tileSpanY = tileHeight × pixelSpan;</code></li>
+<li><code>tileMatrixMaxX = tileMatrixMinX + tileSpanX × matrixWidth;</code></li>
+<li><code>tileMatrixMinY = tileMatrixMaxY - tileSpanY × matrixHeight;</code></li>
+</ul>
+<p><img data-echo="/posts/assets/wmts-few-things-i-want-to-remember/wmts.png" title="WMTS tiling schema" class="img-responsive centered"></p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2014/degrees-to-decimal-with-javascript/" rel="bookmark" title="Permalink to Degrees To Decimal With Javascript">Degrees To Decimal With&nbsp;Javascript</a></h1>
     <aside><span>Sep 9, 2014</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>    </span>
@@ -321,18 +361,6 @@ z = map(lat, 16.59971950210866964, 63.68835804244784526, 0, height)
 <h3>How does it&nbsp;look</h3>
 
 <iframe width="420" height="315" src="//www.youtube.com/embed/4jl6-qOiSAE?rel=0" frameborder="0" allowfullscreen></iframe>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2014/leaflet-coordinates-control/" rel="bookmark" title="Permalink to Leaflet Coordinates Control">Leaflet Coordinates&nbsp;Control</a></h1>
-    <aside><span>Sep 2, 2014</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/leaflet.html">leaflet</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
-    </aside>
-    <p>I&#8217;ve made a <a href="https://github.com/zimmicz/Leaflet-Coordinates-Control">simple Leaflet control</a> that displays coordinates when user clicks the map. It is possible to copy them out by clicking the&nbsp;control.</p>
-
-<p><a href="http://zimmicz.github.io/Leaflet-Coordinates-Control/">See GitHub for&nbsp;demo.</a></p>
-
-<p>You can find it in a <a href="http://leafletjs.com/plugins">list of Leaflet plugins</a> as well (Controls and Interaction section). My first contribution to the open source world&nbsp;ever.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/index13.html">&laquo; Previous page</a>
