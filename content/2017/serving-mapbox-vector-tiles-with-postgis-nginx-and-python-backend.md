@@ -9,7 +9,7 @@ Image: https://www.zimmi.cz/posts/assets/serving-mapbox-vector-tiles-with-postgi
 <div class="text-center"><img data-echo="/posts/assets/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/election.gif"/></div>
 
 
-During the last week, while working on the Czech parlamental election data visualization, I've struggled with the server becoming unresponsive far too often due to the issues mentioned above.
+During the last week, while working on the Czech legislative election data visualization, I've struggled with the server becoming unresponsive far too often due to the issues mentioned above.
 
 <div class="text-center"><img data-echo="/posts/assets/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/schema.png"/></div>
 

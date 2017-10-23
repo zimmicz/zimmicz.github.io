@@ -16,7 +16,7 @@
   <meta property="og:title" content="Serving Mapbox Vector Tiles with PostGIS, Nginx and Python Backend" />
   <meta property="og:description" content="Since version 2.4.0, PostGIS can serve MVT data directly. MVT returning queries put heavy workload on the database though. On top of that, each of the query has to be run again every time a client demands the data. This leaves us with plenty of room..." />
   <meta property="og:url" content="https://www.zimmi.cz/posts/2017/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?38b6b69e">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?a4089d0f">
 </head>
 <body>
     <nav role="navigation">
@@ -39,7 +39,7 @@
 <p><a href="({filename}../2017/postgis-as-a-mapbox-vector-tiles-generator.md)">Since version 2.4.0, PostGIS can serve <span class="caps">MVT</span></a> data directly. <span class="caps">MVT</span> returning queries put heavy workload on the database though. On top of that, each of the query has to be run again every time a client demands the data. This leaves us with plenty of room to optimize the&nbsp;process.</p>
 <div class="text-center"><img data-echo="/posts/assets/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/election.gif"/></div>
 
-<p>During the last week, while working on the Czech parlamental election data visualization, I&#8217;ve struggled with the server becoming unresponsive far too often due to the issues mentioned&nbsp;above.</p>
+<p>During the last week, while working on the Czech legislative election data visualization, I&#8217;ve struggled with the server becoming unresponsive far too often due to the issues mentioned&nbsp;above.</p>
 <div class="text-center"><img data-echo="/posts/assets/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/schema.png"/></div>
 
 <p>According to the schema, the first client to come to the&nbsp;server:</p>
@@ -164,14 +164,14 @@
 <p>PostGIS is a brilliant tool for generating Mapbox vector tiles. Combined with Python powered static file generator and Nginx, it seems to become the only tool needed to get you&nbsp;going.</p>
 <aside>
 <h3>More reading</h3>
-<ul>
-    <li>
-        <a class="neighbor" href="https://www.zimmi.cz/posts/2017/postgresql-dollar-quoting-inside-bash-heredoc/">
-             PostgreSQL Dollar Quoting inside Bash&nbsp;Heredoc
-        </a>
-    </li>
-    </li>
-</ul><!-- Start of Async Drift Code -->
+    <ul>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/">Automated Map Creation With <span class="caps">QGIS</span>, PostGIS, Python, <span class="caps">SVG</span> and&nbsp;ImageMagick</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/liftago-open-dataset-infographics/">Liftago Open Dataset&nbsp;Infographics</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/postgresql-development-history-revealed-with-postgresql/">PostgreSQL Development History Revealed with&nbsp;PostgreSQL</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/">Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span></a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-iii/">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">III</span>)</a></li>
+    </ul>
+<!-- Start of Async Drift Code -->
 <script>
     !function () {
         var t;
