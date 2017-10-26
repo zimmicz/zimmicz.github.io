@@ -23,6 +23,54 @@
     <main>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2016/how-to-convert-dgn-to-tiff-with-gdal/" rel="bookmark" title="Permalink to How to convert DGN to Tiff with GDAL">How to convert <span class="caps">DGN</span> to Tiff with <span class="caps">GDAL</span></a></h1>
+    <aside><span>Feb 21, 2016</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
+    </aside>
+    <p>We have to deal with <span class="caps">DGN</span> drawings quite often at <a href="http://www.clevermaps.cz">CleverMaps</a> - heavily used for infrastructure projects (highways, roads, pipelines), they are a pure nightmare to the <span class="caps">GIS</span> person inside me. Right now, I&#8217;m only capable of converting it into a raster file and serve it with Geoserver. The transformation from <span class="caps">DGN</span> to <span class="caps">PDF</span> to <span class="caps">PNG</span> to Tiff is not something that makes me utterly happy&nbsp;though.</p>
+<p>All you need to do the same is <a href="https://www.zimmi.cz/posts/tag/gdal.html"><span class="caps">GDAL</span></a>, ImageMagick, some <span class="caps">PDF</span> documents created out of <span class="caps">DGN</span> files - something MicroStation can help you with - and their upper left and lower right corner&nbsp;coordinates.</p>
+<div class="highlight"><pre><span></span><span class="c1"># I recommend putting some limits on ImageMagick - it tends to eat up all the resources and quit</span>
+<span class="nb">export</span> <span class="nv">MAGICK_MEMORY_LIMIT</span><span class="o">=</span><span class="m">1512</span>
+<span class="nb">export</span> <span class="nv">MAGICK_MAP_LIMIT</span><span class="o">=</span><span class="m">512</span>
+<span class="nb">export</span> <span class="nv">MAGICK_AREA_LIMIT</span><span class="o">=</span><span class="m">1024</span>
+<span class="nb">export</span> <span class="nv">MAGICK_FILES_LIMIT</span><span class="o">=</span><span class="m">512</span>
+<span class="nb">export</span> <span class="nv">MAGICK_TMPDIR</span><span class="o">=</span>/partition/large/enough
+
+<span class="c1"># I expect two files on the input: the first is PDF file with drawing, the second is a simple text file with four coordinates on a single line in the following order: upper left x, upper left y, lower right x, lower right y</span>
+<span class="nv">INPUT</span><span class="o">=</span><span class="si">${</span><span class="nv">1</span><span class="p">:?</span><span class="s2">&quot;PDF file path&quot;</span><span class="si">}</span>
+<span class="nv">COORDS</span><span class="o">=</span><span class="si">${</span><span class="nv">2</span><span class="p">:?</span><span class="s2">&quot;Bounding box file path&quot;</span><span class="si">}</span>
+<span class="nv">OUTPUTDIRNAME</span><span class="o">=</span><span class="k">$(</span>dirname <span class="nv">$INPUT</span><span class="k">)</span>
+<span class="nv">OUTPUTFILENAME</span><span class="o">=</span><span class="k">$(</span>basename <span class="nv">$INPUT</span> <span class="p">|</span> cut -d. -f1<span class="k">)</span>.png
+<span class="nv">OUTPUTPATH</span><span class="o">=</span><span class="nv">$OUTPUTDIRNAME</span>/<span class="nv">$OUTPUTFILENAME</span>
+
+<span class="c1"># create PNG image - I actually don&#39;t remember why it didn&#39;t work directly to Tiff</span>
+gdal_translate <span class="se">\</span>
+    -co <span class="nv">WORLDFILE</span><span class="o">=</span>YES <span class="se">\</span>
+    -co <span class="nv">ZLEVEL</span><span class="o">=</span><span class="m">5</span> <span class="se">\</span>
+    -of PNG <span class="se">\</span>
+    --config GDAL_CACHEMAX <span class="m">500</span> <span class="se">\</span>
+    --config GDAL_PDF_DPI <span class="m">300</span> <span class="se">\</span>
+    -a_srs EPSG:5514 <span class="se">\ </span><span class="c1"># Czech local CRS</span>
+    -a_ullr <span class="k">$(</span><span class="nb">echo</span> <span class="k">$(</span>cat <span class="nv">$COORDS</span><span class="k">))</span> <span class="se">\ </span><span class="c1"># read the file with coordinates</span>
+    <span class="nv">$INPUT</span> <span class="se">\</span>
+    <span class="nv">$OUTPUTPATH</span>
+
+<span class="c1"># convert to Tiff image</span>
+convert <span class="se">\</span>
+    -define tiff:tile-geometry<span class="o">=</span>256x256 <span class="se">\</span>
+    -transparent white <span class="se">\ </span><span class="c1"># drawings come with white background</span>
+    <span class="nv">$OUTPUTPATH</span> <span class="se">\</span>
+    <span class="si">${</span><span class="nv">OUTPUTPATH</span><span class="p">/.png</span><span class="si">}</span>_alpha.tif
+
+<span class="c1"># build overwies to speed things up</span>
+gdaladdo <span class="si">${</span><span class="nv">OUTPUTPATH</span><span class="p">/.png</span><span class="si">}</span>_alpha.tif <span class="m">2</span> <span class="m">4</span> <span class="m">8</span> <span class="m">16</span> <span class="m">32</span>
+</pre></div>
+
+
+<p>And you&#8217;re done. The <code>.wld</code> file will be present for each resulting file. I rename it manually to match the name of a GeoTiff - that should be probably done automatically as&nbsp;well.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2016/looking-for-the-next-row-with-postgresql/" rel="bookmark" title="Permalink to Looking for the Next Row with PostgreSQL">Looking for the Next Row with&nbsp;PostgreSQL</a></h1>
     <aside><span>Jan 23, 2016</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>    </span>
@@ -253,91 +301,6 @@ psql <span class="nv">$DATABASE</span> <span class="s">&lt;&lt; EOF</span>
 <p><img data-echo="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen2.png" title="vozejkmap.cz data map" class="img-responsive centered"> You can hide the&nbsp;infobox.</p>
 
 <p><img data-echo="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen3.png" title="vozejkmap.cz data map" class="img-responsive centered">You can jump to any of the nearest&nbsp;places.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2015/twitter-rest-api-data-mining-on-openshift-part-i/" rel="bookmark" title="Permalink to Twitter REST API Data Mining on OpenShift (Part I)">Twitter <span class="caps">REST</span> <span class="caps">API</span> Data Mining on OpenShift (Part&nbsp;I)</a></h1>
-    <aside><span>Nov 6, 2015</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/openshift.html">openshift</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/twitter.html">twitter</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
-    </aside>
-    <p>More than a year ago I wrote about <a href="http://www.zimmi.cz/posts/2014/analyzing-twitter-languages-with-streaming-api/">analyzing Twitter languages with Streaming <span class="caps">API</span></a>. Back then I kept my laptop running for a week to download data. Not a comfortable way, especially if you decide to get more data. One year uptime doesn&#8217;t sound like anything you want to be part of. <a href="https://www.openshift.com/">OpenShift</a> by Red Hat seems to be almost perfect replacement.&nbsp;Almost.</p>
-<h2>OpenShift&nbsp;setup</h2>
-<p>I started with Node.js application running on one small gear. Once running, you can easily <code>git push</code> the code to your OpenShift repo and login via <span class="caps">SSH</span>. I quickly found simple copy-pasting my local solution wasn&#8217;t going to work. and fixed it with some minor tweaks. That&#8217;s where the fun&nbsp;begins&#8230;</p>
-<blockquote>
-<p>I based the downloader on Node.js a year ago. Until now I still don&#8217;t get how that piece of software works. Frankly, I don&#8217;t really care as long as it&nbsp;works.</p>
-</blockquote>
-<h3>Pitfalls</h3>
-<p>If your application doesn&#8217;t generate any traffic, <strong>OpenShift turns it off</strong>. It wakes up once someone visits again. I had no idea about that and spent some time trying to stop that behavior. Obviously, I could have scheduled a cron job on my laptop pinging it every now and then. Luckily, OpenShift can run cron jobs itself. All you need is to embed a cron cartridge into the running application (and install a bunch of ruby dependencies&nbsp;beforehand).</p>
-<div class="highlight"><pre><span></span>rhc cartridge add cron-1.4 -a app-name
-</pre></div>
-
-
-<p>Then create <code>.openshift/cron/{hourly,daily,weekly,monthly}</code> folder in the git repository and put your script running a simple curl command into one of&nbsp;those.</p>
-<div class="highlight"><pre><span></span>curl http://social-zimmi.rhcloud.com &gt; /dev/null
-</pre></div>
-
-
-<p>Another problem was just around the corner. Once in a while, the app stopped writing data to the database without saying a word. What helped was restarting it - the only automatic way to do so being a <code>git push</code> command. Sadly, I haven&#8217;t found a way to restart the app from within itself; it probably can&#8217;t be&nbsp;done.</p>
-<p>When you <code>git push</code>, the gear stops, builds, deploys and restarts the app. By using hot deployment you can minimize the downtime. Just put the <code>hot_deploy</code> file into <code>.openshift/markers</code> folder.</p>
-<div class="highlight"><pre><span></span>git commit --allow-empty -m <span class="s2">&quot;Restart gear&quot;</span> <span class="o">&amp;&amp;</span> git push
-</pre></div>
-
-
-<p>This solved the problem until I realize that <strong>every restart deleted all the data</strong> collected so far. If your data are to stay safe and sound, <strong>save them in <code>process.env.OPENSHIFT_DATA_DIR</code></strong> (which is <code>app-root/data</code>).</p>
-<h3>Anacron to the&nbsp;rescue</h3>
-<p>How do you push an empty commit once a day? With cron of course. Even better, <strong>anacron</strong>.</p>
-<div class="highlight"><pre><span></span>mkdir ~/.anacron
-<span class="nb">cd</span> ~/.anacron
-mkdir cron.daily cron.weekly cron.monthly spool etc
-
-cat <span class="s">&lt;&lt;EOT &gt; ~/.anacron/etc/anacrontab</span>
-
-<span class="s">SHELL=/bin/sh</span>
-<span class="s">PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/$HOME/bin</span>
-<span class="s">HOME=$HOME</span>
-<span class="s">LOGNAME=$USER</span>
-
-<span class="s">1 5  daily-cron nice run-parts --report $HOME/.anacron/cron.daily</span>
-<span class="s">7 10 weekly-cron nice run-parts --report $HOME/.anacron/cron.weekly</span>
-<span class="s">@monthly 15 monthly-cron nice run-parts --report $HOME/.anacron/cron.monthly</span>
-
-<span class="s">EOT</span>
-
-cat <span class="s">&lt;&lt;EOT &gt;&gt; ~/.zprofile # I use zsh shell</span>
-<span class="s">rm -f $HOME/.anacron/anacron.log</span>
-<span class="s">/usr/sbin/anacron -t /home/zimmi/.anacron/etc/anacrontab -S /home/zimmi/.anacron/spool &amp;&gt; /home/zimmi/.anacron/anacron.log</span>
-
-<span class="s">EOT</span>
-</pre></div>
-
-
-<p>Anacron is to laptop what cron is to 24/7 running server. It just runs automatic jobs when the laptop is running. If it&#8217;s not and the job should be run, it runs it once the <span class="caps">OS</span> boots. Brilliant&nbsp;idea.</p>
-<p>It runs the following code for me to keep the app writing data to the&nbsp;database.</p>
-<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
-
-<span class="nv">workdir</span><span class="o">=</span><span class="s1">&#39;/home/zimmi/documents/zimmi/dizertace/social&#39;</span>
-<span class="nv">logfile</span><span class="o">=</span><span class="nv">$workdir</span>/restart-gear.log
-date &gt; <span class="nv">$logfile</span>
-
-<span class="o">{</span> 
-<span class="nv">HOME</span><span class="o">=</span>/home/zimmi
-<span class="nb">cd</span> <span class="nv">$workdir</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
-git merge origin/master <span class="o">&amp;&amp;</span> <span class="se">\</span>
-git commit --allow-empty -m <span class="s2">&quot;Restart gear&quot;</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
-git push <span class="o">&amp;&amp;</span> <span class="se">\</span>
-<span class="nb">echo</span> <span class="s2">&quot;Success&quot;</span> <span class="p">;</span> 
-<span class="o">}</span> &gt;&gt; <span class="nv">$logfile</span> <span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span>
-</pre></div>
-
-
-<p><strong><span class="caps">UPDATE</span>:</strong> Spent a long time debugging the &#8220;Permission denied (publickey).&#8221;-like errors. What seems to help&nbsp;is:</p>
-<ol>
-<li>Use id_rsa instead of any other <span class="caps">SSH</span>&nbsp;key</li>
-<li>Put a new entry into the <code>~/.ssh/config</code> file</li>
-</ol>
-<p>I don&#8217;t know which one did the magic&nbsp;though.</p>
-<p>I&#8217;ve been harvesting Twitter for a month with about 10-15K tweets a day (only interested in the Czech Republic). 
-<sup>1</sup>&frasl;<sub>6</sub> to <sup>1</sup>&frasl;<sub>5</sub> of them is located with latitude and longitude. More on this next&nbsp;time.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/index6.html">&laquo; Previous page</a>

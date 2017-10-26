@@ -23,6 +23,21 @@
     <main>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2014/ogr2ogr-unix-x-windows/" rel="bookmark" title="Permalink to ogr2ogr UNIX x Windows">ogr2ogr <span class="caps">UNIX</span> x&nbsp;Windows</a></h1>
+    <aside><span>Sep 23, 2014</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/spatial.html">spatial</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+    </aside>
+    <p><span class="caps">GDAL</span> with its ogr2ogr, ogrinfo and many more is one of the best open source tools to do anything to your spatial data. It is a&nbsp;command line tool, which sort of determines it to be used with <span class="caps">UNIX</span> systems, but you might bump into a Windows guy trying to use it as well once in a&nbsp;while.</p>
+<p>Be careful, it behaves differently on different <span class="caps">OS</span>. Let&#8217;s say you do something like this on <span class="caps">UNIX</span>:</p>
+<div class="highlight"><pre><span></span>ogr2ogr -f GeoJSON -where &quot;attribute IN (&#39;value1&#39;, &#39;value2&#39;)&quot; output.json input.json
+</pre></div>
+
+
+<p>What you <abbr title="But you might get expected result as well">might get is a big nothing</abbr>. Executed on Windows it gives you the result you&#8217;ve expected. <em>Aargh</em>, what is that supposed to&nbsp;mean?</p>
+<p>Well, that&#8217;s the ogr2ogr&#8217;s way to tell you: <em>Hello there, you need to switch single quotes for double quotes and vice versa, you dumb!</em> I don&#8217;t know why and I find it really annoying. Just in case you get stuck with ogr2ogr (or probably any other command line tool), try&nbsp;this.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2014/notify-when-average-of-10-subsequent-numbers-is-bigger-than-given-value/" rel="bookmark" title="Permalink to Notify When Average of 10 Subsequent Numbers Is Bigger Than Given Value">Notify When Average of 10 Subsequent Numbers Is Bigger Than Given&nbsp;Value</a></h1>
     <aside><span>Sep 21, 2014</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/php.html">php</a>    </span>
@@ -164,42 +179,6 @@ for ($i = 0; $i &lt; $size; $i++) {
 <li>You should probably take care of calling the <code>retrieveToken()</code> in shorter interval than the token expiration is set to. Otherwise you might end up with invalid&nbsp;token.</li>
 <li>You need to hide the username and password from anonymous users (I guess that&#8217;s only possible with server side implementation of selective JavaScript&nbsp;loading).</li>
 </ol>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2014/blogging-on-docker-piecrust-to-the-rescue/" rel="bookmark" title="Permalink to Blogging On Docker: Piecrust To The Rescue">Blogging On Docker: Piecrust To The&nbsp;Rescue</a></h1>
-    <aside><span>Sep 11, 2014</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/docker.html">docker</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
-    </aside>
-    <p>I love blogging. I hate blogging systems. I hate content management systems. I just want to blog. That&#8217;s what <a href="http://bolt80.com/piecrust/">PieCrust</a> is all about - it lets you&nbsp;blog.</p>
-<p>It is powerful static website generator perfect for my needs (and for yours as well?). Blogging with PieCrust is really a piece of&nbsp;cake:</p>
-<ol>
-<li>prepare&nbsp;post</li>
-<li>serve&nbsp;site</li>
-<li>bake&nbsp;site</li>
-<li>send it off to the&nbsp;public</li>
-</ol>
-<p>I love having clean <span class="caps">OS</span>. That&#8217;s what <a href="http://docker.com">Docker</a> is all about - for me. Running PieCrust on Docker is really easy, it does not clutter your <span class="caps">PC</span> and it just&nbsp;works.</p>
-<p>If you ever want to use PieCrust on Docker, why don&#8217;t you start with this code?
-    <span class="caps">FROM</span>&nbsp;centos:centos6</p>
-<div class="highlight"><pre><span></span><span class="nt">RUN</span> <span class="nt">rpm</span> <span class="nt">-Uvh</span> <span class="nt">http</span><span class="o">://</span><span class="nt">mirror</span><span class="p">.</span><span class="nc">webtatic</span><span class="p">.</span><span class="nc">com</span><span class="o">/</span><span class="nt">yum</span><span class="o">/</span><span class="nt">el6</span><span class="o">/</span><span class="nt">latest</span><span class="p">.</span><span class="nc">rpm</span>
-<span class="nt">RUN</span> <span class="nt">rpm</span> <span class="nt">-Uvh</span> <span class="nt">http</span><span class="o">://</span><span class="nt">download</span><span class="p">.</span><span class="nc">fedoraproject</span><span class="p">.</span><span class="nc">org</span><span class="o">/</span><span class="nt">pub</span><span class="o">/</span><span class="nt">epel</span><span class="o">/</span><span class="nt">6</span><span class="o">/</span><span class="nt">x86_64</span><span class="o">/</span><span class="nt">epel-release-6-8</span><span class="p">.</span><span class="nc">noarch</span><span class="p">.</span><span class="nc">rpm</span>
-<span class="nt">RUN</span> <span class="nt">rpm</span> <span class="nt">-Uvh</span> <span class="nt">http</span><span class="o">://</span><span class="nt">rpms</span><span class="p">.</span><span class="nc">famillecollet</span><span class="p">.</span><span class="nc">com</span><span class="o">/</span><span class="nt">enterprise</span><span class="o">/</span><span class="nt">remi-release-6</span><span class="p">.</span><span class="nc">rpm</span>
-
-<span class="nt">RUN</span> <span class="nt">yum</span> <span class="nt">--enablerepo</span><span class="o">=</span><span class="nt">remi</span><span class="o">,</span><span class="nt">remi-php55</span> <span class="nt">install</span> <span class="nt">-y</span> <span class="nt">php</span> <span class="nt">php-mbstring</span> <span class="nt">php-opcache</span> <span class="nt">php-cli</span> <span class="nt">php-pear</span> <span class="nt">php-common</span> <span class="o">&amp;&amp;</span> <span class="nt">yum</span> <span class="nt">clean</span> <span class="nt">all</span>
-<span class="nt">RUN</span> <span class="nt">php</span> <span class="nt">-r</span> <span class="s2">&quot;readfile(&#39;https://getcomposer.org/installer&#39;);&quot;</span> <span class="o">|</span> <span class="nt">php</span>
-<span class="nt">RUN</span> <span class="nt">echo</span> <span class="s2">&quot;date.timezone = Europe/Prague&quot;</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="nt">etc</span><span class="o">/</span><span class="nt">php</span><span class="p">.</span><span class="nc">ini</span>
-<span class="nt">RUN</span> <span class="nt">mv</span> <span class="nt">composer</span><span class="p">.</span><span class="nc">phar</span> <span class="o">/</span><span class="nt">usr</span><span class="o">/</span><span class="nt">bin</span><span class="o">/</span><span class="nt">composer</span>
-<span class="nt">RUN</span> <span class="nt">php</span> <span class="nt">-r</span> <span class="s2">&quot;eval(&#39;?&gt;&#39;.file_get_contents(&#39;http://backend.bolt80.com/piecrust/install&#39;));&quot;</span>
-<span class="nt">RUN</span> <span class="nt">mv</span> <span class="nt">piecrust</span><span class="p">.</span><span class="nc">phar</span> <span class="o">/</span><span class="nt">usr</span><span class="o">/</span><span class="nt">bin</span><span class="o">/</span><span class="nt">chef</span>
-
-<span class="nt">CMD</span> <span class="cp">[</span><span class="s2">&quot;/bin/bash&quot;</span><span class="cp">]</span>
-</pre></div>
-
-
-<p>Running <code>sudo docker build --tag=piecrust .</code> will result in having docker container ready to run. Just run <code>sudo docker run -it -p 8080:8080 -v /host_piecrust_path/:/container_path piecrust /bin/bash</code> in terminal. While in container terminal, run <code>chef serve -n -p 8080 -a 0.0.0.0</code> and visit <a href="http://localhost:8080">http://localhost:8080</a>. You should see your PieCrust site up and&nbsp;running.</p>
-<p>The last command tells chef to serve your site on port 8080 (which should be free unless you&#8217;re running Tomcat or something like that) and make it listen on every available network interface. If you used 127.0.0.1 instead, you would never reach your site from outside the&nbsp;container.</p>
-<p>See?&nbsp;Easy.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/index12.html">&laquo; Previous page</a>

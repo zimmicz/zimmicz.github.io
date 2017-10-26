@@ -1,5 +1,18 @@
-<h3>More reading</h3>
+{% if article.series %}
+<h3>This post is part {{ article.series.index }} of the "{{ article.series.name }}" series:</h3>
+    <ol class="parts">
+        {% for part_article in article.series.all %}
+            <li>
+                {% if part_article != article %}<a href='{{ SITEURL }}/{{ part_article.url }}'>{% endif %}
+                {{ part_article.title }}
+                {% if part_article != article %}</a>{% endif %}
+            </li>
+        {% endfor %}
+    </ol>
+{% endif %}
+
 {% if article.related_posts %}
+<h3>More reading</h3>
     <ul>
     {% for related_post in article.related_posts %}
         <li><a class="neighbor" href="{{ SITEURL }}/{{ related_post.url }}">{{ related_post.title }}</a></li>

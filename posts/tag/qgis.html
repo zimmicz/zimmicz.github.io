@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" prefix="og: http://ogp.me/ns#">
 <head>
-        <title>Michal Zimmermann | tag: qgis</title>
+        <title>Michal Zimmermann | tag: QGIS</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
@@ -21,8 +21,39 @@
         <h1><a href="/posts">Michal Zimmermann<small>Pieces of knowledge from the world of GIS.</small></a></h1>
     </header>
     <main>
-<h2 class="text-center">Articles tagged with qgis tag</h2>
+<h2 class="text-center">Articles tagged with QGIS tag</h2>
 
+<article>
+    <h1><a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-getting-started/" rel="bookmark" title="Permalink to QGIS Plugin Development: Getting Started"><span class="caps">QGIS</span> Plugin Development: Getting&nbsp;Started</a></h1>
+    <aside><span>Oct 26, 2017</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">QGIS</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/qgis.html">QGIS</a></span>
+    </aside>
+    <p><span class="caps">QGIS</span> 2.1x is a brilliant tool for Python-based automation in form of custom scripts or even plugins. The first steps towards writing the custom code might be a bit difficult, as you need to grasp quite complex Python <span class="caps">API</span>. The <em><span class="caps">QGIS</span> Plugin Development</em> series (see the list of other parts at the end of this article) targets pitfalls and traps I&#8217;ve met while learning to use it&nbsp;myself.</p>
+<p>The outcome of the series is going to be <strong>a fully functional custom plugin</strong> capable of writing attribute values from a source layer nearest neighbour to a target layer based on their spatial&nbsp;proximity.</p>
+<p>In this part, I&#8217;ll mention the basics a.k.a. what is good to know before you&nbsp;start.</p>
+<h2>Documentation</h2>
+<p>Different <span class="caps">QGIS</span> versions come with different Python <span class="caps">API</span>. The documentation is to be found at <a href="http://qgis.org">https://qgis.org</a>, the latest being <a href="http://qgis.org/api/2.18/">version 2.18</a>. Note that if you come directly to <a href="http://qgis.org/api/">http://qgis.org/api/</a>, you&#8217;ll see the current master&nbsp;docs.</p>
+<p>Alternatively, you can <code>apt install qgis-api-doc</code> on your Ubuntu-based system and run <code>python -m SimpleHTTPServer [port]</code> inside <code>/usr/share/qgis/doc/api</code>. You&#8217;ll find the documentation at <a href="http://localhost:8000">http://localhost:8000</a> (if you don&#8217;t provide port number) and it will be available even when you&#8217;re&nbsp;offline.</p>
+<h2>Basic <span class="caps">API</span> objects&nbsp;structure</h2>
+<p>Before launching <span class="caps">QGIS</span>, take a look at what&#8217;s available inside <span class="caps">API</span>:</p>
+<ul>
+<li><strong>qgis.core</strong> package brings all the basic objects like QgsMapLayer, QgsDataSourceURI, QgsFeature&nbsp;etc</li>
+<li><strong>qgis.gui</strong> package brings <span class="caps">GUI</span> elements that can be used within <span class="caps">QGIS</span> like QgsMessageBar or QgsInterface (very important <span class="caps">API</span> element, exposed to all custom&nbsp;plugins)</li>
+<li><strong>qgis.analysis</strong>, <strong>qgis.networkanalysis</strong>, <strong>qgis.server</strong>, and <strong>qgis.testing</strong> packages that won&#8217;t be covered in the&nbsp;series</li>
+<li><strong>qgis.utils</strong> module that comes with <code>iface</code> exposed (very handy within <span class="caps">QGIS</span> Python&nbsp;console)</li>
+</ul>
+<h2><span class="caps">QGIS</span> Python&nbsp;Console</h2>
+<p>Using Python console is the easiest way to automate your <span class="caps">QGIS</span> workflow. It can be accessed via pressing <code>Ctrl + Alt + P</code> or navigating to <code>Plugins -&gt; Python Console</code>. Note the above mentioned <code>iface</code> from <strong>qgis.utils</strong> module is exposed by default within the console, letting you interact with <span class="caps">QGIS</span> <span class="caps">GUI</span>. Try out the following&nbsp;examples.</p>
+<div class="highlight"><pre><span></span><span class="n">iface</span><span class="o">.</span><span class="n">mapCanvas</span><span class="p">()</span><span class="o">.</span><span class="n">scale</span><span class="p">()</span> <span class="c1"># returns the current map scale</span>
+<span class="n">iface</span><span class="o">.</span><span class="n">mapCanvas</span><span class="p">()</span><span class="o">.</span><span class="n">zoomScale</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="c1"># zoom to scale of 1:100</span>
+<span class="n">iface</span><span class="o">.</span><span class="n">activeLayer</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="p">()</span> <span class="c1"># get the active layer name</span>
+<span class="n">iface</span><span class="o">.</span><span class="n">activeLayer</span><span class="p">()</span><span class="o">.</span><span class="n">startEditing</span><span class="p">()</span> <span class="c1"># toggle editting</span>
+</pre></div>
+
+
+<p>That was a very brief introduction to <span class="caps">QGIS</span> <span class="caps">API</span>, the next part will walk you through the console more&nbsp;thoroughly.</p>
+</article>
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2017/mapping-north-america-with-qgis-tips-and-tricks" rel="bookmark" title="Permalink to Mapping North America with QGIS: Tips and Tricks">Mapping North America with <span class="caps">QGIS</span>: Tips and&nbsp;Tricks</a></h1>
     <aside><span>May 21, 2017</span>
@@ -453,35 +484,8 @@ gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span c
 <p>I created pretty efficient semi-automated workflow using several open source technologies that saves me a lot of work. Although <span class="caps">QGIS</span> has some minor pet peeves (scale with decimal places, not showing the entire feature, not substituting variables at times), it definitely makes boring map creation quite amusing. The more I work with big data / on big tasks, the more I find Linux a&nbsp;must-have.</p>
 <p>The whole process was done with <span class="caps">QGIS</span> 2.10, PostGIS 2.1, PostgreSQL 9.3, Python 2.7, ImageMagick&nbsp;6.7.</p>
 </article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2015/qgis-tips-for-collaborative-mapping/" rel="bookmark" title="Permalink to QGIS Tips For Collaborative Mapping"><span class="caps">QGIS</span> Tips For Collaborative&nbsp;Mapping</a></h1>
-    <aside><span>Jul 21, 2015</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/tools.html">Tools</a></span>
-    </aside>
-    <p>Right now I&#8217;m setting up a project aimed at crop evaluation over ortophotos, <span class="caps">HR</span> and <span class="caps">VHR</span> imagery. All the steps of evaluation will be done in <span class="caps">QGIS</span> with PostGIS used for data storage and&nbsp;post-processing.</p>
-<p>In the initial phase, fifteen <span class="caps">GIS</span> operators will be using <span class="caps">QGIS</span> to reshape geometries and fill attribute data accordingly. Fifteen are not so many, but it is enough to be a possible source of errors. Luckily, there are many things you can do with <span class="caps">QGIS</span> to prevent people from making&nbsp;mistakes.</p>
-<h2><span class="caps">QGIS</span> project&nbsp;file</h2>
-<p><span class="caps">QGIS</span> project, the .qgs file, is a pure <span class="caps">XML</span> and, unlike <span class="caps">ESRI</span>&#8217;s .mxd, can be edited with any text editor. That&#8217;s great advantage when you need to prepare one project for many different operators. My project has to load some database layers that should be different for different operators that have different database&nbsp;accounts.</p>
-<p>How do you do that? It&#8217;s enough to create a project using your own credentials and then replace them with <code>USERNAME</code> and <code>PASSWORD</code> strings as seen below. What happens when the user loads the&nbsp;project?</p>
-<div class="highlight"><pre><span></span><span class="nt">&lt;datasource&gt;</span>dbname=&#39;database&#39; host=host port=5432 user=&#39;USERNAME&#39; password=&#39;PASSWORD&#39; sslmode=require key=&#39;qgis_id&#39; srid=5514 type=POLYGON table=&quot;schema&quot;.&quot;table&quot; (wkb_geometry) sql=<span class="nt">&lt;/datasource&gt;</span>
-</pre></div>
-
-
-<p>A popup window will be shown asking him/her to handle bad layers, as <span class="caps">QGIS</span> will not be able to connect to the layer. When he/she fills in right credentials (just once), the layer will be loaded. Don&#8217;t forget to <strong>use a table name that doesn&#8217;t exist</strong>, <span class="caps">QGIS</span> will use the credentials stored with PostGIS connection otherwise and won&#8217;t ask for them. <em>I don&#8217;t like this&nbsp;behaviour.</em></p>
-<p>Using this multiple times for each user-specific layer is a great time&nbsp;saver.</p>
-<h2>Adjust attribute table to fit your&nbsp;needs</h2>
-<p><span class="caps">QGIS</span> attribute table has so many settings you probably don&#8217;t use on daily basis and yet they might be invaluable in such project. All of them are available from layer properties under the Fields&nbsp;tab.</p>
-<p class='text-center'><img data-echo="/posts/assets/qgis-tips-for-collaborative-mapping/hidden.png" width=50% class="img-responsive centered"></p>
-
-<p>Sadly, our PostGIS layers are very wide in terms of column count. Not all of the columns are to be edited or even seen by operators, so it might be a good idea to hide them by setting their Edit Widget to Hidden. Those that should be seen, but not edited, might be set as not editable by unchecking that&nbsp;option.</p>
-<p>Lots of our attributes use enumerations provided by our project partner as <span class="caps">CSV</span> files. We use them in <span class="caps">QGIS</span> as value maps, so operators don&#8217;t have to type them manually - we both make their work easier and eliminate mistakes they&nbsp;made.</p>
-<p class='text-center'><img data-echo="/posts/assets/qgis-tips-for-collaborative-mapping/valuemap.png" width=50% class="img-responsive centered"></p>
-
-<p>Note <span class="caps">QGIS</span> swallows the first row of the given <span class="caps">CSV</span> file as if it was a header. Don&#8217;t forget about this when creating your own enumerations. Once set, operators will see a friendly combo box instead of a hostile blank input in the attribute&nbsp;table.</p>
-<p>These are just small adjustments that can make a big difference in your <span class="caps">QGIS</span>&nbsp;workflow.</p>
-</article>
 <aside id="pagination">
+            <a href="https://www.zimmi.cz/posts/tag/qgis2.html">Next page &raquo;</a>
 </aside>    </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.

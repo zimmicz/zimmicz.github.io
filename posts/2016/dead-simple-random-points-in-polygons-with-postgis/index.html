@@ -110,11 +110,12 @@
 <p>The inner <code>SELECT</code> calculates random points based on the extent of the polygon. Note it directly calls <code>a.geom</code>, a value that comes from the previous <code>SELECT</code>! The <code>LATERAL JOIN</code> part is thus run for every row of the previous <code>SELECT</code> statement inside <code>FROM</code> part of the query. This means it will return 201 points for each of the two polygons (run the query inside <span class="caps">QGIS</span> to see the&nbsp;result).</p>
 <p>Note all the points fall inside the polygons by accident, because they are <strong>square</strong>. Otherwise a <code>ST_Contains</code> or <code>ST_Within</code> should be used inside the outermost <code>WHERE</code> query to filter outliers. This part could use some&nbsp;tweaking.</p>
 <aside>
+
 <h3>More reading</h3>
     <ul>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/finding-polygons-lying-across-other-polygons-with-postgis/">Finding Polygons Lying across Other Polygons with&nbsp;PostGIS</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/subdivide-and-conquer-effective-spatial-indexes-in-postgis/">Subdivide and Conquer: Effective Spatial Indexes in&nbsp;PostGIS</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-polygon-from-centroid/">PostGIS Custom Function to Create Polygon from&nbsp;Centroid</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/subdivide-and-conquer-effective-spatial-indexes-in-postgis/">Subdivide and Conquer: Effective Spatial Indexes in&nbsp;PostGIS</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-wind-rose/">PostGIS Custom Function to Create Wind&nbsp;Rose</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/">Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span></a></li>
     </ul>

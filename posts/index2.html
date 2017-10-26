@@ -23,6 +23,67 @@
     <main>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2017/fighting-raster-geopackage-with-gdal/" rel="bookmark" title="Permalink to Fighting Raster GeoPackage with GDAL">Fighting Raster GeoPackage with <span class="caps">GDAL</span></a></h1>
+    <aside><span>Jul 19, 2017</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
+    </aside>
+    <p>As I&#8217;m still running Ubuntu 16.04 based Linux Mint, I have no access to <span class="caps">GDAL</span> 2.x repositories (except for ubuntugis, that I really don&#8217;t like to use). Provided with a GeoPackage raster file recently, I had to find a way to load it into <span class="caps">QGIS</span>, somehow. The solution is simple: Docker with&nbsp;gdal_translate.</p>
+<h2>Preparing the Docker&nbsp;container</h2>
+<p>I like using Docker for experiments that might leave the <span class="caps">OS</span> in an <em>unexpected</em> state (which is exactly what happens to me with ubuntugis repository whenever I use it. That&#8217;s why I don&#8217;t anymore.). A very simple Dockerfile keeps the troubles away from&nbsp;you.</p>
+<div class="highlight"><pre><span></span>FROM ubuntu:17.04
+RUN apt update
+RUN apt install -y gdal-bin
+</pre></div>
+
+
+<p><code>cd</code> into the folder and build the image with <code>docker build -t gdal .</code>. Once ready, summon the daemon, run the container, mount the GeoPackage file to the container directory and you&#8217;re ready to&nbsp;rock.</p>
+<div class="highlight"><pre><span></span>docker run -v /path/to/geopackage:/home/ -it gdal
+</pre></div>
+
+
+<h2>Raster GeoPackage to GeoTiff&nbsp;translation</h2>
+<p>With the container running, the raster GeoPackage to GeoTiff translation can be done easily with <code>gdal_translate</code>. Note I chose to cut the source file into tiles, because the gdal_translate was choking about the resulting&nbsp;size.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="nv">SIZE</span><span class="o">=</span><span class="m">10000</span>
+<span class="nv">ULX</span><span class="o">=</span>-630000
+<span class="nv">ULY</span><span class="o">=</span>-1135450
+<span class="nv">LRX</span><span class="o">=</span>-560000
+<span class="nv">LRY</span><span class="o">=</span>-1172479
+<span class="nv">COUNTER_X</span><span class="o">=</span><span class="m">0</span>
+<span class="nv">COUNTER_Y</span><span class="o">=</span><span class="m">0</span>
+
+<span class="k">while</span> <span class="o">[[</span> <span class="nv">$ULX</span> -lt <span class="nv">$LRX</span> <span class="o">]]</span>
+<span class="k">do</span>
+    <span class="k">while</span> <span class="o">[[</span> <span class="nv">$ULY</span> -gt <span class="nv">$LRY</span> <span class="o">]]</span>
+    <span class="k">do</span>
+        <span class="nb">echo</span> <span class="nv">$ULX</span>, <span class="k">$((</span><span class="nv">$ULX</span><span class="o">+</span><span class="nv">$SIZE</span><span class="k">))</span>, <span class="nv">$ULY</span>, <span class="k">$((</span><span class="nv">$ULY</span><span class="o">-</span><span class="nv">$SIZE</span><span class="k">))</span>
+
+        gdal_translate <span class="se">\</span>
+            -co <span class="nv">TILED</span><span class="o">=</span>YES <span class="se">\</span>
+            -co <span class="nv">COMPRESS</span><span class="o">=</span>DEFLATE <span class="se">\</span>
+            -co <span class="nv">TFW</span><span class="o">=</span>YES <span class="se">\</span>
+            -co <span class="nv">NUM_THREADS</span><span class="o">=</span>ALL_CPUS <span class="se">\</span>
+            -a_nodata <span class="m">0</span> <span class="se">\</span>
+            -of GTiff <span class="se">\</span>
+            -projwin <span class="nv">$ULX</span>, <span class="nv">$ULY</span>, <span class="k">$((</span><span class="nv">$ULX</span><span class="o">+</span><span class="nv">$SIZE</span><span class="k">))</span>, <span class="k">$((</span><span class="nv">$ULY</span><span class="o">-</span><span class="nv">$SIZE</span><span class="k">))</span> <span class="se">\</span>
+            -projwin_srs EPSG:5514 <span class="se">\</span>
+            data/detected.gpkg data/detected_<span class="si">${</span><span class="nv">COUNTER_X</span><span class="si">}</span>_<span class="si">${</span><span class="nv">COUNTER_Y</span><span class="si">}</span>.tiff
+
+        <span class="nv">ULY</span><span class="o">=</span><span class="k">$((</span><span class="nv">$ULY</span><span class="o">-</span><span class="nv">$SIZE</span><span class="k">))</span>
+        <span class="nv">COUNTER_Y</span><span class="o">=</span><span class="k">$((</span>COUNTER_Y+1<span class="k">))</span>
+    <span class="k">done</span>
+    <span class="nv">ULX</span><span class="o">=</span><span class="k">$((</span><span class="nv">$ULX</span><span class="o">+</span><span class="nv">$SIZE</span><span class="k">))</span>
+    <span class="nv">ULY</span><span class="o">=</span>-1135450
+    <span class="nv">COUNTER_X</span><span class="o">=</span><span class="k">$((</span>COUNTER_X+1<span class="k">))</span>
+<span class="k">done</span>
+</pre></div>
+
+
+<h2>Final Touch: Raster to&nbsp;Vector</h2>
+<p>After the GeoTiff is written to hard drive, <a href="https://www.zimmi.cz/posts/2015/how-to-use-queue-with-rsync/">inotifywait</a> can be used to generate overviews. And with ease of calling <code>gdal_polygonize.py</code> on each of GeoTiffs&hellip;vector layer, at you&nbsp;service.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2017/mapping-north-america-with-qgis-tips-and-tricks" rel="bookmark" title="Permalink to Mapping North America with QGIS: Tips and Tricks">Mapping North America with <span class="caps">QGIS</span>: Tips and&nbsp;Tricks</a></h1>
     <aside><span>May 21, 2017</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/visualization.html">visualization</a>    </span>
@@ -431,41 +492,6 @@ v.net <span class="nv">input</span><span class="o">=</span>network <span class="
 <li>Pedestrians usually don&#8217;t follow the road&nbsp;network.</li>
 <li>Bridges and tunnels might be an&nbsp;issue.</li>
 </ul>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2017/exploiting-prague-open-data-without-api/" rel="bookmark" title="Permalink to Exploiting Prague Open Data without API">Exploiting Prague Open Data without <span class="caps">API</span></a></h1>
-    <aside><span>Apr 3, 2017</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/data.html">data</a></span>
-    </aside>
-    <p>Speaking the Czech Republic, <a href="http://www.geoportalpraha.cz">Prague is an undoubted leader in open data publishing</a>. However, there is no public <span class="caps">API</span> to explore/search existing&nbsp;datasets.</p>
-<p>I wanted to download the <span class="caps">ESRI</span> Shapefile of the city urban plan that <a href="http://www.geoportalpraha.cz/cs/opendata/21733E1F-21B7-4ABC-B1C2-DC19C0237380#.WOKHMbmFvVM">is divided into more than a hundred files</a> (a file representing a cadastral&nbsp;area).</p>
-<p>This becomes a piece of cake with Opera Developer tools and a bit of JavaScript&nbsp;code</p>
-<div class="highlight"><pre><span></span><span class="kd">let</span> <span class="nx">links</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementsByClassName</span><span class="p">(</span><span class="s1">&#39;open-data-icon-rastr open-data-link tooltipstered&#39;</span><span class="p">)</span>
-
-<span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">link</span> <span class="k">of</span> <span class="nx">links</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">link</span><span class="p">.</span><span class="nx">href</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s1">&#39;SHP&#39;</span><span class="p">)</span> <span class="o">===</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span> <span class="k">continue</span><span class="p">;}</span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">link</span><span class="p">.</span><span class="nx">href</span><span class="p">)</span>
-<span class="p">}</span>
-</pre></div>
-
-
-<p>With the list saved to a file called <code>list.txt</code>, <code>wget --input-file=list.txt</code> will download the data. Followed by <code>for f in *.zip; do unzip $f -d ${f%%.zip}; done</code>, each archive will be extracted in the directory called by its&nbsp;name.</p>
-<p>Once done and assuming that the files are named consistently across the folders, <code>ogr2ogr</code> will merge all of them into a single GeoPackage file, resulting in just four files. Not bad considered I began with more than a hundred &times;&nbsp;4.</p>
-<div class="highlight"><pre><span></span>ogr2ogr -f <span class="s2">&quot;GPKG&quot;</span> pvp_fvu_p.gpkg ./PVP_fvu_p_Bechovice_SHP/PVP_fvu_p.shp
-find -type f -not -path <span class="s1">&#39;./PVP_fvu_p_Bechovice_SHP*&#39;</span> -iname <span class="s1">&#39;*fvu_p.shp&#39;</span> -exec ogr2ogr -update -append -f <span class="s2">&quot;GPKG&quot;</span> pvp_fvu_p.gpkg <span class="s1">&#39;{}&#39;</span> <span class="se">\;</span>
-
-ogr2ogr -f <span class="s2">&quot;GPKG&quot;</span> pvp_fvu_popis_z_a.gpkg ./PVP_fvu_p_Bechovice_SHP/PVP_fvu_popis_z_a.shp
-find -type f -not -path <span class="s1">&#39;./PVP_fvu_p_Bechovice_SHP*&#39;</span> -iname <span class="s1">&#39;*fvu_popis_z_a.shp&#39;</span> -exec ogr2ogr -update -append -f <span class="s2">&quot;GPKG&quot;</span> pvp_fvu_popis_z_a.gpkg <span class="s1">&#39;{}&#39;</span> <span class="se">\;</span>
-
-ogr2ogr -f <span class="s2">&quot;GPKG&quot;</span> pvp_pp_pl_a.gpkg ./PVP_fvu_p_Bechovice_SHP/PVP_pp_pl_a.shp
-find -type f -not -path <span class="s1">&#39;./PVP_fvu_p_Bechovice_SHP*&#39;</span> -iname <span class="s1">&#39;*pp_pl_a.shp&#39;</span> -exec ogr2ogr -update -append -f <span class="s2">&quot;GPKG&quot;</span> pvp_pp_pl_a.gpkg <span class="s1">&#39;{}&#39;</span> <span class="se">\;</span>
-
-ogr2ogr -f <span class="s2">&quot;GPKG&quot;</span> pvp_pp_s_a.gpkg ./PVP_fvu_p_Bechovice_SHP/PVP_pp_s_a.shp
-find -type f -not -path <span class="s1">&#39;./PVP_fvu_p_Bechovice_SHP*&#39;</span> -iname <span class="s1">&#39;*pp_s_a.shp&#39;</span> -exec ogr2ogr -update -append -f <span class="s2">&quot;GPKG&quot;</span> pvp_pp_s_a.gpkg <span class="s1">&#39;{}&#39;</span> <span class="se">\;</span>
-</pre></div>
-
-
-<p>A boring task that would take me hours five years ago transformed into simple, yet fun, piece of work done in no more than half an&nbsp;hour.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/index.html">&laquo; Previous page</a>

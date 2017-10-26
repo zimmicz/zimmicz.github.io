@@ -23,6 +23,37 @@
     <main>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-getting-started/" rel="bookmark" title="Permalink to QGIS Plugin Development: Getting Started"><span class="caps">QGIS</span> Plugin Development: Getting&nbsp;Started</a></h1>
+    <aside><span>Oct 26, 2017</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">QGIS</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/qgis.html">QGIS</a></span>
+    </aside>
+    <p><span class="caps">QGIS</span> 2.1x is a brilliant tool for Python-based automation in form of custom scripts or even plugins. The first steps towards writing the custom code might be a bit difficult, as you need to grasp quite complex Python <span class="caps">API</span>. The <em><span class="caps">QGIS</span> Plugin Development</em> series (see the list of other parts at the end of this article) targets pitfalls and traps I&#8217;ve met while learning to use it&nbsp;myself.</p>
+<p>The outcome of the series is going to be <strong>a fully functional custom plugin</strong> capable of writing attribute values from a source layer nearest neighbour to a target layer based on their spatial&nbsp;proximity.</p>
+<p>In this part, I&#8217;ll mention the basics a.k.a. what is good to know before you&nbsp;start.</p>
+<h2>Documentation</h2>
+<p>Different <span class="caps">QGIS</span> versions come with different Python <span class="caps">API</span>. The documentation is to be found at <a href="http://qgis.org">https://qgis.org</a>, the latest being <a href="http://qgis.org/api/2.18/">version 2.18</a>. Note that if you come directly to <a href="http://qgis.org/api/">http://qgis.org/api/</a>, you&#8217;ll see the current master&nbsp;docs.</p>
+<p>Alternatively, you can <code>apt install qgis-api-doc</code> on your Ubuntu-based system and run <code>python -m SimpleHTTPServer [port]</code> inside <code>/usr/share/qgis/doc/api</code>. You&#8217;ll find the documentation at <a href="http://localhost:8000">http://localhost:8000</a> (if you don&#8217;t provide port number) and it will be available even when you&#8217;re&nbsp;offline.</p>
+<h2>Basic <span class="caps">API</span> objects&nbsp;structure</h2>
+<p>Before launching <span class="caps">QGIS</span>, take a look at what&#8217;s available inside <span class="caps">API</span>:</p>
+<ul>
+<li><strong>qgis.core</strong> package brings all the basic objects like QgsMapLayer, QgsDataSourceURI, QgsFeature&nbsp;etc</li>
+<li><strong>qgis.gui</strong> package brings <span class="caps">GUI</span> elements that can be used within <span class="caps">QGIS</span> like QgsMessageBar or QgsInterface (very important <span class="caps">API</span> element, exposed to all custom&nbsp;plugins)</li>
+<li><strong>qgis.analysis</strong>, <strong>qgis.networkanalysis</strong>, <strong>qgis.server</strong>, and <strong>qgis.testing</strong> packages that won&#8217;t be covered in the&nbsp;series</li>
+<li><strong>qgis.utils</strong> module that comes with <code>iface</code> exposed (very handy within <span class="caps">QGIS</span> Python&nbsp;console)</li>
+</ul>
+<h2><span class="caps">QGIS</span> Python&nbsp;Console</h2>
+<p>Using Python console is the easiest way to automate your <span class="caps">QGIS</span> workflow. It can be accessed via pressing <code>Ctrl + Alt + P</code> or navigating to <code>Plugins -&gt; Python Console</code>. Note the above mentioned <code>iface</code> from <strong>qgis.utils</strong> module is exposed by default within the console, letting you interact with <span class="caps">QGIS</span> <span class="caps">GUI</span>. Try out the following&nbsp;examples.</p>
+<div class="highlight"><pre><span></span><span class="n">iface</span><span class="o">.</span><span class="n">mapCanvas</span><span class="p">()</span><span class="o">.</span><span class="n">scale</span><span class="p">()</span> <span class="c1"># returns the current map scale</span>
+<span class="n">iface</span><span class="o">.</span><span class="n">mapCanvas</span><span class="p">()</span><span class="o">.</span><span class="n">zoomScale</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="c1"># zoom to scale of 1:100</span>
+<span class="n">iface</span><span class="o">.</span><span class="n">activeLayer</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="p">()</span> <span class="c1"># get the active layer name</span>
+<span class="n">iface</span><span class="o">.</span><span class="n">activeLayer</span><span class="p">()</span><span class="o">.</span><span class="n">startEditing</span><span class="p">()</span> <span class="c1"># toggle editting</span>
+</pre></div>
+
+
+<p>That was a very brief introduction to <span class="caps">QGIS</span> <span class="caps">API</span>, the next part will walk you through the console more&nbsp;thoroughly.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2017/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/" rel="bookmark" title="Permalink to Serving Mapbox Vector Tiles with PostGIS, Nginx and Python Backend">Serving Mapbox Vector Tiles with PostGIS, Nginx and Python&nbsp;Backend</a></h1>
     <aside><span>Oct 23, 2017</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>    </span>
@@ -630,67 +661,6 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
 
 
 <p>The <a href="https://gist.github.com/zimmicz/9e78d9888ab73abc7e87553b77999bc8">server <span class="caps">MVP</span> is available</a> as a GitHub&nbsp;gist.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2017/fighting-raster-geopackage-with-gdal/" rel="bookmark" title="Permalink to Fighting Raster GeoPackage with GDAL">Fighting Raster GeoPackage with <span class="caps">GDAL</span></a></h1>
-    <aside><span>Jul 19, 2017</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
-    </aside>
-    <p>As I&#8217;m still running Ubuntu 16.04 based Linux Mint, I have no access to <span class="caps">GDAL</span> 2.x repositories (except for ubuntugis, that I really don&#8217;t like to use). Provided with a GeoPackage raster file recently, I had to find a way to load it into <span class="caps">QGIS</span>, somehow. The solution is simple: Docker with&nbsp;gdal_translate.</p>
-<h2>Preparing the Docker&nbsp;container</h2>
-<p>I like using Docker for experiments that might leave the <span class="caps">OS</span> in an <em>unexpected</em> state (which is exactly what happens to me with ubuntugis repository whenever I use it. That&#8217;s why I don&#8217;t anymore.). A very simple Dockerfile keeps the troubles away from&nbsp;you.</p>
-<div class="highlight"><pre><span></span>FROM ubuntu:17.04
-RUN apt update
-RUN apt install -y gdal-bin
-</pre></div>
-
-
-<p><code>cd</code> into the folder and build the image with <code>docker build -t gdal .</code>. Once ready, summon the daemon, run the container, mount the GeoPackage file to the container directory and you&#8217;re ready to&nbsp;rock.</p>
-<div class="highlight"><pre><span></span>docker run -v /path/to/geopackage:/home/ -it gdal
-</pre></div>
-
-
-<h2>Raster GeoPackage to GeoTiff&nbsp;translation</h2>
-<p>With the container running, the raster GeoPackage to GeoTiff translation can be done easily with <code>gdal_translate</code>. Note I chose to cut the source file into tiles, because the gdal_translate was choking about the resulting&nbsp;size.</p>
-<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
-<span class="nv">SIZE</span><span class="o">=</span><span class="m">10000</span>
-<span class="nv">ULX</span><span class="o">=</span>-630000
-<span class="nv">ULY</span><span class="o">=</span>-1135450
-<span class="nv">LRX</span><span class="o">=</span>-560000
-<span class="nv">LRY</span><span class="o">=</span>-1172479
-<span class="nv">COUNTER_X</span><span class="o">=</span><span class="m">0</span>
-<span class="nv">COUNTER_Y</span><span class="o">=</span><span class="m">0</span>
-
-<span class="k">while</span> <span class="o">[[</span> <span class="nv">$ULX</span> -lt <span class="nv">$LRX</span> <span class="o">]]</span>
-<span class="k">do</span>
-    <span class="k">while</span> <span class="o">[[</span> <span class="nv">$ULY</span> -gt <span class="nv">$LRY</span> <span class="o">]]</span>
-    <span class="k">do</span>
-        <span class="nb">echo</span> <span class="nv">$ULX</span>, <span class="k">$((</span><span class="nv">$ULX</span><span class="o">+</span><span class="nv">$SIZE</span><span class="k">))</span>, <span class="nv">$ULY</span>, <span class="k">$((</span><span class="nv">$ULY</span><span class="o">-</span><span class="nv">$SIZE</span><span class="k">))</span>
-
-        gdal_translate <span class="se">\</span>
-            -co <span class="nv">TILED</span><span class="o">=</span>YES <span class="se">\</span>
-            -co <span class="nv">COMPRESS</span><span class="o">=</span>DEFLATE <span class="se">\</span>
-            -co <span class="nv">TFW</span><span class="o">=</span>YES <span class="se">\</span>
-            -co <span class="nv">NUM_THREADS</span><span class="o">=</span>ALL_CPUS <span class="se">\</span>
-            -a_nodata <span class="m">0</span> <span class="se">\</span>
-            -of GTiff <span class="se">\</span>
-            -projwin <span class="nv">$ULX</span>, <span class="nv">$ULY</span>, <span class="k">$((</span><span class="nv">$ULX</span><span class="o">+</span><span class="nv">$SIZE</span><span class="k">))</span>, <span class="k">$((</span><span class="nv">$ULY</span><span class="o">-</span><span class="nv">$SIZE</span><span class="k">))</span> <span class="se">\</span>
-            -projwin_srs EPSG:5514 <span class="se">\</span>
-            data/detected.gpkg data/detected_<span class="si">${</span><span class="nv">COUNTER_X</span><span class="si">}</span>_<span class="si">${</span><span class="nv">COUNTER_Y</span><span class="si">}</span>.tiff
-
-        <span class="nv">ULY</span><span class="o">=</span><span class="k">$((</span><span class="nv">$ULY</span><span class="o">-</span><span class="nv">$SIZE</span><span class="k">))</span>
-        <span class="nv">COUNTER_Y</span><span class="o">=</span><span class="k">$((</span>COUNTER_Y+1<span class="k">))</span>
-    <span class="k">done</span>
-    <span class="nv">ULX</span><span class="o">=</span><span class="k">$((</span><span class="nv">$ULX</span><span class="o">+</span><span class="nv">$SIZE</span><span class="k">))</span>
-    <span class="nv">ULY</span><span class="o">=</span>-1135450
-    <span class="nv">COUNTER_X</span><span class="o">=</span><span class="k">$((</span>COUNTER_X+1<span class="k">))</span>
-<span class="k">done</span>
-</pre></div>
-
-
-<h2>Final Touch: Raster to&nbsp;Vector</h2>
-<p>After the GeoTiff is written to hard drive, <a href="https://www.zimmi.cz/posts/2015/how-to-use-queue-with-rsync/">inotifywait</a> can be used to generate overviews. And with ease of calling <code>gdal_polygonize.py</code> on each of GeoTiffs&hellip;vector layer, at you&nbsp;service.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/index2.html">Next page &raquo;</a>
