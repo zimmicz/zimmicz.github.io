@@ -27,10 +27,12 @@ ARTICLE_URL = '{date:%Y}/{slug}/'
 ARTICLE_SAVE_AS = '{date:%Y}/{slug}/index.html'
 GOOGLE_ANALYTICS = True
 PLUGIN_PATHS = ['content/pelican-plugins']
-PLUGINS = ['neighbors', 'assets', 'pelican-image-optimizer', 'related_posts']
+PLUGINS = ['neighbors', 'assets', 'pelican-image-optimizer', 'related_posts', 'series']
 
 CACHE_CONTENT = True
 LOAD_CONTENT_CACHE = True
 CACHE_PATH = 'cache'
 CHECK_MODIFIED_METHOD = 'mtime'
 IMAGE_OPTIMIZATION_ONCE_AND_FOR_ALL = True
+
+IGNORE_FILES = ['*.rst', 'pelican-plugins/**/*.md']
