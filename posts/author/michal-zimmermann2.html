@@ -24,6 +24,110 @@
 <h2>Articles by Michal Zimmermann</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2017/postgis-as-a-mapbox-vector-tiles-generator/" rel="bookmark" title="Permalink to PostGIS as a Mapbox Vector Tiles generator">PostGIS as a Mapbox Vector Tiles&nbsp;generator</a></h1>
+    <aside><span>Aug 6, 2017</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/docker.html">docker</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p><a href="http://postgis.net/2017/08/05/postgis-2.4.0alpha/">PostGIS 2.4.0</a> was released recently bringing the possibilities to generate <strong>Mapbox Vector Tiles</strong> without any third party tools. I got a shot at it with Node.js and docker. Even if it&#8217;s not as straightforward as solely using <a href="https://postgis.net/docs/manual-dev/ST_AsMVT.html">ST_AsMVT</a>, it still looks pretty&nbsp;great.</p>
+<h2>Docker&nbsp;container</h2>
+<p>There are no Ubuntu or Debian based PostGIS 2.4.0 packages as far as I know. As installation from source (especially considering <span class="caps">GIS</span> software) is always a bit risky, I prefer using Docker to stay away from trouble. The image is based on Ubuntu 17.04, has PostgreSQL 9.6 and PostGIS 2.4.0 installed. It exposes port 5432 to the host, so you can access the database from the outside the&nbsp;container.</p>
+<div class="highlight"><pre><span></span>FROM ubuntu:17.04
+RUN apt update
+RUN apt install -y wget less systemd
+RUN touch /etc/apt/sources.list.d/pgdg.list
+RUN <span class="nb">echo</span> <span class="s2">&quot;deb http://apt.postgresql.org/pub/repos/apt/ zesty-pgdg main&quot;</span> &gt; /etc/apt/sources.list.d/pgdg.list
+RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc <span class="p">|</span> apt-key add -
+RUN apt update
+RUN apt -y install postgresql-9.6 postgresql-server-dev-9.6
+
+USER postgres
+RUN /usr/lib/postgresql/9.6/bin/pg_ctl -D /var/lib/postgresql/9.6/main -l /tmp/logfile start
+
+USER root
+RUN <span class="nb">echo</span> <span class="s2">&quot;host all  all    0.0.0.0/0  trust&quot;</span> &gt;&gt; /etc/postgresql/9.6/main/pg_hba.conf <span class="o">&amp;&amp;</span> <span class="se">\</span>
+    <span class="nb">echo</span> <span class="s2">&quot;listen_addresses=&#39;*&#39;&quot;</span> &gt;&gt; /etc/postgresql/9.6/main/postgresql.conf
+
+
+EXPOSE <span class="m">5432</span>
+RUN apt install -y netcat build-essential libxml2 libxml2-dev libgeos-3.5.1 libgdal-dev gdal-bin libgdal20 libgeos-dev libprotobuf-c1 libprotobuf-c-dev libprotobuf-dev protobuf-compiler protobuf-c-compiler
+RUN wget http://download.osgeo.org/postgis/source/postgis-2.4.0alpha.tar.gz
+RUN tar -xvzf postgis-2.4.0alpha.tar.gz
+RUN <span class="nb">cd</span> postgis-2.4.0alpha <span class="o">&amp;&amp;</span> ./configure <span class="o">&amp;&amp;</span> make <span class="o">&amp;&amp;</span> make install
+
+USER postgres
+RUN service postgresql start <span class="o">&amp;&amp;</span> psql -c <span class="s2">&quot;CREATE EXTENSION postgis&quot;</span>
+
+USER root
+COPY start.postgis.sh /start.postgis.sh
+RUN chmod <span class="m">0755</span> /start.postgis.sh
+
+CMD <span class="o">[</span><span class="s2">&quot;/start.postgis.sh&quot;</span><span class="o">]</span>
+</pre></div>
+
+
+<p><code>start.postgis.sh</code> file starts the database server and keeps it running&nbsp;forever.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+<span class="nv">DATADIR</span><span class="o">=</span><span class="s2">&quot;/var/lib/postgresql/9.6/main&quot;</span>
+<span class="nv">CONF</span><span class="o">=</span><span class="s2">&quot;/etc/postgresql/9.6/main/postgresql.conf&quot;</span>
+<span class="nv">POSTGRES</span><span class="o">=</span><span class="s2">&quot;/usr/lib/postgresql/9.6/bin/postgres&quot;</span>
+
+su postgres sh -c <span class="s2">&quot;</span><span class="nv">$POSTGRES</span><span class="s2"> -D </span><span class="nv">$DATADIR</span><span class="s2"> -c config_file=</span><span class="nv">$CONF</span><span class="s2">&quot;</span> <span class="p">&amp;</span>
+<span class="k">until</span> nc -z localhost <span class="m">5432</span><span class="p">;</span>
+<span class="k">do</span>
+    <span class="nb">echo</span> ...
+    sleep <span class="m">5</span>
+<span class="k">done</span>
+sleep <span class="m">5</span> <span class="c1"># just for sure</span>
+su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT EXISTS postgis\&quot;&quot;</span>
+<span class="nb">echo</span> database up and running
+
+<span class="nb">wait</span> <span class="nv">$!</span>
+</pre></div>
+
+
+<h2>Data</h2>
+<p>I got a cadastre area dataset of the Czech Republic for testing, which contains ~ 13,000 polygons. The geometries should come in Web Mercator a.k.a. <span class="caps">EPSG</span>:3857 to work with <a href="https://www.mapbox.com/vector-tiles/specification/"><span class="caps">MVT</span></a>.</p>
+<h2>Vector&nbsp;tiles</h2>
+<p>I got a bit confused by the docs of <a href="https://postgis.net/docs/manual-dev/ST_AsMVT.html">ST_AsMVT</a> and <a href="https://postgis.net/docs/manual-dev/ST_AsMVTGeom.html">ST_AsMVTGeom</a>. Especially the latter one took me a few hours to get it right. What is essential (I guess) about Mapbox Vector Tiles is that you have to abstract from the real world coordinates and start thinking inside the tile coordinates. What PostGIS does with <code>ST_AsMVTGeom</code> (and what any other <span class="caps">MVT</span> implemenation should do for you) is that it takes real world coordinates and put them inside a&nbsp;tile.</p>
+<div class="text-center"><img data-echo="/posts/assets/postgis-as-a-mapbox-vector-tiles-generator/mvt.gif"/></div>
+
+<p>To make this work, you need to know every bounding box of every tile on every zoom level in a Web Mercator projection. Or you can use <a href="https://github.com/mapbox/postgis-vt-util/blob/master/src/TileBBox.sql">TileBBox procedure by Mapbox</a>, if you&nbsp;wish.</p>
+<p>The <span class="caps">SQL</span> query itself is pretty simple (this comes from an express route I&#8217;ll be discussing&nbsp;shortly).</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">ST_AsMVT</span><span class="p">(</span><span class="s1">&#39;cadastre&#39;</span><span class="p">,</span> <span class="mi">4096</span><span class="p">,</span> <span class="s1">&#39;geom&#39;</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+<span class="k">FROM</span> <span class="p">(</span>
+    <span class="k">SELECT</span>
+        <span class="n">code</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">,</span>
+        <span class="n">ST_AsMVTGeom</span><span class="p">(</span>
+            <span class="n">geom</span><span class="p">,</span>
+            <span class="n">TileBBox</span><span class="p">(</span><span class="err">${</span><span class="n">req</span><span class="p">.</span><span class="n">params</span><span class="p">.</span><span class="n">z</span><span class="err">}</span><span class="p">,</span> <span class="err">${</span><span class="n">req</span><span class="p">.</span><span class="n">params</span><span class="p">.</span><span class="n">x</span><span class="err">}</span><span class="p">,</span> <span class="err">${</span><span class="n">req</span><span class="p">.</span><span class="n">params</span><span class="p">.</span><span class="n">y</span><span class="err">}</span><span class="p">,</span> <span class="mi">3857</span><span class="p">),</span>
+            <span class="mi">4096</span><span class="p">,</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="k">false</span>
+        <span class="p">)</span> <span class="n">geom</span>
+    <span class="k">FROM</span> <span class="n">cadastre_area</span>
+    <span class="k">WHERE</span> <span class="n">ST_Intersects</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span> <span class="p">(</span><span class="k">SELECT</span> <span class="n">ST_Transform</span><span class="p">(</span><span class="n">ST_MakeEnvelope</span><span class="p">(</span><span class="err">$</span><span class="mi">1</span><span class="p">,</span> <span class="err">$</span><span class="mi">2</span><span class="p">,</span> <span class="err">$</span><span class="mi">3</span><span class="p">,</span> <span class="err">$</span><span class="mi">4</span><span class="p">,</span> <span class="err">$</span><span class="mi">5</span><span class="p">),</span> <span class="mi">3857</span><span class="p">)))</span>
+<span class="p">)</span> <span class="n">q</span>
+</pre></div>
+
+
+<p>When filled with proper arguments instead of placeholders, it returns a&nbsp;bytea.</p>
+<div class="highlight"><pre><span></span><span class="se">\x</span>1aa5dbd0070a047465737412e216120400000101180322d7160987913f8db38e01aa59160e2a010412012a0624060e001410420a1a00203b0a3914190e15085912010a0f0c0f06370804080a0e0e0234090e0
+</pre></div>
+
+
+<p>This can be consumed by a Leaflet map using <a href="https://github.com/Leaflet/Leaflet.VectorGrid">Leaflet.VectorGrid plugin</a>. To keep it short, the frontend code actually boils down to three lines of&nbsp;code.</p>
+<div class="highlight"><pre><span></span><span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="s1">&#39;http://localhost:3000/mvt/{x}/{y}/{z}&#39;</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">cadastre</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">vectorGrid</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">(</span><span class="nx">url</span><span class="p">);</span>
+<span class="nx">map</span><span class="p">.</span><span class="nx">addLayer</span><span class="p">(</span><span class="nx">cadastre</span><span class="p">);</span>
+</pre></div>
+
+
+<p>The <a href="https://gist.github.com/zimmicz/9e78d9888ab73abc7e87553b77999bc8">server <span class="caps">MVP</span> is available</a> as a GitHub&nbsp;gist.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2017/fighting-raster-geopackage-with-gdal/" rel="bookmark" title="Permalink to Fighting Raster GeoPackage with GDAL">Fighting Raster GeoPackage with <span class="caps">GDAL</span></a></h1>
     <aside><span>Jul 19, 2017</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
@@ -317,181 +421,6 @@ v.net <span class="nv">input</span><span class="o">=</span>network <span class="
 <li>Pedestrians usually don&#8217;t follow the road&nbsp;network.</li>
 <li>Bridges and tunnels might be an&nbsp;issue.</li>
 <li>Personally, I find <span class="caps">GRASS</span> <span class="caps">GIS</span> easier to use for the network analysis compared to&nbsp;pgRouting.</li>
-</ul>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/" rel="bookmark" title="Permalink to Routing with pgRouting: Catchment Area Calculation">Routing with pgRouting: Catchment Area&nbsp;Calculation</a></h1>
-    <aside><span>Apr 14, 2017</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/pgrouting.html">pgrouting</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p>For a long time I&#8217;ve wanted to play with <a href="http://pgrouting.org/">pgRouting</a> and that time has finally come. Among many other routing functions there is one that caught my eye, called <code>pgr_drivingdistance</code>. As the documentation says, it <em>returns the driving distance from a start node</em> using Dijkstra algorithm. The aforementioned distance doesn&#8217;t need to be defined in Euclidean space (the real distance between two points), it might be calculated in units of time, slopeness etc. How to get it&nbsp;going?</p>
-<h2>Data</h2>
-<p><span class="caps">OSM</span> will do as it always does. There is a tool called <code>osm2pgrouting</code> to help you load the data, the pure <span class="caps">GDAL</span> seems to be a better way to me though. Importing the downloaded data is&nbsp;trivial.</p>
-<div class="highlight"><pre><span></span>ogr2ogr -f <span class="s2">&quot;PostgreSQL&quot;</span> PG:<span class="s2">&quot;dbname=pgrouting active_schema=cze&quot;</span> <span class="se">\</span>
-    -s_srs EPSG:4326 <span class="se">\</span>
-    -t_srs EPSG:5514 <span class="se">\</span>
-    roads.shp <span class="se">\</span>
-    -nln roads <span class="se">\</span>
-    -lco <span class="nv">GEOMETRY_NAME</span><span class="o">=</span>the_geom <span class="se">\</span>
-    -lco <span class="nv">FID</span><span class="o">=</span>id <span class="se">\</span>
-    -gt <span class="m">65000</span> <span class="se">\</span>
-    -nlt PROMOTE_TO_MULTI <span class="se">\</span>
-    -clipsrc <span class="m">16</span>.538 <span class="m">49</span>.147 <span class="m">16</span>.699 <span class="m">49</span>.240
-</pre></div>
-
-
-<p>To route the network, it has to be properly noded. Although pgRouting comes with built-in <code>pgr_nodenetwork</code>, it didn&#8217;t seem to work very well. To node the network, use PostGIS <code>ST_Node</code>. <strong>Note this doesn&#8217;t consider bridges and&nbsp;tunnels.</strong></p>
-<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="k">AS</span>
-<span class="k">SELECT</span>
-    <span class="p">(</span><span class="n">ST_Dump</span><span class="p">(</span><span class="n">geom</span><span class="p">)).</span><span class="n">geom</span> <span class="n">the_geom</span>
-<span class="k">FROM</span> <span class="p">(</span>
-    <span class="k">SELECT</span>
-        <span class="n">ST_Node</span><span class="p">(</span><span class="n">geom</span><span class="p">)</span> <span class="n">geom</span>
-    <span class="k">FROM</span> <span class="p">(</span>
-        <span class="k">SELECT</span> <span class="n">ST_Union</span><span class="p">(</span><span class="n">the_geom</span><span class="p">)</span> <span class="n">geom</span>
-        <span class="k">FROM</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads</span>
-    <span class="p">)</span> <span class="n">a</span>
-<span class="p">)</span> <span class="n">b</span><span class="p">;</span>
-</pre></div>
-
-
-<p>After noding the network, all the information about speed limits and oneways is lost. If needed, it can be brought back with&nbsp;following:</p>
-<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">INDEX</span> <span class="k">ON</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="k">USING</span> <span class="n">gist</span><span class="p">(</span><span class="n">the_geom</span><span class="p">);</span>
-<span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="k">ADD</span> <span class="k">COLUMN</span> <span class="n">id</span> <span class="nb">SERIAL</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">;</span>
-<span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="k">ADD</span> <span class="k">COLUMN</span> <span class="n">maxspeed</span> <span class="nb">integer</span><span class="p">;</span>
-
-<span class="k">UPDATE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span>
-<span class="k">SET</span> <span class="n">maxspeed</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">maxspeed</span>
-<span class="k">FROM</span> <span class="p">(</span>
-    <span class="k">SELECT</span> <span class="k">DISTINCT</span> <span class="k">ON</span> <span class="p">(</span><span class="n">rn</span><span class="p">.</span><span class="n">id</span><span class="p">)</span>
-        <span class="n">rn</span><span class="p">.</span><span class="n">id</span><span class="p">,</span>
-        <span class="n">r</span><span class="p">.</span><span class="n">maxspeed</span>
-    <span class="k">FROM</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="n">rn</span>
-    <span class="k">JOIN</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads</span> <span class="n">r</span> <span class="k">ON</span> <span class="p">(</span><span class="n">ST_Intersects</span><span class="p">(</span><span class="n">rn</span><span class="p">.</span><span class="n">the_geom</span><span class="p">,</span> <span class="n">r</span><span class="p">.</span><span class="n">the_geom</span><span class="p">))</span>
-    <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">rn</span><span class="p">.</span><span class="n">id</span><span class="p">,</span> <span class="n">ST_Length</span><span class="p">(</span><span class="n">ST_Intersection</span><span class="p">(</span><span class="n">rn</span><span class="p">.</span><span class="n">the_geom</span><span class="p">,</span> <span class="n">r</span><span class="p">.</span><span class="n">the_geom</span><span class="p">))</span> <span class="k">DESC</span>
-<span class="p">)</span> <span class="n">a</span>
-<span class="k">WHERE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">id</span><span class="p">;</span>
-</pre></div>
-
-
-<p>With everything set, the topology can be&nbsp;built.</p>
-<div class="highlight"><pre><span></span><span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="k">ADD</span> <span class="k">COLUMN</span> <span class="k">source</span> <span class="nb">integer</span><span class="p">;</span>
-<span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="k">ADD</span> <span class="k">COLUMN</span> <span class="n">target</span> <span class="nb">integer</span><span class="p">;</span>
-<span class="k">SELECT</span> <span class="n">pgr_createTopology</span><span class="p">(</span><span class="s1">&#39;cze.roads_noded&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-</pre></div>
-
-
-<p>This function creates the <code>cze.roads_noded_vertices_pgr</code> that contains all the extracted nodes from the&nbsp;network.</p>
-<div class="text-center"><img data-echo="/posts/assets/routing-with-pgrouting-catchment-area-calculation/nodes.png" width="70%" /></div>
-
-<p>As already mentioned, measures other than length can be used as a distance, I chose the time to get to a given node on&nbsp;foot.</p>
-<div class="highlight"><pre><span></span><span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="k">ADD</span> <span class="k">COLUMN</span> <span class="n">cost_minutes</span> <span class="nb">integer</span><span class="p">;</span>
-<span class="k">UPDATE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span>
-<span class="k">SET</span> <span class="n">cost_minutes</span> <span class="o">=</span> <span class="p">(</span><span class="n">ST_Length</span><span class="p">(</span><span class="n">the_geom</span><span class="p">)</span> <span class="o">/</span> <span class="mi">83</span><span class="p">.</span><span class="mi">0</span><span class="p">)::</span><span class="nb">integer</span><span class="p">;</span> <span class="c1">-- it takes average person one minute to walk 83 meters</span>
-
-<span class="k">UPDATE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span>
-<span class="k">SET</span> <span class="n">cost_minutes</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="k">WHERE</span> <span class="n">cost_minutes</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</pre></div>
-
-
-<h2>Routing</h2>
-<p>Now the interesting part. All the routing functions are built on what&#8217;s called <a href="http://docs.pgrouting.org/2.4/en/pgRouting-concepts.html#inner-queries"><em>inner queries</em></a> that are expected to return a certain data structure with no geometry included. As I want to see the results in <span class="caps">QGIS</span> immediately, I had to use a simple anonymous <span class="caps">PL</span>/pgSQL block that writes polygonal catchment areas to a table (consider it a proof of concept, not the final&nbsp;solution).</p>
-<div class="highlight"><pre><span></span><span class="k">DROP</span> <span class="k">TABLE</span> <span class="k">IF</span> <span class="k">EXISTS</span> <span class="n">cze</span><span class="p">.</span><span class="n">temp</span><span class="p">;</span>
-<span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">cze</span><span class="p">.</span><span class="n">temp</span> <span class="k">AS</span>
-<span class="k">SELECT</span> <span class="o">*</span>
-<span class="k">FROM</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded_vertices_pgr</span> <span class="n">ver</span>
-<span class="k">JOIN</span> <span class="p">(</span>
-    <span class="k">SELECT</span> <span class="o">*</span>
-    <span class="k">FROM</span> <span class="n">pgr_drivingDistance</span><span class="p">(</span>
-        <span class="s1">&#39;SELECT id, source, target, cost_minutes as cost, cost_minutes as reverse_cost FROM cze.roads_noded&#39;</span><span class="p">,</span>
-        <span class="mi">6686</span><span class="p">,</span>
-        <span class="mi">10</span><span class="p">,</span>
-        <span class="k">true</span>
-    <span class="p">)</span>
-<span class="p">)</span><span class="n">dist</span> <span class="k">ON</span> <span class="n">ver</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">dist</span><span class="p">.</span><span class="n">node</span><span class="p">;</span>
-
-<span class="k">DO</span> <span class="err">$$</span>
-<span class="k">DECLARE</span>
-    <span class="k">c</span> <span class="nb">integer</span><span class="p">;</span>
-<span class="k">BEGIN</span>
-    <span class="k">DROP</span> <span class="k">TABLE</span> <span class="k">IF</span> <span class="k">EXISTS</span> <span class="n">tmp</span><span class="p">;</span>
-    <span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">tmp</span> <span class="p">(</span>
-        <span class="n">agg_cost</span> <span class="nb">integer</span><span class="p">,</span>
-        <span class="n">geom</span> <span class="n">geometry</span><span class="p">(</span><span class="n">MULTIPOLYGON</span><span class="p">,</span> <span class="mi">5514</span><span class="p">)</span>
-    <span class="p">);</span>
-
-    <span class="c1">-- order by the biggest area so the polygons are not hidden beneath the bigger ones</span>
-    <span class="k">FOR</span> <span class="k">c</span> <span class="k">IN</span> <span class="k">SELECT</span> <span class="n">agg_cost</span> <span class="k">FROM</span> <span class="n">cze</span><span class="p">.</span><span class="n">temp</span> <span class="k">GROUP</span> <span class="k">BY</span> <span class="n">agg_cost</span> <span class="k">HAVING</span> <span class="k">COUNT</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="mi">1</span> <span class="k">DESC</span> <span class="n">LOOP</span>
-        <span class="n">RAISE</span> <span class="n">INFO</span> <span class="s1">&#39;%&#39;</span><span class="p">,</span> <span class="k">c</span><span class="p">;</span>
-        <span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">tmp</span> <span class="p">(</span><span class="n">agg_cost</span><span class="p">,</span> <span class="n">geom</span><span class="p">)</span>
-        <span class="k">SELECT</span>
-            <span class="k">c</span><span class="p">,</span>
-            <span class="n">ST_Multi</span><span class="p">(</span><span class="n">ST_SetSRID</span><span class="p">(</span><span class="n">pgr_pointsAsPolygon</span><span class="p">(</span>
-                <span class="s1">&#39;SELECT</span>
-<span class="s1">                        temp.id::integer,</span>
-<span class="s1">                        ST_X(temp.the_geom)::float AS x,</span>
-<span class="s1">                        ST_Y(temp.the_geom)::float AS y</span>
-<span class="s1">                FROM cze.temp</span>
-<span class="s1">                WHERE agg_cost = &#39;</span> <span class="o">||</span> <span class="k">c</span>
-            <span class="p">),</span> <span class="mi">5514</span><span class="p">));</span>
-    <span class="k">END</span> <span class="n">LOOP</span><span class="p">;</span>
-<span class="k">END</span><span class="err">$$</span><span class="p">;</span>
-</pre></div>
-
-
-<p>Using <code>pgr_pointsAsPolygon</code> renders resulting nodes accessible in 10-minute walk in polygons, but weird looking ones. Not bad, could be better&nbsp;though.</p>
-<div class="text-center"><img data-echo="/assets/routing-with-pgrouting-catchment-area-calculation/area1.png" width="70%" /></div>
-
-<p>How about seeing only nodes instead of&nbsp;polygons?</p>
-<div class="highlight"><pre><span></span><span class="k">SELECT</span>
-    <span class="n">agg_cost</span><span class="p">,</span>
-    <span class="n">ST_PointN</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
-<span class="k">FROM</span> <span class="p">(</span>
-    <span class="k">SELECT</span>
-        <span class="n">agg_cost</span><span class="p">,</span>
-        <span class="n">ST_ExteriorRing</span><span class="p">((</span><span class="n">ST_Dump</span><span class="p">(</span><span class="n">geom</span><span class="p">)).</span><span class="n">geom</span><span class="p">)</span> <span class="n">geom</span><span class="p">,</span>
-        <span class="n">generate_series</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">ST_NumPoints</span><span class="p">(</span><span class="n">ST_ExteriorRing</span><span class="p">((</span><span class="n">ST_Dump</span><span class="p">(</span><span class="n">geom</span><span class="p">)).</span><span class="n">geom</span><span class="p">)))</span> <span class="n">i</span>
-    <span class="k">FROM</span> <span class="n">tmp</span>
-<span class="p">)</span> <span class="n">a</span><span class="p">;</span>
-</pre></div>
-
-
-<p>Looks good, could be better&nbsp;though.</p>
-<div class="text-center"><img data-echo="/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png" width="70%" /></div>
-
-<p>How about creating concave hulls from the extracted&nbsp;nodes?</p>
-<div class="highlight"><pre><span></span><span class="k">SELECT</span>
-    <span class="n">agg_cost</span><span class="p">,</span>
-    <span class="n">ST_ConcaveHull</span><span class="p">(</span><span class="n">ST_Union</span><span class="p">(</span><span class="n">geom</span><span class="p">))</span> <span class="n">geom</span>
-<span class="k">FROM</span> <span class="p">(</span>
-    <span class="k">SELECT</span>
-        <span class="n">agg_cost</span><span class="p">,</span>
-        <span class="n">ST_PointN</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="n">geom</span>
-    <span class="k">FROM</span> <span class="p">(</span>
-        <span class="k">SELECT</span>
-            <span class="n">agg_cost</span><span class="p">,</span>
-            <span class="n">ST_ExteriorRing</span><span class="p">((</span><span class="n">ST_Dump</span><span class="p">(</span><span class="n">geom</span><span class="p">)).</span><span class="n">geom</span><span class="p">)</span> <span class="n">geom</span><span class="p">,</span>
-            <span class="n">generate_series</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">ST_NumPoints</span><span class="p">(</span><span class="n">ST_ExteriorRing</span><span class="p">((</span><span class="n">ST_Dump</span><span class="p">(</span><span class="n">geom</span><span class="p">)).</span><span class="n">geom</span><span class="p">)))</span> <span class="n">i</span>
-        <span class="k">FROM</span> <span class="n">tmp</span>
-    <span class="p">)</span> <span class="n">a</span>
-<span class="p">)</span> <span class="n">b</span>
-<span class="k">GROUP</span> <span class="k">BY</span> <span class="n">agg_cost</span>
-<span class="k">ORDER</span> <span class="k">BY</span> <span class="n">agg_cost</span> <span class="k">DESC</span><span class="p">;</span>
-</pre></div>
-
-
-<p>This one looks the best I&nbsp;guess.</p>
-<div class="text-center"><img data-echo="/assets/routing-with-pgrouting-catchment-area-calculation/area2.png" width="70%" /></div>
-
-<h2>Remarks</h2>
-<ul>
-<li>The documentation doesn&#8217;t help&nbsp;much.</li>
-<li>I&#8217;d expect existing functions to return different data structures to be easy-to-use,&nbsp;actually.</li>
-<li><code>LATERAL</code> might be really handy with those inner queries, have to give it a shot in the&nbsp;future.</li>
-<li>Pedestrians usually don&#8217;t follow the road&nbsp;network.</li>
-<li>Bridges and tunnels might be an&nbsp;issue.</li>
 </ul>
 </article>
 <aside id="pagination">

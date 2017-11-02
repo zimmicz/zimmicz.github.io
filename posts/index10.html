@@ -23,6 +23,35 @@
     <main>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2015/ssh-grass-processing-status-check/" rel="bookmark" title="Permalink to SSH GRASS Processing Status Check"><span class="caps">SSH</span> <span class="caps">GRASS</span> Processing Status&nbsp;Check</a></h1>
+    <aside><span>Jul 21, 2015</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+    </aside>
+    <p>I&#8217;ve been running some <span class="caps">GRASS</span>/PostGIS computations on a remote server that were taking hours to finish. Once in a while I checked for their state by issuing <code>tail log_XX.log</code> from my laptop to see if they were ready yet. It suddenly became pretty annoying to check five different logs every ten&nbsp;minutes.</p>
+<p>Instead of waiting and checking the logs, I thought it would be great to automate this. And it would be awesome if checking was fun. So I wrote a simple routine that takes log number as an argument (every process logs to a separate logfile) and checks it every minute until it says <em>done</em>. Right after that <code>notify-send</code> gives me a neat popup and Queen starts playing their <em>We are the champions</em> thanks to <code>mpg123</code>.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env bash</span>
+<span class="nv">item</span><span class="o">=</span><span class="nv">$1</span>
+
+<span class="k">while</span> true<span class="p">;</span> <span class="k">do</span>
+    <span class="nb">echo</span> <span class="s2">&quot;############ </span><span class="si">${</span><span class="nv">item</span><span class="si">}</span><span class="s2"> ############&quot;</span>
+    <span class="nv">x</span><span class="o">=</span><span class="k">$(</span>ssh user@remote.server <span class="s2">&quot;tail -n 30 path/to/my/log_</span><span class="si">${</span><span class="nv">item</span><span class="si">}</span><span class="s2">.log&quot;</span><span class="k">)</span>
+
+    <span class="k">if</span> <span class="o">[[</span> <span class="nv">$x</span> <span class="o">==</span> *<span class="s2">&quot;done&quot;</span>* <span class="o">]]</span>
+        <span class="k">then</span>
+            notify-send -u critical <span class="s2">&quot;Finally </span><span class="si">${</span><span class="nv">item</span><span class="si">}</span><span class="s2">&quot;</span>
+            mpg123 -n <span class="m">250</span> ~/Music/queen-we_are_the_champions.mp3
+            <span class="nb">exit</span>
+        <span class="k">else</span> <span class="nb">echo</span> <span class="s2">&quot;Not yet&quot;</span>
+    <span class="k">fi</span>
+    sleep <span class="m">60</span>
+<span class="k">done</span>
+</pre></div>
+
+
+<p>What seemed to be really frustrating makes me happy right now. Unless Freddie starts singing in the middle of the&nbsp;night.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2015/animating-svg-maps-with-smil/" rel="bookmark" title="Permalink to Animating SVG Maps With SMIL">Animating <span class="caps">SVG</span> Maps With <span class="caps">SMIL</span></a></h1>
     <aside><span>Apr 29, 2015</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/smil.html">smil</a>    </span>
@@ -410,108 +439,6 @@ SELECT noded.id, noded.count - test.count cnt FROM noded JOIN test USING (id);
         <td>2</td>
     </tr>
 </table></p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2015/postgis-rectangular-grid-creation/" rel="bookmark" title="Permalink to PostGIS: Rectangular Grid Creation">PostGIS: Rectangular Grid&nbsp;Creation</a></h1>
-    <aside><span>Mar 24, 2015</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p>Creating a rectangular grid to cover a given extent with same sized cells is one of the basic <span class="caps">GIS</span> tasks I&#8217;ve had to solve several times so far. I used <span class="caps">QGIS</span> or some Python to give me a bunch of <code>INSERT</code> statements to run in PostGIS database, now I&#8217;ve come with a final solution at&nbsp;last.</p>
-<div class="highlight"><pre><span></span>CREATE OR REPLACE FUNCTION cm_grid(
-    blx float8, -- bottom left x coordinate
-    bly float8, -- bottom left y coordinate
-    trx float8, -- top right x coordinate
-    try float8, -- top right y coordinate
-    xsize float8, -- cell width
-    ysize float8, -- cell height
-    srid integer DEFAULT 5514,
-    OUT col varchar,
-    OUT &quot;row&quot; varchar,
-    OUT geom geometry
-) RETURNS SETOF record AS
-$$
-DECLARE
-    width float8; -- total area width
-    height float8; -- total area height
-    cols integer;
-    rows integer;
-BEGIN
-    width  := @($1 - $3); -- absolute value
-    height := @($2 - $4); -- absolute value
-    cols   := ceil(width / xsize);
-    rows   := ceil(height / ysize);
-    RETURN QUERY
-        SELECT
-            cast(
-                lpad((i)::varchar,
-                CASE WHEN
-                    char_length(rows::varchar) &gt; char_length(cols::varchar)
-                        THEN  char_length(rows::varchar)
-                        ELSE char_length(cols::varchar)
-                END,
-                &#39;0&#39;)
-                AS varchar
-            ) AS row,
-            cast(
-                lpad((j)::varchar,
-                CASE WHEN
-                    char_length(rows::varchar) &gt; char_length(cols::varchar)
-                        THEN  char_length(rows::varchar)
-                        ELSE char_length(cols::varchar)
-                END,
-                &#39;0&#39;) AS varchar
-            ) AS col,
-            ST_SetSRID(
-                ST_GeomFromText(
-                    &#39;POLYGON((&#39; ||
-                        array_to_string(
-                            ARRAY[i * xsize + blx, j * ysize + bly],
-                            &#39; &#39;
-                        ) || &#39;,&#39; ||
-                        array_to_string(
-                            ARRAY[i * xsize + blx, (j+1) * ysize + bly],
-                            &#39; &#39;
-                        ) || &#39;,&#39; ||
-                        array_to_string(
-                            ARRAY[(i+1) * xsize + blx, (j+1) * ysize + bly],
-                            &#39; &#39;
-                        ) || &#39;,&#39; ||
-                        array_to_string(
-                            ARRAY[(i+1) * xsize + blx, j * ysize + bly],
-                            &#39; &#39;
-                        ) || &#39;,&#39; ||
-                        array_to_string(
-                            ARRAY[i * xsize + blx, j * ysize + bly],
-                            &#39; &#39;
-                        ) || &#39;
-                    ))&#39;
-                )
-            , srid) AS geom
-        FROM
-            generate_series(0, cols) AS i,
-            generate_series(0, rows) AS j;
-END;
-$$
-LANGUAGE plpgsql;
-</pre></div>
-
-
-<p>And you call it like&nbsp;this:</p>
-<div class="highlight"><pre><span></span>CREATE TABLE grid AS
-SELECT *
-FROM cm_grid(-675593.69, -1057711.19, -672254.69, -1054849.19, 333.47, 333.47);
-</pre></div>
-
-
-<p>Few&nbsp;notes:</p>
-<ul>
-<li>it takes bounding box coordinates (bottom left, top right) for an&nbsp;extent,</li>
-<li>followed by cell width and&nbsp;height,</li>
-<li>and optional <span class="caps">SRID</span> (defaults to 5514 which is Czech national&nbsp;grid),</li>
-<li>each cell is indexed with <code>row</code> and <code>col</code> number</li>
-</ul>
-<p>The messy <code>CASE</code> statement makes sure both <code>row</code> and <code>col</code> are of the same length. I used <code>array_to_string</code> for better readability. It might not be the fastest way, didn&#8217;t do any&nbsp;benchmarks.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/index9.html">&laquo; Previous page</a>
