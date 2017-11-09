@@ -3,7 +3,6 @@ Date: 2017-11-09 15:00
 Category: QGIS
 Tags: python, QGIS
 Series: QGIS Plugin Development
-Status: draft
 Image: https://www.zimmi.cz/posts/assets/qgis-plugin-development-finding-nearest-neighbors/qgis.png
 
 I described basics of vector layers manipulation in [the previous part]({filename}../2017/qgis-plugin-development-using-python-console.md) of the series. With my goal in mind (fully functional custom plugin capable of writing an attribute value from a source layer to a target layer based on a feature distance), I'd like to discuss **spatial indexing** and **nearest neighbor analysis**.

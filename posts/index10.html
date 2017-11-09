@@ -23,6 +23,34 @@
     <main>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2015/qgis-tips-for-collaborative-mapping/" rel="bookmark" title="Permalink to QGIS Tips For Collaborative Mapping"><span class="caps">QGIS</span> Tips For Collaborative&nbsp;Mapping</a></h1>
+    <aside><span>Jul 21, 2015</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/tools.html">Tools</a></span>
+    </aside>
+    <p>Right now I&#8217;m setting up a project aimed at crop evaluation over ortophotos, <span class="caps">HR</span> and <span class="caps">VHR</span> imagery. All the steps of evaluation will be done in <span class="caps">QGIS</span> with PostGIS used for data storage and&nbsp;post-processing.</p>
+<p>In the initial phase, fifteen <span class="caps">GIS</span> operators will be using <span class="caps">QGIS</span> to reshape geometries and fill attribute data accordingly. Fifteen are not so many, but it is enough to be a possible source of errors. Luckily, there are many things you can do with <span class="caps">QGIS</span> to prevent people from making&nbsp;mistakes.</p>
+<h2><span class="caps">QGIS</span> project&nbsp;file</h2>
+<p><span class="caps">QGIS</span> project, the .qgs file, is a pure <span class="caps">XML</span> and, unlike <span class="caps">ESRI</span>&#8217;s .mxd, can be edited with any text editor. That&#8217;s great advantage when you need to prepare one project for many different operators. My project has to load some database layers that should be different for different operators that have different database&nbsp;accounts.</p>
+<p>How do you do that? It&#8217;s enough to create a project using your own credentials and then replace them with <code>USERNAME</code> and <code>PASSWORD</code> strings as seen below. What happens when the user loads the&nbsp;project?</p>
+<div class="highlight"><pre><span></span><span class="nt">&lt;datasource&gt;</span>dbname=&#39;database&#39; host=host port=5432 user=&#39;USERNAME&#39; password=&#39;PASSWORD&#39; sslmode=require key=&#39;qgis_id&#39; srid=5514 type=POLYGON table=&quot;schema&quot;.&quot;table&quot; (wkb_geometry) sql=<span class="nt">&lt;/datasource&gt;</span>
+</pre></div>
+
+
+<p>A popup window will be shown asking him/her to handle bad layers, as <span class="caps">QGIS</span> will not be able to connect to the layer. When he/she fills in right credentials (just once), the layer will be loaded. Don&#8217;t forget to <strong>use a table name that doesn&#8217;t exist</strong>, <span class="caps">QGIS</span> will use the credentials stored with PostGIS connection otherwise and won&#8217;t ask for them. <em>I don&#8217;t like this&nbsp;behaviour.</em></p>
+<p>Using this multiple times for each user-specific layer is a great time&nbsp;saver.</p>
+<h2>Adjust attribute table to fit your&nbsp;needs</h2>
+<p><span class="caps">QGIS</span> attribute table has so many settings you probably don&#8217;t use on daily basis and yet they might be invaluable in such project. All of them are available from layer properties under the Fields&nbsp;tab.</p>
+<p class='text-center'><img data-echo="/posts/assets/qgis-tips-for-collaborative-mapping/hidden.png" width=50% class="img-responsive centered"></p>
+
+<p>Sadly, our PostGIS layers are very wide in terms of column count. Not all of the columns are to be edited or even seen by operators, so it might be a good idea to hide them by setting their Edit Widget to Hidden. Those that should be seen, but not edited, might be set as not editable by unchecking that&nbsp;option.</p>
+<p>Lots of our attributes use enumerations provided by our project partner as <span class="caps">CSV</span> files. We use them in <span class="caps">QGIS</span> as value maps, so operators don&#8217;t have to type them manually - we both make their work easier and eliminate mistakes they&nbsp;made.</p>
+<p class='text-center'><img data-echo="/posts/assets/qgis-tips-for-collaborative-mapping/valuemap.png" width=50% class="img-responsive centered"></p>
+
+<p>Note <span class="caps">QGIS</span> swallows the first row of the given <span class="caps">CSV</span> file as if it was a header. Don&#8217;t forget about this when creating your own enumerations. Once set, operators will see a friendly combo box instead of a hostile blank input in the attribute&nbsp;table.</p>
+<p>These are just small adjustments that can make a big difference in your <span class="caps">QGIS</span>&nbsp;workflow.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2015/ssh-grass-processing-status-check/" rel="bookmark" title="Permalink to SSH GRASS Processing Status Check"><span class="caps">SSH</span> <span class="caps">GRASS</span> Processing Status&nbsp;Check</a></h1>
     <aside><span>Jul 21, 2015</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
@@ -382,63 +410,6 @@ JOIN ints
 <li><code>DISTINCT ON</code> cleans up the list so the same owners don&#8217;t appear more than once for any given c.&nbsp;community.</li>
 </ul>
 <p>Writing this makes me realize the list should be probably sorted by area so only the occurence with the biggest value is kept for each c. community. Simple <code>ORDER BY</code> should deal with this just fine. Or even more sophisticated, using <code>GROUP BY</code> to output the total acreage in all surrounding c.&nbsp;communities.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2015/postgis-count-line-self-intersections/" rel="bookmark" title="Permalink to PostGIS: Count Line Self-Intersections">PostGIS: Count Line&nbsp;Self-Intersections</a></h1>
-    <aside><span>Mar 30, 2015</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p><a href="https://gis.stackexchange.com/questions/107927/counting-self-intersections-of-linestring-using-postgis/140674#140674">Is there a way of using PostgreSQL + PostGIS for finding the number of self intersections in a linestring?</a> was a question that made me think of this problem. I came up with a solution that takes just a few lines of&nbsp;code.</p>
-<p>Assume the following&nbsp;geometries:</p>
-<div class="highlight"><pre><span></span>CREATE TABLE test2 (
-    id integer NOT NULL,
-    wkb_geometry geometry(LineString,5514)
-);
-COPY test2 (id, wkb_geometry) FROM stdin;
-1   01020000208A15000004000000CCDC7845E339EEBFF2003B4A8A08E1BFE4154DAB7C31DCBF24C2042773E3E53F2287BA2CC591E43F604749BFE3B2E2BF2AE9770A11B8F0BF9C91435D56C0C63F
-2   01020000208A1500000600000050212BF9E63EC03F1FA046FD69F1EA3F504D44212915EA3F74A99EDF44E3F33F2CE2805DFAB1F33F805D24B1B189DC3F9834DE5938C1F53FB56F1FBF8AAFEC3F24D0C85B4666EA3FF311B0D8D75BE93F306EAA073894D23FA841B27E3404F33F
-\.
-</pre></div>
-
-
-<p><img data-echo="/posts/assets/postgis-count-line-self-intersections/lines.png" title="Self-intersecting lines" class="img-responsive centered"></p>
-<p>Note that those geometries are valid while not being simple, thus, <code>ST_IsValidReason()</code> wouldn&#8217;t help much. What if we compared it to their single counterparts? Those would have had vertices at intersections. Once you know the original number of vertices and the number of simple geometry vertices, it is fairly easy to subtract those&nbsp;two.</p>
-<div class="highlight"><pre><span></span>WITH noded AS (
-SELECT id, COUNT(id)
-FROM (
-    SELECT DISTINCT (ST_DumpPoints(ST_Node(wkb_geometry))).geom, id
-    FROM test
-) tmp  group by id
-),
-test AS (
-    SELECT id, COUNT(id)
-        FROM (
-            SELECT DISTINCT (ST_DumpPoints(wkb_geometry)).geom, id
-            FROM test
-        ) tmp  group by id
-)
-
-SELECT noded.id, noded.count - test.count cnt FROM noded JOIN test USING (id);
-</pre></div>
-
-
-<p>This query gives you geometry id and the difference in number of vertices between the original and simple geometry. Note the <code>DISTINCT</code> in the <code>noded</code> <span class="caps">CTE</span> - with <code>ST_Node()</code> you get <code>one vertex x number of intersecting lines</code> for each intersection. <code>DISTINCT</code> gives you just one of&nbsp;them.</p>
-<p>The query result on my <code>test</code> table:
-<table>
-    <tr>
-        <th>id</th>
-        <th>cnt</th>
-    </tr>
-    <tr>
-        <td>1</td>
-        <td>1</td>
-    </tr>
-    <tr>
-        <td>2</td>
-        <td>2</td>
-    </tr>
-</table></p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/index9.html">&laquo; Previous page</a>

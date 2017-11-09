@@ -23,6 +23,333 @@
     <main>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2017/postgresql-development-history-revealed-with-postgresql/" rel="bookmark" title="Permalink to PostgreSQL Development History Revealed with PostgreSQL">PostgreSQL Development History Revealed with&nbsp;PostgreSQL</a></h1>
+    <aside><span>Aug 9, 2017</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p>I spend a lot of time reading <a href="https://www.postgresql.org/docs/manuals/">PostgreSQL docs</a>. It occurred to me just a few weeks ago that those versioned manuals are great opportunity to get an insight into PostgreSQL development history. Using PostgreSQL, of&nbsp;course.</p>
+<h2><span class="caps">TOP</span> 5 functions with the most verbose docs in each&nbsp;version</h2>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span>
+    <span class="k">version</span><span class="p">,</span>
+    <span class="n">string_agg</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="s1">&#39; | &#39;</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">letter_count</span> <span class="k">DESC</span><span class="p">)</span>
+<span class="k">FROM</span> <span class="p">(</span>
+    <span class="k">SELECT</span>
+        <span class="k">version</span><span class="p">,</span>
+        <span class="n">func</span><span class="p">,</span>
+        <span class="n">letter_count</span><span class="p">,</span>
+        <span class="n">row_number</span><span class="p">()</span> <span class="n">OVER</span> <span class="p">(</span><span class="n">PARTITION</span> <span class="k">BY</span> <span class="k">version</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">letter_count</span> <span class="k">DESC</span><span class="p">)</span>
+    <span class="k">FROM</span> <span class="n">postgresql_development</span><span class="p">.</span><span class="k">data</span>
+<span class="p">)</span> <span class="n">a</span>
+<span class="k">WHERE</span> <span class="n">row_number</span> <span class="o">&lt;=</span> <span class="mi">10</span>
+<span class="k">GROUP</span> <span class="k">BY</span> <span class="k">version</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="k">version</span> <span class="k">DESC</span>
+</pre></div>
+
+
+<p>Seems like a huge comeback for <code>CREATE TABLE</code>.</p>
+<table>
+<thead>
+<tr>
+<th><span class="caps">VERSION</span></th>
+<th>1st</th>
+<th>2nd</th>
+<th>3rd</th>
+<th>4th</th>
+<th>5th</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10.0</td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">SELECT</span></td>
+</tr>
+<tr>
+<td>9.6</td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">SELECT</span></td>
+</tr>
+<tr>
+<td>9.5</td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">SELECT</span></td>
+</tr>
+<tr>
+<td>9.4</td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">SELECT</span></td>
+</tr>
+<tr>
+<td>9.3</td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">DEFAULT</span> <span class="caps">PRIVILEGES</span></td>
+</tr>
+<tr>
+<td>9.2</td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">DEFAULT</span> <span class="caps">PRIVILEGES</span></td>
+</tr>
+<tr>
+<td>9.1</td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">DEFAULT</span> <span class="caps">PRIVILEGES</span></td>
+</tr>
+<tr>
+<td>9.0</td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">DEFAULT</span> <span class="caps">PRIVILEGES</span></td>
+</tr>
+<tr>
+<td>8.4</td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">SELECT</span></td>
+</tr>
+<tr>
+<td>8.3</td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">COMMENT</span></td>
+</tr>
+<tr>
+<td>8.2</td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">SELECT</span></td>
+</tr>
+<tr>
+<td>8.1</td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">SELECT</span></td>
+</tr>
+<tr>
+<td>8</td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">SELECT</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+</tr>
+<tr>
+<td>7.4</td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">SELECT</span></td>
+</tr>
+<tr>
+<td>7.3</td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">SELECT</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">GRANT</span></td>
+</tr>
+<tr>
+<td>7.2</td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">SELECT</span> <span class="caps">INTO</span></td>
+<td><span class="caps">SELECT</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TYPE</span></td>
+</tr>
+<tr>
+<td>7.1</td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">SELECT</span> <span class="caps">INTO</span></td>
+<td><span class="caps">SELECT</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TYPE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+</tr>
+<tr>
+<td>7.0</td>
+<td><span class="caps">SELECT</span></td>
+<td><span class="caps">SELECT</span> <span class="caps">INTO</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TYPE</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">COMMENT</span></td>
+</tr>
+</tbody>
+</table>
+<h2>Number of functions available in each&nbsp;version</h2>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span>
+    <span class="k">version</span><span class="p">,</span>
+    <span class="k">count</span><span class="p">(</span><span class="n">func</span><span class="p">),</span>
+    <span class="k">sum</span><span class="p">(</span><span class="n">letter_count</span><span class="p">)</span>
+<span class="k">FROM</span> <span class="n">postgresql_development</span><span class="p">.</span><span class="k">data</span>
+<span class="k">GROUP</span> <span class="k">BY</span> <span class="k">version</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="k">version</span><span class="p">;</span>
+</pre></div>
+
+
+<div class="text-center"><img data-echo="/posts/assets/postgresql-development-history-revealed-with-postgresql/plot1.png"/></div>
+
+<h2>The most verbose docs in each&nbsp;version</h2>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="k">DISTINCT</span> <span class="k">ON</span> <span class="p">(</span><span class="k">version</span><span class="p">)</span>
+    <span class="k">version</span><span class="p">,</span>
+    <span class="n">func</span><span class="p">,</span>
+    <span class="n">letter_count</span>
+<span class="k">FROM</span> <span class="n">postgresql_development</span><span class="p">.</span><span class="k">data</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="k">version</span><span class="p">,</span> <span class="n">letter_count</span> <span class="k">DESC</span><span class="p">;</span>
+</pre></div>
+
+
+<p>Poor <code>REVOKE</code>, the defeated&nbsp;champion.</p>
+<div class="text-center">
+    <table style="margin-left:auto; margin-right: auto">
+    <thead>
+    <tr>
+    <th><span class="caps"><span class="caps">VERSION</span></span></th>
+    <th><span class="caps"><span class="caps">FUNCTION</span></span></th>
+    <th><span class="caps"><span class="caps">LETTER</span></span> <span class="caps"><span class="caps">COUNT</span></span></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td>10</td>
+    <td><span class="caps"><span class="caps">CREATE</span></span> <span class="caps"><span class="caps">TABLE</span></span></td>
+    <td>3142</td>
+    </tr>
+    <tr>
+    <td>9.6</td>
+    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
+    <td>2856</td>
+    </tr>
+    <tr>
+    <td>9.5</td>
+    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
+    <td>2856</td>
+    </tr>
+    <tr>
+    <td>9.4</td>
+    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
+    <td>2856</td>
+    </tr>
+    <tr>
+    <td>9.3</td>
+    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
+    <td>2856</td>
+    </tr>
+    <tr>
+    <td>9.2</td>
+    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
+    <td>2856</td>
+    </tr>
+    <tr>
+    <td>9.1</td>
+    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
+    <td>2508</td>
+    </tr>
+    <tr>
+    <td>9</td>
+    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
+    <td>2502</td>
+    </tr>
+    <tr>
+    <td>8.4</td>
+    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
+    <td>2105</td>
+    </tr>
+    <tr>
+    <td>8.3</td>
+    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
+    <td>1485</td>
+    </tr>
+    <tr>
+    <td>8.2</td>
+    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
+    <td>1527</td>
+    </tr>
+    <tr>
+    <td>8.1</td>
+    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
+    <td>1312</td>
+    </tr>
+    <tr>
+    <td>8</td>
+    <td><span class="caps"><span class="caps">CREATE</span></span> <span class="caps"><span class="caps">TABLE</span></span></td>
+    <td>1251</td>
+    </tr>
+    <tr>
+    <td>7.4</td>
+    <td><span class="caps"><span class="caps">CREATE</span></span> <span class="caps"><span class="caps">TABLE</span></span></td>
+    <td>1075</td>
+    </tr>
+    <tr>
+    <td>7.3</td>
+    <td><span class="caps"><span class="caps">CREATE</span></span> <span class="caps"><span class="caps">TABLE</span></span></td>
+    <td>929</td>
+    </tr>
+    <tr>
+    <td>7.2</td>
+    <td><span class="caps"><span class="caps">CREATE</span></span> <span class="caps"><span class="caps">TABLE</span></span></td>
+    <td>929</td>
+    </tr>
+    <tr>
+    <td>7.1</td>
+    <td><span class="caps"><span class="caps">CREATE</span></span> <span class="caps"><span class="caps">TABLE</span></span></td>
+    <td>871</td>
+    </tr>
+    <tr>
+    <td>7</td>
+    <td><span class="caps"><span class="caps">SELECT</span></span></td>
+    <td>450</td>
+    </tr>
+    </tbody>
+    </table>
+</div>
+
+<h2><span class="caps">CREATE</span> <span class="caps">TABLE</span> docs&nbsp;evolution</h2>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span>
+    <span class="k">version</span><span class="p">,</span>
+    <span class="n">letter_count</span>
+<span class="k">FROM</span> <span class="n">postgresql_development</span><span class="p">.</span><span class="k">data</span>
+<span class="k">WHERE</span> <span class="n">func</span> <span class="o">=</span> <span class="s1">&#39;CREATE TABLE&#39;</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="n">func</span><span class="p">,</span> <span class="k">version</span><span class="p">;</span>
+</pre></div>
+
+
+<p>Something&#8217;s going on in an upcoming 10.0&nbsp;version.</p>
+<div class="text-center"><img data-echo="/posts/assets/postgresql-development-history-revealed-with-postgresql/plot2.png"/></div>
+
+<p>All the data was obtained with the following Python script and processed inside the PostgreSQL database. Plots done with <a href="http://bokeh.pydata.org/en/latest/">Bokeh</a>, though I probably wouldn&#8217;t use it again, the docs site is absurdly sluggish and the info is just all over the&nbsp;place.</p>
+<script src="https://gist.github.com/zimmicz/f69a5ce5d3cf3a220e171553c35e0391.js"></script>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2017/postgis-as-a-mapbox-vector-tiles-generator/" rel="bookmark" title="Permalink to PostGIS as a Mapbox Vector Tiles generator">PostGIS as a Mapbox Vector Tiles&nbsp;generator</a></h1>
     <aside><span>Aug 6, 2017</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/docker.html">docker</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>    </span>
@@ -349,78 +676,6 @@ git clone git@github.com:citusdata/cstore_fdw.git
     <span class="k">GROUP</span> <span class="k">BY</span> <span class="mi">1</span>
 <span class="p">)</span> <span class="n">a</span><span class="p">;</span>
 </pre></div>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2017/routing-with-grass-gis-catchment-area-calculation/" rel="bookmark" title="Permalink to Routing with GRASS GIS: Catchment Area Calculation">Routing with <span class="caps">GRASS</span> <span class="caps">GIS</span>: Catchment Area&nbsp;Calculation</a></h1>
-    <aside><span>Apr 20, 2017</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/grass.html">grass</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
-    </aside>
-    <p>I got my hands on <a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/">pgRouting</a> in the last post and I&#8217;m about to do the same with <span class="caps">GRASS</span> <span class="caps">GIS</span> in this&nbsp;one.</p>
-<p><span class="caps">GRASS</span> <span class="caps">GIS</span> stores the topology for the native vector format by default, which makes it easy to use for the network analysis. All the commands associated with the network analysis can be found in the <code>v.net</code> family. The ones I&#8217;m going to discuss in this post are <code>v.net</code> itself, <code>v.net.path</code>, <code>.v.net.alloc</code> and <code>v.net.iso</code>,&nbsp;respectively.</p>
-<h2>Data</h2>
-<p>I&#8217;m going to use the roads data <a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/">from the previous post</a> together with some random points used as catchment areas&nbsp;centers.</p>
-<div class="highlight"><pre><span></span><span class="c1"># create the new GRASS GIS location</span>
-grass -text -c ./osm/czech
-
-<span class="c1"># import the roads</span>
-v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&quot;PG:host=localhost dbname=pgrouting&quot;</span> <span class="nv">layer</span><span class="o">=</span>cze.roads <span class="nv">output</span><span class="o">=</span>roads -eo  --overwrite
-
-<span class="c1"># import the random points</span>
-v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&quot;PG:host=localhost dbname=pgrouting&quot;</span> <span class="nv">layer</span><span class="o">=</span>temp.points <span class="nv">output</span><span class="o">=</span>points -eo --overwrite
-</pre></div>
-
-
-<p>I got six different points and the pretty dense road network. Note none of the points is connected to the existing&nbsp;network.</p>
-<div class="text-center"><img data-echo="/posts/assets/routing-with-grass-gis-catchment-area-calculation/roads_points.png"/></div>
-
-<p>You have to have routable network to do the actual routing (the worst sentence ever written). To do so,&nbsp;let&#8217;s:</p>
-<ul>
-<li>connect the random points to the&nbsp;network</li>
-<li>add nodes to ends and intersections of the&nbsp;roads</li>
-</ul>
-<p>Note I&#8217;m using the 500m as the max distance in which to connect the points to the&nbsp;network.</p>
-<div class="highlight"><pre><span></span>v.net <span class="nv">input</span><span class="o">=</span>roads <span class="nv">points</span><span class="o">=</span>points <span class="nv">operation</span><span class="o">=</span>connect <span class="nv">threshold</span><span class="o">=</span><span class="m">500</span> <span class="nv">output</span><span class="o">=</span>network
-v.net <span class="nv">input</span><span class="o">=</span>network <span class="nv">output</span><span class="o">=</span>network_noded <span class="nv">operation</span><span class="o">=</span>nodes
-</pre></div>
-
-
-<h2>Finding the shortest path between two&nbsp;points</h2>
-<p>Once the network is routable, it is easy to find the shortest path between points number 1 and 4 and store it in the new&nbsp;map.</p>
-<div class="highlight"><pre><span></span><span class="nb">echo</span> <span class="s2">&quot;1 1 4&quot;</span> <span class="p">|</span> v.net.path <span class="nv">input</span><span class="o">=</span>network_noded <span class="nv">output</span><span class="o">=</span>path_1_4
-</pre></div>
-
-
-<p>The algorithm doesn&#8217;t take bridges, tunnels and oneways into account, it&#8217;s capable of doing so&nbsp;though.</p>
-<div class="text-center"><img data-echo="/posts/assets/routing-with-grass-gis-catchment-area-calculation/shortest_path.png" width="70%"/></div>
-
-<h2>Distributing the subnets for nearest&nbsp;centers</h2>
-<div class="highlight"><pre><span></span>v.net.alloc <span class="nv">input</span><span class="o">=</span>network_noded <span class="nv">output</span><span class="o">=</span>network_alloc <span class="nv">center_cats</span><span class="o">=</span><span class="m">1</span>-6 <span class="nv">node_layer</span><span class="o">=</span><span class="m">2</span>
-</pre></div>
-
-
-<p><code>v.net.alloc</code> module takes the given centers and distributes the network so each of its parts belongs to exactly one center - the nearest one (speaking the distance, time units,&nbsp;&hellip;).</p>
-<div class="text-center"><img data-echo="/posts/assets/routing-with-grass-gis-catchment-area-calculation/subnets.png" width="70%"/></div>
-
-<h2>Creating catchment&nbsp;areas</h2>
-<div class="highlight"><pre><span></span>v.net.iso <span class="nv">input</span><span class="o">=</span>network_noded <span class="nv">output</span><span class="o">=</span>network_iso <span class="nv">center_cats</span><span class="o">=</span><span class="m">1</span>-6 <span class="nv">costs</span><span class="o">=</span><span class="m">1000</span>,3000,5000
-</pre></div>
-
-
-<p><code>v.net.iso</code> splits net by cost isolines. Again, the costs might be specified as lengths, time units,&nbsp;&hellip;.</p>
-<div class="text-center"><img data-echo="/posts/assets/routing-with-grass-gis-catchment-area-calculation/isolines.png" width="70%"/></div>
-
-<p>Two different ways lead to the actual catchment area creation. First, you extract nodes from the roads with their values, turn them into the raster grid and either extract contours or polygonize the raster. I find the last step suboptimal and would love to find another way of polygonizing the&nbsp;results.</p>
-<div class="text-center"><img data-echo="/posts/assets/routing-with-grass-gis-catchment-area-calculation/catchment_area.gif" width="70%"/></div>
-
-<p>Note when extracting contours the interval has to be set to the reasonable number depending on the nodes&nbsp;values.</p>
-<h2>Remarks</h2>
-<ul>
-<li>Once you grasp the basics, <span class="caps">GRASS</span> <span class="caps">GIS</span> is real fun. Grasping the basics is pretty tough&nbsp;though.</li>
-<li>Pedestrians usually don&#8217;t follow the road&nbsp;network.</li>
-<li>Bridges and tunnels might be an&nbsp;issue.</li>
-<li>Personally, I find <span class="caps">GRASS</span> <span class="caps">GIS</span> easier to use for the network analysis compared to&nbsp;pgRouting.</li>
-</ul>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/index.html">&laquo; Previous page</a>
