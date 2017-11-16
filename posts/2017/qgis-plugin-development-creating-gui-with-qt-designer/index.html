@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+          <title>Michal Zimmermann | QGIS Plugin Development: Creating GUI with Qt Designer</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+
+
+
+    <meta name="tags" content="python" />
+    <meta name="tags" content="QGIS" />
+    <meta property="og:image" content="https://www.zimmi.cz/posts/assets/qgis-plugin-development-creating-gui-with-qt-designer/qgis.png" />
+  <meta property="og:title" content="QGIS Plugin Development: Creating GUI with Qt Designer" />
+  <meta property="og:description" content="After fiddling with QGIS Python console and implementing nearest neighbor analysis, I’m going to create a very simple GUI for the plugin at last. While QGIS API docs took me few hours to grasp, the PyQGIS ecosystem knocked my socks off. Here comes the..." />
+  <meta property="og:url" content="https://www.zimmi.cz/posts/2017/qgis-plugin-development-creating-gui-with-qt-designer/" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?a4089d0f">
+</head>
+<body>
+    <nav role="navigation">
+        <ul>
+            <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+            <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+            <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
+        </ul>
+    </nav>
+    <header>
+        <h1><a href="/posts">Michal Zimmermann<small>Pieces of knowledge from the world of GIS.</small></a></h1>
+    </header>
+    <main>
+<article>
+    <h1><a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-creating-gui-with-qt-designer/" rel="bookmark" title="Permalink to QGIS Plugin Development: Creating GUI with Qt Designer"><span class="caps">QGIS</span> Plugin Development: Creating <span class="caps">GUI</span> with Qt&nbsp;Designer</a></h1>
+    <aside><span>Nov 16, 2017</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">QGIS</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/qgis.html">QGIS</a></span>
+    </aside>
+<p>After fiddling with <a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/"><span class="caps">QGIS</span> Python console</a> and implementing <a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/">nearest neighbor analysis</a>, I&#8217;m going to create a very simple <span class="caps">GUI</span> for the plugin at&nbsp;last.</p>
+<p>While <span class="caps">QGIS</span> <span class="caps">API</span> docs took me few hours to grasp, the PyQGIS ecosystem knocked my socks off. Here comes the list of tools you should incorporate into your development process as soon as&nbsp;possible.</p>
+<h2>Plugin&nbsp;Builder</h2>
+<p>The <a href="https://plugins.qgis.org/plugins/pluginbuilder/"><span class="caps">QGIS</span> Plugin Builder</a> is a plugin created to create&hellip; well, other plugins. It gets you going in minutes and lets you code instead of setting up things you don&#8217;t want to be setting up. A definite must-have. Note you should put the plugin inside the <span class="caps">QGIS</span> plugins folder (defaults to ~/.qgis2/python/plugins) in&nbsp;Linux.</p>
+<div class="text-center"><img data-echo="/posts/assets/qgis-plugin-development-creating-gui-with-qt-designer/qgis.gif"/></div>
+
+<p>Remember to run <code>pyrcc4 -o resources.py resources.qrc</code> inside your plugin folder before you add it to <span class="caps">QGIS</span>.</p>
+<h2>Plugin&nbsp;Reloader</h2>
+<p>The <a href="https://plugins.qgis.org/plugins/plugin_reloader/"><span class="caps">QGIS</span> Plugin Reloader</a> is a plugin (possibly created with <span class="caps">QGIS</span> Plugin Builder) that lets you live reload your plugin while you code. No <span class="caps">QGIS</span> restarts needed. A definite&nbsp;must-have.</p>
+<h2>Qt&nbsp;Designer</h2>
+<p><a href="https://www.qt.io/qt-features-libraries-apis-tools-and-ide/">Qt Designer</a> comes with <code>qt4-designer</code> package in Ubuntu. It is tailored to design and build GUIs from Qt components that can be used within <span class="caps">QGIS</span>. Its drag&amp;drop interface lets you prototype&nbsp;quickly.</p>
+<p>Thanks to the Plugin Builder you can load the <code>attribute_transfer_dialog_base.ui</code> file straight into the Qt Designer and adjust it to your&nbsp;needs.</p>
+<div class="text-center"><img data-echo="/posts/assets/qgis-plugin-development-creating-gui-with-qt-designer/qt.gif"/></div>
+
+<p>It doesn&#8217;t take much, just one <code>QLineEdit</code> and a few <code>QComboBox</code> widgets. Those will be available in the <code>attribute_transfer.py</code> file as properties of the <code>AttributeTransferDialog</code> class.</p>
+<p>The widget name can be customized in the right sidebar and I advise you to do so. I chose the&nbsp;following:</p>
+<div class="text-center"><img data-echo="/posts/assets/qgis-plugin-development-creating-gui-with-qt-designer/qt.png"/></div>
+
+<p>Once loaded with Plugins -&gt; Manage and Install Plugins -&gt; AttributeTransfer, the plugin is available right from the toolbar or Vector menu. It is missing the business logic completely, but I have this covered in <a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/">the previous part</a>.</p>
+<p>All that is to be done is to bind those two parts&nbsp;together.</p>
+<aside>
+<h3>This post is part 4 of the "QGIS Plugin Development" series:</h3>
+    <ol class="parts">
+            <li>
+<a href='https://www.zimmi.cz/posts/2017/qgis-plugin-development-getting-started/'>                <span class="caps">QGIS</span> Plugin Development: Getting&nbsp;Started
+</a>            </li>
+            <li>
+<a href='https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/'>                <span class="caps">QGIS</span> Plugin Development: Using Python&nbsp;Console
+</a>            </li>
+            <li>
+<a href='https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/'>                <span class="caps">QGIS</span> Plugin Development: Finding Nearest&nbsp;Neighbors
+</a>            </li>
+            <li>
+                <span class="caps">QGIS</span> Plugin Development: Creating <span class="caps">GUI</span> with Qt&nbsp;Designer
+            </li>
+    </ol>
+
+<h3>More reading</h3>
+    <ul>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/"><span class="caps">QGIS</span> Plugin Development: Finding Nearest&nbsp;Neighbors</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/"><span class="caps">QGIS</span> Plugin Development: Using Python&nbsp;Console</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/">Automated Map Creation With <span class="caps">QGIS</span>, PostGIS, Python, <span class="caps">SVG</span> and&nbsp;ImageMagick</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-getting-started/"><span class="caps">QGIS</span> Plugin Development: Getting&nbsp;Started</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/wifileaks-wi-fi-networks-dataviz/">Wifileaks Wi-Fi Networks&nbsp;Dataviz</a></li>
+    </ul>
+<!-- Start of Async Drift Code -->
+<script>
+    !function () {
+        var t;
+        if (t = window.driftt = window.drift = window.driftt || [], !t.init) return t.invoked ? void (window.console && console.error && console.error("Drift snippet included twice.")) : (t.invoked = !0,
+            t.methods = ["identify", "config", "track", "reset", "debug", "show", "ping", "page", "hide", "off", "on"],
+            t.factory = function (e) {
+                return function () {
+                    var n;
+                    return n = Array.prototype.slice.call(arguments), n.unshift(e), t.push(n), t;
+                };
+            }, t.methods.forEach(function (e) {
+                t[e] = t.factory(e);
+            }), t.load = function (t) {
+                var e, n, o, i;
+                e = 3e5, i = Math.ceil(new Date() / e) * e, o = document.createElement("script"),
+                    o.type = "text/javascript", o.async = !0, o.crossorigin = "anonymous", o.src = "https://js.driftt.com/include/" + i + "/" + t + ".js",
+                    n = document.getElementsByTagName("script")[0], n.parentNode.insertBefore(o, n);
+            });
+    }();
+    drift.SNIPPET_VERSION = '0.3.1';
+    drift.load('caacyauy5t6b');
+
+</script>
+<!-- End of Async Drift Code --></aside>
+    </main>
+    <footer>
+        Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
+        Proudly powered by <a href="//getpelican.com/">Pelican</a>,
+        which takes great advantage of <a href="//python.org">Python</a>.
+    </footer>
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-43432739-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments)};
+  gtag('js', new Date());
+
+  gtag('config', 'UA-43432739-2');
+</script>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NW8R37N');</script>
+<!-- End Google Tag Manager -->
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NW8R37N"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<script src="https://www.zimmi.cz/posts/theme/js/echo.min.js"></script>
+<script>
+echo.init({
+  offset: 200,
+  throttle: 250,
+  unload: false
+});
+</script>
+</body>
+</html>

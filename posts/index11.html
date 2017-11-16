@@ -23,6 +23,66 @@
     <main>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2015/postgis-finding-biggest-land-users-nearby/" rel="bookmark" title="Permalink to PostGIS: Finding Biggest Land Users Nearby">PostGIS: Finding Biggest Land Users&nbsp;Nearby</a></h1>
+    <aside><span>Apr 3, 2015</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p>At <a href="http://clevermaps.cz">CleverMaps</a> we heavily rely on the cadastre of real estate, which is probably the biggest data source in my country. Using their excellent knowledge of this data set, my teammates often supply me with all kinds of weird&nbsp;challenges.</p>
+<h2>Give me the biggest land users&nbsp;nearby</h2>
+<p><em>Find the biggest land users in surrounding cadastral communities for each cadastral community (~ 13K)</em> being the latest task, here&#8217;s the query I tackled it&nbsp;with:</p>
+<div class="highlight"><pre><span></span>WITH users_ AS (
+    SELECT
+        cad_code,
+        id,
+        zipcode,
+        city,
+        concat_ws(&#39; &#39;,street, concat_ws(&#39;/&#39;, house_number, street_number)) as street,
+        name,
+        &#39;Users with more than 10 ha&#39;::text note,
+        SUM(acreage) area
+        FROM land_blocks -- being a table with info about all the agricultural land blocks
+        JOIN users u ON id_uz = id
+        GROUP BY cad_code, u.id
+        HAVING SUM(acreage) &gt; 10
+),
+ints AS (
+    SELECT
+        ku.cad_code as community,
+        ku2.cad_code as surrounding,
+        ku2.cad_name
+    FROM cadastral_community ku
+    JOIN cadastral_community ku2
+        ON ST_Intersects(ku.geom, ku2.geom)
+    WHERE ku.cad_code &lt;&gt; ku2.cad_code
+)
+SELECT
+    DISTINCT ON (surrounding, cad_name, u.zipcode, u.city, u.street, u.name)
+    surrounding,
+    cad_name,
+    u.zipcode,
+    u.city,
+    u.street,
+    u.name,
+    u.note,
+    u.area
+FROM
+    users_ u
+JOIN ints
+    ON cad_code = community;
+</pre></div>
+
+
+<p>Few things to&nbsp;note:</p>
+<ul>
+<li><code>concat_ws()</code> is a great function for joining values that might be <code>NULL</code>. If such a value is found, it is skipped and the function continues with the next one (if any). Thus, you&#8217;ll never get a string ending with a trailing slash (<code>Street name 55/</code>).</li>
+<li>With <code>users_</code> <span class="caps">CTE</span> I get a list of owners having more than 10 hectares of land for each cadastral community. This gives me the inverse result of what I want (if I know the biggest owners in the cadastral community, I know these are the ones that should be listed for surrounding c.&nbsp;communities).</li>
+<li>This <em>putting-it-all-together</em> step is done with <code>ints</code> <span class="caps">CTE</span> that outputs the list of surrounding c. communities for each of&nbsp;them.</li>
+<li><code>DISTINCT ON</code> cleans up the list so the same owners don&#8217;t appear more than once for any given c.&nbsp;community.</li>
+</ul>
+<p>Writing this makes me realize the list should be probably sorted by area so only the occurence with the biggest value is kept for each c. community. Simple <code>ORDER BY</code> should deal with this just fine. Or even more sophisticated, using <code>GROUP BY</code> to output the total acreage in all surrounding c.&nbsp;communities.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2015/postgis-count-line-self-intersections/" rel="bookmark" title="Permalink to PostGIS: Count Line Self-Intersections">PostGIS: Count Line&nbsp;Self-Intersections</a></h1>
     <aside><span>Mar 30, 2015</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
@@ -460,34 +520,6 @@ ALTER TABLE uni ADD PRIMARY KEY(id);
 <li>Derive image width (<span class="caps">CRS</span>, pixels) from the saved image, thus getting the same zoom level you were using in <span class="caps">QGIS</span>.</li>
 </ol>
 <p>Code given is not bulletproof, it will fail on any network error. However, if you restart it after such a crash, it checks for existing files and starts with the first missing, so you don&#8217;t have to download all the tiles&nbsp;again.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2015/hosting-website-on-openshift/" rel="bookmark" title="Permalink to Hosting Website On Openshift">Hosting Website On&nbsp;Openshift</a></h1>
-    <aside><span>Feb 23, 2015</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/openshift.html">openshift</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
-    </aside>
-    <p>I decided to migrate <a href="http://www.zimmi.cz">my web</a> to <a href="http://openshift.com">OpenShift</a>. It was a bit frustrating but I got it working&nbsp;eventually.</p>
-<h2>Things to know before taking the&nbsp;leap</h2>
-<p>Some domain providers don&#8217;t support <span class="caps">CNAME</span> changes for root domains (zimmi.cz in my case). This means you can&#8217;t simply tell your domain to serve content from OpenShift address. But what you can do is to tell your <code>www</code> subdomain to do&nbsp;so:</p>
-<div class="highlight"><pre><span></span>www.zimmi.cz CNAME hp-zimmi.rhcloud.com
-</pre></div>
-
-
-<p>Which is great until you realize you&#8217;ve just created two different websites. That&#8217;s where <a href="http://wwwizer.com/">wwwizer</a> lends you a hand and lets you redirect your naked domain to your <code>www</code> domain:</p>
-<div class="highlight"><pre><span></span>zimmi.cz A 174.129.25.170
-</pre></div>
-
-
-<p>Now everything works fine and you have your <code>www.domain.tld</code> up and&nbsp;running.</p>
-<h2>OpenShift&nbsp;subdomains</h2>
-<p>I wasn&#8217;t successful creating a subdomain on the same application where I run my domain. This can be easily solved by creating another application and pointing <span class="caps">DNS</span> to&nbsp;it:</p>
-<div class="highlight"><pre><span></span>posts.zimmi.cz A 174.179.25.170
-www.posts.zimmi.cz CNAME posts-zimmi.rhcloud.com
-</pre></div>
-
-
-<p>Just don&#8217;t forget to handle both naked and <code>www</code> version. When Google reindexes new URLs (http://www.zimmi.cz/posts instead of http://posts.zimmi.cz) subdomain application might be&nbsp;deleted.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/index10.html">&laquo; Previous page</a>

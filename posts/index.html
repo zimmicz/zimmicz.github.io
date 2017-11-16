@@ -23,6 +23,33 @@
     <main>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-creating-gui-with-qt-designer/" rel="bookmark" title="Permalink to QGIS Plugin Development: Creating GUI with Qt Designer"><span class="caps">QGIS</span> Plugin Development: Creating <span class="caps">GUI</span> with Qt&nbsp;Designer</a></h1>
+    <aside><span>Nov 16, 2017</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">QGIS</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/qgis.html">QGIS</a></span>
+    </aside>
+    <p>After fiddling with <a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/"><span class="caps">QGIS</span> Python console</a> and implementing <a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/">nearest neighbor analysis</a>, I&#8217;m going to create a very simple <span class="caps">GUI</span> for the plugin at&nbsp;last.</p>
+<p>While <span class="caps">QGIS</span> <span class="caps">API</span> docs took me few hours to grasp, the PyQGIS ecosystem knocked my socks off. Here comes the list of tools you should incorporate into your development process as soon as&nbsp;possible.</p>
+<h2>Plugin&nbsp;Builder</h2>
+<p>The <a href="https://plugins.qgis.org/plugins/pluginbuilder/"><span class="caps">QGIS</span> Plugin Builder</a> is a plugin created to create&hellip; well, other plugins. It gets you going in minutes and lets you code instead of setting up things you don&#8217;t want to be setting up. A definite must-have. Note you should put the plugin inside the <span class="caps">QGIS</span> plugins folder (defaults to ~/.qgis2/python/plugins) in&nbsp;Linux.</p>
+<div class="text-center"><img data-echo="/posts/assets/qgis-plugin-development-creating-gui-with-qt-designer/qgis.gif"/></div>
+
+<p>Remember to run <code>pyrcc4 -o resources.py resources.qrc</code> inside your plugin folder before you add it to <span class="caps">QGIS</span>.</p>
+<h2>Plugin&nbsp;Reloader</h2>
+<p>The <a href="https://plugins.qgis.org/plugins/plugin_reloader/"><span class="caps">QGIS</span> Plugin Reloader</a> is a plugin (possibly created with <span class="caps">QGIS</span> Plugin Builder) that lets you live reload your plugin while you code. No <span class="caps">QGIS</span> restarts needed. A definite&nbsp;must-have.</p>
+<h2>Qt&nbsp;Designer</h2>
+<p><a href="https://www.qt.io/qt-features-libraries-apis-tools-and-ide/">Qt Designer</a> comes with <code>qt4-designer</code> package in Ubuntu. It is tailored to design and build GUIs from Qt components that can be used within <span class="caps">QGIS</span>. Its drag&amp;drop interface lets you prototype&nbsp;quickly.</p>
+<p>Thanks to the Plugin Builder you can load the <code>attribute_transfer_dialog_base.ui</code> file straight into the Qt Designer and adjust it to your&nbsp;needs.</p>
+<div class="text-center"><img data-echo="/posts/assets/qgis-plugin-development-creating-gui-with-qt-designer/qt.gif"/></div>
+
+<p>It doesn&#8217;t take much, just one <code>QLineEdit</code> and a few <code>QComboBox</code> widgets. Those will be available in the <code>attribute_transfer.py</code> file as properties of the <code>AttributeTransferDialog</code> class.</p>
+<p>The widget name can be customized in the right sidebar and I advise you to do so. I chose the&nbsp;following:</p>
+<div class="text-center"><img data-echo="/posts/assets/qgis-plugin-development-creating-gui-with-qt-designer/qt.png"/></div>
+
+<p>Once loaded with Plugins -&gt; Manage and Install Plugins -&gt; AttributeTransfer, the plugin is available right from the toolbar or Vector menu. It is missing the business logic completely, but I have this covered in <a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/">the previous part</a>.</p>
+<p>All that is to be done is to bind those two parts&nbsp;together.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/" rel="bookmark" title="Permalink to QGIS Plugin Development: Finding Nearest Neighbors"><span class="caps">QGIS</span> Plugin Development: Finding Nearest&nbsp;Neighbors</a></h1>
     <aside><span>Nov 9, 2017</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">QGIS</a>    </span>
@@ -373,51 +400,6 @@
 
 <h2>Conclusion</h2>
 <p>PostGIS is a brilliant tool for generating Mapbox vector tiles. Combined with Python powered static file generator and Nginx, it seems to become the only tool needed to get you&nbsp;going.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2017/postgresql-dollar-quoting-inside-bash-heredoc/" rel="bookmark" title="Permalink to PostgreSQL Dollar Quoting inside Bash Heredoc">PostgreSQL Dollar Quoting inside Bash&nbsp;Heredoc</a></h1>
-    <aside><span>Sep 22, 2017</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p>Yesterday I spent two very unpleasant hours debugging the weirdest <span class="caps">SQL</span> error I&#8217;ve seen in my life, running the below query (simplified for this&nbsp;post).</p>
-<div class="highlight"><pre><span></span><span class="n">psql</span> <span class="o">-</span><span class="n">qAt</span> <span class="c1">--no-psqlrc &lt;&lt;BACKUP</span>
-<span class="k">DO</span>
-<span class="err">$$</span>
-<span class="k">DECLARE</span> <span class="n">r</span> <span class="n">record</span><span class="p">;</span>
-<span class="k">BEGIN</span>
-  <span class="n">RAISE</span> <span class="n">INFO</span> <span class="s1">&#39;%&#39;</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">;</span>
-<span class="k">END</span>
-<span class="err">$$</span><span class="p">;</span>
-<span class="n">BACKUP</span>
-</pre></div>
-
-
-<p>Running this in your terminal will result in a nasty syntax&nbsp;error.</p>
-<div class="highlight"><pre><span></span>ERROR:  syntax error at or near <span class="s2">&quot;1111&quot;</span>
-LINE <span class="m">2</span>: <span class="m">1111</span>
-        ^
-ERROR:  syntax error at or near <span class="s2">&quot;RAISE&quot;</span>
-LINE <span class="m">2</span>:   RAISE INFO <span class="s1">&#39;%&#39;</span>, <span class="s1">&#39;info&#39;</span><span class="p">;</span>
-          ^
-ERROR:  syntax error at or near <span class="s2">&quot;1111&quot;</span>
-LINE <span class="m">2</span>: <span class="m">1111</span><span class="p">;</span>
-</pre></div>
-
-
-<p>You stare on the screen for a while, absolutely sure that number <code>1111</code> is nowhere close to the data you work with. You try again. Another error. You save the code into a file and try again. It works. What the <em>heck</em>? You try again using the bash heredoc. Another&nbsp;failure.</p>
-<p>The minute you realize <code>$$</code> is being substituted with the <span class="caps">ID</span> of the current process, you feel like the dumbest person on Earth. Yet the happiest one at the same&nbsp;time.</p>
-<p>The solution is&nbsp;trivial.</p>
-<div class="highlight"><pre><span></span><span class="n">psql</span> <span class="o">-</span><span class="n">qAt</span> <span class="c1">--no-psqlrc &lt;&lt;BACKUP</span>
-<span class="k">DO</span>
-<span class="err">\$\$</span>
-<span class="k">DECLARE</span> <span class="n">r</span> <span class="n">record</span><span class="p">;</span>
-<span class="k">BEGIN</span>
-  <span class="n">RAISE</span> <span class="n">INFO</span> <span class="s1">&#39;%&#39;</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">;</span>
-<span class="k">END</span>
-<span class="err">\$\$</span><span class="p">;</span>
-<span class="n">BACKUP</span>
-</pre></div>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/index2.html">Next page &raquo;</a>

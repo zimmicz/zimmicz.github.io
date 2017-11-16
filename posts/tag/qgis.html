@@ -24,6 +24,33 @@
 <h2 class="text-center">Articles tagged with QGIS tag</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-creating-gui-with-qt-designer/" rel="bookmark" title="Permalink to QGIS Plugin Development: Creating GUI with Qt Designer"><span class="caps">QGIS</span> Plugin Development: Creating <span class="caps">GUI</span> with Qt&nbsp;Designer</a></h1>
+    <aside><span>Nov 16, 2017</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">QGIS</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/qgis.html">QGIS</a></span>
+    </aside>
+    <p>After fiddling with <a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/"><span class="caps">QGIS</span> Python console</a> and implementing <a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/">nearest neighbor analysis</a>, I&#8217;m going to create a very simple <span class="caps">GUI</span> for the plugin at&nbsp;last.</p>
+<p>While <span class="caps">QGIS</span> <span class="caps">API</span> docs took me few hours to grasp, the PyQGIS ecosystem knocked my socks off. Here comes the list of tools you should incorporate into your development process as soon as&nbsp;possible.</p>
+<h2>Plugin&nbsp;Builder</h2>
+<p>The <a href="https://plugins.qgis.org/plugins/pluginbuilder/"><span class="caps">QGIS</span> Plugin Builder</a> is a plugin created to create&hellip; well, other plugins. It gets you going in minutes and lets you code instead of setting up things you don&#8217;t want to be setting up. A definite must-have. Note you should put the plugin inside the <span class="caps">QGIS</span> plugins folder (defaults to ~/.qgis2/python/plugins) in&nbsp;Linux.</p>
+<div class="text-center"><img data-echo="/posts/assets/qgis-plugin-development-creating-gui-with-qt-designer/qgis.gif"/></div>
+
+<p>Remember to run <code>pyrcc4 -o resources.py resources.qrc</code> inside your plugin folder before you add it to <span class="caps">QGIS</span>.</p>
+<h2>Plugin&nbsp;Reloader</h2>
+<p>The <a href="https://plugins.qgis.org/plugins/plugin_reloader/"><span class="caps">QGIS</span> Plugin Reloader</a> is a plugin (possibly created with <span class="caps">QGIS</span> Plugin Builder) that lets you live reload your plugin while you code. No <span class="caps">QGIS</span> restarts needed. A definite&nbsp;must-have.</p>
+<h2>Qt&nbsp;Designer</h2>
+<p><a href="https://www.qt.io/qt-features-libraries-apis-tools-and-ide/">Qt Designer</a> comes with <code>qt4-designer</code> package in Ubuntu. It is tailored to design and build GUIs from Qt components that can be used within <span class="caps">QGIS</span>. Its drag&amp;drop interface lets you prototype&nbsp;quickly.</p>
+<p>Thanks to the Plugin Builder you can load the <code>attribute_transfer_dialog_base.ui</code> file straight into the Qt Designer and adjust it to your&nbsp;needs.</p>
+<div class="text-center"><img data-echo="/posts/assets/qgis-plugin-development-creating-gui-with-qt-designer/qt.gif"/></div>
+
+<p>It doesn&#8217;t take much, just one <code>QLineEdit</code> and a few <code>QComboBox</code> widgets. Those will be available in the <code>attribute_transfer.py</code> file as properties of the <code>AttributeTransferDialog</code> class.</p>
+<p>The widget name can be customized in the right sidebar and I advise you to do so. I chose the&nbsp;following:</p>
+<div class="text-center"><img data-echo="/posts/assets/qgis-plugin-development-creating-gui-with-qt-designer/qt.png"/></div>
+
+<p>Once loaded with Plugins -&gt; Manage and Install Plugins -&gt; AttributeTransfer, the plugin is available right from the toolbar or Vector menu. It is missing the business logic completely, but I have this covered in <a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/">the previous part</a>.</p>
+<p>All that is to be done is to bind those two parts&nbsp;together.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/" rel="bookmark" title="Permalink to QGIS Plugin Development: Finding Nearest Neighbors"><span class="caps">QGIS</span> Plugin Development: Finding Nearest&nbsp;Neighbors</a></h1>
     <aside><span>Nov 9, 2017</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">QGIS</a>    </span>
@@ -289,121 +316,6 @@
 <h3>Layer blending&nbsp;mode</h3>
 <p>The mechanics behind layer blending modes are still a mystery to me, but they can add that little extra to a map very easily. Thanks to the Overlay blending mode, <em>the Rocky Mountains</em> may remain very subtle on different kinds of&nbsp;background.</p>
 <div class="text-center"><img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/blending_mode.png"/></div>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2017/wifileaks-wi-fi-networks-dataviz/" rel="bookmark" title="Permalink to Wifileaks Wi-Fi Networks Dataviz">Wifileaks Wi-Fi Networks&nbsp;Dataviz</a></h1>
-    <aside><span>May 2, 2017</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/visualization.html">visualization</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
-    </aside>
-    <p><a href="http://www.wifileaks.cz">Wifileaks</a> is a project by Jakub Čížek aimed to map the Czech wi-fi networks with Android/iOS app. The data gathered by people using the app <a href="http://download.wifileaks.cz/data/wifileaks_raw_170416.tar.gz">is available to download</a> and features ~&nbsp;90,000,000 records, each representing the position of the cellphone when connecting to the network. Just about perfect to craft some&nbsp;maps!</p>
-<div class="text-center"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/cr.png"/></div>
-
-<h2>Using PostgreSQL&nbsp;cstore_fdw</h2>
-<p>I ran out of disk space immediately after loading the dataset into the PostgreSQL database. After fiddling around I remembered that columnar store should be a bit space-friendlier than the old fashioned relational database. Thus, I installed the <a href="https://github.com/citusdata/cstore_fdw">cstore_fdw</a> by Citus Data in just few&nbsp;steps.</p>
-<div class="highlight"><pre><span></span>sudo apt install libprotobuf-c-dev libprotobuf-c1 protobuf-c-compiler postgresql-server-dev-9.6
-git clone git@github.com:citusdata/cstore_fdw.git
-<span class="nv">PATH</span><span class="o">=</span>/usr/bin/:<span class="nv">$PATH</span> make
-<span class="nv">PATH</span><span class="o">=</span>/usr/bin/:<span class="nv">$PATH</span> make install
-
-<span class="c1"># when the cstore_fdw installation finishes, add the following line to your postgresql.conf and restart the database cluster</span>
-<span class="nv">shared_preload_libraries</span> <span class="o">=</span> <span class="s1">&#39;cstore_fdw&#39;</span>
-</pre></div>
-
-
-<p>This makes <a href="https://www.zimmi.cz/posts/2016/testing-postgresql-ogr-fdw/">another <span class="caps">FDW</span> available</a> to you inside the PostgreSQL. The actual foreign server has to be created before loading the data into a foreign&nbsp;table.</p>
-<div class="highlight"><pre><span></span>cat <span class="s">&lt;&lt;END | psql -qAt --no-psqlrc</span>
-<span class="s">    CREATE SERVER cstore_server FOREIGN DATA WRAPPER cstore_fdw;</span>
-<span class="s">    CREATE SCHEMA data_cstore;</span>
-<span class="s">    CREATE FOREIGN TABLE data_cstore.wifi (</span>
-<span class="s">        id integer,</span>
-<span class="s">        mac text,</span>
-<span class="s">        ssid text,</span>
-<span class="s">        signal_strength numeric,</span>
-<span class="s">        security integer,</span>
-<span class="s">        lat numeric,</span>
-<span class="s">        lon numeric,</span>
-<span class="s">        alt numeric,</span>
-<span class="s">        unixtime bigint,</span>
-<span class="s">        filename text</span>
-<span class="s">    )</span>
-<span class="s">    SERVER cstore_server</span>
-<span class="s">    OPTIONS (compression &#39;pglz&#39;);</span>
-<span class="s">END</span>
-</pre></div>
-
-
-<p>The foreign table <strong>is 3&times; smaller</strong> than it&#8217;s standard counterpart. However, this comes with some&nbsp;costs:</p>
-<ul>
-<li>neither <code>UPDATE</code> nor <code>DELETE</code> can be&nbsp;used</li>
-<li>no <code>CREATE INDEX</code></li>
-<li>no <code>SERIAL</code></li>
-</ul>
-<p>To overcome these shortcomings I used <code>COPY</code> statement to spit out the slightly modified table and immediately loaded it back&nbsp;in.</p>
-<div class="highlight"><pre><span></span>cat <span class="s">&lt;&lt;END | psql -qAt --no-psqlrc</span>
-<span class="s">COPY (</span>
-<span class="s">    SELECT</span>
-<span class="s">        row_number() OVER (),</span>
-<span class="s">        mac,</span>
-<span class="s">        ssid,</span>
-<span class="s">        signal_strength,</span>
-<span class="s">        security,</span>
-<span class="s">        split_part(filename, &#39;_&#39;, 2)::integer,</span>
-<span class="s">        to_timestamp(unixtime),</span>
-<span class="s">        ST_Transform(ST_SetSRID(ST_MakePoint(lon, lat, alt), 4326), 32633)</span>
-<span class="s">    FROM data_cstore.wifi</span>
-<span class="s">    WHERE lon BETWEEN 0 AND 20</span>
-<span class="s">        AND lat BETWEEN 18 AND 84</span>
-<span class="s">) TO &#39;/tmp/wifileaks.db&#39; WITH CSV DELIMITER &#39;;&#39;</span>
-<span class="s">    DROP SCHEMA IF EXISTS data_cstore CASCADE;</span>
-
-<span class="s">DROP SCHEMA data_cstore;</span>
-<span class="s">CREATE SCHEMA data_cstore;</span>
-<span class="s">CREATE FOREIGN TABLE data_cstore.wifi (</span>
-<span class="s">    id integer,</span>
-<span class="s">    mac text,</span>
-<span class="s">    ssid text,</span>
-<span class="s">    signal_strength numeric,</span>
-<span class="s">    security integer,</span>
-<span class="s">    userid integer,</span>
-<span class="s">    unixtime timestamp without time zone,</span>
-<span class="s">    geom geometry(POINTZ, 32633)</span>
-<span class="s">)</span>
-<span class="s">SERVER cstore_server</span>
-<span class="s">OPTIONS (compression &#39;pglz&#39;);</span>
-<span class="s">END</span>
-</pre></div>
-
-
-<h2>Putting the networks on the&nbsp;map</h2>
-<table>
-    <tr>
-        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"></a></td>
-        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"></a></td>
-        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"></a></td>
-    </tr>
-    <tr>
-        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"></a></td>
-        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"></a></td>
-        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"></a></td>
-    </tr>
-</table>
-
-<p>As mentioned, each row of data represents the cellphone&#8217;s location when connecting to a wi-fi network. To get real wi-fi transmitter position, I calculated the average of location of each cellphone ever connected (although the signal strength should be taken into account here as&nbsp;well).</p>
-<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="n">UNLOGGED</span> <span class="k">TABLE</span> <span class="n">data_cstore</span><span class="p">.</span><span class="n">wifi_avg_loc</span> <span class="k">AS</span>
-<span class="k">SELECT</span>
-    <span class="n">row_number</span><span class="p">()</span> <span class="n">OVER</span> <span class="p">()</span> <span class="n">id</span><span class="p">,</span>
-    <span class="n">mac</span><span class="p">,</span>
-    <span class="n">ST_SetSRID</span><span class="p">(</span><span class="n">ST_MakePoint</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="mi">32633</span><span class="p">)</span> <span class="n">geom</span>
-<span class="k">FROM</span> <span class="p">(</span>
-    <span class="k">SELECT</span>
-        <span class="n">mac</span><span class="p">,</span>
-        <span class="k">AVG</span><span class="p">(</span><span class="n">ST_X</span><span class="p">(</span><span class="n">geom</span><span class="p">))</span> <span class="n">x</span><span class="p">,</span>
-        <span class="k">AVG</span><span class="p">(</span><span class="n">ST_Y</span><span class="p">(</span><span class="n">geom</span><span class="p">))</span> <span class="n">y</span>
-    <span class="k">FROM</span> <span class="n">data_cstore</span><span class="p">.</span><span class="n">wifi_loc</span>
-    <span class="k">GROUP</span> <span class="k">BY</span> <span class="mi">1</span>
-<span class="p">)</span> <span class="n">a</span><span class="p">;</span>
-</pre></div>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/tag/qgis2.html">Next page &raquo;</a>

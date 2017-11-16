@@ -24,6 +24,37 @@
 <h2>Articles by Michal Zimmermann</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2014/degrees-to-decimal-with-javascript/" rel="bookmark" title="Permalink to Degrees To Decimal With Javascript">Degrees To Decimal With&nbsp;Javascript</a></h1>
+    <aside><span>Sep 9, 2014</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+    </aside>
+    <p>I have found a nice way to get decimal value from degrees of longitude and latitude&nbsp;recently:</p>
+<div class="highlight"><pre><span></span><span class="kd">function</span> <span class="nx">format</span><span class="p">(</span><span class="nx">coords</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">decimal</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="nx">output</span>  <span class="o">=</span> <span class="p">[],</span>
+        <span class="nx">coords</span>  <span class="o">=</span> <span class="nx">coords</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;  &#39;</span><span class="p">);</span> <span class="c1">// it might be &lt;br&gt; as well</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">coords</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">c</span> <span class="o">=</span> <span class="nx">coords</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">);</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">j</span> <span class="o">&lt;</span> <span class="nx">c</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">j</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">decimal</span> <span class="o">+=</span> <span class="nx">c</span><span class="p">[</span><span class="nx">j</span><span class="p">]</span> <span class="o">/</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="nx">j</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="nx">output</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nb">parseFloat</span><span class="p">(</span><span class="nx">decimal</span><span class="p">).</span><span class="nx">toFixed</span><span class="p">(</span><span class="mi">5</span><span class="p">));</span>
+        <span class="nx">decimal</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nx">prompt</span><span class="p">(</span><span class="s1">&#39;Souřadnice bodu&#39;</span><span class="p">,</span> <span class="nx">output</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="p">));</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>When you call <code>format("DD° MM' SS'  DD° MM' SS'");</code> you&#8217;ll get decimal value in return (or <code>prompt</code> to be accurate). What I like the most about this solution is the usage of Math.pow(). I think it is a neat way to transform the values as you need to divide parts of latitude or longitude by 60<sup>0</sup>, 60<sup>1</sup> and 60<sup>2</sup> respectively.</p>
+<p>There is definitely a googol of different solutions to this task, I just liked the simplicity of this&nbsp;one.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2014/geoserver-printing-with-mapfish/" rel="bookmark" title="Permalink to Geoserver Printing With Mapfish">Geoserver Printing With&nbsp;Mapfish</a></h1>
     <aside><span>Sep 2, 2014</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/geoserver.html">geoserver</a>    </span>
@@ -304,34 +335,9 @@ z = map(lat, 16.59971950210866964, 63.68835804244784526, 0, height)
 
 <p>You can find it in a <a href="http://leafletjs.com/plugins">list of Leaflet plugins</a> as well (Controls and Interaction section). My first contribution to the open source world&nbsp;ever.</p>
 </article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2014/leaflet-chmi-radar-control/" rel="bookmark" title="Permalink to Leaflet CHMI Radar Control">Leaflet <span class="caps">CHMI</span> Radar&nbsp;Control</a></h1>
-    <aside><span>Sep 1, 2014</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/leaflet.html">leaflet</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
-    </aside>
-    <p>I&#8217;ve been in love with Leaflet ever since v0.4 was released. Well-documented, clean <span class="caps">API</span> included, beautiful controls and tons of plugins makes it my number one choice to create a web map. I wrote a Google Maps <span class="caps">API</span> app used at edpp.cz a year and a half ago and I&#8217;ve been thinking of refactoring it since then. I don&#8217;t think I even knew Leaflet existed back in those&nbsp;days.</p>
-<p>I used to use Google Maps as my primary tool for web maps, it used to be the only choice back then. OpenLayers <span class="caps">API</span> documentation was one of the worst docs I have ever read (<em>alphabetic sorting, please!</em>), thus making it a no-go for me. It looked ugly and was sort of overwhelmed with functions. Leaflet came out completely different and I decided to rewrite our main map app using this great open-source&nbsp;library.</p>
-
-<h3>My first&nbsp;control</h3>
-
-<p><img data-echo="/posts/assets/leaflet-chmi-radar-control/google_maps.png" title="Google maps layer control" class="left">Modularity is one of the things I like the most about Leaflet. I was struggling with creating checkboxes used to toggle layers in Google Maps app, it comes ready with Leaflet. Adding a control to the map is easy as piece of cake, you do <a href="http://leafletjs.com/reference.html#icontrol"><code>L.Control.extend({)}</code></a> and that&#8217;s it (almost). Since the map displays animated radar images showing the precipitation that occurred during last three hours or so I thought it would be great implementing this as a control: a button used to toggle the animation on/off and displaying the time currently shown image was created&nbsp;at.</p>
-
-<p>The image on the left side displays the old solution using Google Maps. It was using a lot of <span class="caps">DOM</span> manipulation, was quite hard to maintain and definitely not eye-candy. When the animation was turned on, another control popped up in the map&#8217;s top left corner displaying the time the image was taken at. The animation toggle (<em>srážkový radar</em>) was incorporated into the layer control. I decided to take it out and make it a separate feature of the&nbsp;map.</p>
-
-<p><img data-echo="/posts/assets/leaflet-chmi-radar-control/control.png" title="Leaflet radar control" class="right">You can see the result in the image below. The control is a simple button with the radar icon displaying the time when active. It is only useful for the Czech Republic and is highly dependent on the image provider (<abbr title="Czech Hydrometeorogical Institute"><span class="caps">CHMI</span></abbr>), which means that if the <span class="caps">URL</span> of the images was to be changed, the whole control would&nbsp;break.</p>
-
-<p>You can<a href="https://www.zimmi.cz/posts/assets/leaflet-chmi-radar-control/radarcontrol.zip"> grab the code if you like</a>. You add the control to the map as any other&nbsp;control:</p>
-
-<div class="highlight"><pre><span></span><span class="kd">var</span> <span class="nx">radar</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">L</span><span class="p">.</span><span class="nx">Control</span><span class="p">.</span><span class="nx">Radar</span><span class="p">();</span>
-<span class="nx">radar</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
-</pre></div>
-
-
-<p>You can set the control visibility with <code>visible</code> property passed into <code>options</code> of the&nbsp;control.</p>
-</article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/author/michal-zimmermann14.html">&laquo; Previous page</a>
+            <a href="https://www.zimmi.cz/posts/author/michal-zimmermann16.html">Next page &raquo;</a>
 </aside>    </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.

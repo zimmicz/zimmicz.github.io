@@ -24,6 +24,64 @@
 <h2>Articles by Michal Zimmermann</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2014/postgis-spatial-indexing-with-st_intersects/" rel="bookmark" title="Permalink to PostGIS Spatial Indexing With ST_Intersects">PostGIS Spatial Indexing With&nbsp;ST_Intersects</a></h1>
+    <aside><span>Nov 23, 2014</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p><a href="http://postgis.net/docs/ST_Intersects.html">PostGIS docs</a> clearly states that:
+    &gt; This function call will automatically include a bounding box comparison that will make use of any indexes that are available on the&nbsp;geometries.</p>
+<p>That means (or at least I think so) that you shouldn&#8217;t bother with using <a href="http://postgis.net/docs/reference.html#Operators">operators</a> before calling this&nbsp;function.</p>
+<p><a href="http://slides.com/michalzimmermann">I was preparing</a> my second lecture on PostGIS and I was experimenting a bit and came up with an interesting thing on this&nbsp;matter:</p>
+<p>Let&#8217;s have two <span class="caps">SQL</span> relations, <code>roads</code> and <code>regions</code>. I would like to retrieve every road that intersects a certain region. Spatial indexes were built beforehand on both&nbsp;tables.</p>
+<p>First&nbsp;try:</p>
+<div class="highlight"><pre><span></span>EXPLAIN ANALYZE SELECT roads.* FROM roads
+JOIN regions ON ST_Intersects(roads.geom, regions.geom)
+WHERE regions.&quot;NAZEV&quot; = &#39;Jihomoravský&#39;;`
+</pre></div>
+
+
+<p>And here comes the&nbsp;result:</p>
+<div class="highlight"><pre><span></span>Nested Loop  (cost=4.85..324.26 rows=249 width=214) (actual time=45.102..5101.472 rows=74253 loops=1)
+-&gt;  Seq Scan on regions  (cost=0.00..12.62 rows=1 width=32) (actual time=0.015..0.018 rows=1 loops=1)
+     Filter: ((&quot;NAZEV&quot;)::text = &#39;Jihomoravský&#39;::text)
+     Rows Removed by Filter: 13
+-&gt;  Bitmap Heap Scan on roads  (cost=4.85..311.38 rows=25 width=214) (actual time=45.079..4931.495 rows=74253 loops=1)
+     Recheck Cond: (geom &amp;&amp; regions.geom)
+     Rows Removed by Index Recheck: 154841
+     Filter: _st_intersects(geom, regions.geom)
+     Rows Removed by Filter: 71212
+     -&gt;  Bitmap Index Scan on roads_idx  (cost=0.00..4.85 rows=75 width=0) (actual time=40.142..40.142 rows=145465 loops=1)
+           Index Cond: (geom &amp;&amp; regions.geom)
+Total runtime: 5181.459 ms
+</pre></div>
+
+
+<p>I was pretty satisfied with the result, I kept digging deeper&nbsp;though.</p>
+<p>Second&nbsp;try:</p>
+<div class="highlight"><pre><span></span>EXPLAIN ANALYZE SELECT roads.* FROM roads
+JOIN regions ON roads.geom &amp;&amp; regions.geom
+WHERE regions.&quot;NAZEV&quot; = &#39;Jihomoravský&#39; AND ST_Intersects(roads.geom, regions.geom);
+</pre></div>
+
+
+<p>And the&nbsp;result:</p>
+<div class="highlight"><pre><span></span>Nested Loop  (cost=0.29..21.19 rows=1 width=214) (actual time=3.041..3850.302 rows=74253 loops=1)
+-&gt;  Seq Scan on regions  (cost=0.00..12.62 rows=1 width=32) (actual time=0.021..0.024 rows=1 loops=1)
+     Filter: ((&quot;NAZEV&quot;)::text = &#39;Jihomoravský&#39;::text)
+     Rows Removed by Filter: 13
+-&gt;  Index Scan using roads_idx on roads  (cost=0.29..8.55 rows=1 width=214) (actual time=2.938..3681.432 rows=74253 loops=1)
+     Index Cond: ((geom &amp;&amp; regions.geom) AND (geom &amp;&amp; regions.geom))
+     Filter: _st_intersects(geom, regions.geom)
+     Rows Removed by Filter: 71212
+Total runtime: 3930.270 ms
+</pre></div>
+
+
+<p>Now there&#8217;s a significant difference between total runtimes of both queries and - more important - also a difference between their query plans. The latter is like <strong>20 % faster</strong>.</p>
+<p>I&#8217;m puzzled about this behavior and would appreciate any thoughts on this. Reach me at <a href="http://twitter.com/zimmicz">Twitter</a>, <a href="https://www.linkedin.com/pub/michal-zimmermann/29/8/b30">LinkedIn</a> or e-mail&nbsp;(zimmicz[at]gmail.com).</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2014/bash-prepend-to-filename/" rel="bookmark" title="Permalink to Bash: Prepend To Filename">Bash: Prepend To&nbsp;Filename</a></h1>
     <aside><span>Nov 1, 2014</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>    </span>
@@ -125,26 +183,6 @@ for ($i = 0; $i &lt; $size; $i++) {
 
 <p>I made a simple benchmark with <a href="http://php.net/manual/en/function.microtime.php"><code>microtime()</code></a> and found out that my solution (ran 100k times) took about ~12.3 seconds while Dave&#8217;s took only ~7.4 seconds to finish. That makes his code almost twice faster than&nbsp;mine.</p>
 <p><strong>Lesson learned: do not stop&nbsp;learning!</strong></p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2014/postgresql-remote-access/" rel="bookmark" title="Permalink to PostgreSQL Remote Access">PostgreSQL Remote&nbsp;Access</a></h1>
-    <aside><span>Sep 17, 2014</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
-    </aside>
-    <p>PostgreSQL is set to listen only to connections coming from localhost by default. I guess that&#8217;s fine as far as you don&#8217;t need access to the database from anywhere else (like your work network). If you do, you need to log via <span class="caps">SSH</span> or use some online database management tool (go for <a href="http://adminer.org">Adminer</a> and forget about anything called php[pg|my]admin). Or you can set it up to access connections from other&nbsp;locations.</p>
-<p>You need&nbsp;to:</p>
-<ol>
-<li>set <code>listen_addresses</code> to <code>*</code> in your postgres.conf. That does not mean anyone can connect to your database, that means that the server will listen to connections coming from any available <span class="caps">IP</span>&nbsp;interface.</li>
-<li>insert new entry into pg_hba.conf looking like this: <code>host database user xxx.xxx.xxx.xxx md5</code>. Now we&#8217;re saying we only want connections coming from <span class="caps">IP</span> <code>xxx.xxx.xxx.xxx</code> accepted.</li>
-<li>
-<p>Add rule allowing the database server access to iptables. Number 5 says it will be the fifth rule in the order. It must come before the final <span class="caps">REJECT</span> <span class="caps">ALL</span> rule if&nbsp;present.</p>
-<p><code>iptables -I INPUT 5 -p tcp --dport 5432 -s xxx.xxx.xxx.xxx -j ACCEPT</code>
-4. Just to be sure noone else is able to connect, reject all on port&nbsp;5432.</p>
-<p><code>iptables -I INPUT 6 -p tcp --dport 5432 -j REJECT</code></p>
-</li>
-</ol>
-<p>You&#8217;re set to remotely connect to your database&nbsp;server.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/author/michal-zimmermann12.html">&laquo; Previous page</a>

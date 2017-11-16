@@ -24,6 +24,77 @@
 <h2>Articles by Michal Zimmermann</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-wind-rose/" rel="bookmark" title="Permalink to PostGIS Custom Function to Create Wind Rose">PostGIS Custom Function to Create Wind&nbsp;Rose</a></h1>
+    <aside><span>Sep 1, 2016</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p>I&#8217;ve come across the <a href="http://gis.stackexchange.com/questions/208797/draw-wind-rose-with-qgis-from-postgis/">beautiful <span class="caps">GIS</span> StackExchange question</a> recently, asking how to draw a <a href="https://en.wikipedia.org/wiki/Wind_rose">wind rose</a> within&nbsp;PostGIS.</p>
+<div class="text-center">
+<img data-echo="http://i.stack.imgur.com/0xAMU.png">
+</div>
+
+<p>It&#8217;s pretty easy to accomplish this with a custom <span class="caps">PLPGSQL</span> procedure below, that takes line geometry, number of sections and radius of the inner circle as&nbsp;parameters.</p>
+<!-- codeblock -->
+
+<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">OR</span> <span class="k">REPLACE</span> <span class="k">FUNCTION</span> <span class="n">ST_WindRose</span><span class="p">(</span>
+    <span class="n">line</span> <span class="n">geometry</span><span class="p">,</span>
+    <span class="n">directions</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">radius</span> <span class="nb">numeric</span>
+<span class="p">)</span>
+<span class="k">RETURNS</span> <span class="k">TABLE</span> <span class="p">(</span>
+    <span class="n">id</span> <span class="nb">integer</span><span class="p">,</span>
+    <span class="n">geom</span> <span class="n">geometry</span><span class="p">(</span><span class="n">LINESTRING</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="k">AS</span> <span class="err">$</span><span class="n">ST_WindRose$</span>
+<span class="k">BEGIN</span>
+    <span class="k">IF</span> <span class="n">directions</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">&lt;&gt;</span> <span class="mi">0</span> <span class="k">THEN</span>
+        <span class="n">RAISE</span> <span class="k">EXCEPTION</span> <span class="s1">&#39;Odd number of directions found, please provide even number of directions instead.&#39;</span><span class="p">;</span>
+    <span class="k">END</span> <span class="k">IF</span><span class="p">;</span>
+
+<span class="k">IF</span> <span class="n">radius</span> <span class="o">&gt;</span> <span class="n">ST_Length</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="k">THEN</span>
+    <span class="n">RAISE</span> <span class="k">EXCEPTION</span> <span class="s1">&#39;Inner circle radius is bigger than the wind rose diameter, please make it smaller.&#39;</span><span class="p">;</span>
+<span class="k">END</span> <span class="k">IF</span><span class="p">;</span>
+
+<span class="k">RETURN</span> <span class="n">QUERY</span>
+<span class="k">WITH</span> <span class="n">rose</span> <span class="k">AS</span> <span class="p">(</span>
+    <span class="k">SELECT</span>
+        <span class="n">ST_Rotate</span><span class="p">(</span><span class="n">_line</span><span class="p">,</span> <span class="n">radians</span><span class="p">(</span><span class="mi">360</span><span class="p">)</span> <span class="o">/</span> <span class="n">directions</span> <span class="o">*</span> <span class="n">dirs</span><span class="p">.</span><span class="n">id</span><span class="p">,</span> <span class="n">ST_Centroid</span><span class="p">(</span><span class="n">_line</span><span class="p">))</span> <span class="n">_line</span>
+    <span class="k">FROM</span> <span class="p">(</span>
+        <span class="k">SELECT</span> <span class="n">line</span> <span class="n">_line</span>
+    <span class="p">)</span> <span class="n">a</span>
+    <span class="k">CROSS</span> <span class="k">JOIN</span> <span class="p">(</span>
+        <span class="k">SELECT</span> <span class="n">generate_series</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">directions</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="n">id</span>
+    <span class="p">)</span> <span class="n">dirs</span>
+<span class="p">)</span>
+<span class="k">SELECT</span>
+    <span class="n">row_number</span><span class="p">()</span> <span class="n">OVER</span> <span class="p">()::</span><span class="nb">integer</span> <span class="n">id</span><span class="p">,</span>
+    <span class="n">_line</span> <span class="n">geom</span>
+<span class="k">FROM</span> <span class="p">(</span>
+    <span class="k">SELECT</span> <span class="n">_line</span> <span class="k">FROM</span> <span class="n">rose</span>
+    <span class="k">UNION</span> <span class="k">ALL</span>
+    <span class="k">SELECT</span> <span class="n">ST_ExteriorRing</span><span class="p">(</span><span class="n">ST_Buffer</span><span class="p">(</span><span class="n">ST_Centroid</span><span class="p">(</span><span class="n">line</span><span class="p">),</span> <span class="n">radius</span><span class="p">,</span> <span class="mi">30</span><span class="p">))</span> <span class="c1">-- inner circle</span>
+    <span class="k">UNION</span> <span class="k">ALL</span>
+    <span class="k">SELECT</span> <span class="n">ST_ExteriorRing</span><span class="p">(</span><span class="n">ST_Buffer</span><span class="p">(</span><span class="n">ST_Centroid</span><span class="p">(</span><span class="n">line</span><span class="p">),</span> <span class="n">ST_Length</span><span class="p">(</span><span class="n">line</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mi">30</span><span class="p">))</span> <span class="c1">-- outer circle</span>
+<span class="p">)</span> <span class="n">a</span><span class="p">;</span>
+<span class="k">END</span>
+<span class="err">$</span><span class="n">ST_WindRose$</span>
+<span class="k">LANGUAGE</span> <span class="n">PLPGSQL</span><span class="p">;</span>
+</pre></div>
+
+
+<p>Wind rose created with this function might look like the one&nbsp;below.</p>
+<div class="text-center">
+<img data-echo="http://i.stack.imgur.com/4OD0J.png">
+</div>
+
+<p>Run it as follows. The <code>line</code> parameter should be a simple straight line made of just two&nbsp;vertices.</p>
+<!-- codeblock -->
+
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">ST_WindRose</span><span class="p">(</span><span class="n">ST_MakeLine</span><span class="p">(</span><span class="n">ST_MakePoint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">ST_MakePoint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)),</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mi">01</span><span class="p">);</span>
+</pre></div>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-polygon-from-centroid/" rel="bookmark" title="Permalink to PostGIS Custom Function to Create Polygon from Centroid">PostGIS Custom Function to Create Polygon from&nbsp;Centroid</a></h1>
     <aside><span>Aug 28, 2016</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>    </span>
@@ -296,82 +367,6 @@ pg_dump -a -t <span class="s2">&quot;schema1.*&quot;</span> -t <span class="s2">
 psql -qAt -d target -f create.sql
 ​
 </pre></div>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2016/testing-postgresql-ogr-fdw/" rel="bookmark" title="Permalink to Testing PostgreSQL OGR FDW">Testing PostgreSQL <span class="caps">OGR</span> <span class="caps">FDW</span></a></h1>
-    <aside><span>Jul 1, 2016</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p><a href="https://wiki.postgresql.org/wiki/Foreign_data_wrappers">PostgreSQL foreign data wrappers</a> are used to connect PostgreSQL database to different datasources, e.g. other <span class="caps">SQL</span> databases, <span class="caps">CSV</span> files, <span class="caps">XLS</span>&nbsp;spreadsheets&times;</p>
-<p>The one I&#8217;ve been interested in for several months is <a href="https://github.com/pramsey/pgsql-ogr-fdw">Paul Ramsey&#8217;s <span class="caps">OGR</span> <span class="caps">FDW</span></a> - it gives you access to <span class="caps">OGR</span> supported spatial formats directly from your database. <em>No more shapefiles lying&nbsp;around?</em></p>
-<p>Each foreign data wrapper should have three basic&nbsp;components:</p>
-<ul>
-<li>foreign server&nbsp;object</li>
-<li>foreign user mapping - not necessary if you&#8217;re not connecting to other&nbsp;database</li>
-<li>foreign&nbsp;table(s)</li>
-</ul>
-<p>I got some data about <a href="http://www.dibavod.cz/download.php?id_souboru=1413">rivers</a> and <a href="http://www.dibavod.cz/download.php?id_souboru=1416">dams</a> from <a href="http://www.dibavod.cz"><span class="caps">DIBAVOD</span></a> open datasets to play&nbsp;with.</p>
-<p>First define the foreign server&nbsp;object:</p>
-<div class="highlight"><pre><span></span>CREATE SERVER dibavod
-FOREIGN DATA WRAPPER ogr_fdw
-OPTIONS (
-    datasource &#39;/downloads/dibavod&#39;,
-    format &#39;ESRI Shapefile&#39;,
-    config_options &#39;SHAPE_ENCODING=CP1250&#39;
-);
-</pre></div>
-
-
-<p>Note the <span class="caps">OGR</span> specific driver configuration options are available inside <code>config_options</code>. In case of <span class="caps">ESRI</span> Shapefiles, the <code>datasource</code> is the directory your files reside&nbsp;in.</p>
-<p>Let&#8217;s create PostgreSQL tables (use <code>ogrinfo</code> or Paul&#8217;s <code>ogr_fdw_info</code> to list the&nbsp;columns):</p>
-<div class="highlight"><pre><span></span>CREATE FOREIGN TABLE rivers (
-    fid integer,
-    utokj_id numeric,
-    utokjn_id numeric,
-    utokjn_f numeric,
-    prprop_z integer,
-    ex_jh integer,
-    pozn text,
-    shape_leng numeric,
-    naz_tok text,
-    idvt integer,
-    tok_id numeric,
-    shape_len numeric,
-    geom geometry(LINESTRING, 5514)
-)
-SERVER dibavod
-OPTIONS (layer &#39;A02_Vodni_tok_JU&#39;);
-
-CREATE FOREIGN TABLE dams (
-    fid integer,
-    objectid integer,
-    naz_na text,
-    nadr_gid numeric,
-    kota_hladi numeric,
-    hloubka numeric,
-    zatop_ploc numeric,
-    objem numeric,
-    kota_hraz numeric,
-    kota_preli numeric,
-    kota_vypus numeric,
-    plocha_m2 numeric,
-    shape_area numeric,
-    shape_len numeric,
-    geom geometry(MULTIPOLYGON, 5514)
-)
-SERVER dibavod
-OPTIONS (LAYER &#39;A05_Vodni_nadrze&#39;);
-</pre></div>
-
-
-<p>Note the <code>fid</code> column - required for <strong>write access</strong> to underlying&nbsp;datasource.</p>
-<p>Things to&nbsp;remember:</p>
-<ul>
-<li>foreign tables mean no constraints nor&nbsp;indices</li>
-<li>no indices mean spatial queries are terribly slow compared to&nbsp;PostGIS</li>
-<li>I like the idea of <code>CREATE UNLOGGED TABLE dams2 AS SELECT * FROM dams</code>, not sure what to use it for&nbsp;though</li>
-</ul>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/author/michal-zimmermann5.html">&laquo; Previous page</a>

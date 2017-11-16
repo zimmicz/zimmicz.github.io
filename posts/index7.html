@@ -23,6 +23,82 @@
     <main>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2016/testing-postgresql-ogr-fdw/" rel="bookmark" title="Permalink to Testing PostgreSQL OGR FDW">Testing PostgreSQL <span class="caps">OGR</span> <span class="caps">FDW</span></a></h1>
+    <aside><span>Jul 1, 2016</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p><a href="https://wiki.postgresql.org/wiki/Foreign_data_wrappers">PostgreSQL foreign data wrappers</a> are used to connect PostgreSQL database to different datasources, e.g. other <span class="caps">SQL</span> databases, <span class="caps">CSV</span> files, <span class="caps">XLS</span>&nbsp;spreadsheets&times;</p>
+<p>The one I&#8217;ve been interested in for several months is <a href="https://github.com/pramsey/pgsql-ogr-fdw">Paul Ramsey&#8217;s <span class="caps">OGR</span> <span class="caps">FDW</span></a> - it gives you access to <span class="caps">OGR</span> supported spatial formats directly from your database. <em>No more shapefiles lying&nbsp;around?</em></p>
+<p>Each foreign data wrapper should have three basic&nbsp;components:</p>
+<ul>
+<li>foreign server&nbsp;object</li>
+<li>foreign user mapping - not necessary if you&#8217;re not connecting to other&nbsp;database</li>
+<li>foreign&nbsp;table(s)</li>
+</ul>
+<p>I got some data about <a href="http://www.dibavod.cz/download.php?id_souboru=1413">rivers</a> and <a href="http://www.dibavod.cz/download.php?id_souboru=1416">dams</a> from <a href="http://www.dibavod.cz"><span class="caps">DIBAVOD</span></a> open datasets to play&nbsp;with.</p>
+<p>First define the foreign server&nbsp;object:</p>
+<div class="highlight"><pre><span></span>CREATE SERVER dibavod
+FOREIGN DATA WRAPPER ogr_fdw
+OPTIONS (
+    datasource &#39;/downloads/dibavod&#39;,
+    format &#39;ESRI Shapefile&#39;,
+    config_options &#39;SHAPE_ENCODING=CP1250&#39;
+);
+</pre></div>
+
+
+<p>Note the <span class="caps">OGR</span> specific driver configuration options are available inside <code>config_options</code>. In case of <span class="caps">ESRI</span> Shapefiles, the <code>datasource</code> is the directory your files reside&nbsp;in.</p>
+<p>Let&#8217;s create PostgreSQL tables (use <code>ogrinfo</code> or Paul&#8217;s <code>ogr_fdw_info</code> to list the&nbsp;columns):</p>
+<div class="highlight"><pre><span></span>CREATE FOREIGN TABLE rivers (
+    fid integer,
+    utokj_id numeric,
+    utokjn_id numeric,
+    utokjn_f numeric,
+    prprop_z integer,
+    ex_jh integer,
+    pozn text,
+    shape_leng numeric,
+    naz_tok text,
+    idvt integer,
+    tok_id numeric,
+    shape_len numeric,
+    geom geometry(LINESTRING, 5514)
+)
+SERVER dibavod
+OPTIONS (layer &#39;A02_Vodni_tok_JU&#39;);
+
+CREATE FOREIGN TABLE dams (
+    fid integer,
+    objectid integer,
+    naz_na text,
+    nadr_gid numeric,
+    kota_hladi numeric,
+    hloubka numeric,
+    zatop_ploc numeric,
+    objem numeric,
+    kota_hraz numeric,
+    kota_preli numeric,
+    kota_vypus numeric,
+    plocha_m2 numeric,
+    shape_area numeric,
+    shape_len numeric,
+    geom geometry(MULTIPOLYGON, 5514)
+)
+SERVER dibavod
+OPTIONS (LAYER &#39;A05_Vodni_nadrze&#39;);
+</pre></div>
+
+
+<p>Note the <code>fid</code> column - required for <strong>write access</strong> to underlying&nbsp;datasource.</p>
+<p>Things to&nbsp;remember:</p>
+<ul>
+<li>foreign tables mean no constraints nor&nbsp;indices</li>
+<li>no indices mean spatial queries are terribly slow compared to&nbsp;PostGIS</li>
+<li>I like the idea of <code>CREATE UNLOGGED TABLE dams2 AS SELECT * FROM dams</code>, not sure what to use it for&nbsp;though</li>
+</ul>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2016/a-month-of-commuting-on-my-own/" rel="bookmark" title="Permalink to A Month of Commuting on My Own">A Month of Commuting on My&nbsp;Own</a></h1>
     <aside><span>Apr 9, 2016</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/spatial.html">spatial</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/visualization.html">visualization</a>    </span>
@@ -235,16 +311,6 @@ gdaladdo <span class="si">${</span><span class="nv">OUTPUTPATH</span><span class
 
 
 <p>It reads well and the purpose of such a query is pretty&nbsp;obvious.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2015/liftago-open-dataset-infographics/" rel="bookmark" title="Permalink to Liftago Open Dataset Infographics">Liftago Open Dataset&nbsp;Infographics</a></h1>
-    <aside><span>Dec 21, 2015</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/visualization.html">visualization</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/data.html">data</a></span>
-    </aside>
-    <p><a href="https://www.liftago.com/cs">Liftago</a> (the Czech analogy of Uber) has recently <a href="http://try.liftago.com/info-wants-to-be-free/">released a sample of its data</a> covering four weeks of driver/pasenger&nbsp;interactions.</p>
-<p>Have a look at my infographics created with PostGIS, Inkscape, Python and&nbsp;pygal.</p>
-<p class="text-center"><a href="https://www.zimmi.cz/posts/assets/liftago-open-dataset-infographics/liftago.pdf"><img title="Liftago infographics" src="{filename}/assets/liftago-open-dataset-infographics/liftago.png" class="img-responsive centered"></a></p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/index6.html">&laquo; Previous page</a>
