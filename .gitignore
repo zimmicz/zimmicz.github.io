@@ -4,3 +4,4 @@ content/**/*.pyc
 content/pelican-plugins
 output
 .webassets-cache
+*sublime*
