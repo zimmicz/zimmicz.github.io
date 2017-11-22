@@ -24,6 +24,54 @@
 <h2>Articles by Michal Zimmermann</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2017/mapping-north-america-with-qgis-tips-and-tricks" rel="bookmark" title="Permalink to Mapping North America with QGIS: Tips and Tricks">Mapping North America with <span class="caps">QGIS</span>: Tips and&nbsp;Tricks</a></h1>
+    <aside><span>May 21, 2017</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/visualization.html">visualization</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
+    </aside>
+    <p>Recently I&#8217;ve bought a book called <em>Maps</em> by Aleksandra Mizielinska and Daniel Mizielinski to my nephew. The book&#8217;s absolutely wonderful and made me want to try crafting a map with similar looks. I don&#8217;t do maps much at <a href="https://clevermaps.cz">CleverMaps</a>, so this was a great opportunity to find out what new features became available during the last months of <span class="caps">QGIS</span>&nbsp;development.</p>
+<h2>Result</h2>
+<p>A map of North America in scale of 1:22,000,000 featuring the biggest lakes, rivers, mountain ranges and basic administrative units for the North American countries. I aimed for visually appealing overview map rather than perfectly correct topographic&nbsp;one.</p>
+<div class="text-center"><a href="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/map.png" title="Click for the full size (3 MB)"><img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/map.min.png"/></a></div>
+
+<h2>Data</h2>
+<p>I used my beloved <a href="http://www.naturalearthdata.com">Natural Earth dataset</a> for both cultural (boundaries, cities) and physical (rivers, lakes) map features. Different scales came to play for different map layers as they seemed a bit too/few simplified for the given&nbsp;scale.</p>
+<h2>Fonts</h2>
+<p>I usually use built-in system fonts (Ubuntu Condensed or such), but this kind of map needed a more handwritten looking, sort of childish font. After searching <a href="dafont.com">dafont.com</a> I chose <a href="http://www.dafont.com/es/precursive.font">PreCursive by RaseOne Full Time Artists</a> and <a href="http://www.dafont.com/es/kg-primary-penmanship.font"><span class="caps">KG</span> Primary Penmanship by Kimberly Geswein</a>.</p>
+<h2>Symbols</h2>
+<p>The mountain point symbol was one of the two custom symbols used on the map. It comes from <a href="http://all-free-download.com/free-vector/download/mountains_311829.html">BSGStudio</a>. The ocean wave symbol was made by&nbsp;myself.</p>
+<h2><span class="caps">QGIS</span>&nbsp;effects</h2>
+<p>I&#8217;ve used several techniques I find interesting enough to be listed&nbsp;here.</p>
+<h3>Coastlines</h3>
+<p>For a long time I&#8217;ve considered coastlines a field for cartographic invention. They can be emphasized by shading or 3D effects. I chose the set of four parallel coastlines subtly disappearing into the sea, hopefully invoking the feeling of waves coming to the&nbsp;shore.</p>
+<div class="text-center"><img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/coastlines.png"/></div>
+
+<p>It&#8217;s done by dissolving all the features and buffering them again and&nbsp;again.</p>
+<h3>Buffered&nbsp;labels</h3>
+<p>Buffered labels are usually hard to get right, because they fill so much space if the buffer color&#8217;s not corresponding to its surroundings. But choosing the proper color can be a real struggle at&nbsp;times.</p>
+<div class="text-center"><img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/qgis_expressions.png"/></div>
+
+<p>On this map, almost all the labels are buffered with the color of its surroundings, which makes them more legible, yet not too expressive. This is possible thanks to <span class="caps">QGIS</span> expression based properties that let you define unique styling to different map&nbsp;features.</p>
+<div class="text-center"><img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/buffered_labels.png"/></div>
+
+<p>Where it isn&#8217;t possible (e.g. Bahamas or Honduras) to choose just one buffer color, the label is not buffered at all (or the semi-transparent white buffer is&nbsp;used).</p>
+<p>Note the <em>Rocky Mountains</em> label is split on the borders of the <span class="caps">U.S.A.</span> and Canada and its both parts match the background&nbsp;color.</p>
+<h3>Tapered&nbsp;rivers</h3>
+<p>Rivers are tapered based on the Natural Earth&#8217;s width attribute value for each river&nbsp;segment.</p>
+<h3>Labels in separate&nbsp;layers</h3>
+<p>I&#8217;m used to put labels into separate layers in more complicated map compositions, especially when you need to draw label along path for areal features (such as countries or&nbsp;states).</p>
+<div class="text-center"><img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/labels.png"/></div>
+
+<p>It becomes a bit harder to keep the features in sync with the labels though. I&#8217;d like to use only one layer for all the map layers in the future, as I feel that&#8217;s the way to go for the best&nbsp;labeling.</p>
+<h3>Labels wrapped on&nbsp;character</h3>
+<p>Some labels just can&#8217;t fit the feature they belong to and <span class="caps">QGIS</span> lets you deal with this by wrapping labels on a special character, <code>\</code> in my&nbsp;case.</p>
+<div class="text-center"><img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/wrapped_labels.png"/></div>
+
+<h3>Layer blending&nbsp;mode</h3>
+<p>The mechanics behind layer blending modes are still a mystery to me, but they can add that little extra to a map very easily. Thanks to the Overlay blending mode, <em>the Rocky Mountains</em> may remain very subtle on different kinds of&nbsp;background.</p>
+<div class="text-center"><img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/blending_mode.png"/></div>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2017/wifileaks-wi-fi-networks-dataviz/" rel="bookmark" title="Permalink to Wifileaks Wi-Fi Networks Dataviz">Wifileaks Wi-Fi Networks&nbsp;Dataviz</a></h1>
     <aside><span>May 2, 2017</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/visualization.html">visualization</a>    </span>
@@ -419,106 +467,6 @@ find -type f -not -path <span class="s1">&#39;./PVP_fvu_p_Bechovice_SHP*&#39;</s
 
 
 <p>A boring task that would take me hours five years ago transformed into simple, yet fun, piece of work done in no more than half an&nbsp;hour.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2017/upgrading-postgresql-95-to-postgresql-96-with-postgis/" rel="bookmark" title="Permalink to Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with PostGIS">Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with&nbsp;PostGIS</a></h1>
-    <aside><span>Mar 1, 2017</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p>Thanks to <code>pg_upgrade</code> tool the PostgreSQL upgrade on Ubuntu is pretty straightforward. Different PostGIS versions might cause troubles though. This post covers PostgreSQL 9.5, PostGIS 2.2 to PostgreSQL 9.6, PostGIS 2.3&nbsp;migration.</p>
-<p>First of all, install the PostgreSQL 9.6 with PostGIS&nbsp;2.3.</p>
-<div class="highlight"><pre><span></span>apt install postgresql-9.6 postgresql-9.6-postgis-2.3
-</pre></div>
-
-
-<p>Mind that newly installed database cluster runs on port <code>5433</code>.</p>
-<p>If you run <code>pg_upgrade</code> at this stage, it will fail with the following&nbsp;error.</p>
-<div class="highlight"><pre><span></span>could not load library <span class="s2">&quot;</span><span class="nv">$libdir</span><span class="s2">/postgis_topology-2.2&quot;</span>:
-ERROR:  could not access file <span class="s2">&quot;</span><span class="nv">$libdir</span><span class="s2">/postgis_topology-2.2&quot;</span>: No such file or directory
-</pre></div>
-
-
-<p><code>pg_upgrade</code> can&#8217;t run the upgrade because PostGIS versions don&#8217;t match. Install the PostGIS 2.3 for PostgreSQL 9.5 and update extensions in all your&nbsp;databases.</p>
-<div class="highlight"><pre><span></span>apt install postgresql-9.5-postgis-2.3
-
-:::sql
-ALTER EXTENSION postgis UPDATE<span class="p">;</span>
-</pre></div>
-
-
-<p>With both clusters using the same PostGIS version, the upgrade can begin. First, stop them&nbsp;with</p>
-<div class="highlight"><pre><span></span>service postgresql stop
-</pre></div>
-
-
-<p>Then, run the actual <code>pg_upgrade</code> command as <code>postgres</code> user. Make sure the <code>pg_hba.conf</code> file is set to allow local&nbsp;connections.</p>
-<div class="highlight"><pre><span></span>/usr/lib/postgresql/9.6/bin/pg_upgrade <span class="se">\</span>
--b /usr/lib/postgresql/9.5/bin/ <span class="se">\</span>
--B /usr/lib/postgresql/9.6/bin/ <span class="se">\</span>
--d /var/lib/postgresql/9.5/main <span class="se">\</span>
--D /var/lib/postgresql/9.6/main <span class="se">\</span>
--o <span class="s1">&#39; -c config_file=/etc/postgresql/9.5/main/postgresql.conf&#39;</span> <span class="se">\</span>
--O <span class="s1">&#39; -c config_file=/etc/postgresql/9.6/main/postgresql.conf&#39;</span>
-</pre></div>
-
-
-<p>The following result means the upgrade was&nbsp;smooth.</p>
-<div class="highlight"><pre><span></span>Performing Consistency Checks
------------------------------
-Checking cluster versions                                   ok
-Checking database user is the install user                  ok
-Checking database connection settings                       ok
-Checking <span class="k">for</span> prepared transactions                          ok
-Checking <span class="k">for</span> reg* system OID user data types                ok
-Checking <span class="k">for</span> contrib/isn with bigint-passing mismatch       ok
-Checking <span class="k">for</span> roles starting with <span class="s1">&#39;pg_&#39;</span>                      ok
-Creating dump of global objects                             ok
-Creating dump of database schemas
-                                                            ok
-Checking <span class="k">for</span> presence of required libraries                 ok
-Checking database user is the install user                  ok
-Checking <span class="k">for</span> prepared transactions                          ok
-
-If pg_upgrade fails after this point, you must re-initdb the
-new cluster before continuing.
-
-Performing Upgrade
-------------------
-Analyzing all rows in the new cluster                       ok
-Freezing all rows on the new cluster                        ok
-Deleting files from new pg_clog                             ok
-Copying old pg_clog to new server                           ok
-Setting next transaction ID and epoch <span class="k">for</span> new cluster       ok
-Deleting files from new pg_multixact/offsets                ok
-Copying old pg_multixact/offsets to new server              ok
-Deleting files from new pg_multixact/members                ok
-Copying old pg_multixact/members to new server              ok
-Setting next multixact ID and offset <span class="k">for</span> new cluster        ok
-Resetting WAL archives                                      ok
-Setting frozenxid and minmxid counters in new cluster       ok
-Restoring global objects in the new cluster                 ok
-Restoring database schemas in the new cluster
-                                                            ok
-Copying user relation files
-                                                            ok
-Setting next OID <span class="k">for</span> new cluster                            ok
-Sync data directory to disk                                 ok
-Creating script to analyze new cluster                      ok
-Creating script to delete old cluster                       ok
-
-Upgrade Complete
-----------------
-Optimizer statistics are not transferred by pg_upgrade so,
-once you start the new server, consider running:
-    ./analyze_new_cluster.sh
-
-Running this script will delete the old cluster<span class="err">&#39;</span>s data files:
-    ./delete_old_cluster.sh
-</pre></div>
-
-
-<p>The old cluster can be removed and the new one switched back to port <code>5432</code>. Run <code>/usr/lib/postgresql/9.6/bin/vacuumdb -p 5433 --all --analyze-in-stages</code> to collect&nbsp;statistics.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/author/michal-zimmermann2.html">&laquo; Previous page</a>

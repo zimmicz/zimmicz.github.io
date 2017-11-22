@@ -24,6 +24,139 @@
 <h2>Articles by Michal Zimmermann</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2017/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/" rel="bookmark" title="Permalink to Serving Mapbox Vector Tiles with PostGIS, Nginx and Python Backend">Serving Mapbox Vector Tiles with PostGIS, Nginx and Python&nbsp;Backend</a></h1>
+    <aside><span>Oct 23, 2017</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p><a href="({filename}../2017/postgis-as-a-mapbox-vector-tiles-generator.md)">Since version 2.4.0, PostGIS can serve <span class="caps">MVT</span></a> data directly. <span class="caps">MVT</span> returning queries put heavy workload on the database though. On top of that, each of the query has to be run again every time a client demands the data. This leaves us with plenty of room to optimize the&nbsp;process.</p>
+<div class="text-center"><img data-echo="/posts/assets/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/election.gif"/></div>
+
+<p>During the last week, while working on the Czech legislative election data visualization, I&#8217;ve struggled with the server becoming unresponsive far too often due to the issues mentioned&nbsp;above.</p>
+<div class="text-center"><img data-echo="/posts/assets/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/schema.png"/></div>
+
+<p>According to the schema, the first client to come to the&nbsp;server:</p>
+<ul>
+<li>goes through filesystem unstopped, because there are no cached files&nbsp;yet,</li>
+<li>continues to the Flask backend and asks for a file at <code>{z}/{x}/{y}</code>,</li>
+<li>Flask backend asks the database to return the <span class="caps">MVT</span> for the given&nbsp;tile,</li>
+<li>Flask backend writes the response to the filesystem and sends it to the&nbsp;client.</li>
+</ul>
+<p>Other clients get tiles directly from the filesystem, leaving the database at&nbsp;ease.</p>
+<h2>Nginx</h2>
+<p>Nginx is fairly simple to set up, once you know what you&#8217;re doing. The <code>/volby-2017/municipality/</code> location serves static <span class="caps">MVT</span> from the given alias directory. If not found, the request is passed to <code>@postgis</code> location, that asks the Flask backend for the&nbsp;response.</p>
+<div class="highlight"><pre><span></span>server election <span class="o">{</span>
+    location /volby-2017/municipality <span class="o">{</span>
+            <span class="nb">alias</span> /opt/volby-cz-2017/server/cache/<span class="p">;</span>
+            try_files <span class="nv">$uri</span> @postgis<span class="p">;</span>
+    <span class="o">}</span>
+
+    location @postgis <span class="o">{</span>
+            include uwsgi_params<span class="p">;</span>
+            uwsgi_pass <span class="m">127</span>.0.0.1:5000<span class="p">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<h2>Flask&nbsp;backend</h2>
+<script src="https://gist.github.com/zimmicz/46485676e1cf3d6566f0aaa7f93f055b.js"></script>
+
+<h2>Generating static <span class="caps">MVT</span> in&nbsp;advance</h2>
+<p>If you&#8217;re going to serve static tiles that don&#8217;t change often, it might be a good idea to use PostGIS to create files in advance and serve them with&nbsp;Nginx.</p>
+<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">tiles</span> <span class="p">(</span>
+    <span class="n">x</span> <span class="nb">integer</span><span class="p">,</span>
+    <span class="n">y</span> <span class="nb">integer</span><span class="p">,</span>
+    <span class="n">z</span> <span class="nb">integer</span><span class="p">,</span>
+    <span class="n">west</span> <span class="nb">numeric</span><span class="p">,</span>
+    <span class="n">south</span> <span class="nb">numeric</span><span class="p">,</span>
+    <span class="n">east</span> <span class="nb">numeric</span><span class="p">,</span>
+    <span class="n">north</span> <span class="nb">numeric</span><span class="p">,</span>
+    <span class="n">geom</span> <span class="n">geometry</span><span class="p">(</span><span class="n">POLYGON</span><span class="p">,</span> <span class="mi">3857</span><span class="p">)</span>
+<span class="p">);</span>
+</pre></div>
+
+
+<p>Using <a href="https://github.com/mapbox/mercantile">mercantile</a>, you can create the <code>tiles</code> table holding the bounding boxes of the tiles you need. PostGIS them inserts the actual <span class="caps">MVT</span> into the <code>mvt</code> table.</p>
+<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">TEMPORARY</span> <span class="k">TABLE</span> <span class="n">tmp_tiles</span> <span class="k">AS</span>
+    <span class="k">SELECT</span>
+        <span class="n">muni</span><span class="p">.</span><span class="n">muni_id</span><span class="p">,</span>
+        <span class="n">prc</span><span class="p">.</span><span class="k">data</span><span class="p">,</span>
+        <span class="n">ST_AsMVTGeom</span><span class="p">(</span>
+            <span class="n">muni</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span>
+            <span class="n">TileBBox</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">x</span> <span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="mi">3857</span><span class="p">),</span>
+            <span class="mi">4096</span><span class="p">,</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="k">false</span>
+        <span class="p">)</span> <span class="n">geom</span><span class="p">,</span>
+        <span class="n">x</span><span class="p">,</span>
+        <span class="n">y</span><span class="p">,</span>
+        <span class="n">z</span>
+    <span class="k">FROM</span> <span class="n">muni</span>
+    <span class="k">JOIN</span> <span class="p">(</span>
+        <span class="k">SELECT</span>
+            <span class="n">x</span><span class="p">,</span>
+            <span class="n">y</span><span class="p">,</span>
+            <span class="n">z</span><span class="p">,</span>
+            <span class="n">geom</span>
+        <span class="k">FROM</span> <span class="n">tiles</span>
+    <span class="p">)</span> <span class="n">bbox</span> <span class="k">ON</span> <span class="p">(</span><span class="n">ST_Intersects</span><span class="p">(</span><span class="n">muni</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">bbox</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span>
+    <span class="k">JOIN</span> <span class="n">party_results_cur</span> <span class="n">prc</span> <span class="k">ON</span> <span class="p">(</span><span class="n">muni</span><span class="p">.</span><span class="n">muni_id</span> <span class="o">=</span> <span class="n">prc</span><span class="p">.</span><span class="n">muni_id</span><span class="p">);</span>
+<span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">mvt</span> <span class="p">(</span><span class="n">mvt</span> <span class="n">bytea</span><span class="p">,</span> <span class="n">x</span> <span class="nb">integer</span><span class="p">,</span> <span class="n">y</span> <span class="nb">integer</span><span class="p">,</span> <span class="n">z</span> <span class="nb">integer</span><span class="p">);</span>
+<span class="k">DO</span>
+<span class="err">$$</span>
+<span class="k">DECLARE</span> <span class="n">r</span> <span class="n">record</span><span class="p">;</span>
+<span class="k">BEGIN</span>
+<span class="k">FOR</span> <span class="n">r</span> <span class="k">in</span> <span class="k">SELECT</span> <span class="k">DISTINCT</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="k">FROM</span> <span class="n">tmp_tiles</span> <span class="n">LOOP</span>
+    <span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">mvt</span>
+    <span class="k">SELECT</span> <span class="n">ST_AsMVT</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="s1">&#39;municipality&#39;</span><span class="p">,</span> <span class="mi">4096</span><span class="p">,</span> <span class="s1">&#39;geom&#39;</span><span class="p">),</span> <span class="n">r</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">r</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="n">r</span><span class="p">.</span><span class="n">z</span>
+    <span class="k">FROM</span> <span class="p">(</span>
+        <span class="k">SELECT</span>
+            <span class="n">muni_id</span><span class="p">,</span>
+            <span class="k">data</span><span class="p">,</span>
+            <span class="n">geom</span>
+        <span class="k">FROM</span> <span class="n">tmp_tiles</span>
+        <span class="k">WHERE</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">r</span><span class="p">)</span>
+    <span class="p">)</span> <span class="n">q</span><span class="p">;</span>
+    <span class="n">RAISE</span> <span class="n">INFO</span> <span class="s1">&#39;%&#39;</span><span class="p">,</span> <span class="n">r</span><span class="p">;</span>
+<span class="k">END</span> <span class="n">LOOP</span><span class="p">;</span>
+<span class="k">END</span><span class="p">;</span>
+<span class="err">$$</span><span class="p">;</span>
+</pre></div>
+
+
+<p>Once filled, the table rows can be written to the filesystem with the simple piece of Python&nbsp;code.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">create_engine</span><span class="p">,</span> <span class="n">text</span>
+
+<span class="n">CACHE_PATH</span><span class="o">=</span><span class="s2">&quot;cache/&quot;</span>
+
+<span class="n">e</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s1">&#39;postgresql:///&#39;</span><span class="p">)</span>
+<span class="n">conn</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="n">sql</span><span class="o">=</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;SELECT mvt, x, y, z FROM mvt&quot;</span><span class="p">)</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+    <span class="n">cachefile</span> <span class="o">=</span> <span class="s2">&quot;{}/{}/{}/{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">CACHE_PATH</span><span class="p">,</span> <span class="n">d</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">cachefile</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s2">&quot;{}/{}/{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">CACHE_PATH</span><span class="p">,</span> <span class="n">d</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">])):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s2">&quot;{}/{}/{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">CACHE_PATH</span><span class="p">,</span> <span class="n">d</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cachefile</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+</pre></div>
+
+
+<h2>Conclusion</h2>
+<p>PostGIS is a brilliant tool for generating Mapbox vector tiles. Combined with Python powered static file generator and Nginx, it seems to become the only tool needed to get you&nbsp;going.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2017/postgresql-dollar-quoting-inside-bash-heredoc/" rel="bookmark" title="Permalink to PostgreSQL Dollar Quoting inside Bash Heredoc">PostgreSQL Dollar Quoting inside Bash&nbsp;Heredoc</a></h1>
     <aside><span>Sep 22, 2017</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>    </span>
@@ -559,54 +692,6 @@ RUN apt install -y gdal-bin
 
 <h2>Final Touch: Raster to&nbsp;Vector</h2>
 <p>After the GeoTiff is written to hard drive, <a href="https://www.zimmi.cz/posts/2015/how-to-use-queue-with-rsync/">inotifywait</a> can be used to generate overviews. And with ease of calling <code>gdal_polygonize.py</code> on each of GeoTiffs&hellip;vector layer, at you&nbsp;service.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2017/mapping-north-america-with-qgis-tips-and-tricks" rel="bookmark" title="Permalink to Mapping North America with QGIS: Tips and Tricks">Mapping North America with <span class="caps">QGIS</span>: Tips and&nbsp;Tricks</a></h1>
-    <aside><span>May 21, 2017</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/visualization.html">visualization</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
-    </aside>
-    <p>Recently I&#8217;ve bought a book called <em>Maps</em> by Aleksandra Mizielinska and Daniel Mizielinski to my nephew. The book&#8217;s absolutely wonderful and made me want to try crafting a map with similar looks. I don&#8217;t do maps much at <a href="https://clevermaps.cz">CleverMaps</a>, so this was a great opportunity to find out what new features became available during the last months of <span class="caps">QGIS</span>&nbsp;development.</p>
-<h2>Result</h2>
-<p>A map of North America in scale of 1:22,000,000 featuring the biggest lakes, rivers, mountain ranges and basic administrative units for the North American countries. I aimed for visually appealing overview map rather than perfectly correct topographic&nbsp;one.</p>
-<div class="text-center"><a href="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/map.png" title="Click for the full size (3 MB)"><img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/map.min.png"/></a></div>
-
-<h2>Data</h2>
-<p>I used my beloved <a href="http://www.naturalearthdata.com">Natural Earth dataset</a> for both cultural (boundaries, cities) and physical (rivers, lakes) map features. Different scales came to play for different map layers as they seemed a bit too/few simplified for the given&nbsp;scale.</p>
-<h2>Fonts</h2>
-<p>I usually use built-in system fonts (Ubuntu Condensed or such), but this kind of map needed a more handwritten looking, sort of childish font. After searching <a href="dafont.com">dafont.com</a> I chose <a href="http://www.dafont.com/es/precursive.font">PreCursive by RaseOne Full Time Artists</a> and <a href="http://www.dafont.com/es/kg-primary-penmanship.font"><span class="caps">KG</span> Primary Penmanship by Kimberly Geswein</a>.</p>
-<h2>Symbols</h2>
-<p>The mountain point symbol was one of the two custom symbols used on the map. It comes from <a href="http://all-free-download.com/free-vector/download/mountains_311829.html">BSGStudio</a>. The ocean wave symbol was made by&nbsp;myself.</p>
-<h2><span class="caps">QGIS</span>&nbsp;effects</h2>
-<p>I&#8217;ve used several techniques I find interesting enough to be listed&nbsp;here.</p>
-<h3>Coastlines</h3>
-<p>For a long time I&#8217;ve considered coastlines a field for cartographic invention. They can be emphasized by shading or 3D effects. I chose the set of four parallel coastlines subtly disappearing into the sea, hopefully invoking the feeling of waves coming to the&nbsp;shore.</p>
-<div class="text-center"><img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/coastlines.png"/></div>
-
-<p>It&#8217;s done by dissolving all the features and buffering them again and&nbsp;again.</p>
-<h3>Buffered&nbsp;labels</h3>
-<p>Buffered labels are usually hard to get right, because they fill so much space if the buffer color&#8217;s not corresponding to its surroundings. But choosing the proper color can be a real struggle at&nbsp;times.</p>
-<div class="text-center"><img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/qgis_expressions.png"/></div>
-
-<p>On this map, almost all the labels are buffered with the color of its surroundings, which makes them more legible, yet not too expressive. This is possible thanks to <span class="caps">QGIS</span> expression based properties that let you define unique styling to different map&nbsp;features.</p>
-<div class="text-center"><img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/buffered_labels.png"/></div>
-
-<p>Where it isn&#8217;t possible (e.g. Bahamas or Honduras) to choose just one buffer color, the label is not buffered at all (or the semi-transparent white buffer is&nbsp;used).</p>
-<p>Note the <em>Rocky Mountains</em> label is split on the borders of the <span class="caps">U.S.A.</span> and Canada and its both parts match the background&nbsp;color.</p>
-<h3>Tapered&nbsp;rivers</h3>
-<p>Rivers are tapered based on the Natural Earth&#8217;s width attribute value for each river&nbsp;segment.</p>
-<h3>Labels in separate&nbsp;layers</h3>
-<p>I&#8217;m used to put labels into separate layers in more complicated map compositions, especially when you need to draw label along path for areal features (such as countries or&nbsp;states).</p>
-<div class="text-center"><img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/labels.png"/></div>
-
-<p>It becomes a bit harder to keep the features in sync with the labels though. I&#8217;d like to use only one layer for all the map layers in the future, as I feel that&#8217;s the way to go for the best&nbsp;labeling.</p>
-<h3>Labels wrapped on&nbsp;character</h3>
-<p>Some labels just can&#8217;t fit the feature they belong to and <span class="caps">QGIS</span> lets you deal with this by wrapping labels on a special character, <code>\</code> in my&nbsp;case.</p>
-<div class="text-center"><img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/wrapped_labels.png"/></div>
-
-<h3>Layer blending&nbsp;mode</h3>
-<p>The mechanics behind layer blending modes are still a mystery to me, but they can add that little extra to a map very easily. Thanks to the Overlay blending mode, <em>the Rocky Mountains</em> may remain very subtle on different kinds of&nbsp;background.</p>
-<div class="text-center"><img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/blending_mode.png"/></div>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/author/michal-zimmermann.html">&laquo; Previous page</a>

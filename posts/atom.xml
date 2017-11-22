@@ -1,5 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Michal Zimmermann</title><link href="https://www.zimmi.cz/posts/" rel="alternate"></link><link href="https://www.zimmi.cz/posts/atom.xml" rel="self"></link><id>https://www.zimmi.cz/posts/</id><updated>2017-11-16T15:00:00+01:00</updated><entry><title>QGIS Plugin Development: Creating GUI with Qt Designer</title><link href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-creating-gui-with-qt-designer/" rel="alternate"></link><published>2017-11-16T15:00:00+01:00</published><updated>2017-11-16T15:00:00+01:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-11-16:/posts/2017/qgis-plugin-development-creating-gui-with-qt-designer/</id><summary type="html">&lt;p&gt;After fiddling with &lt;a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/"&gt;&lt;span class="caps"&gt;QGIS&lt;/span&gt; Python console&lt;/a&gt; and implementing &lt;a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/"&gt;nearest neighbor analysis&lt;/a&gt;, I&amp;#8217;m going to create a very simple &lt;span class="caps"&gt;GUI&lt;/span&gt; for the plugin at&amp;nbsp;last.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Michal Zimmermann</title><link href="https://www.zimmi.cz/posts/" rel="alternate"></link><link href="https://www.zimmi.cz/posts/atom.xml" rel="self"></link><id>https://www.zimmi.cz/posts/</id><updated>2017-11-23T19:00:00+01:00</updated><entry><title>QGIS Plugin Development: AttributeTransfer Plugin</title><link href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-attributetransfer-plugin/" rel="alternate"></link><published>2017-11-23T19:00:00+01:00</published><updated>2017-11-23T19:00:00+01:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-11-23:/posts/2017/qgis-plugin-development-attributetransfer-plugin/</id><summary type="html">&lt;p&gt;This part finally brings &lt;a href="https://github.com/zimmicz/qgis-attribute-transfer-plugin"&gt;the whole source code of the &lt;span class="caps"&gt;QGIS&lt;/span&gt; AttributeTransfer plugin&lt;/a&gt;.&lt;/p&gt;
+&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/qgis-plugin-development-attribute-transfer-plugin/qgis.gif"/&gt;&lt;/div&gt;
+
+&lt;p&gt;The plugin itself resides in the &lt;a href="https://github.com/zimmicz/qgis-attribute-transfer-plugin/blob/master/attribute_transfer.py"&gt;&lt;code&gt;attribute_transfer.py&lt;/code&gt;&lt;/a&gt; file. When &lt;code&gt;run()&lt;/code&gt; method is invoked, the &lt;span class="caps"&gt;QT&lt;/span&gt; form pops up with combos prefilled with available vector layers that support attribute&amp;nbsp;editing.&lt;/p&gt;
+&lt;p&gt;Source and target layer combos are mutually …&lt;/p&gt;</summary><content type="html">&lt;p&gt;This part finally brings &lt;a href="https://github.com/zimmicz/qgis-attribute-transfer-plugin"&gt;the whole source code of the &lt;span class="caps"&gt;QGIS&lt;/span&gt; AttributeTransfer plugin&lt;/a&gt;.&lt;/p&gt;
+&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/qgis-plugin-development-attribute-transfer-plugin/qgis.gif"/&gt;&lt;/div&gt;
+
+&lt;p&gt;The plugin itself resides in the &lt;a href="https://github.com/zimmicz/qgis-attribute-transfer-plugin/blob/master/attribute_transfer.py"&gt;&lt;code&gt;attribute_transfer.py&lt;/code&gt;&lt;/a&gt; file. When &lt;code&gt;run()&lt;/code&gt; method is invoked, the &lt;span class="caps"&gt;QT&lt;/span&gt; form pops up with combos prefilled with available vector layers that support attribute&amp;nbsp;editing.&lt;/p&gt;
+&lt;p&gt;Source and target layer combos are mutually exclusive, thus it&amp;#8217;s not possible to transfer the attribute within the same&amp;nbsp;layer.&lt;/p&gt;
+&lt;p&gt;Coding the plugin, I came across minor issues related mainly to the &lt;code&gt;QgsSpatialIndex&lt;/code&gt; implementation. In &lt;a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/"&gt;the nearest neighbor analysis part&lt;/a&gt; of the series, the &lt;code&gt;QgsSpatialIndex.nearestNeighbor&lt;/code&gt; method was mentioned. Yet, as I found out, this method only works with &lt;code&gt;QgsPoint&lt;/code&gt; geometries. Those are impossible to get from &lt;code&gt;QgsPolygon&lt;/code&gt; or &lt;code&gt;QgsPolyline&lt;/code&gt;, though. What can one possibly do, facing such a misfortune? Well&amp;hellip; draw a solution&amp;nbsp;matrix.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;/th&gt;
+&lt;th&gt;point&lt;/th&gt;
+&lt;th&gt;line&lt;/th&gt;
+&lt;th&gt;polygon&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;point&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;QgsSpatialIndex.nearestNeighbor&lt;/td&gt;
+&lt;td&gt;QgsSpatialIndex.nearestNeighbor; layers have to be switched, e.g. source layer = line&lt;/td&gt;
+&lt;td&gt;QgsSpatialIndex.nearestNeighbor; layers have to be switched, e.g. source layer = polygon&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;line&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;QgsSpatialIndex.nearestNeighbor&lt;/td&gt;
+&lt;td&gt;QgsSpatialIndex.intersects with QgsGeometry.distance&lt;/td&gt;
+&lt;td&gt;QgsSpatialIndex.intersects with QgsGeometry.distance&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;polygon&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;QgsSpatialIndex.nearestNeighbor&lt;/td&gt;
+&lt;td&gt;QgsSpatialIndex.intersects with QgsGeometry.distance&lt;/td&gt;
+&lt;td&gt;QgsSpatialIndex.intersects with QgsGeometry.distance&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Using the spatial index brings one more issue I&amp;#8217;ve come to realize just after implementing the special comparison workflows for different geometry types. There&amp;#8217;s a chance of finding the nearest feature using the bounding box that&amp;#8217;s actually not the nearest feature. Take a close look at lines number four and seven in the picture below. The first surely is the closest to the polygon on its ride side, yet the polygon is wrongly paired with the line number&amp;nbsp;seven.&lt;/p&gt;
+&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/qgis-plugin-development-attribute-transfer-plugin/qgis.png"/&gt;&lt;/div&gt;
+
+&lt;p&gt;I think the following set of steps will help to overcome this&amp;nbsp;issue:&lt;/p&gt;
+&lt;ul&gt;
+    &lt;li&gt;try using `QgsSpatialIndex.intersects` to find any&amp;nbsp;intersection&lt;/li&gt;
+    &lt;li&gt;if the intersection is found, get the distance between the target feature and the most distant source&amp;nbsp;vertex&lt;/li&gt;
+    &lt;li&gt;
+        &lt;ul&gt;
+            &lt;li&gt;use this distance to construct the new bounding box to test whether there are any closer&amp;nbsp;features&lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/li&gt;
+    &lt;li&gt;if none is found, grow the target feature bounding box step by step until the intersection is finally&amp;nbsp;found&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;This part is yet to be&amp;nbsp;implemented.&lt;/p&gt;</content><category term="python"></category><category term="QGIS"></category></entry><entry><title>QGIS Plugin Development: Creating GUI with Qt Designer</title><link href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-creating-gui-with-qt-designer/" rel="alternate"></link><published>2017-11-16T15:00:00+01:00</published><updated>2017-11-16T15:00:00+01:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-11-16:/posts/2017/qgis-plugin-development-creating-gui-with-qt-designer/</id><summary type="html">&lt;p&gt;After fiddling with &lt;a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/"&gt;&lt;span class="caps"&gt;QGIS&lt;/span&gt; Python console&lt;/a&gt; and implementing &lt;a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/"&gt;nearest neighbor analysis&lt;/a&gt;, I&amp;#8217;m going to create a very simple &lt;span class="caps"&gt;GUI&lt;/span&gt; for the plugin at&amp;nbsp;last.&lt;/p&gt;
 &lt;p&gt;While &lt;span class="caps"&gt;QGIS&lt;/span&gt; &lt;span class="caps"&gt;API&lt;/span&gt; docs took me few hours to grasp, the PyQGIS ecosystem knocked my socks off. Here comes the list of tools you should …&lt;/p&gt;</summary><content type="html">&lt;p&gt;After fiddling with &lt;a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/"&gt;&lt;span class="caps"&gt;QGIS&lt;/span&gt; Python console&lt;/a&gt; and implementing &lt;a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/"&gt;nearest neighbor analysis&lt;/a&gt;, I&amp;#8217;m going to create a very simple &lt;span class="caps"&gt;GUI&lt;/span&gt; for the plugin at&amp;nbsp;last.&lt;/p&gt;
 &lt;p&gt;While &lt;span class="caps"&gt;QGIS&lt;/span&gt; &lt;span class="caps"&gt;API&lt;/span&gt; docs took me few hours to grasp, the PyQGIS ecosystem knocked my socks off. Here comes the list of tools you should incorporate into your development process as soon as&amp;nbsp;possible.&lt;/p&gt;
 &lt;h2&gt;Plugin&amp;nbsp;Builder&lt;/h2&gt;

@@ -24,6 +24,111 @@
 <h2>Articles by Michal Zimmermann</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/" rel="bookmark" title="Permalink to Installing PostGIS 2.2 with SFCGAL on Ubuntu-based OS">Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span></a></h1>
+    <aside><span>Oct 29, 2015</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+    </aside>
+    <p>I&#8217;ve seen a bunch of questions on <span class="caps">GIS</span> StackExchange recently related to <a href="http://sfcgal.org/"><span class="caps">SFCGAL</span></a> extension for <a href="http://postgis.net">PostGIS 2.2</a>. Great news are it can be installed with one simple query <code>CREATE EXTENSION postgis_sfcgal</code>. Not so great news are you have to compile it from source for Ubuntu-based <span class="caps">OS</span> (14.04) as recent versions of required packages are not available in the&nbsp;repositories.</p>
+<p>I tested my solution on elementary <span class="caps">OS</span> 0.3.1 based on Ubuntu 14.04. <strong>And it works!</strong> It installs PostgreSQL 9.4 from repositories together with <span class="caps">GDAL</span> and <span class="caps">GEOS</span> and some other libs PostGIS depends on. PostGIS itself, <span class="caps">CGAL</span>, Boost, <span class="caps">MPFR</span> and <span class="caps">GMP</span> are built from&nbsp;source.</p>
+<p>Here comes the code (commented where&nbsp;needed).</p>
+<div class="highlight"><pre><span></span>sudo -i
+<span class="nb">echo</span> <span class="s2">&quot;deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main&quot;</span> <span class="p">|</span> tee -a /etc/apt/sources.list
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc <span class="p">|</span> sudo apt-key add -
+apt-get update
+apt-get install -y postgresql-9.4 <span class="se">\</span>
+    postgresql-client-9.4 <span class="se">\</span>
+    postgresql-contrib-9.4 <span class="se">\</span>
+    libpq-dev <span class="se">\</span>
+    postgresql-server-dev-9.4 <span class="se">\</span>
+    build-essential <span class="se">\</span>
+    libgeos-c1 <span class="se">\</span>
+    libgdal-dev <span class="se">\</span>
+    libproj-dev <span class="se">\</span>
+    libjson0-dev <span class="se">\</span>
+    libxml2-dev <span class="se">\</span>
+    libxml2-utils <span class="se">\</span>
+    xsltproc <span class="se">\</span>
+    docbook-xsl <span class="se">\</span>
+    docbook-mathml <span class="se">\</span>
+    cmake <span class="se">\</span>
+    gcc <span class="se">\</span>
+    m4 <span class="se">\</span>
+    icu-devtools
+
+<span class="nb">exit</span> <span class="c1"># leave root otherwise postgis will choke</span>
+
+<span class="nb">cd</span> /tmp
+touch download.txt
+cat <span class="s">&lt;&lt;EOT &gt;&gt; download.txt</span>
+<span class="s">https://gmplib.org/download/gmp/gmp-6.0.0a.tar.bz2</span>
+<span class="s">https://github.com/Oslandia/SFCGAL/archive/v1.2.0.tar.gz</span>
+<span class="s">http://www.mpfr.org/mpfr-current/mpfr-3.1.3.tar.gz</span>
+<span class="s">http://downloads.sourceforge.net/project/boost/boost/1.59.0/boost_1_59_0.tar.gz</span>
+<span class="s">https://github.com/CGAL/cgal/archive/releases/CGAL-4.6.3.tar.gz</span>
+<span class="s">http://download.osgeo.org/postgis/source/postgis-2.2.0.tar.gz</span>
+
+<span class="s">EOT</span>
+
+cat download.txt <span class="p">|</span> xargs -n <span class="m">1</span> -P <span class="m">8</span> wget <span class="c1"># make wget a little bit faster</span>
+
+tar xjf gmp-6.0.0a.tar.bz2
+tar xzf mpfr-3.1.3.tar.gz
+tar xzf v1.2.0.tar.gz
+tar xzf boost_1_59_0.tar.gz
+tar xzf CGAL-4.6.3.tar.gz
+tar xzf postgis-2.2.0.tar.gz
+
+<span class="nv">CORES</span><span class="o">=</span><span class="k">$(</span>nproc<span class="k">)</span>
+
+<span class="k">if</span> <span class="o">[[</span> <span class="nv">$CORES</span> &gt; <span class="m">1</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nv">CORES</span><span class="o">=</span><span class="k">$(</span>expr <span class="nv">$CORES</span> - <span class="m">1</span><span class="k">)</span> <span class="c1"># be nice to your PC</span>
+<span class="k">fi</span>
+
+<span class="nb">cd</span> gmp-6.0.0
+./configure <span class="o">&amp;&amp;</span> make -j <span class="nv">$CORES</span> <span class="o">&amp;&amp;</span> sudo make -j <span class="nv">$CORES</span> install
+
+<span class="nb">cd</span> ..
+<span class="nb">cd</span> mpfr-3.1.3
+./configure <span class="o">&amp;&amp;</span> make -j <span class="nv">$CORES</span> <span class="o">&amp;&amp;</span> sudo make -j <span class="nv">$CORES</span> install
+
+<span class="nb">cd</span> ..
+<span class="nb">cd</span> boost_1_59_0
+./bootstrap.sh --prefix<span class="o">=</span>/usr/local --with-libraries<span class="o">=</span>all <span class="o">&amp;&amp;</span> sudo ./b2 install <span class="c1"># there might be some warnings along the way, don&#39;t panic</span>
+<span class="nb">echo</span> <span class="s2">&quot;/usr/local/lib&quot;</span> <span class="p">|</span> sudo tee /etc/ld.so.conf.d/boost.conf
+sudo ldconfig
+
+<span class="nb">cd</span> ..
+<span class="nb">cd</span> cgal-releases-CGAL-4.6.3
+cmake . <span class="o">&amp;&amp;</span> make -j <span class="nv">$CORES</span> <span class="o">&amp;&amp;</span> sudo make -j <span class="nv">$CORES</span> install
+
+<span class="nb">cd</span> ..
+<span class="nb">cd</span> SFCGAL-1.2.0/
+cmake . <span class="o">&amp;&amp;</span> make -j <span class="nv">$CORES</span> <span class="o">&amp;&amp;</span> sudo make -j <span class="nv">$CORES</span> install
+
+<span class="nb">cd</span> ..
+<span class="nb">cd</span> postgis-2.2.0
+./configure <span class="se">\</span>
+    --with-geosconfig<span class="o">=</span>/usr/bin/geos-config <span class="se">\</span>
+    --with-xml2config<span class="o">=</span>/usr/bin/xml2-config <span class="se">\</span>
+    --with-projdir<span class="o">=</span>/usr/share/proj <span class="se">\</span>
+    --with-libiconv<span class="o">=</span>/usr/bin <span class="se">\</span>
+    --with-jsondir<span class="o">=</span>/usr/include/json <span class="se">\</span>
+    --with-gdalconfig<span class="o">=</span>/usr/bin/gdal-config <span class="se">\</span>
+    --with-raster <span class="se">\</span>
+    --with-topology <span class="se">\</span>
+    --with-sfcgal<span class="o">=</span>/usr/local/bin/sfcgal-config <span class="o">&amp;&amp;</span> <span class="se">\</span>
+make <span class="o">&amp;&amp;</span> make cheatsheets <span class="o">&amp;&amp;</span> sudo make install <span class="c1"># deliberately one CPU only</span>
+
+sudo -u postgres psql
+sudo -u postgres createdb spatial_template
+sudo -u postgres psql -d spatial_template -c <span class="s2">&quot;CREATE EXTENSION postgis;&quot;</span>
+sudo -u postgres psql -d spatial_template -c <span class="s2">&quot;CREATE EXTENSION postgis_topology;&quot;</span>
+sudo -u postgres psql -d spatial_template -c <span class="s2">&quot;CREATE EXTENSION postgis_sfcgal;&quot;</span>
+sudo -u postgres psql -d spatial_template -c <span class="s2">&quot;SELECT postgis_full_version();&quot;</span>
+</pre></div>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2015/color-relief-shaded-map-using-open-data-with-open-source-software/" rel="bookmark" title="Permalink to Color Relief Shaded Map Using Open Data with Open Source Software">Color Relief Shaded Map Using Open Data with Open Source&nbsp;Software</a></h1>
     <aside><span>Oct 25, 2015</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>    </span>
@@ -409,48 +514,6 @@ gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span c
 <h2>Conclusion</h2>
 <p>I created pretty efficient semi-automated workflow using several open source technologies that saves me a lot of work. Although <span class="caps">QGIS</span> has some minor pet peeves (scale with decimal places, not showing the entire feature, not substituting variables at times), it definitely makes boring map creation quite amusing. The more I work with big data / on big tasks, the more I find Linux a&nbsp;must-have.</p>
 <p>The whole process was done with <span class="caps">QGIS</span> 2.10, PostGIS 2.1, PostgreSQL 9.3, Python 2.7, ImageMagick&nbsp;6.7.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2015/clip-raster-with-vector-using-gdal/" rel="bookmark" title="Permalink to Clip Raster With Vector Using GDAL">Clip Raster With Vector Using <span class="caps">GDAL</span></a></h1>
-    <aside><span>Jul 21, 2015</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
-    </aside>
-    <p>Recently I needed to clip several raster files with polygonal layer of municipalities. A solution to this task is pretty straightforward using <a href="http://gdal.org/"><span class="caps">GDAL</span></a> and a bit of Bash and <span class="caps">QGIS</span> thrown&nbsp;in.</p>
-<p>The necessary steps&nbsp;are:</p>
-<ol>
-<li>Put each polygon to a separate file. This can be done easily with <code>Vector - Data Management Tools - Split Vector Layer</code> in <span class="caps">QGIS</span>. The solution below assumes that each shapefile has the same basename as the raster&nbsp;file.</li>
-<li>These polygons are stored in the <code>obce</code> subfolder relative to the folder with&nbsp;rasters.</li>
-<li>An <code>output</code> folder exists that is used for&#8230; output,&nbsp;yes.</li>
-<li>Rasters are saved with output alpha band for nodata (<code>-dstalpha</code> flag).</li>
-<li>The script takes one argument - raster&nbsp;name.</li>
-<li>Profit!</li>
-</ol>
-<div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env bash</span>
-
-<span class="nv">OBEC</span><span class="o">=</span><span class="nv">$1</span>
-<span class="nv">BASE</span><span class="o">=</span><span class="k">$(</span>basename <span class="nv">$OBEC</span> _jpeg.tif<span class="k">)</span>
-<span class="nb">echo</span> <span class="nv">$BASE</span>
-<span class="nv">EXTENT</span><span class="o">=</span><span class="k">$(</span>ogrinfo -so obce/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.shp <span class="nv">$BASE</span> <span class="p">|</span> grep Extent <span class="se">\</span>
-<span class="p">|</span> sed <span class="s1">&#39;s/Extent: //g&#39;</span> <span class="p">|</span> sed <span class="s1">&#39;s/(//g&#39;</span> <span class="p">|</span> sed <span class="s1">&#39;s/)//g&#39;</span> <span class="se">\</span>
-<span class="p">|</span> sed <span class="s1">&#39;s/ - /, /g&#39;</span><span class="k">)</span>
-<span class="nv">EXTENT</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span> <span class="nv">$EXTENT</span> <span class="p">|</span> awk -F <span class="s1">&#39;,&#39;</span> <span class="s1">&#39;{print $1 &quot; &quot; $4 &quot; &quot; $3 &quot; &quot; $2}&#39;</span><span class="k">)</span>
-gdal_translate -projwin <span class="nv">$EXTENT</span> -of GTiff <span class="nv">$OBEC</span> output/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.tif
-gdalwarp -dstalpha -s_srs <span class="s1">&#39;EPSG:5514&#39;</span> -t_srs <span class="s1">&#39;EPSG:5514&#39;</span> <span class="se">\</span>
-    -co <span class="nv">COMPRESS</span><span class="o">=</span>JPEG <span class="se">\</span>
-    -co <span class="nv">TILED</span><span class="o">=</span>YES -<span class="se">\</span>
-    of GTiff <span class="se">\</span>
-    -cutline obce/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.shp <span class="se">\</span>
-    output/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.tif output/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.final.tif
-</pre></div>
-
-
-<p>Note that if <code>gdalwarp</code> doesn&#8217;t recognize an <span class="caps">EPSG</span> code (which is the case for my country national grid), you might pass it as a <span class="caps">PROJ</span>.4&nbsp;string.</p>
-<p>According to the point 5 in the above list, the script needs to be run in a&nbsp;loop:</p>
-<div class="highlight"><pre><span></span><span class="k">for</span> f in *_jpeg.tif<span class="p">;</span>
-    <span class="k">do</span> the_script_above.sh <span class="nv">$f</span>
-<span class="p">;</span><span class="k">done</span>
-</pre></div>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/author/michal-zimmermann8.html">&laquo; Previous page</a>

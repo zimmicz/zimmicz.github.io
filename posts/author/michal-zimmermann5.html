@@ -24,6 +24,52 @@
 <h2>Articles by Michal Zimmermann</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/" rel="bookmark" title="Permalink to Plotting the Czech Cadastre Land Use with d3: Data Load (part III)">Plotting the Czech Cadastre Land Use with d3: Data Load (part <span class="caps">III</span>)</a></h1>
+    <aside><span>Nov 15, 2016</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/d3.html">d3</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/data.html">data</a></span>
+    </aside>
+    <p>This post is the third part of the series summarizing the process of visualizing landuse data with bash, PostgreSQL and d3.js. Read other&nbsp;parts:</p>
+<ol>
+<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part&nbsp;I)</a></li>
+<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></li>
+<li>you&#8217;re reading it&nbsp;now</li>
+</ol>
+<h2><span class="caps">ETL</span>&nbsp;process</h2>
+<p>Before the d3 viz can be crafted, it&#8217;s necessary&nbsp;to:</p>
+<ol>
+<li>extract <span class="caps">CSV</span> data from the URLs provided via the Atom&nbsp;feed</li>
+<li>transform those data into a relational database, do some&nbsp;math</li>
+<li>load data into a d3.js&nbsp;viz</li>
+<li>profit (as&nbsp;usual)</li>
+</ol>
+<h3>Extract</h3>
+<p>See <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)</a>.</p>
+<h3>Transform</h3>
+<p>See <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a>.</p>
+<h2>Load</h2>
+<p>Thanks to the way I transformed the data, the whole load is done with&nbsp;simple</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+touch ./data/data.js
+<span class="nb">echo</span> <span class="s2">&quot;let data =&quot;</span> &gt; ./data/data.js
+
+<span class="o">(</span>
+cat <span class="s">&lt;&lt; EOF | psql -qAt --no-psqlrc</span>
+<span class="s">    SELECT</span>
+<span class="s">    array_to_json(array_agg(row_to_json(r)))</span>
+<span class="s">    FROM (</span>
+<span class="s">    SELECT *</span>
+<span class="s">    FROM data</span>
+<span class="s">    ) r</span>
+<span class="s">EOF</span>
+<span class="o">)</span> &gt;&gt; ./data/data.js
+</pre></div>
+
+
+<p>That&#8217;s the whole <span class="caps">ETL</span> process! Next time, I&#8217;ll cover the d3.js&nbsp;viz.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii" rel="bookmark" title="Permalink to Plotting the Czech Cadastre Land Use with d3: Data Transformation (part II)">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></h1>
     <aside><span>Nov 14, 2016</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/d3.html">d3</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>    </span>
@@ -308,41 +354,6 @@ rm <span class="nv">$CSVFILE</span> <span class="nv">$CSVUTF8FILE</span>
 
 
 <p>Once you have an input array, that&#8217;s pretty much it. Love&nbsp;JavaScript.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2016/ogrinfo-output-formatting/" rel="bookmark" title="Permalink to Ogrinfo Output Formatting">Ogrinfo Output&nbsp;Formatting</a></h1>
-    <aside><span>Oct 21, 2016</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
-    </aside>
-    <p>Today my workmate asked if there was a way to see an attribute table other than importing spatial data into a PostGIS database. I told him about <span class="caps">QGIS</span> and while talking about other <span class="caps">GIS</span> stuff, I started thinking about <em>pipes</em> and how awesome it would be to actually format the output of the <code>ogrinfo</code> command.</p>
-<p>Here it is. It is just a much longer way to do <code>ogr2ogr -f "CSV" dest source</code>, but sometimes you just have to experiment a&nbsp;bit.</p>
-<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
-<span class="nv">FILE</span><span class="o">=</span><span class="nv">$1</span>
-
-<span class="k">function</span> columns <span class="o">{</span>
-    ogrinfo <span class="nv">$FILE</span> -al -so <span class="p">|</span> <span class="se">\</span>
-    sed <span class="s1">&#39;/Column/,$!d&#39;</span> <span class="p">|</span> <span class="se">\</span>
-    sed <span class="s1">&#39;/Geometry Column/d&#39;</span> <span class="p">|</span> <span class="se">\</span>
-    sed -e <span class="s1">&#39;s/Column =/\:/g&#39;</span> <span class="p">|</span> <span class="se">\</span>
-    awk -F: <span class="s1">&#39;{print $1}&#39;</span> <span class="p">|</span> <span class="se">\</span>
-    awk -v <span class="nv">RS</span><span class="o">=</span> -v <span class="nv">OFS</span><span class="o">=</span><span class="s2">&quot;|&quot;</span> <span class="s1">&#39;{$1 = $1} 1&#39;</span>
-<span class="o">}</span>
-
-<span class="k">function</span> data <span class="o">{</span>
-   ogrinfo <span class="nv">$FILE</span> -al <span class="p">|</span> <span class="se">\</span>
-   sed <span class="s1">&#39;/OGRFeature/,$!d&#39;</span> <span class="p">|</span> <span class="se">\</span>
-   sed <span class="s1">&#39;/POLYGON\|LINESTRING\|POINT/ d&#39;</span> <span class="p">|</span> <span class="se">\</span>
-   sed -e <span class="s1">&#39;s/OGRFeature\(.*\)\://g&#39;</span> <span class="p">|</span> <span class="se">\</span>
-   sed -e <span class="s1">&#39;s/.*\s*\(.*\)\s*=\s*//g&#39;</span> <span class="p">|</span> <span class="se">\</span>
-   awk -v <span class="nv">RS</span><span class="o">=</span> -v <span class="nv">OFS</span><span class="o">=</span><span class="s2">&quot;|&quot;</span> <span class="s1">&#39;{$1 = $1} 1&#39;</span>
-<span class="o">}</span>
-
-<span class="o">{</span> columns<span class="p">;</span> data<span class="p">;</span> <span class="o">}</span>
-</pre></div>
-
-
-<p>The result can be piped to other <code>bash</code> functions, such as <code>less</code> or <code>more</code>. I call it <code>ogrinfotable</code>.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/author/michal-zimmermann4.html">&laquo; Previous page</a>

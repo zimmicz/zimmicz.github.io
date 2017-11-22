@@ -24,6 +24,65 @@
 <h2 class="text-center">Articles tagged with python tag</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-attributetransfer-plugin/" rel="bookmark" title="Permalink to QGIS Plugin Development: AttributeTransfer Plugin"><span class="caps">QGIS</span> Plugin Development: AttributeTransfer&nbsp;Plugin</a></h1>
+    <aside><span>Nov 23, 2017</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">QGIS</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/qgis.html">QGIS</a></span>
+    </aside>
+    <p>This part finally brings <a href="https://github.com/zimmicz/qgis-attribute-transfer-plugin">the whole source code of the <span class="caps">QGIS</span> AttributeTransfer plugin</a>.</p>
+<div class="text-center"><img data-echo="/posts/assets/qgis-plugin-development-attribute-transfer-plugin/qgis.gif"/></div>
+
+<p>The plugin itself resides in the <a href="https://github.com/zimmicz/qgis-attribute-transfer-plugin/blob/master/attribute_transfer.py"><code>attribute_transfer.py</code></a> file. When <code>run()</code> method is invoked, the <span class="caps">QT</span> form pops up with combos prefilled with available vector layers that support attribute&nbsp;editing.</p>
+<p>Source and target layer combos are mutually exclusive, thus it&#8217;s not possible to transfer the attribute within the same&nbsp;layer.</p>
+<p>Coding the plugin, I came across minor issues related mainly to the <code>QgsSpatialIndex</code> implementation. In <a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/">the nearest neighbor analysis part</a> of the series, the <code>QgsSpatialIndex.nearestNeighbor</code> method was mentioned. Yet, as I found out, this method only works with <code>QgsPoint</code> geometries. Those are impossible to get from <code>QgsPolygon</code> or <code>QgsPolyline</code>, though. What can one possibly do, facing such a misfortune? Well&hellip; draw a solution&nbsp;matrix.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>point</th>
+<th>line</th>
+<th>polygon</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>point</strong></td>
+<td>QgsSpatialIndex.nearestNeighbor</td>
+<td>QgsSpatialIndex.nearestNeighbor; layers have to be switched, e.g. source layer = line</td>
+<td>QgsSpatialIndex.nearestNeighbor; layers have to be switched, e.g. source layer = polygon</td>
+</tr>
+<tr>
+<td><strong>line</strong></td>
+<td>QgsSpatialIndex.nearestNeighbor</td>
+<td>QgsSpatialIndex.intersects with QgsGeometry.distance</td>
+<td>QgsSpatialIndex.intersects with QgsGeometry.distance</td>
+</tr>
+<tr>
+<td><strong>polygon</strong></td>
+<td>QgsSpatialIndex.nearestNeighbor</td>
+<td>QgsSpatialIndex.intersects with QgsGeometry.distance</td>
+<td>QgsSpatialIndex.intersects with QgsGeometry.distance</td>
+</tr>
+</tbody>
+</table>
+<p>Using the spatial index brings one more issue I&#8217;ve come to realize just after implementing the special comparison workflows for different geometry types. There&#8217;s a chance of finding the nearest feature using the bounding box that&#8217;s actually not the nearest feature. Take a close look at lines number four and seven in the picture below. The first surely is the closest to the polygon on its ride side, yet the polygon is wrongly paired with the line number&nbsp;seven.</p>
+<div class="text-center"><img data-echo="/posts/assets/qgis-plugin-development-attribute-transfer-plugin/qgis.png"/></div>
+
+<p>I think the following set of steps will help to overcome this&nbsp;issue:</p>
+<ul>
+    <li>try using `QgsSpatialIndex.intersects` to find any&nbsp;intersection</li>
+    <li>if the intersection is found, get the distance between the target feature and the most distant source&nbsp;vertex</li>
+    <li>
+        <ul>
+            <li>use this distance to construct the new bounding box to test whether there are any closer&nbsp;features</li>
+        </ul>
+    </li>
+    <li>if none is found, grow the target feature bounding box step by step until the intersection is finally&nbsp;found</li>
+</ul>
+
+<p>This part is yet to be&nbsp;implemented.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-creating-gui-with-qt-designer/" rel="bookmark" title="Permalink to QGIS Plugin Development: Creating GUI with Qt Designer"><span class="caps">QGIS</span> Plugin Development: Creating <span class="caps">GUI</span> with Qt&nbsp;Designer</a></h1>
     <aside><span>Nov 16, 2017</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">QGIS</a>    </span>
@@ -268,139 +327,6 @@
 
 
 <p>That was a very brief introduction to <span class="caps">QGIS</span> <span class="caps">API</span>, the next part will walk you through the console more&nbsp;thoroughly.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2017/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/" rel="bookmark" title="Permalink to Serving Mapbox Vector Tiles with PostGIS, Nginx and Python Backend">Serving Mapbox Vector Tiles with PostGIS, Nginx and Python&nbsp;Backend</a></h1>
-    <aside><span>Oct 23, 2017</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p><a href="({filename}../2017/postgis-as-a-mapbox-vector-tiles-generator.md)">Since version 2.4.0, PostGIS can serve <span class="caps">MVT</span></a> data directly. <span class="caps">MVT</span> returning queries put heavy workload on the database though. On top of that, each of the query has to be run again every time a client demands the data. This leaves us with plenty of room to optimize the&nbsp;process.</p>
-<div class="text-center"><img data-echo="/posts/assets/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/election.gif"/></div>
-
-<p>During the last week, while working on the Czech legislative election data visualization, I&#8217;ve struggled with the server becoming unresponsive far too often due to the issues mentioned&nbsp;above.</p>
-<div class="text-center"><img data-echo="/posts/assets/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/schema.png"/></div>
-
-<p>According to the schema, the first client to come to the&nbsp;server:</p>
-<ul>
-<li>goes through filesystem unstopped, because there are no cached files&nbsp;yet,</li>
-<li>continues to the Flask backend and asks for a file at <code>{z}/{x}/{y}</code>,</li>
-<li>Flask backend asks the database to return the <span class="caps">MVT</span> for the given&nbsp;tile,</li>
-<li>Flask backend writes the response to the filesystem and sends it to the&nbsp;client.</li>
-</ul>
-<p>Other clients get tiles directly from the filesystem, leaving the database at&nbsp;ease.</p>
-<h2>Nginx</h2>
-<p>Nginx is fairly simple to set up, once you know what you&#8217;re doing. The <code>/volby-2017/municipality/</code> location serves static <span class="caps">MVT</span> from the given alias directory. If not found, the request is passed to <code>@postgis</code> location, that asks the Flask backend for the&nbsp;response.</p>
-<div class="highlight"><pre><span></span>server election <span class="o">{</span>
-    location /volby-2017/municipality <span class="o">{</span>
-            <span class="nb">alias</span> /opt/volby-cz-2017/server/cache/<span class="p">;</span>
-            try_files <span class="nv">$uri</span> @postgis<span class="p">;</span>
-    <span class="o">}</span>
-
-    location @postgis <span class="o">{</span>
-            include uwsgi_params<span class="p">;</span>
-            uwsgi_pass <span class="m">127</span>.0.0.1:5000<span class="p">;</span>
-    <span class="o">}</span>
-<span class="o">}</span>
-</pre></div>
-
-
-<h2>Flask&nbsp;backend</h2>
-<script src="https://gist.github.com/zimmicz/46485676e1cf3d6566f0aaa7f93f055b.js"></script>
-
-<h2>Generating static <span class="caps">MVT</span> in&nbsp;advance</h2>
-<p>If you&#8217;re going to serve static tiles that don&#8217;t change often, it might be a good idea to use PostGIS to create files in advance and serve them with&nbsp;Nginx.</p>
-<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">tiles</span> <span class="p">(</span>
-    <span class="n">x</span> <span class="nb">integer</span><span class="p">,</span>
-    <span class="n">y</span> <span class="nb">integer</span><span class="p">,</span>
-    <span class="n">z</span> <span class="nb">integer</span><span class="p">,</span>
-    <span class="n">west</span> <span class="nb">numeric</span><span class="p">,</span>
-    <span class="n">south</span> <span class="nb">numeric</span><span class="p">,</span>
-    <span class="n">east</span> <span class="nb">numeric</span><span class="p">,</span>
-    <span class="n">north</span> <span class="nb">numeric</span><span class="p">,</span>
-    <span class="n">geom</span> <span class="n">geometry</span><span class="p">(</span><span class="n">POLYGON</span><span class="p">,</span> <span class="mi">3857</span><span class="p">)</span>
-<span class="p">);</span>
-</pre></div>
-
-
-<p>Using <a href="https://github.com/mapbox/mercantile">mercantile</a>, you can create the <code>tiles</code> table holding the bounding boxes of the tiles you need. PostGIS them inserts the actual <span class="caps">MVT</span> into the <code>mvt</code> table.</p>
-<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">TEMPORARY</span> <span class="k">TABLE</span> <span class="n">tmp_tiles</span> <span class="k">AS</span>
-    <span class="k">SELECT</span>
-        <span class="n">muni</span><span class="p">.</span><span class="n">muni_id</span><span class="p">,</span>
-        <span class="n">prc</span><span class="p">.</span><span class="k">data</span><span class="p">,</span>
-        <span class="n">ST_AsMVTGeom</span><span class="p">(</span>
-            <span class="n">muni</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span>
-            <span class="n">TileBBox</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">x</span> <span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="mi">3857</span><span class="p">),</span>
-            <span class="mi">4096</span><span class="p">,</span>
-            <span class="mi">0</span><span class="p">,</span>
-            <span class="k">false</span>
-        <span class="p">)</span> <span class="n">geom</span><span class="p">,</span>
-        <span class="n">x</span><span class="p">,</span>
-        <span class="n">y</span><span class="p">,</span>
-        <span class="n">z</span>
-    <span class="k">FROM</span> <span class="n">muni</span>
-    <span class="k">JOIN</span> <span class="p">(</span>
-        <span class="k">SELECT</span>
-            <span class="n">x</span><span class="p">,</span>
-            <span class="n">y</span><span class="p">,</span>
-            <span class="n">z</span><span class="p">,</span>
-            <span class="n">geom</span>
-        <span class="k">FROM</span> <span class="n">tiles</span>
-    <span class="p">)</span> <span class="n">bbox</span> <span class="k">ON</span> <span class="p">(</span><span class="n">ST_Intersects</span><span class="p">(</span><span class="n">muni</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">bbox</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span>
-    <span class="k">JOIN</span> <span class="n">party_results_cur</span> <span class="n">prc</span> <span class="k">ON</span> <span class="p">(</span><span class="n">muni</span><span class="p">.</span><span class="n">muni_id</span> <span class="o">=</span> <span class="n">prc</span><span class="p">.</span><span class="n">muni_id</span><span class="p">);</span>
-<span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">mvt</span> <span class="p">(</span><span class="n">mvt</span> <span class="n">bytea</span><span class="p">,</span> <span class="n">x</span> <span class="nb">integer</span><span class="p">,</span> <span class="n">y</span> <span class="nb">integer</span><span class="p">,</span> <span class="n">z</span> <span class="nb">integer</span><span class="p">);</span>
-<span class="k">DO</span>
-<span class="err">$$</span>
-<span class="k">DECLARE</span> <span class="n">r</span> <span class="n">record</span><span class="p">;</span>
-<span class="k">BEGIN</span>
-<span class="k">FOR</span> <span class="n">r</span> <span class="k">in</span> <span class="k">SELECT</span> <span class="k">DISTINCT</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="k">FROM</span> <span class="n">tmp_tiles</span> <span class="n">LOOP</span>
-    <span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">mvt</span>
-    <span class="k">SELECT</span> <span class="n">ST_AsMVT</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="s1">&#39;municipality&#39;</span><span class="p">,</span> <span class="mi">4096</span><span class="p">,</span> <span class="s1">&#39;geom&#39;</span><span class="p">),</span> <span class="n">r</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">r</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="n">r</span><span class="p">.</span><span class="n">z</span>
-    <span class="k">FROM</span> <span class="p">(</span>
-        <span class="k">SELECT</span>
-            <span class="n">muni_id</span><span class="p">,</span>
-            <span class="k">data</span><span class="p">,</span>
-            <span class="n">geom</span>
-        <span class="k">FROM</span> <span class="n">tmp_tiles</span>
-        <span class="k">WHERE</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">r</span><span class="p">)</span>
-    <span class="p">)</span> <span class="n">q</span><span class="p">;</span>
-    <span class="n">RAISE</span> <span class="n">INFO</span> <span class="s1">&#39;%&#39;</span><span class="p">,</span> <span class="n">r</span><span class="p">;</span>
-<span class="k">END</span> <span class="n">LOOP</span><span class="p">;</span>
-<span class="k">END</span><span class="p">;</span>
-<span class="err">$$</span><span class="p">;</span>
-</pre></div>
-
-
-<p>Once filled, the table rows can be written to the filesystem with the simple piece of Python&nbsp;code.</p>
-<div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
-
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">create_engine</span><span class="p">,</span> <span class="n">text</span>
-
-<span class="n">CACHE_PATH</span><span class="o">=</span><span class="s2">&quot;cache/&quot;</span>
-
-<span class="n">e</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s1">&#39;postgresql:///&#39;</span><span class="p">)</span>
-<span class="n">conn</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
-<span class="n">sql</span><span class="o">=</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;SELECT mvt, x, y, z FROM mvt&quot;</span><span class="p">)</span>
-<span class="n">query</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
-
-<span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
-    <span class="n">cachefile</span> <span class="o">=</span> <span class="s2">&quot;{}/{}/{}/{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">CACHE_PATH</span><span class="p">,</span> <span class="n">d</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
-    <span class="k">print</span><span class="p">(</span><span class="n">cachefile</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s2">&quot;{}/{}/{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">CACHE_PATH</span><span class="p">,</span> <span class="n">d</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">])):</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s2">&quot;{}/{}/{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">CACHE_PATH</span><span class="p">,</span> <span class="n">d</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cachefile</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
-</pre></div>
-
-
-<h2>Conclusion</h2>
-<p>PostGIS is a brilliant tool for generating Mapbox vector tiles. Combined with Python powered static file generator and Nginx, it seems to become the only tool needed to get you&nbsp;going.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/tag/python2.html">Next page &raquo;</a>
