@@ -64,22 +64,11 @@
 </tr>
 </tbody>
 </table>
-<p>Using the spatial index brings one more issue I&#8217;ve come to realize just after implementing the special comparison workflows for different geometry types. There&#8217;s a chance of finding the nearest feature using the bounding box that&#8217;s actually not the nearest feature. Take a close look at lines number four and seven in the picture below. The first surely is the closest to the polygon on its ride side, yet the polygon is wrongly paired with the line number&nbsp;seven.</p>
+<p>Using the spatial index brings one more issue I&#8217;ve come to realize just after implementing the special comparison workflows for different geometry types. There&#8217;s a chance of finding the nearest feature using the bounding box that&#8217;s actually <em>not</em> the nearest feature. In that case, I chose to find the most distant vertex of such a feature and use it to construct the rectangle around the target feature. If there are any source features in such a rectangle, it&#8217;s very likely one of them is the <em>real</em> nearest&nbsp;feature.</p>
 <div class="text-center"><img data-echo="/posts/assets/qgis-plugin-development-attribute-transfer-plugin/qgis.png"/></div>
 
-<p>I think the following set of steps will help to overcome this&nbsp;issue:</p>
-<ul>
-    <li>try using `QgsSpatialIndex.intersects` to find any&nbsp;intersection</li>
-    <li>if the intersection is found, get the distance between the target feature and the most distant source&nbsp;vertex</li>
-    <li>
-        <ul>
-            <li>use this distance to construct the new bounding box to test whether there are any closer&nbsp;features</li>
-        </ul>
-    </li>
-    <li>if none is found, grow the target feature bounding box step by step until the intersection is finally&nbsp;found</li>
-</ul>
-
-<p>This part is yet to be&nbsp;implemented.</p>
+<p>Right now, I&#8217;m working on <a href="https://github.com/zimmicz/qgis-attribute-transfer-plugin/issues/3">finding the nearest feature even if no bounding box intersection is found</a>. Meanwhile, <a href="https://github.com/zimmicz/qgis-attribute-transfer-plugin/issues/2">the plugin is being reviewed</a> to be featured in <a href="https://plugins.qgis.org"><span class="caps">QGIS</span> Plugins repository</a>. Fingers&nbsp;crossed.</p>
+<p>I thought this was going to be the last part of the series. But how could one possibly claim the coding project done without writing <em>tests</em>? Stay tuned for the next&nbsp;episode.</p>
 </article>
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-creating-gui-with-qt-designer/" rel="bookmark" title="Permalink to QGIS Plugin Development: Creating GUI with Qt Designer"><span class="caps">QGIS</span> Plugin Development: Creating <span class="caps">GUI</span> with Qt&nbsp;Designer</a></h1>
