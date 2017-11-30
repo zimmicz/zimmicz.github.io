@@ -23,6 +23,57 @@
     <main>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2016/plotting-the-czech-cadastre-land-use-with-d3-data-viz-part-iv/" rel="bookmark" title="Permalink to Plotting the Czech Cadastre Land Use with d3: Data Viz (part IV)">Plotting the Czech Cadastre Land Use with d3: Data Viz (part <span class="caps">IV</span>)</a></h1>
+    <aside><span>Nov 20, 2016</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/d3.html">d3</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/data.html">data</a></span>
+    </aside>
+    <p>This post is the fourth part of the series summarizing the process of visualizing land use data with bash, PostgreSQL and d3.js. Read other&nbsp;parts:</p>
+<ol>
+<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part&nbsp;I)</a></li>
+<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></li>
+<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/">Plotting the Czech Cadastre Land Use with d3: Data Load (part <span class="caps">III</span>)</a></li>
+</ol>
+<h2>Data&nbsp;vizualization</h2>
+<p>Those of you who&#8217;ve been following this series know all the data are set and ready to be used. The rest of you, <em>shame on you by the way</em>, can go through the above posts to catch&nbsp;up.</p>
+<p>The result is available at <a href="https://www.zimmi.cz/kn-landuse-monitor">https://www.zimmi.cz/kn-landuse-monitor</a> and works like the gif&nbsp;below.</p>
+<div class="text-center"><img data-echo="/posts/assets/plotting-the-czech-cadastre-land-use-with-d3-part-iv/screen.gif" /></div>
+
+<h3>Features</h3>
+<ul>
+<li>land use data for 13,093 cadastral areas between 2015/01/01 and&nbsp;2016/10/01</li>
+<li>relative area and parcel count per land use&nbsp;type</li>
+<li>similar cadastres based on land use relative area&nbsp;values</li>
+<li>time series plots for various charachteristics (including agricultural land area and parcel&nbsp;count)</li>
+</ul>
+<h3>Todos</h3>
+<ul>
+<li>time series chart titles&nbsp;onmouseover</li>
+<li>barchart titles&nbsp;onmouseover</li>
+<li>absolute values chart&nbsp;(?)</li>
+<li><code>fetch API</code> polyfill</li>
+<li>Firefox seems to be&nbsp;broken</li>
+</ul>
+<h3>Technologies</h3>
+<p>I implemented <a href="https://github.com/zimmicz/kn-landuse-monitor/tree/f0af50d44d6aac11adb6cdb0c7c67a97d7db1df3">the whole app with vanilla JavaScript</a>. The app resided in the <code>Monitor</code> variable, had several modules that were communicating via custom events with each&nbsp;other.</p>
+<p>So far, so good. Once the app was production-ready, I stumbled upon <a href="https://vuejs.org">vue.js</a>, which is by miles the best JavaScript framework experience I&#8217;ve had so far. Reinventing the app once again was the matter of two days (thanks to <a href="https://github.com/vuejs-templates/webpack">this amazing setup</a> - hot reload&nbsp;included).</p>
+<p>Thus, the current version of the app is based&nbsp;on:</p>
+<h4>vue.js</h4>
+<p>Thanks to the easy-to-understand system of components, properties and methods, learning curve is really steep. The app is now divided into several components (Search, Dashboard with child components for charts and similar cadastres&nbsp;list).</p>
+<h4>vuex</h4>
+<p><a href="https://vuex.vuejs.org/en/">Vuex</a>, probably inspired by Flux or Redux, is the <em>&#8220;state management pattern + library&#8221;</em>, the single source of truth for your apps. That&#8217;s pretty much it: there&#8217;s only one place in your app (called the <code>store</code>), where you go to put or get your data. Not necessarily every single piece of data, just those pieces used across several components. It plays really nice with the&nbsp;vue.js.</p>
+<h4>D3.js</h4>
+<p>Tried it before, <a href="https://d3js.org">D3.js</a> was really hard to grasp. And it still is, I guess. At the same time, it&#8217;s damn good at plotting the data. Yet, being a bit less low-level would be&nbsp;great.</p>
+<h4>Dexie</h4>
+<p>I hate writing servers for my pet projects. The server means no Github Pages. Thus, I decided to load the whole dataset with <code>fetch API</code>  from the external <span class="caps">JSON</span> file. Loading the 13K objects &times; 30 properties &times; array with 8 items in each didn&#8217;t seem like the best idea ever, so&hellip; Here comes <a href="http://dexie.org">Dexie</a>, a <code>IndexedDB API</code> wrapper that makes it easy on you (unlike the <code>IndexedDB API</code> itself, which doesn&#8217;t even let you find out whether the database you&#8217;re creating already exists.&nbsp;Seriously?).</p>
+<p>Dexie loads the initial dataset into the IndexedDB storage and reads it every time user comes back without loading the <span class="caps">JSON</span> file again. On data change, the fresh file will be loaded, the database flushed and the new data written. <a href="https://github.com/zimmicz/kn-landuse-monitor/blob/master/src/stores/actions.js">Behold</a>; I hate the way it&#8217;s&nbsp;written.</p>
+<h4>Flex</h4>
+<p>Used <code>flex</code> for the first time, I&#8217;m not sure I understand how it actually works though. <span class="caps">CSS</span> feels more complicated every time I need&nbsp;it.</p>
+<p><small>Bottom line: I use localStorage to keep track of the database existence.</small></p>
+<h3>Resume</h3>
+<p>Two pet projects completed in one month definitely means the winter is here! Looking forward to using more&nbsp;vue.js.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/" rel="bookmark" title="Permalink to Plotting the Czech Cadastre Land Use with d3: Data Load (part III)">Plotting the Czech Cadastre Land Use with d3: Data Load (part <span class="caps">III</span>)</a></h1>
     <aside><span>Nov 15, 2016</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/d3.html">d3</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>    </span>
@@ -334,25 +385,6 @@ rm <span class="nv">$CSVFILE</span> <span class="nv">$CSVUTF8FILE</span>
 <li>the other one lets you type name highlighted feature (much&nbsp;tougher)</li>
 </ul>
 <p>Have&nbsp;fun!</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2016/degrees-to-decimal-with-javascript-reworked/" rel="bookmark" title="Permalink to Degrees To Decimal With Javascript Reworked">Degrees To Decimal With Javascript&nbsp;Reworked</a></h1>
-    <aside><span>Oct 28, 2016</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
-    </aside>
-    <p>Two years ago I was pretty happy with <a href="https://www.zimmi.cz/posts/2014/degrees-to-decimal-with-javascript/">this little piece of code to transform degrees to the decimal value</a>. Yesterday, I found a neater way to do the&nbsp;same:</p>
-<div class="highlight"><pre><span></span><span class="kd">let</span> <span class="nx">deg</span> <span class="o">=</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">0</span><span class="p">];</span>
-
-<span class="kd">function</span> <span class="nx">degToDec</span><span class="p">(</span><span class="nx">prev</span><span class="p">,</span> <span class="nx">cur</span><span class="p">,</span> <span class="nx">curIndex</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">prev</span> <span class="o">+</span> <span class="nx">cur</span> <span class="o">/</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="nx">curIndex</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="nx">deg</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">degToDec</span><span class="p">);</span>
-</pre></div>
-
-
-<p>Once you have an input array, that&#8217;s pretty much it. Love&nbsp;JavaScript.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/index4.html">&laquo; Previous page</a>

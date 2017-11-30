@@ -24,6 +24,25 @@
 <h2>Articles by Michal Zimmermann</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2016/degrees-to-decimal-with-javascript-reworked/" rel="bookmark" title="Permalink to Degrees To Decimal With Javascript Reworked">Degrees To Decimal With Javascript&nbsp;Reworked</a></h1>
+    <aside><span>Oct 28, 2016</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+    </aside>
+    <p>Two years ago I was pretty happy with <a href="https://www.zimmi.cz/posts/2014/degrees-to-decimal-with-javascript/">this little piece of code to transform degrees to the decimal value</a>. Yesterday, I found a neater way to do the&nbsp;same:</p>
+<div class="highlight"><pre><span></span><span class="kd">let</span> <span class="nx">deg</span> <span class="o">=</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">0</span><span class="p">];</span>
+
+<span class="kd">function</span> <span class="nx">degToDec</span><span class="p">(</span><span class="nx">prev</span><span class="p">,</span> <span class="nx">cur</span><span class="p">,</span> <span class="nx">curIndex</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">prev</span> <span class="o">+</span> <span class="nx">cur</span> <span class="o">/</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="nx">curIndex</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">deg</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">degToDec</span><span class="p">);</span>
+</pre></div>
+
+
+<p>Once you have an input array, that&#8217;s pretty much it. Love&nbsp;JavaScript.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2016/ogrinfo-output-formatting/" rel="bookmark" title="Permalink to Ogrinfo Output Formatting">Ogrinfo Output&nbsp;Formatting</a></h1>
     <aside><span>Oct 21, 2016</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
@@ -228,86 +247,6 @@
 
 
 <p>In my case, centerlines of layer B were also included and their length inside each intersection was used to divide the area of the smallest part with. It was fun,&nbsp;actually.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2016/dead-simple-random-points-in-polygons-with-postgis/" rel="bookmark" title="Permalink to Dead Simple Random Points in Polygons with PostGIS">Dead Simple Random Points in Polygons with&nbsp;PostGIS</a></h1>
-    <aside><span>Aug 3, 2016</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p>Since PostgreSQL 9.3 there has been a handy little keyword called <code>LATERAL</code>, which - combined with <code>JOIN</code> - might rock your <span class="caps">GIS</span> world in a second. To keep it simple, a <code>LATERAL JOIN</code> enables a subquery in the <code>FROM</code> part of a query to reference columns from preceding expressions in the <code>FROM</code> list. What the&nbsp;heck?</p>
-<p>Imagine that not so unusual request to <strong>generate random points in polygons</strong> (something I needed to do today). Do it automatically without your favorite piece of desktop <span class="caps">GIS</span>&nbsp;software.</p>
-<p>It is pretty easy using <code>LATERAL JOIN</code>:</p>
-<div class="highlight"><pre><span></span><span class="k">SELECT</span>
-    <span class="n">a</span><span class="p">.</span><span class="n">id</span><span class="p">,</span>
-    <span class="n">b</span><span class="p">.</span><span class="o">*</span>
-<span class="k">FROM</span> <span class="p">(</span>
-    <span class="k">VALUES</span><span class="p">(</span>
-        <span class="mi">1</span><span class="p">,</span>
-        <span class="n">ST_SetSRID</span><span class="p">(</span>
-            <span class="n">ST_GeomFromText</span><span class="p">(</span>
-                <span class="s1">&#39;POLYGON((0 0, -1 0, -1 -1, 0 -1, 0 0))&#39;</span>
-            <span class="p">),</span>
-        <span class="mi">4326</span><span class="p">)</span>
-    <span class="p">)</span>
-    <span class="k">UNION</span> <span class="k">ALL</span>
-    <span class="k">VALUES</span><span class="p">(</span>
-        <span class="mi">2</span><span class="p">,</span>
-        <span class="n">ST_SetSRID</span><span class="p">(</span>
-            <span class="n">ST_GeomFromText</span><span class="p">(</span>
-                <span class="s1">&#39;POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))&#39;</span>
-            <span class="p">),</span>
-        <span class="mi">4326</span><span class="p">)</span>
-    <span class="p">)</span>
-<span class="p">)</span> <span class="n">a</span><span class="p">(</span><span class="n">id</span><span class="p">,</span> <span class="n">geom</span><span class="p">)</span>
-<span class="k">CROSS</span> <span class="k">JOIN</span> <span class="k">LATERAL</span> <span class="p">(</span>
-    <span class="k">SELECT</span> <span class="n">ST_SetSRID</span><span class="p">(</span><span class="n">ST_MakePoint</span><span class="p">(</span><span class="n">tmp</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">tmp</span><span class="p">.</span><span class="n">y</span><span class="p">),</span> <span class="mi">4326</span><span class="p">)</span> <span class="n">geom</span>
-    <span class="k">FROM</span> <span class="p">(</span>
-        <span class="k">SELECT</span>
-            <span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">ST_XMax</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="o">-</span> <span class="n">ST_XMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span> <span class="o">+</span> <span class="n">ST_XMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">x</span><span class="p">,</span>
-            <span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">ST_YMax</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="o">-</span> <span class="n">ST_YMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span> <span class="o">+</span> <span class="n">ST_YMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">y</span>
-        <span class="k">FROM</span> <span class="n">generate_series</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">)</span>
-    <span class="p">)</span> <span class="n">tmp</span>
-<span class="p">)</span> <span class="n">b</span><span class="p">;</span>
-</pre></div>
-
-
-<p>What actually happened over there? If you want to put points inside polygons, you need&#8230; polygons. We will do just fine with two of them created inside this&nbsp;query:</p>
-<div class="highlight"><pre><span></span><span class="k">VALUES</span><span class="p">(</span>
-    <span class="mi">1</span><span class="p">,</span>
-    <span class="n">ST_SetSRID</span><span class="p">(</span>
-        <span class="n">ST_GeomFromText</span><span class="p">(</span>
-            <span class="s1">&#39;POLYGON((0 0, -1 0, -1 -1, 0 -1, 0 0))&#39;</span>
-        <span class="p">),</span>
-    <span class="mi">4326</span><span class="p">)</span>
-<span class="p">)</span>
-<span class="k">UNION</span> <span class="k">ALL</span>
-<span class="k">VALUES</span><span class="p">(</span>
-    <span class="mi">2</span><span class="p">,</span>
-    <span class="n">ST_SetSRID</span><span class="p">(</span>
-        <span class="n">ST_GeomFromText</span><span class="p">(</span>
-            <span class="s1">&#39;POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))&#39;</span>
-        <span class="p">),</span>
-    <span class="mi">4326</span><span class="p">)</span>
-<span class="p">)</span>
-</pre></div>
-
-
-<p>All the magic happens inside the <code>LATERAL JOIN</code> part of the&nbsp;query:</p>
-<div class="highlight"><pre><span></span><span class="k">CROSS</span> <span class="k">JOIN</span> <span class="k">LATERAL</span> <span class="p">(</span>
-    <span class="k">SELECT</span> <span class="n">ST_SetSRID</span><span class="p">(</span><span class="n">ST_MakePoint</span><span class="p">(</span><span class="n">tmp</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">tmp</span><span class="p">.</span><span class="n">y</span><span class="p">),</span> <span class="mi">4326</span><span class="p">)</span> <span class="n">geom</span>
-    <span class="k">FROM</span> <span class="p">(</span>
-        <span class="k">SELECT</span>
-            <span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">ST_XMax</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="o">-</span> <span class="n">ST_XMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span> <span class="o">+</span> <span class="n">ST_XMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">x</span><span class="p">,</span>
-            <span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">ST_YMax</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="o">-</span> <span class="n">ST_YMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span> <span class="o">+</span> <span class="n">ST_YMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">y</span>
-        <span class="k">FROM</span> <span class="n">generate_series</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">)</span>
-    <span class="p">)</span> <span class="n">tmp</span>
-<span class="p">)</span> <span class="n">b</span><span class="p">;</span>
-</pre></div>
-
-
-<p>The inner <code>SELECT</code> calculates random points based on the extent of the polygon. Note it directly calls <code>a.geom</code>, a value that comes from the previous <code>SELECT</code>! The <code>LATERAL JOIN</code> part is thus run for every row of the previous <code>SELECT</code> statement inside <code>FROM</code> part of the query. This means it will return 201 points for each of the two polygons (run the query inside <span class="caps">QGIS</span> to see the&nbsp;result).</p>
-<p>Note all the points fall inside the polygons by accident, because they are <strong>square</strong>. Otherwise a <code>ST_Contains</code> or <code>ST_Within</code> should be used inside the outermost <code>WHERE</code> query to filter outliers. This part could use some&nbsp;tweaking.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/author/michal-zimmermann5.html">&laquo; Previous page</a>

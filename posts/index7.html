@@ -23,6 +23,86 @@
     <main>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2016/dead-simple-random-points-in-polygons-with-postgis/" rel="bookmark" title="Permalink to Dead Simple Random Points in Polygons with PostGIS">Dead Simple Random Points in Polygons with&nbsp;PostGIS</a></h1>
+    <aside><span>Aug 3, 2016</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p>Since PostgreSQL 9.3 there has been a handy little keyword called <code>LATERAL</code>, which - combined with <code>JOIN</code> - might rock your <span class="caps">GIS</span> world in a second. To keep it simple, a <code>LATERAL JOIN</code> enables a subquery in the <code>FROM</code> part of a query to reference columns from preceding expressions in the <code>FROM</code> list. What the&nbsp;heck?</p>
+<p>Imagine that not so unusual request to <strong>generate random points in polygons</strong> (something I needed to do today). Do it automatically without your favorite piece of desktop <span class="caps">GIS</span>&nbsp;software.</p>
+<p>It is pretty easy using <code>LATERAL JOIN</code>:</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span>
+    <span class="n">a</span><span class="p">.</span><span class="n">id</span><span class="p">,</span>
+    <span class="n">b</span><span class="p">.</span><span class="o">*</span>
+<span class="k">FROM</span> <span class="p">(</span>
+    <span class="k">VALUES</span><span class="p">(</span>
+        <span class="mi">1</span><span class="p">,</span>
+        <span class="n">ST_SetSRID</span><span class="p">(</span>
+            <span class="n">ST_GeomFromText</span><span class="p">(</span>
+                <span class="s1">&#39;POLYGON((0 0, -1 0, -1 -1, 0 -1, 0 0))&#39;</span>
+            <span class="p">),</span>
+        <span class="mi">4326</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">UNION</span> <span class="k">ALL</span>
+    <span class="k">VALUES</span><span class="p">(</span>
+        <span class="mi">2</span><span class="p">,</span>
+        <span class="n">ST_SetSRID</span><span class="p">(</span>
+            <span class="n">ST_GeomFromText</span><span class="p">(</span>
+                <span class="s1">&#39;POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))&#39;</span>
+            <span class="p">),</span>
+        <span class="mi">4326</span><span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">)</span> <span class="n">a</span><span class="p">(</span><span class="n">id</span><span class="p">,</span> <span class="n">geom</span><span class="p">)</span>
+<span class="k">CROSS</span> <span class="k">JOIN</span> <span class="k">LATERAL</span> <span class="p">(</span>
+    <span class="k">SELECT</span> <span class="n">ST_SetSRID</span><span class="p">(</span><span class="n">ST_MakePoint</span><span class="p">(</span><span class="n">tmp</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">tmp</span><span class="p">.</span><span class="n">y</span><span class="p">),</span> <span class="mi">4326</span><span class="p">)</span> <span class="n">geom</span>
+    <span class="k">FROM</span> <span class="p">(</span>
+        <span class="k">SELECT</span>
+            <span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">ST_XMax</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="o">-</span> <span class="n">ST_XMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span> <span class="o">+</span> <span class="n">ST_XMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">x</span><span class="p">,</span>
+            <span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">ST_YMax</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="o">-</span> <span class="n">ST_YMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span> <span class="o">+</span> <span class="n">ST_YMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">y</span>
+        <span class="k">FROM</span> <span class="n">generate_series</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">)</span>
+    <span class="p">)</span> <span class="n">tmp</span>
+<span class="p">)</span> <span class="n">b</span><span class="p">;</span>
+</pre></div>
+
+
+<p>What actually happened over there? If you want to put points inside polygons, you need&#8230; polygons. We will do just fine with two of them created inside this&nbsp;query:</p>
+<div class="highlight"><pre><span></span><span class="k">VALUES</span><span class="p">(</span>
+    <span class="mi">1</span><span class="p">,</span>
+    <span class="n">ST_SetSRID</span><span class="p">(</span>
+        <span class="n">ST_GeomFromText</span><span class="p">(</span>
+            <span class="s1">&#39;POLYGON((0 0, -1 0, -1 -1, 0 -1, 0 0))&#39;</span>
+        <span class="p">),</span>
+    <span class="mi">4326</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="k">UNION</span> <span class="k">ALL</span>
+<span class="k">VALUES</span><span class="p">(</span>
+    <span class="mi">2</span><span class="p">,</span>
+    <span class="n">ST_SetSRID</span><span class="p">(</span>
+        <span class="n">ST_GeomFromText</span><span class="p">(</span>
+            <span class="s1">&#39;POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))&#39;</span>
+        <span class="p">),</span>
+    <span class="mi">4326</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+
+
+<p>All the magic happens inside the <code>LATERAL JOIN</code> part of the&nbsp;query:</p>
+<div class="highlight"><pre><span></span><span class="k">CROSS</span> <span class="k">JOIN</span> <span class="k">LATERAL</span> <span class="p">(</span>
+    <span class="k">SELECT</span> <span class="n">ST_SetSRID</span><span class="p">(</span><span class="n">ST_MakePoint</span><span class="p">(</span><span class="n">tmp</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">tmp</span><span class="p">.</span><span class="n">y</span><span class="p">),</span> <span class="mi">4326</span><span class="p">)</span> <span class="n">geom</span>
+    <span class="k">FROM</span> <span class="p">(</span>
+        <span class="k">SELECT</span>
+            <span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">ST_XMax</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="o">-</span> <span class="n">ST_XMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span> <span class="o">+</span> <span class="n">ST_XMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">x</span><span class="p">,</span>
+            <span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">ST_YMax</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="o">-</span> <span class="n">ST_YMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span> <span class="o">+</span> <span class="n">ST_YMin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">y</span>
+        <span class="k">FROM</span> <span class="n">generate_series</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">)</span>
+    <span class="p">)</span> <span class="n">tmp</span>
+<span class="p">)</span> <span class="n">b</span><span class="p">;</span>
+</pre></div>
+
+
+<p>The inner <code>SELECT</code> calculates random points based on the extent of the polygon. Note it directly calls <code>a.geom</code>, a value that comes from the previous <code>SELECT</code>! The <code>LATERAL JOIN</code> part is thus run for every row of the previous <code>SELECT</code> statement inside <code>FROM</code> part of the query. This means it will return 201 points for each of the two polygons (run the query inside <span class="caps">QGIS</span> to see the&nbsp;result).</p>
+<p>Note all the points fall inside the polygons by accident, because they are <strong>square</strong>. Otherwise a <code>ST_Contains</code> or <code>ST_Within</code> should be used inside the outermost <code>WHERE</code> query to filter outliers. This part could use some&nbsp;tweaking.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2016/syncing-two-postgresql-databases-faster/" rel="bookmark" title="Permalink to Syncing Two PostgreSQL Databases Faster">Syncing Two PostgreSQL Databases&nbsp;Faster</a></h1>
     <aside><span>Jul 17, 2016</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>    </span>
@@ -282,54 +362,6 @@ node_modules/webpack-dev-server/bin/webpack-dev-server.js --quiet --inline --hot
 
 <p>That&#8217;s it. If I need to build code, I run <code>npm run build</code>, which calls some other tasks from <code>scripts</code> section in the <code>package.json</code>.</p>
 <p>That&#8217;s pretty much it. I don&#8217;t think it&#8217;s a silver bullet, but I feel like I finally found peace of mind for my future JavaScript development. At least for a month or so before some other guy comes to&nbsp;town.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2016/how-to-convert-dgn-to-tiff-with-gdal/" rel="bookmark" title="Permalink to How to convert DGN to Tiff with GDAL">How to convert <span class="caps">DGN</span> to Tiff with <span class="caps">GDAL</span></a></h1>
-    <aside><span>Feb 21, 2016</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
-    </aside>
-    <p>We have to deal with <span class="caps">DGN</span> drawings quite often at <a href="http://www.clevermaps.cz">CleverMaps</a> - heavily used for infrastructure projects (highways, roads, pipelines), they are a pure nightmare to the <span class="caps">GIS</span> person inside me. Right now, I&#8217;m only capable of converting it into a raster file and serve it with Geoserver. The transformation from <span class="caps">DGN</span> to <span class="caps">PDF</span> to <span class="caps">PNG</span> to Tiff is not something that makes me utterly happy&nbsp;though.</p>
-<p>All you need to do the same is <a href="https://www.zimmi.cz/posts/tag/gdal.html"><span class="caps">GDAL</span></a>, ImageMagick, some <span class="caps">PDF</span> documents created out of <span class="caps">DGN</span> files - something MicroStation can help you with - and their upper left and lower right corner&nbsp;coordinates.</p>
-<div class="highlight"><pre><span></span><span class="c1"># I recommend putting some limits on ImageMagick - it tends to eat up all the resources and quit</span>
-<span class="nb">export</span> <span class="nv">MAGICK_MEMORY_LIMIT</span><span class="o">=</span><span class="m">1512</span>
-<span class="nb">export</span> <span class="nv">MAGICK_MAP_LIMIT</span><span class="o">=</span><span class="m">512</span>
-<span class="nb">export</span> <span class="nv">MAGICK_AREA_LIMIT</span><span class="o">=</span><span class="m">1024</span>
-<span class="nb">export</span> <span class="nv">MAGICK_FILES_LIMIT</span><span class="o">=</span><span class="m">512</span>
-<span class="nb">export</span> <span class="nv">MAGICK_TMPDIR</span><span class="o">=</span>/partition/large/enough
-
-<span class="c1"># I expect two files on the input: the first is PDF file with drawing, the second is a simple text file with four coordinates on a single line in the following order: upper left x, upper left y, lower right x, lower right y</span>
-<span class="nv">INPUT</span><span class="o">=</span><span class="si">${</span><span class="nv">1</span><span class="p">:?</span><span class="s2">&quot;PDF file path&quot;</span><span class="si">}</span>
-<span class="nv">COORDS</span><span class="o">=</span><span class="si">${</span><span class="nv">2</span><span class="p">:?</span><span class="s2">&quot;Bounding box file path&quot;</span><span class="si">}</span>
-<span class="nv">OUTPUTDIRNAME</span><span class="o">=</span><span class="k">$(</span>dirname <span class="nv">$INPUT</span><span class="k">)</span>
-<span class="nv">OUTPUTFILENAME</span><span class="o">=</span><span class="k">$(</span>basename <span class="nv">$INPUT</span> <span class="p">|</span> cut -d. -f1<span class="k">)</span>.png
-<span class="nv">OUTPUTPATH</span><span class="o">=</span><span class="nv">$OUTPUTDIRNAME</span>/<span class="nv">$OUTPUTFILENAME</span>
-
-<span class="c1"># create PNG image - I actually don&#39;t remember why it didn&#39;t work directly to Tiff</span>
-gdal_translate <span class="se">\</span>
-    -co <span class="nv">WORLDFILE</span><span class="o">=</span>YES <span class="se">\</span>
-    -co <span class="nv">ZLEVEL</span><span class="o">=</span><span class="m">5</span> <span class="se">\</span>
-    -of PNG <span class="se">\</span>
-    --config GDAL_CACHEMAX <span class="m">500</span> <span class="se">\</span>
-    --config GDAL_PDF_DPI <span class="m">300</span> <span class="se">\</span>
-    -a_srs EPSG:5514 <span class="se">\ </span><span class="c1"># Czech local CRS</span>
-    -a_ullr <span class="k">$(</span><span class="nb">echo</span> <span class="k">$(</span>cat <span class="nv">$COORDS</span><span class="k">))</span> <span class="se">\ </span><span class="c1"># read the file with coordinates</span>
-    <span class="nv">$INPUT</span> <span class="se">\</span>
-    <span class="nv">$OUTPUTPATH</span>
-
-<span class="c1"># convert to Tiff image</span>
-convert <span class="se">\</span>
-    -define tiff:tile-geometry<span class="o">=</span>256x256 <span class="se">\</span>
-    -transparent white <span class="se">\ </span><span class="c1"># drawings come with white background</span>
-    <span class="nv">$OUTPUTPATH</span> <span class="se">\</span>
-    <span class="si">${</span><span class="nv">OUTPUTPATH</span><span class="p">/.png</span><span class="si">}</span>_alpha.tif
-
-<span class="c1"># build overwies to speed things up</span>
-gdaladdo <span class="si">${</span><span class="nv">OUTPUTPATH</span><span class="p">/.png</span><span class="si">}</span>_alpha.tif <span class="m">2</span> <span class="m">4</span> <span class="m">8</span> <span class="m">16</span> <span class="m">32</span>
-</pre></div>
-
-
-<p>And you&#8217;re done. The <code>.wld</code> file will be present for each resulting file. I rename it manually to match the name of a GeoTiff - that should be probably done automatically as&nbsp;well.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/index6.html">&laquo; Previous page</a>

@@ -1,9 +1,8 @@
 Title: QGIS Plugin Development: Testing Your Code
-Date: 2017-11-02 15:00
+Date: 2017-11-30 17:36
 Category: QGIS
 Tags: python, QGIS
 Series: QGIS Plugin Development
-Status: draft
 
 Good news, everyone! The [AttributeTransfer](https://plugins.qgis.org/plugins/AttributeTransfer/) plugin has been approved for [QGIS Python Plugins Repository](https://plugins.qgis.org/plugins/). It's available via QGIS *Manage and Install Plugins* menu. Feel free to download!
 
