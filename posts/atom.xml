@@ -3133,7 +3133,7 @@ gdaladdo hillshade.tif &lt;span class="m"&gt;2&lt;/span&gt; &lt;span class="m"&g
 &lt;li&gt;&lt;span class="caps"&gt;HR&lt;/span&gt;, &lt;span class="caps"&gt;VHR&lt;/span&gt;, &lt;span class="caps"&gt;NIR&lt;/span&gt; imagery, orthophoto - served via &lt;span class="caps"&gt;WMS&lt;/span&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;Labels should be visible only for the featured land block (both for the land parcels and the land block itself. The whole map scales dynamically, showing small land blocks zoomed in and the large ones zoomed&amp;nbsp;out.&lt;/p&gt;
-&lt;p class='text-center'&gt;&lt;a id="desired-map" title="Desired map" href="{filename}/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map.jpg"&gt;&lt;img title="Desired map" src="{filename}/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map.jpg" width=70% class="img-responsive centered"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p class='text-center'&gt;&lt;a id="desired-map" title="Desired map" href="/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map.jpg"&gt;&lt;img title="Desired map" src="/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map.jpg" width=70% class="img-responsive centered"&gt;&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;Every map features additional&amp;nbsp;items:&lt;/p&gt;
 &lt;ul&gt;
@@ -3176,7 +3176,7 @@ gdaladdo hillshade.tif &lt;span class="m"&gt;2&lt;/span&gt; &lt;span class="m"&g
 &lt;li&gt;fixed scale: sets the scale the same for all the&amp;nbsp;maps&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;With these settings, I get a map similar to the one below. Notice two interesting&amp;nbsp;things:&lt;/p&gt;
-&lt;p class='text-center'&gt;&lt;a title="QGIS map skeleton" href="{filename}/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map_skeleton.png"&gt;&lt;img title="QGIS map skeleton" src="{filename}/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map_skeleton.png" width=70% class="img-responsive centered"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p class='text-center'&gt;&lt;a title="QGIS map skeleton" href="/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map_skeleton.png"&gt;&lt;img title="QGIS map skeleton" src="/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map_skeleton.png" width=70% class="img-responsive centered"&gt;&lt;/a&gt;&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;Scale uses decimal places, which I find &lt;em&gt;a huge failure&lt;/em&gt;. Has anyone ever seen a map with such scale? The worst is there is no easy way to hide these, or at least I didn&amp;#8217;t find&amp;nbsp;one.&lt;/li&gt;
@@ -3200,7 +3200,7 @@ gdaladdo hillshade.tif &lt;span class="m"&gt;2&lt;/span&gt; &lt;span class="m"&g
 
 
 &lt;p&gt;With this simple expression, I get labels only for those land parcels that are part of the mapped land block. Even the &lt;strong&gt;layer style&lt;/strong&gt; can be controlled with atlas feature. Land parcels inside the land block have blue borders, the rest is yellowish, remember? It&amp;#8217;s a piece of cake with rule-based&amp;nbsp;styling.&lt;/p&gt;
-&lt;p class='text-center'&gt;&lt;a title="Layer style based on atlas feature" href="{filename}/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/atlas_feature_style.png"&gt;&lt;img title="Layer style based on atlas feature" src="{filename}/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/atlas_feature_style.png" width=70% class="img-responsive centered"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p class='text-center'&gt;&lt;a title="Layer style based on atlas feature" href="/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/atlas_feature_style.png"&gt;&lt;img title="Layer style based on atlas feature" src="/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/atlas_feature_style.png" width=70% class="img-responsive centered"&gt;&lt;/a&gt;&lt;/p&gt;
 
 &lt;h3&gt;Atlas&amp;nbsp;generation&lt;/h3&gt;
 &lt;p&gt;When you&amp;#8217;re set, atlas can be created with a single button. I used &lt;span class="caps"&gt;SVG&lt;/span&gt; as an output format to easily manipulate the map content afterwards. The resulting maps look like the one in &lt;a href="#desired-map"&gt;the first picture&lt;/a&gt; without the text in the red rectangle. A Python script appends this to each map&amp;nbsp;afterwards.&lt;/p&gt;

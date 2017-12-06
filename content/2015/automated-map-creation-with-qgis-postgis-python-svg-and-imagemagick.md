@@ -24,7 +24,7 @@ Every map should feature following layers:
 
 Labels should be visible only for the featured land block (both for the land parcels and the land block itself. The whole map scales dynamically, showing small land blocks zoomed in and the large ones zoomed out.
 
-<p class='text-center'><a id="desired-map" title="Desired map" href="{filename}/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map.jpg"><img title="Desired map" src="{filename}/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map.jpg" width=70% class="img-responsive centered"></a></p>
+<p class='text-center'><a id="desired-map" title="Desired map" href="/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map.jpg"><img title="Desired map" src="/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map.jpg" width=70% class="img-responsive centered"></a></p>
 
 Every map features additional items:
 
@@ -73,7 +73,7 @@ Different land blocks are of different sizes, thus needing different **scales** 
 
 With these settings, I get a map similar to the one below. Notice two interesting things:
 
-<p class='text-center'><a title="QGIS map skeleton" href="{filename}/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map_skeleton.png"><img title="QGIS map skeleton" src="{filename}/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map_skeleton.png" width=70% class="img-responsive centered"></a></p>
+<p class='text-center'><a title="QGIS map skeleton" href="/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map_skeleton.png"><img title="QGIS map skeleton" src="/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/map_skeleton.png" width=70% class="img-responsive centered"></a></p>
 
 * Scale uses decimal places, which I find *a huge failure*. Has anyone ever seen a map with such scale? The worst is there is no easy way to hide these, or at least I didn't find one.
 * You can see a bunch of `[something in the brackets]` notations. These will be substituted with actual values during the atlas generation. Showing land block ID with a preceeding label is as easy as `[%concat('PB: ', "kod_pb")%]` (mind the percentage sign).
@@ -98,7 +98,7 @@ QGIS keeps reference to each coverage layer feature ID during atlas generation, 
 
 With this simple expression, I get labels only for those land parcels that are part of the mapped land block. Even the **layer style** can be controlled with atlas feature. Land parcels inside the land block have blue borders, the rest is yellowish, remember? It's a piece of cake with rule-based styling.
 
-<p class='text-center'><a title="Layer style based on atlas feature" href="{filename}/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/atlas_feature_style.png"><img title="Layer style based on atlas feature" src="{filename}/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/atlas_feature_style.png" width=70% class="img-responsive centered"></a></p>
+<p class='text-center'><a title="Layer style based on atlas feature" href="/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/atlas_feature_style.png"><img title="Layer style based on atlas feature" src="/posts/assets/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/atlas_feature_style.png" width=70% class="img-responsive centered"></a></p>
 
 ### Atlas generation
 
