@@ -24,6 +24,63 @@
 <h2 class="text-center">Articles tagged with postgresql tag</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2015/postgis-count-line-self-intersections/" rel="bookmark" title="Permalink to PostGIS: Count Line Self-Intersections">PostGIS: Count Line&nbsp;Self-Intersections</a></h1>
+    <aside><span>Mar 30, 2015</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p><a href="https://gis.stackexchange.com/questions/107927/counting-self-intersections-of-linestring-using-postgis/140674#140674">Is there a way of using PostgreSQL + PostGIS for finding the number of self intersections in a linestring?</a> was a question that made me think of this problem. I came up with a solution that takes just a few lines of&nbsp;code.</p>
+<p>Assume the following&nbsp;geometries:</p>
+<div class="highlight"><pre><span></span>CREATE TABLE test2 (
+    id integer NOT NULL,
+    wkb_geometry geometry(LineString,5514)
+);
+COPY test2 (id, wkb_geometry) FROM stdin;
+1   01020000208A15000004000000CCDC7845E339EEBFF2003B4A8A08E1BFE4154DAB7C31DCBF24C2042773E3E53F2287BA2CC591E43F604749BFE3B2E2BF2AE9770A11B8F0BF9C91435D56C0C63F
+2   01020000208A1500000600000050212BF9E63EC03F1FA046FD69F1EA3F504D44212915EA3F74A99EDF44E3F33F2CE2805DFAB1F33F805D24B1B189DC3F9834DE5938C1F53FB56F1FBF8AAFEC3F24D0C85B4666EA3FF311B0D8D75BE93F306EAA073894D23FA841B27E3404F33F
+\.
+</pre></div>
+
+
+<p><img data-echo="/posts/assets/postgis-count-line-self-intersections/lines.png" title="Self-intersecting lines" class="img-responsive centered"></p>
+<p>Note that those geometries are valid while not being simple, thus, <code>ST_IsValidReason()</code> wouldn&#8217;t help much. What if we compared it to their single counterparts? Those would have had vertices at intersections. Once you know the original number of vertices and the number of simple geometry vertices, it is fairly easy to subtract those&nbsp;two.</p>
+<div class="highlight"><pre><span></span>WITH noded AS (
+SELECT id, COUNT(id)
+FROM (
+    SELECT DISTINCT (ST_DumpPoints(ST_Node(wkb_geometry))).geom, id
+    FROM test
+) tmp  group by id
+),
+test AS (
+    SELECT id, COUNT(id)
+        FROM (
+            SELECT DISTINCT (ST_DumpPoints(wkb_geometry)).geom, id
+            FROM test
+        ) tmp  group by id
+)
+
+SELECT noded.id, noded.count - test.count cnt FROM noded JOIN test USING (id);
+</pre></div>
+
+
+<p>This query gives you geometry id and the difference in number of vertices between the original and simple geometry. Note the <code>DISTINCT</code> in the <code>noded</code> <span class="caps">CTE</span> - with <code>ST_Node()</code> you get <code>one vertex x number of intersecting lines</code> for each intersection. <code>DISTINCT</code> gives you just one of&nbsp;them.</p>
+<p>The query result on my <code>test</code> table:
+<table>
+    <tr>
+        <th>id</th>
+        <th>cnt</th>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>2</td>
+    </tr>
+</table></p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2015/postgis-rectangular-grid-creation/" rel="bookmark" title="Permalink to PostGIS: Rectangular Grid Creation">PostGIS: Rectangular Grid&nbsp;Creation</a></h1>
     <aside><span>Mar 24, 2015</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
@@ -395,175 +452,6 @@ FROM vozejkmap AS lg ) AS f
 
 
 <p>That&#8217;s what I&#8217;ve come up with. It basically extracts the zoom level from the link, adds number two to its value and writes it back to the&nbsp;string.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2014/postgis-case-study-vozejkmap-open-data-part-i/" rel="bookmark" title="Permalink to PostGIS Case Study: VozejkMap Open Data (Part I)">PostGIS Case Study: VozejkMap Open Data (Part&nbsp;I)</a></h1>
-    <aside><span>Dec 2, 2014</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p><a href="http://www.vozejkmap.cz">VozejkMap.cz</a> is a Czech <strong>open data</strong> iniatitive that collects data about wheelchair accessible places, e.g. pubs, toilets, cafes etc. As part of being open, they offer a <a href="http://www.vozejkmap.cz/opendata/"><span class="caps">JSON</span> data download</a>. <span class="caps">JSON</span> is a great text format, not so great spatial format (leaving GeoJSON aside) though. Anyway, nothing that <a href="http://posts.zimmi.cz/tag/postgis/">PostGIS</a> wouldn&#8217;t be able to take care&nbsp;of.</p>
-<h3>Let&#8217;s get some&nbsp;data</h3>
-<p>Using curl or wget, let&#8217;s download the <span class="caps">JSON</span>&nbsp;file:</p>
-<div class="highlight"><pre><span></span>wget -O /tmp/locations.json http://www.vozejkmap.cz/opendata/locations.json
-</pre></div>
-
-
-<p>We need to split them into rows to load each point into one&nbsp;row:</p>
-<div class="highlight"><pre><span></span>sed -i &#39;s/\},{/\n},{/g&#39; /tmp/locations.json
-</pre></div>
-
-
-<p>If you peep into the file, you&#8217;ll see lots of unicode characters we don&#8217;t want to have in our pretty little table. Here&#8217;s how we get rid of&nbsp;them:</p>
-<div class="highlight"><pre><span></span>echo -en &quot;$(cat /tmp/locations.json)&quot;
-</pre></div>
-
-
-<h3>Let&#8217;s load the&nbsp;data</h3>
-<p>Let&#8217;s just be nice and leave the public schema&nbsp;clean.</p>
-<div class="highlight"><pre><span></span>CREATE SCHEMA vozejkmap;
-SET search_path=vozejkmap, public;
-</pre></div>
-
-
-<p>Load the&nbsp;data:</p>
-<div class="highlight"><pre><span></span>CREATE TABLE vozejkmap_raw(id SERIAL PRIMARY KEY, raw text);
-COPY vozejkmap_raw(raw) FROM &#39;/tmp/locations.json&#39; DELIMITERS &#39;#&#39; ESCAPE &#39;\&#39; CSV;
-</pre></div>
-
-
-<p>A few&nbsp;notes:</p>
-<ol>
-<li>I&#8217;m using <code>/tmp</code> folder to avoid any permission-denied issues when opening the file from <code>psql</code>.</li>
-<li>By setting <code>DELIMITERS</code> to <code>#</code> we tell PostgreSQL to load whole data into one column, because it is safe to assume there is no such character in our&nbsp;data.</li>
-<li><code>ESCAPE</code> needs to be set because there is one trailing quote in the&nbsp;dataset.</li>
-</ol>
-<h3>Let&#8217;s get dirty with spatial&nbsp;data</h3>
-<p>Great, now what? We loaded all the data into one column. That is not very useful, is it? How about splitting them into separate columns with this query? Shall we call it a <code>split_part</code> hell?</p>
-<div class="highlight"><pre><span></span>CREATE TABLE vozejkmap AS
-SELECT
-    id,
-    trim(
-        split_part(
-            split_part(
-                raw, &#39;title:&#39;, 2
-            ),
-            &#39;,location_type:&#39;, 1
-        )
-    ) AS title,
-
-    trim(
-        split_part(
-            split_part(
-                raw, &#39;location_type:&#39;, 2
-            ),
-            &#39;,description:&#39;, 1
-        )
-    )::integer AS location_type,
-
-    trim(
-        split_part(
-            split_part(
-                raw, &#39;description:&#39;, 2
-            ),
-            &#39;,lat:&#39;, 1
-        )
-    ) AS description,
-
-    cast( trim(
-        split_part(
-            split_part(
-                raw, &#39;lat:&#39;, 2
-            ),
-            &#39;,lng:&#39;, 1
-        )
-    ) AS double precision) AS lat,
-
-    cast( trim(
-        split_part(
-            split_part(
-                raw, &#39;lng:&#39;, 2
-            ),
-            &#39;,attr1:&#39;, 1
-        )
-    )  AS double precision) AS lng,
-
-    trim(
-        split_part(
-            split_part(
-                raw, &#39;attr1:&#39;, 2
-            ),
-            &#39;,attr2:&#39;, 1
-        )
-    )::integer AS attr1,
-
-    trim(
-        split_part(
-            split_part(
-                raw, &#39;attr2:&#39;, 2
-            ),
-            &#39;,attr3:&#39;, 1
-        )
-    ) AS attr2,
-
-    trim(
-        split_part(
-            split_part(
-                raw, &#39;attr3:&#39;, 2
-            ),
-            &#39;,author_name:&#39;, 1
-        )
-    ) AS attr3,
-
-    trim(
-        split_part(
-            split_part(
-                raw, &#39;author_name:&#39;, 2
-            ),
-            &#39;,}:&#39;, 1
-        )
-    ) AS author_name
-
-FROM vozejkmap_raw;
-</pre></div>
-
-
-<p>It just splits the <span class="caps">JSON</span> data and creates table out of it according to the <a href="http://www.vozejkmap.cz/opendata/">VozejkMap.cz data specification</a>. Before going on we should create a table with location types to join their numeric codes to real&nbsp;names:</p>
-<div class="highlight"><pre><span></span>CREATE TABLE location_type (
-    id integer PRIMARY KEY,
-    description varchar(255)
-);
-
-INSERT INTO location_type VALUES(1, &#39;Kultura&#39;);
-INSERT INTO location_type VALUES(2, &#39;Sport&#39;);
-INSERT INTO location_type VALUES(3, &#39;Instituce&#39;);
-INSERT INTO location_type VALUES(4, &#39;Jídlo a pití&#39;);
-INSERT INTO location_type VALUES(5, &#39;Ubytování&#39;);
-INSERT INTO location_type VALUES(6, &#39;Lékaři, lékárny&#39;);
-INSERT INTO location_type VALUES(7, &#39;Jiné&#39;);
-INSERT INTO location_type VALUES(8, &#39;Doprava&#39;);
-INSERT INTO location_type VALUES(9, &#39;Veřejné WC&#39;);
-INSERT INTO location_type VALUES(10, &#39;Benzínka&#39;);
-INSERT INTO location_type VALUES(11, &#39;Obchod&#39;);
-INSERT INTO location_type VALUES(12, &#39;Banka, bankomat&#39;);
-INSERT INTO location_type VALUES(13, &#39;Parkoviště&#39;);
-INSERT INTO location_type VALUES(14, &#39;Prodejní a servisní místa Škoda Auto&#39;);
-</pre></div>
-
-
-<p>Let&#8217;s build some geometry column, constraints and indexes. And don&#8217;t forget to get rid of all the mess (the <code>vozejkmap_raw</code> table).</p>
-<div class="highlight"><pre><span></span>DROP TABLE vozejkmap_raw;
-ALTER TABLE vozejkmap ADD PRIMARY KEY(id);
--- 4326 geometry is not very useful for measurements, I might get to that next time
-ALTER TABLE vozejkmap ADD COLUMN geom geometry(point, 4326);
-ALTER TABLE vozejkmap ADD CONSTRAINT loctype_fk FOREIGN KEY(location_type); REFERENCES location_type(id);
-
-UPDATE vozejkmap SET geom = ST_SetSRID(ST_MakePoint(lng, lat), 4326);
-</pre></div>
-
-
-<p><strong>And here we are, ready to use our spatial&nbsp;data!</strong></p>
-<p>Feel free to <a href="https://github.com/zimmicz/vozejkmap-to-postgis">grab the code</a> at&nbsp;GitHub.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/tag/postgresql4.html">&laquo; Previous page</a>

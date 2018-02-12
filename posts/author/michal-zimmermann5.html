@@ -24,6 +24,25 @@
 <h2>Articles by Michal Zimmermann</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2016/counting-substring-occurrences-in-postgresql/" rel="bookmark" title="Permalink to Counting substring occurrences in PostgreSQL">Counting substring occurrences in&nbsp;PostgreSQL</a></h1>
+    <aside><span>Dec 19, 2016</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p>I got to count occurrences of <em>/</em> character today and found out no built-in function exists in PostgreSQL, so here&#8217;s my shot at it. Pretty simple, yet&nbsp;useful.</p>
+<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">OR</span> <span class="k">REPLACE</span> <span class="k">FUNCTION</span> <span class="n">how_many</span><span class="p">(</span><span class="k">IN</span> <span class="nb">text</span><span class="p">,</span> <span class="k">IN</span> <span class="nb">varchar</span><span class="p">,</span> <span class="k">OUT</span> <span class="nb">integer</span><span class="p">)</span>
+<span class="k">RETURNS</span> <span class="nb">integer</span>
+<span class="k">AS</span>
+<span class="err">$</span><span class="n">how_many$</span>
+    <span class="k">SELECT</span> <span class="k">length</span><span class="p">(</span><span class="err">$</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="k">length</span><span class="p">(</span><span class="k">replace</span><span class="p">(</span><span class="err">$</span><span class="mi">1</span><span class="p">,</span> <span class="err">$</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">));</span>
+<span class="err">$</span><span class="n">how_many$</span>
+<span class="k">LANGUAGE</span> <span class="k">SQL</span>
+<span class="k">SECURITY</span> <span class="k">DEFINER</span><span class="p">;</span>
+
+<span class="c1">-- SELECT how_many(&#39;test&#39;, &#39;t&#39;); -- returns number 2</span>
+</pre></div>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2016/plotting-the-czech-cadastre-land-use-with-d3-data-viz-part-iv/" rel="bookmark" title="Permalink to Plotting the Czech Cadastre Land Use with d3: Data Viz (part IV)">Plotting the Czech Cadastre Land Use with d3: Data Viz (part <span class="caps">IV</span>)</a></h1>
     <aside><span>Nov 20, 2016</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/d3.html">d3</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>    </span>
@@ -357,35 +376,6 @@ rm <span class="nv">$CSVFILE</span> <span class="nv">$CSVUTF8FILE</span>
 <p>See <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a>.</p>
 <h2>Load</h2>
 <p>See <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">III</span>)</a>.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2016/introducing-blind-maps-project/" rel="bookmark" title="Permalink to Introducing Blind Maps Project">Introducing Blind Maps&nbsp;Project</a></h1>
-    <aside><span>Nov 2, 2016</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/leaflet.html">leaflet</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/web-maps.html">web maps</a></span>
-    </aside>
-    <p>I&#8217;d like to introduce you to my little pet project, which might just as well be awarded <em>the first pet project I&#8217;ve ever completed</em>, called <a href="https://www.zimmi.cz/blind-maps">Blind maps</a>.</p>
-<p>It&#8217;s a very simple, yet useful web application built on top of the great <a href="../../tag/leaflet.html">Leaflet</a> library meant to help you get to know our world a bit better. As the name suggests, the app shows you, well&hellip; a blind map, and you try to fill as many features as you&nbsp;can.</p>
-<div class="text-center"><img data-echo="/posts/assets/introducing-blind-maps-project/map.png" /></div>
-
-<p>The app is ready and can be&nbsp;used:</p>
-<ul>
-<li>online at <a href="https://www.zimmi.cz/blind-maps/">Blind maps</a> with the map of your choice (if&nbsp;available)</li>
-<li>offline, downloaded to your computer and filled with whatever data you&nbsp;want</li>
-</ul>
-<p>What I find great about this project is the ease of adding new dataset. For starters, I filled it with data coming from <a href="naturalearthdata.com">Natural Earth</a>:</p>
-<ul>
-<li><span class="caps">CONUS</span>&nbsp;states</li>
-<li>European&nbsp;states</li>
-<li>World&nbsp;capitals</li>
-</ul>
-<p>If you wish, feel free to send me a pull request with GeoJSON data, I&#8217;ll be happy to have more datasets available! The process is described at the <a href="https://www.zimmi.cz/blind-maps">project homepage</a>.</p>
-<p>As you notice at the project homepage, there are two versions of the game&nbsp;available:</p>
-<ul>
-<li>one lets you find map features by their&nbsp;names</li>
-<li>the other one lets you type name highlighted feature (much&nbsp;tougher)</li>
-</ul>
-<p>Have&nbsp;fun!</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/author/michal-zimmermann4.html">&laquo; Previous page</a>

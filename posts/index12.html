@@ -23,6 +23,108 @@
     <main>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2015/postgis-rectangular-grid-creation/" rel="bookmark" title="Permalink to PostGIS: Rectangular Grid Creation">PostGIS: Rectangular Grid&nbsp;Creation</a></h1>
+    <aside><span>Mar 24, 2015</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p>Creating a rectangular grid to cover a given extent with same sized cells is one of the basic <span class="caps">GIS</span> tasks I&#8217;ve had to solve several times so far. I used <span class="caps">QGIS</span> or some Python to give me a bunch of <code>INSERT</code> statements to run in PostGIS database, now I&#8217;ve come with a final solution at&nbsp;last.</p>
+<div class="highlight"><pre><span></span>CREATE OR REPLACE FUNCTION cm_grid(
+    blx float8, -- bottom left x coordinate
+    bly float8, -- bottom left y coordinate
+    trx float8, -- top right x coordinate
+    try float8, -- top right y coordinate
+    xsize float8, -- cell width
+    ysize float8, -- cell height
+    srid integer DEFAULT 5514,
+    OUT col varchar,
+    OUT &quot;row&quot; varchar,
+    OUT geom geometry
+) RETURNS SETOF record AS
+$$
+DECLARE
+    width float8; -- total area width
+    height float8; -- total area height
+    cols integer;
+    rows integer;
+BEGIN
+    width  := @($1 - $3); -- absolute value
+    height := @($2 - $4); -- absolute value
+    cols   := ceil(width / xsize);
+    rows   := ceil(height / ysize);
+    RETURN QUERY
+        SELECT
+            cast(
+                lpad((i)::varchar,
+                CASE WHEN
+                    char_length(rows::varchar) &gt; char_length(cols::varchar)
+                        THEN  char_length(rows::varchar)
+                        ELSE char_length(cols::varchar)
+                END,
+                &#39;0&#39;)
+                AS varchar
+            ) AS row,
+            cast(
+                lpad((j)::varchar,
+                CASE WHEN
+                    char_length(rows::varchar) &gt; char_length(cols::varchar)
+                        THEN  char_length(rows::varchar)
+                        ELSE char_length(cols::varchar)
+                END,
+                &#39;0&#39;) AS varchar
+            ) AS col,
+            ST_SetSRID(
+                ST_GeomFromText(
+                    &#39;POLYGON((&#39; ||
+                        array_to_string(
+                            ARRAY[i * xsize + blx, j * ysize + bly],
+                            &#39; &#39;
+                        ) || &#39;,&#39; ||
+                        array_to_string(
+                            ARRAY[i * xsize + blx, (j+1) * ysize + bly],
+                            &#39; &#39;
+                        ) || &#39;,&#39; ||
+                        array_to_string(
+                            ARRAY[(i+1) * xsize + blx, (j+1) * ysize + bly],
+                            &#39; &#39;
+                        ) || &#39;,&#39; ||
+                        array_to_string(
+                            ARRAY[(i+1) * xsize + blx, j * ysize + bly],
+                            &#39; &#39;
+                        ) || &#39;,&#39; ||
+                        array_to_string(
+                            ARRAY[i * xsize + blx, j * ysize + bly],
+                            &#39; &#39;
+                        ) || &#39;
+                    ))&#39;
+                )
+            , srid) AS geom
+        FROM
+            generate_series(0, cols) AS i,
+            generate_series(0, rows) AS j;
+END;
+$$
+LANGUAGE plpgsql;
+</pre></div>
+
+
+<p>And you call it like&nbsp;this:</p>
+<div class="highlight"><pre><span></span>CREATE TABLE grid AS
+SELECT *
+FROM cm_grid(-675593.69, -1057711.19, -672254.69, -1054849.19, 333.47, 333.47);
+</pre></div>
+
+
+<p>Few&nbsp;notes:</p>
+<ul>
+<li>it takes bounding box coordinates (bottom left, top right) for an&nbsp;extent,</li>
+<li>followed by cell width and&nbsp;height,</li>
+<li>and optional <span class="caps">SRID</span> (defaults to 5514 which is Czech national&nbsp;grid),</li>
+<li>each cell is indexed with <code>row</code> and <code>col</code> number</li>
+</ul>
+<p>The messy <code>CASE</code> statement makes sure both <code>row</code> and <code>col</code> are of the same length. I used <code>array_to_string</code> for better readability. It might not be the fastest way, didn&#8217;t do any&nbsp;benchmarks.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2015/postgis-buffers-intersections-differences-and-collections/" rel="bookmark" title="Permalink to PostGIS: Buffers, Intersections, Differences And Collections">PostGIS: Buffers, Intersections, Differences And&nbsp;Collections</a></h1>
     <aside><span>Mar 19, 2015</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
@@ -397,30 +499,6 @@ FROM vozejkmap AS lg ) AS f
 <li>Map key (by extending&nbsp;L.Control)</li>
 </ol>
 <p>The code is still <a href="https://github.com/zimmicz/vozejkmap-to-postgis">available at my GitHub</a>.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2015/using-postgresql-to-update-outdated-map-links/" rel="bookmark" title="Permalink to Using PostgreSQL To Update Outdated Map Links">Using PostgreSQL To Update Outdated Map&nbsp;Links</a></h1>
-    <aside><span>Feb 16, 2015</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/regex.html">regex</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p><a href="http://www.edpp.cz/pdb_mapa-povodnoveho-planu-mesta/">We&#8217;ve rolled out</a> completely new map <span class="caps">GUI</span> at <a href="http://edpp.cz">edpp.cz</a> built on top of <a href="http://ol3js.org">OpenLayers 3</a>. It looks great and has lots of functions both for <span class="caps">BFU</span> and power users. The only pitfall that came with moving away from OpenLayers 2 were remarkable differences in zoom levels between the old map and the new&nbsp;one.</p>
-<p>Each of our maps is defined by our admins (center, zoom level, layers) at the map creation. Lots of links calling different views of map are created as well. They take form of <code>http://edpp.cz/some-map?0=0&amp;1=0...zoom=5</code>. That <code>zoom=&lt;Number&gt;</code> started causing troubles immediately after the map switch. No way my workmates would update them one by one as there were ~4,500 of them. Sounds like a task for little bit of regular expressions and some <span class="caps">SQL</span>&nbsp;updates.</p>
-<div class="highlight"><pre><span></span>UPDATE table
-    SET column = regexp_replace(column, &#39;zoom=\d&#39;, &#39;zoom=&#39; || subquery.zoom, &#39;g&#39;)
-    FROM (
-        SELECT regexp_replace(
-            substring(column from &#39;zoom=\d&#39;),
-            &#39;zoom=(\d)&#39;,
-            &#39;\1&#39;,
-            &#39;g&#39;)::integer + 2 AS zoom, guid
-        FROM table) AS subquery
-    WHERE column ~ &#39;zoom=\d&#39;
-        AND table.guid = subquery.guid
-</pre></div>
-
-
-<p>That&#8217;s what I&#8217;ve come up with. It basically extracts the zoom level from the link, adds number two to its value and writes it back to the&nbsp;string.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/index11.html">&laquo; Previous page</a>

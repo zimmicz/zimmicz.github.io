@@ -24,6 +24,77 @@
 <h2>Articles by Michal Zimmermann</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2016/finding-polygons-lying-across-other-polygons-with-postgis/" rel="bookmark" title="Permalink to Finding Polygons Lying across Other Polygons with PostGIS">Finding Polygons Lying across Other Polygons with&nbsp;PostGIS</a></h1>
+    <aside><span>Aug 5, 2016</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p>Doing overlays (<code>ST_Intersection()</code>) in PostGIS based on spatial relationships (<code>ST_Intersects()</code>, <code>ST_Contains()</code>, &hellip;) is so easy it is not something you get particularly excited&nbsp;about.</p>
+<p>Today I faced a bit more interesting task: <strong>given two polygon layers, get me all the polygons from layer A such that they lie across the polygons from layer B and&hellip; a picture worth a thousand words,&nbsp;right?</strong></p>
+<div class="text-center"><img data-echo="/posts/assets/finding-polygons-lying-across-other-polygons-with-postgis/polygons.svg" /></div>
+
+<p>I hope you got the idea, it is fairly&nbsp;simple:</p>
+<ol>
+<li>Intersect A (red, blue) with B&nbsp;(green)</li>
+<li>Subtract the result of previous from layer&nbsp;A</li>
+<li>Combine results from steps 1 and&nbsp;2</li>
+<li>Keep polygon only if its id occurs more than twice (that means it went straight through the layer&nbsp;B)</li>
+<li>Profit!</li>
+</ol>
+<!-- codeblock -->
+
+<div class="highlight"><pre><span></span><span class="k">WITH</span> <span class="n">overlays</span> <span class="k">AS</span> <span class="p">(</span>
+<span class="cm">/* nothing fancy here */</span>
+    <span class="k">SELECT</span>
+        <span class="n">A</span><span class="p">.</span><span class="n">ogc_fid</span> <span class="n">a_id</span><span class="p">,</span>
+        <span class="n">B</span><span class="p">.</span><span class="n">ogc_fid</span> <span class="n">b_id</span><span class="p">,</span>
+        <span class="n">ST_Intersection</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">B</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">geom</span><span class="p">,</span>
+        <span class="n">ST_Area</span><span class="p">(</span><span class="n">ST_Intersection</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">B</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">area_shared</span>
+    <span class="k">FROM</span> <span class="n">A</span>
+    <span class="k">JOIN</span> <span class="n">B</span> <span class="k">ON</span> <span class="p">(</span><span class="n">ST_Intersects</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">B</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span>
+<span class="p">),</span>
+<span class="n">diffs</span> <span class="k">AS</span> <span class="p">(</span>
+<span class="cm">/* note this is a 1:1 relationship in ST_Difference */</span>
+<span class="cm">/* a little hack is needed to prevent PostGIS from returning its usual difference mess */</span>
+    <span class="k">SELECT</span>
+        <span class="n">o</span><span class="p">.</span><span class="n">a_id</span><span class="p">,</span>
+        <span class="n">o</span><span class="p">.</span><span class="n">b_id</span><span class="p">,</span>
+        <span class="p">(</span><span class="n">ST_Dump</span><span class="p">(</span><span class="n">ST_Difference</span><span class="p">(</span><span class="n">ST_Buffer</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="o">-</span><span class="mi">0</span><span class="p">.</span><span class="mi">0001</span><span class="p">),</span> <span class="n">o</span><span class="p">.</span><span class="n">geom</span><span class="p">))).</span><span class="n">geom</span><span class="p">,</span> <span class="c1">-- ugly hack</span>
+        <span class="n">o</span><span class="p">.</span><span class="n">area_shared</span>
+    <span class="k">FROM</span> <span class="n">overlays</span> <span class="n">o</span>
+    <span class="k">JOIN</span> <span class="n">A</span> <span class="k">ON</span> <span class="p">(</span><span class="n">o</span><span class="p">.</span><span class="n">a_id</span> <span class="o">=</span> <span class="n">A</span><span class="p">.</span><span class="n">id</span><span class="p">)</span>
+<span class="p">),</span>
+
+<span class="n">merged</span> <span class="k">AS</span> <span class="p">(</span>
+<span class="cm">/* put those two result sets together */</span>
+    <span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">overlays</span>
+    <span class="k">UNION</span> <span class="k">ALL</span>
+    <span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">diffs</span>
+<span class="p">),</span>
+
+<span class="n">merged_reduced</span> <span class="k">AS</span> <span class="p">(</span>
+<span class="cm">/* get only those A polygons that consist of three parts at least for each intersection with B polygon */</span>
+  <span class="k">SELECT</span>
+    <span class="n">m</span><span class="p">.</span><span class="o">*</span>
+  <span class="k">FROM</span> <span class="n">merged</span> <span class="n">m</span>
+  <span class="k">JOIN</span> <span class="p">(</span>
+    <span class="k">SELECT</span>
+      <span class="n">a_id</span><span class="p">,</span>
+      <span class="n">b_id</span>
+    <span class="k">FROM</span> <span class="n">merged</span>
+    <span class="k">GROUP</span> <span class="k">BY</span> <span class="n">a_id</span><span class="p">,</span> <span class="n">b_id</span>
+    <span class="k">HAVING</span> <span class="k">COUNT</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span>
+  <span class="p">)</span> <span class="n">a</span> <span class="k">ON</span> <span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">a_id</span> <span class="o">=</span> <span class="n">m</span><span class="p">.</span><span class="n">a_id</span> <span class="k">AND</span> <span class="n">a</span><span class="p">.</span><span class="n">b_id</span> <span class="o">=</span> <span class="n">m</span><span class="p">.</span><span class="n">b_id</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="cm">/* do as you wish with the result */</span>
+<span class="k">SELECT</span> <span class="o">*</span>
+<span class="k">FROM</span> <span class="n">merged_reduced</span><span class="p">;</span>
+</pre></div>
+
+
+<p>In my case, centerlines of layer B were also included and their length inside each intersection was used to divide the area of the smallest part with. It was fun,&nbsp;actually.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2016/dead-simple-random-points-in-polygons-with-postgis/" rel="bookmark" title="Permalink to Dead Simple Random Points in Polygons with PostGIS">Dead Simple Random Points in Polygons with&nbsp;PostGIS</a></h1>
     <aside><span>Aug 3, 2016</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>    </span>
@@ -317,52 +388,6 @@ OPTIONS (LAYER &#39;A05_Vodni_nadrze&#39;);
 <p>Is it rather car or bike friendly? Do you feel at risk riding a bike or running? Is it faster to run/ride or drive? Does your city actually want you to leave your car at home at all, or has it been designed for&nbsp;cars?</p>
 <p>River seems to be blessing when your city has one (unless flood strikes, different story). <a href="https://goo.gl/maps/T6wMLSCFzZU2">If done right</a>, its shores might become one of the most beautiful parts of the city. Something Brno needs to catch up with other&nbsp;cities.</p>
 <p>I hope one day I&#8217;ll get up and see Brno changing in front of me. <a href="http://www.fastcoexist.com/3058685/paris-is-redesigning-its-major-intersections-for-pedestrians-not-cars">Just like Paris is right now.</a> We all die in the end, so why not to take a walk before we&nbsp;do?</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2016/do-you-really-need-gulp-or-grunt-or-bower-or-what/" rel="bookmark" title="Permalink to Do You Really Need Gulp? Or Grunt? Or Bower? Or What?">Do You Really Need Gulp? Or Grunt? Or Bower? Or&nbsp;What?</a></h1>
-    <aside><span>Mar 20, 2016</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
-    </aside>
-    <p><strong>Disclaimer:</strong> I&#8217;m an enthuastic developer, but I do not code for a living. I&#8217;m just the ordinary guy who keeps editing a wrong file wondering why <em>the heck</em> the changes are not being&nbsp;applied.</p>
-<p><strong><span class="caps">TL</span>;<span class="caps">DR</span>:</strong> I do think <code>npm</code> might be the&nbsp;answer.</p>
-<h2>Wonderful world of JavaScript&nbsp;DevOps</h2>
-<p>When I first started using JavaScript on the server side with <code>node.js</code>, I felt overwhelmed by numerous options to automate tasks. There was <code>npm</code> taking care of backend dependencies. Then I would build a&nbsp;frontend and found out about <code>bower</code> for handling frontend dependencies. Then it would be great to have some kind of minification/obfuscation/uglification/you-name-it task. And the <code>build</code> task. And the <code>build:prod</code> task. And how about <code>eslint</code> task? And then I would end up spending hours doing nothing, just reading blogs about the tools being used by others who do code for a&nbsp;living.</p>
-<p><strong>Intermezzo:</strong> I think my coding is slow. Definitely slower than yours. I&#8217;m getting better&nbsp;though.</p>
-<h2>Using the&nbsp;force</h2>
-<p>Looking back I find it a bit stressful - how <em>the heck</em> do I choose the right tools? Where&#8217;s Yoda to help me out? Anyway, next to adopt after <code>npm</code> was <code>bower</code>. And I liked it, even though some packages were missing - but who cares as long as there is no better way, right? Except there is&hellip; I&nbsp;guess.</p>
-<p>Automation was next in the line to tackle. So I chose <code>gulp</code> without a bit of hesitation. It was a&nbsp;hype, a bigger than <code>grunt</code> back then. I even heard of <code>yeoman</code>, but until now I still don&#8217;t know what it actually does. And I&#8217;m happy with&nbsp;that.</p>
-<p>A short summary so&nbsp;far:</p>
-<ul>
-<li><code>npm</code> for backend&nbsp;dependencies</li>
-<li><code>bower</code> for frontend&nbsp;dependencies</li>
-<li><code>gulp</code> for running&nbsp;tasks</li>
-</ul>
-<p>So far, so&nbsp;good.</p>
-<h2>Is Bower going to&nbsp;die?</h2>
-<p>Then I stumbled upon this tweet and started panicking. Or rather started to feel cheated. <em>It took me time to set all this up and now it&#8217;s useless? Or&nbsp;what?</em></p>
-<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Bower development is stopped. Move to npm, if you haven&#39;t already. <a href="https://t.co/RQRcE7DT5V">https://t.co/RQRcE7DT5V</a></p>&mdash; Nacho Coloma (@nachocoloma) <a href="https://twitter.com/nachocoloma/status/663622545162280960">November 9, 2015</a></blockquote>
-
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-<p>Seeing it now, I&#8217;m glad I read this. And I really don&#8217;t know what happened to Bower, if anything at&nbsp;all.</p>
-<h2>Keeping it&nbsp;simple</h2>
-<p>So Bower&#8217;s dying, what are you going to do about that? You&#8217;ll use <code>npm</code> instead! And you&#8217;ll have a&nbsp;single source of truth called <code>package.json</code>. You&#8217;l resolve all the dependencies with a single <code>npm install</code> command and feel like a king. We&#8217;re down to two now - <code>npm</code> and <code>gulp</code>.</p>
-<h2>Gulp, Gulp&nbsp;everywhere!</h2>
-<p>When you get rid of Bower, next feeling you have is your <code>gulpfile.js</code> just got off the leash. It got really big and grew to ~160 lines of code and became a nightmare to&nbsp;manage.</p>
-<p>So you split it into <a href="https://github.com/zimmicz/bookmap/commit/98a3ce451856e2beaac8fa2be9eb3b7e2878b0a7">task files</a> and a <a href="https://github.com/zimmicz/bookmap/commit/07eaf7d355a47ff9d08e5b7138791a67669534d6">config file</a>. What a relief. But you still realize a <strong>half</strong> of your <code>package.json</code> dependencies starts with <code>gulp-</code>. And you hate&nbsp;it.</p>
-<h2>Webpack for the&nbsp;win</h2>
-<p>For me, a non-developer, setting the <a href="https://webpack.github.io/">webpack</a> wasn&#8217;t easy. I didn&#8217;t find docs very helpful either. Reading the website for the first time, I didn&#8217;t even understand what it should be used for. I&nbsp;got it working eventually. And I got rid of <code>gulp</code>, <code>gulp-connect</code>, <code>gulp-less</code>, <code>gulp-nodemon</code>, <code>gulp-rename</code>, <code>gulp-replace</code>, <code>gulp-task-listing</code> and <code>gutil</code>. And the whole <code>gulpfile.js</code>. That was a big win for&nbsp;me.</p>
-<h2>But how do you run&nbsp;tasks?</h2>
-<p>Well&hellip;</p>
-<div class="highlight"><pre><span></span>npm run start-dev <span class="c1"># which in turn calls the code below</span>
-npm run start-webpack <span class="p">&amp;</span> <span class="nv">NODE_ENV</span><span class="o">=</span>development nodemon server.js <span class="c1"># where start-webpack does the following</span>
-node_modules/webpack-dev-server/bin/webpack-dev-server.js --quiet --inline --hot --watch
-</pre></div>
-
-
-<p>That&#8217;s it. If I need to build code, I run <code>npm run build</code>, which calls some other tasks from <code>scripts</code> section in the <code>package.json</code>.</p>
-<p>That&#8217;s pretty much it. I don&#8217;t think it&#8217;s a silver bullet, but I feel like I finally found peace of mind for my future JavaScript development. At least for a month or so before some other guy comes to&nbsp;town.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/author/michal-zimmermann6.html">&laquo; Previous page</a>

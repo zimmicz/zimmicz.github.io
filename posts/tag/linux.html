@@ -24,6 +24,72 @@
 <h2 class="text-center">Articles tagged with linux tag</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-wal-archiving/" rel="bookmark" title="Permalink to PostgreSQL Backup and Recovery Orchestration: WAL Archiving">PostgreSQL Backup and Recovery Orchestration: <span class="caps">WAL</span>&nbsp;Archiving</a></h1>
+    <aside><span>Feb 12, 2018</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p>Just a very few of my day-to-day work tasks can be accomplished without PostgreSQL. For years I&#8217;ve been a (power) user of this wonderful relational database, knowing almost nothing about how its internals really work. Faced with the need to build a backup and recovery strategy, I&#8217;ve recently read up <em>a lot</em> on this&nbsp;topic.</p>
+<p>As I don&#8217;t find it very odd for a <span class="caps">GIS</span> person to be given such an extraordinary task (nobody wants to lose the priceless spatial data, right?), I hope this series might shed light on how to prepare and manage the backup/recovery process to those, who are up to such a task. I won&#8217;t be discussing backup strategies based on <code>pg_backup</code> tool, as those don&#8217;t offer neither continuous archivation, nor point-in-time-recovery (<span class="caps">PITR</span>) - those two features disqualifies it as <a href="https://www.clevermaps.cz">CleverMaps</a> production backup&nbsp;strategy.</p>
+<p><strong>That leaves us with taking periodic base backups combined with continuous <span class="caps">WAL</span> archivation, as described&nbsp;below.</strong></p>
+<h2>Taking base&nbsp;backups</h2>
+<p>Archived <span class="caps">WAL</span> segments are worthless without a base backup they can be run on. It&#8217;s crucial to have consistent, periodic base backups to keep your data&nbsp;safe.</p>
+<p><a href="https://www.postgresql.org/docs/current/static/app-pgbasebackup.html"><code>pg_basebackup</code></a> takes base backup of PostgreSQL cluster. Nothing fancy. Gzipping the output folder once the backup is done is definitely a good&nbsp;idea.</p>
+<div class="highlight"><pre><span></span>pg_basebackup <span class="se">\</span>
+    --pgdata<span class="o">=</span>/mnt/backup/base/backup_number <span class="se">\</span>
+    --format<span class="o">=</span>plain <span class="se">\</span>
+    --write-recovery-conf <span class="se">\</span>
+    --xlog-method<span class="o">=</span>stream <span class="se">\</span>
+    --label<span class="o">=</span><span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span> <span class="se">\</span>
+    --checkpoint<span class="o">=</span>fast <span class="se">\</span>
+    --progress <span class="se">\</span>
+    --verbose
+</pre></div>
+
+
+<p>In our current environment, we take a base backup of each of our clusters once a&nbsp;week.</p>
+<h2><span class="caps">WAL</span> archiving&nbsp;configuration</h2>
+<p>To properly set <span class="caps">WAL</span> archiving, several <code>postgresql.conf</code> settings has to be&nbsp;adjusted:</p>
+<ul>
+<li><code>wal_level = replica</code></li>
+<li><code>archive_mode = on</code></li>
+<li><code>archive_command = test ! -f /backup/wal/%f &amp;&amp; cp %p /backup/wal/%f</code></li>
+</ul>
+<p>Setting <code>wal_level</code> to <code>replica</code> writes enough information for <span class="caps">WAL</span> archiving. Turning on <code>archive_mode</code> will run <code>archive_command</code> each time a <span class="caps">WAL</span> segment is completed. <code>archive_command</code> might be anything from simple <code>cp</code> to <code>rsync</code> or <code>aws s3 cp</code> commands. It is absolutely critical that the command returns <strong>non-zero exit code</strong> in case of failure (including when a file with the same name already exists in your backup&nbsp;folder).</p>
+<p>That&#8217;s it, after reloading PostgreSQL service, new <span class="caps">WAL</span> files should be copied to <code>/backup/wal</code> directory. The PostgreSQL process user (<code>postgres</code> usually) has to be able to write to the&nbsp;location.</p>
+<h3>Pitfalls</h3>
+<ul>
+<li>If <code>archive_command</code> fails, <span class="caps">WAL</span> segment remains on your database drive. If it keeps failing long enough, you&#8217;ll run out of space and the database will&nbsp;crash.</li>
+<li>If the backup location fills up, the above-mentioned happens as&nbsp;well.</li>
+<li>If you lose or corrupt any of the archived <span class="caps">WAL</span> segments, you won&#8217;t be able to pass through. That&#8217;s why you want to be sure that your <code>archive_command</code> actually does what you think it&nbsp;does.</li>
+</ul>
+<h3>Tips</h3>
+<p>It might be a real <span class="caps">PITA</span> (fiddling around <span class="caps">WAL</span> segments included) to start a crashed database cluster with no space left. Keeping a dummy file in your <code>pg_xlog</code> location might save you a lot of trouble. Create one with following&nbsp;command.</p>
+<div class="highlight"><pre><span></span>dd <span class="k">if</span><span class="o">=</span>/dev/zero <span class="nv">of</span><span class="o">=</span>/path_to_your_database_cluster/pg_xlog/DO_NOT_MOVE_THIS_FILE <span class="nv">bs</span><span class="o">=</span>1MB <span class="nv">count</span><span class="o">=</span><span class="m">300</span>
+</pre></div>
+
+
+<p>There&#8217;s no need to keep archived <span class="caps">WAL</span> segments forever. They&#8217;re only needed until you take another base backup. Again, deleting <span class="caps">WAL</span> segments manually (or using <code>find ! -newer previous_base_backup.tar.gz</code>) might lead to accidental corruption of your backups. It&#8217;s much safer to use <a href="https://www.postgresql.org/docs/9.6/static/pgarchivecleanup.html"><code>pg_archivecleanup</code></a> pointed to your <span class="caps">WAL</span> backup folder, referencing the last <strong>sucessful</strong> full backup. Below is the script we use to keep our <span class="caps">WAL</span> backup folder of reasonable size, keeping the last three full&nbsp;backups.</p>
+<div class="highlight"><pre><span></span><span class="c1"># Find base_backup files not older than 3 weeks</span>
+<span class="c1"># Sort by date</span>
+<span class="c1"># Use the oldest one as a reference</span>
+<span class="nv">OLDEST_BASE_BACKUP</span><span class="o">=</span><span class="k">$(</span>basename <span class="k">$(</span>find <span class="si">${</span><span class="nv">CR_WAL_BACKUP_DIR</span><span class="si">}</span>/u/p/ -type f -iname <span class="s2">&quot;*.backup&quot;</span> -mtime -21 -print0 <span class="p">|</span> <span class="se">\</span>
+xargs -0 ls -t <span class="p">|</span> <span class="se">\</span>
+tail -n <span class="m">1</span><span class="k">))</span>
+
+<span class="c1"># Find all subfolders</span>
+<span class="c1"># Except the u/p backup subfolder</span>
+<span class="c1"># Execute pg_archivecleanup for each of the subfolders</span>
+find <span class="nv">$CR_WAL_BACKUP_DIR</span> <span class="se">\</span>
+    -type d <span class="se">\</span>
+    -not -path <span class="s2">&quot;</span><span class="si">${</span><span class="nv">CR_WAL_BACKUP_DIR</span><span class="si">}</span><span class="s2">u*&quot;</span> <span class="se">\</span>
+    -exec pg_archivecleanup -d <span class="o">{}</span> <span class="nv">$OLDEST_BASE_BACKUP</span> <span class="se">\;</span>
+</pre></div>
+
+
+<p>Functional backups are crucial part of a solid backup/recovery system. They&#8217;re still just one half of that system, though. <strong>If not tested thoroughly</strong>, they&#8217;re even less than that. More on testing backups and recovering from failures next&nbsp;time.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/" rel="bookmark" title="Permalink to Installing PostGIS 2.2 with SFCGAL on Ubuntu-based OS">Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span></a></h1>
     <aside><span>Oct 29, 2015</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
@@ -419,48 +485,6 @@ gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span c
 <h2>Conclusion</h2>
 <p>I created pretty efficient semi-automated workflow using several open source technologies that saves me a lot of work. Although <span class="caps">QGIS</span> has some minor pet peeves (scale with decimal places, not showing the entire feature, not substituting variables at times), it definitely makes boring map creation quite amusing. The more I work with big data / on big tasks, the more I find Linux a&nbsp;must-have.</p>
 <p>The whole process was done with <span class="caps">QGIS</span> 2.10, PostGIS 2.1, PostgreSQL 9.3, Python 2.7, ImageMagick&nbsp;6.7.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2015/clip-raster-with-vector-using-gdal/" rel="bookmark" title="Permalink to Clip Raster With Vector Using GDAL">Clip Raster With Vector Using <span class="caps">GDAL</span></a></h1>
-    <aside><span>Jul 21, 2015</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
-    </aside>
-    <p>Recently I needed to clip several raster files with polygonal layer of municipalities. A solution to this task is pretty straightforward using <a href="http://gdal.org/"><span class="caps">GDAL</span></a> and a bit of Bash and <span class="caps">QGIS</span> thrown&nbsp;in.</p>
-<p>The necessary steps&nbsp;are:</p>
-<ol>
-<li>Put each polygon to a separate file. This can be done easily with <code>Vector - Data Management Tools - Split Vector Layer</code> in <span class="caps">QGIS</span>. The solution below assumes that each shapefile has the same basename as the raster&nbsp;file.</li>
-<li>These polygons are stored in the <code>obce</code> subfolder relative to the folder with&nbsp;rasters.</li>
-<li>An <code>output</code> folder exists that is used for&#8230; output,&nbsp;yes.</li>
-<li>Rasters are saved with output alpha band for nodata (<code>-dstalpha</code> flag).</li>
-<li>The script takes one argument - raster&nbsp;name.</li>
-<li>Profit!</li>
-</ol>
-<div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env bash</span>
-
-<span class="nv">OBEC</span><span class="o">=</span><span class="nv">$1</span>
-<span class="nv">BASE</span><span class="o">=</span><span class="k">$(</span>basename <span class="nv">$OBEC</span> _jpeg.tif<span class="k">)</span>
-<span class="nb">echo</span> <span class="nv">$BASE</span>
-<span class="nv">EXTENT</span><span class="o">=</span><span class="k">$(</span>ogrinfo -so obce/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.shp <span class="nv">$BASE</span> <span class="p">|</span> grep Extent <span class="se">\</span>
-<span class="p">|</span> sed <span class="s1">&#39;s/Extent: //g&#39;</span> <span class="p">|</span> sed <span class="s1">&#39;s/(//g&#39;</span> <span class="p">|</span> sed <span class="s1">&#39;s/)//g&#39;</span> <span class="se">\</span>
-<span class="p">|</span> sed <span class="s1">&#39;s/ - /, /g&#39;</span><span class="k">)</span>
-<span class="nv">EXTENT</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span> <span class="nv">$EXTENT</span> <span class="p">|</span> awk -F <span class="s1">&#39;,&#39;</span> <span class="s1">&#39;{print $1 &quot; &quot; $4 &quot; &quot; $3 &quot; &quot; $2}&#39;</span><span class="k">)</span>
-gdal_translate -projwin <span class="nv">$EXTENT</span> -of GTiff <span class="nv">$OBEC</span> output/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.tif
-gdalwarp -dstalpha -s_srs <span class="s1">&#39;EPSG:5514&#39;</span> -t_srs <span class="s1">&#39;EPSG:5514&#39;</span> <span class="se">\</span>
-    -co <span class="nv">COMPRESS</span><span class="o">=</span>JPEG <span class="se">\</span>
-    -co <span class="nv">TILED</span><span class="o">=</span>YES -<span class="se">\</span>
-    of GTiff <span class="se">\</span>
-    -cutline obce/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.shp <span class="se">\</span>
-    output/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.tif output/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.final.tif
-</pre></div>
-
-
-<p>Note that if <code>gdalwarp</code> doesn&#8217;t recognize an <span class="caps">EPSG</span> code (which is the case for my country national grid), you might pass it as a <span class="caps">PROJ</span>.4&nbsp;string.</p>
-<p>According to the point 5 in the above list, the script needs to be run in a&nbsp;loop:</p>
-<div class="highlight"><pre><span></span><span class="k">for</span> f in *_jpeg.tif<span class="p">;</span>
-    <span class="k">do</span> the_script_above.sh <span class="nv">$f</span>
-<span class="p">;</span><span class="k">done</span>
-</pre></div>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/tag/linux2.html">Next page &raquo;</a>
