@@ -24,6 +24,53 @@
 <h2>Articles by Michal Zimmermann</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-recovery/" rel="bookmark" title="Permalink to PostgreSQL Backup and Recovery Orchestration: Recovery">PostgreSQL Backup and Recovery Orchestration:&nbsp;Recovery</a></h1>
+    <aside><span>Feb 16, 2018</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p>PostgreSQL continuous backups are very powerful, if you know how to use them for recovery. There&#8217;s nothing else to do to be sure about that other than <strong>actually trying it</strong>. Personally, I see recovery as a single process with two possibly different&nbsp;outcomes:</p>
+<ul>
+<li>you&#8217;re recovering to the same state your cluster is/was in (because of a hardware failure, provider switch, &hellip;) - it&#8217;s more of a data migration, but you need your backup&nbsp;anyway</li>
+<li>you&#8217;re doing a point-in-time-recovery (someone dropped the wrong table, data got corrupted,&nbsp;&hellip;)</li>
+</ul>
+<p>Both scenarios follow the same steps and differ slighty at the&nbsp;end.</p>
+<ol>
+<li>Stop the PostgreSQL&nbsp;cluster.</li>
+<li>Copy the current <code>PGDATA_DIR</code> somewhere safe, just in case you screw&nbsp;up.</li>
+<li>Replace the <code>PGDATA_DIR</code> with the full backup. If you start the cluster right away, it will boot to the last full backup state (in my case, missing a week of <span class="caps">WAL</span> segments&nbsp;tops).</li>
+</ol>
+<h2>General&nbsp;recovery</h2>
+<p>In this case, you&#8217;re trying to recover as far as possible. With previous steps done succesfully, the next&nbsp;follow:</p>
+<ul>
+<li>Copy all archived <span class="caps">WAL</span> segments created after the last full backup to <code>PGDATA_DIR/pg_xlog</code>. These can be found with <code>find -newer</code> command run against the corresponding <code>.backup</code> file in your <code>wal-archive/u/p</code> directory.</li>
+<li>If your full backup strategy includes <code>recovery.conf</code> file creation, you cane safely move it or remove&nbsp;it.</li>
+<li>Start the database cluster again. It is going to boot to the last working&nbsp;state.</li>
+</ul>
+<p>If you&#8217;re about to migrate your data, you might be better off with simple <code>pg_dump</code>, <code>pg_dumpall</code> and <code>pg_restore</code> commands rather than using full backup/<span class="caps">WAL</span> segments&nbsp;combination.</p>
+<h2>Point-in-time-recovery</h2>
+<p>PostgreSQL&#8217;s <span class="caps">PITR</span> can help you restore your accidentally deleted/corrupted data. After the first three steps mentioned above, you should follow with&nbsp;these:</p>
+<ul>
+<li>Copy all archived segments created after the last full backup somewhere the PostgreSQL user can read them (<code>/your-wal-recovery-folder/</code> for&nbsp;example).</li>
+<li>Set up the <code>recovery.conf</code> file properly. If you know something nasty happened at 2018-01-29 08:00:00, try to recover right to that point (or to any other, as <a href="https://www.postgresql.org/docs/9.6/static/recovery-target-settings.html">described in the documentation</a>).</li>
+</ul>
+<!-- -->
+
+<div class="highlight"><pre><span></span><span class="nv">restore_command</span> <span class="o">=</span> <span class="s1">&#39;cp /your-wal-recovery-folder/%f &quot;%p&quot;&#39;</span>
+<span class="nv">recovery_target_time</span> <span class="o">=</span> <span class="s1">&#39;2018-01-29 08:00:00&#39;</span>
+</pre></div>
+
+
+<ul>
+<li>Start the database cluster again. It is going to boot to the last full backup and then play all the <span class="caps">WAL</span> segments until the recovery target. Depending on how many <span class="caps">WAL</span> segments are about to be used, this might take a&nbsp;while.</li>
+</ul>
+<h2>Pitfalls</h2>
+<p>You don&#8217;t want to find yourself in the middle of the biggest database failure of the century just to find out your <strong>backups don&#8217;t work</strong>, and even if they did, you would have <strong>no idea how to use them</strong>. Or, even worse, there are no backups at all, because your <strong>backup strategy has been failing silently</strong> without a single notice for several&nbsp;months.</p>
+<h2>Tips</h2>
+<p>Try to recover from your backups once in a&nbsp;while.</p>
+<p>I forget things and make mistakes. We all do. That&#8217;s why I built an ensemble that takes care of our database automatically. Nothing fancy, just a bunch of good old Bash scripts managed with systemd rathern than cron. Next time, I&#8217;d like to show you the code and walk you through our current&nbsp;setup.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-wal-archiving/" rel="bookmark" title="Permalink to PostgreSQL Backup and Recovery Orchestration: WAL Archiving">PostgreSQL Backup and Recovery Orchestration: <span class="caps">WAL</span>&nbsp;Archiving</a></h1>
     <aside><span>Feb 12, 2018</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
@@ -64,7 +111,7 @@
 <li>If you lose or corrupt any of the archived <span class="caps">WAL</span> segments, you won&#8217;t be able to pass through. That&#8217;s why you want to be sure that your <code>archive_command</code> actually does what you think it&nbsp;does.</li>
 </ul>
 <h3>Tips</h3>
-<p>It might be a real <span class="caps">PITA</span> (fiddling around <span class="caps">WAL</span> segments included) to start a crashed database cluster with no space left. Keeping a dummy file in your <code>pg_xlog</code> location might save you a lot of trouble. Create one with following&nbsp;command.</p>
+<p>It might be a real <span class="caps">PITA</span> (fiddling around <span class="caps">WAL</span> segments included) to start a crashed database cluster with no space left. Keeping a dummy file in your <code>pg_xlog</code> location might save you a lot of trouble. Create one with following command. If you run out of space, remove this file and you get 300 <span class="caps">MB</span> for free. Don&#8217;t forget to recreate it after you start the&nbsp;cluster.</p>
 <div class="highlight"><pre><span></span>dd <span class="k">if</span><span class="o">=</span>/dev/zero <span class="nv">of</span><span class="o">=</span>/path_to_your_database_cluster/pg_xlog/DO_NOT_MOVE_THIS_FILE <span class="nv">bs</span><span class="o">=</span>1MB <span class="nv">count</span><span class="o">=</span><span class="m">300</span>
 </pre></div>
 
@@ -286,83 +333,6 @@ find <span class="nv">$CR_WAL_BACKUP_DIR</span> <span class="se">\</span>
 
 <p>Once loaded with Plugins -&gt; Manage and Install Plugins -&gt; AttributeTransfer, the plugin is available right from the toolbar or Vector menu. It is missing the business logic completely, but I have this covered in <a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/">the previous part</a>.</p>
 <p>All that is to be done is to bind those two parts&nbsp;together.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/" rel="bookmark" title="Permalink to QGIS Plugin Development: Finding Nearest Neighbors"><span class="caps">QGIS</span> Plugin Development: Finding Nearest&nbsp;Neighbors</a></h1>
-    <aside><span>Nov 9, 2017</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">QGIS</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/qgis.html">QGIS</a></span>
-    </aside>
-    <p>I described basics of vector layers manipulation in <a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/">the previous part</a> of the series. With my goal in mind (fully functional custom plugin capable of writing an attribute value from a source layer to a target layer based on a feature distance), I&#8217;d like to discuss <strong>spatial indexing</strong> and <strong>nearest neighbor analysis</strong>.</p>
-<div class="text-center"><img data-echo="/posts/assets/qgis-plugin-development-finding-nearest-neighbors/qgis.png"/></div>
-
-<p>The picture above illustrates the task that can be solved solely by using <span class="caps">QGIS</span> <span class="caps">API</span>. Imagine you&#8217;re given a source layer with an attribute filled with values. You&#8217;re given a target layer as well, sadly though, the values in this layer are missing (<em>not so rare in the <span class="caps">GIS</span> world, right?</em>). Yet you know that the missing attribute value of each feature in the target layer can be filled by the value of its nearest neighbor from the source layer. How do you do&nbsp;that?</p>
-<h2>Generating dummy&nbsp;data</h2>
-<p>Let&#8217;s create two memory data sets with id and value attributes. Both of them will have ten&nbsp;features.</p>
-<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qgis.core</span> <span class="kn">import</span> <span class="n">QgsMapLayerRegistry</span><span class="p">,</span> <span class="n">QgsVectorLayer</span><span class="p">,</span> <span class="n">QgsFeature</span><span class="p">,</span> <span class="n">QgsGeometry</span><span class="p">,</span> <span class="n">QgsPoint</span><span class="p">,</span> <span class="n">QgsSpatialIndex</span>
-<span class="kn">from</span> <span class="nn">qgis.utils</span> <span class="kn">import</span> <span class="n">iface</span>
-
-<span class="n">source_layer</span> <span class="o">=</span> <span class="n">QgsVectorLayer</span><span class="p">(</span><span class="s2">&quot;point?crs=epsg:4326&amp;field=id:integer&amp;field=value:integer&quot;</span><span class="p">,</span> <span class="s2">&quot;Source layer&quot;</span><span class="p">,</span> <span class="s2">&quot;memory&quot;</span><span class="p">)</span>
-<span class="n">target_layer</span> <span class="o">=</span> <span class="n">QgsVectorLayer</span><span class="p">(</span><span class="s2">&quot;point?crs=epsg:4326&amp;field=id:integer&amp;field=value:integer&quot;</span><span class="p">,</span> <span class="s2">&quot;Target layer&quot;</span><span class="p">,</span> <span class="s2">&quot;memory&quot;</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">create_dummy_data</span><span class="p">():</span>
-
-    <span class="n">source_layer</span><span class="o">.</span><span class="n">startEditing</span><span class="p">()</span>
-    <span class="n">target_layer</span><span class="o">.</span><span class="n">startEditing</span><span class="p">()</span>
-
-    <span class="n">feature</span> <span class="o">=</span> <span class="n">QgsFeature</span><span class="p">(</span><span class="n">source_layer</span><span class="o">.</span><span class="n">pendingFields</span><span class="p">())</span>
-
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
-        <span class="n">feature</span><span class="o">.</span><span class="n">setGeometry</span><span class="p">(</span><span class="n">QgsGeometry</span><span class="o">.</span><span class="n">fromPoint</span><span class="p">(</span><span class="n">QgsPoint</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">)))</span>
-        <span class="n">feature</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
-        <span class="n">feature</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
-        <span class="n">source_layer</span><span class="o">.</span><span class="n">addFeature</span><span class="p">(</span><span class="n">feature</span><span class="p">)</span>
-
-    <span class="n">feature</span> <span class="o">=</span> <span class="n">QgsFeature</span><span class="p">(</span><span class="n">source_layer</span><span class="o">.</span><span class="n">pendingFields</span><span class="p">())</span>
-
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
-        <span class="n">feature</span><span class="o">.</span><span class="n">setGeometry</span><span class="p">(</span><span class="n">QgsGeometry</span><span class="o">.</span><span class="n">fromPoint</span><span class="p">(</span><span class="n">QgsPoint</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">)))</span>
-        <span class="n">feature</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
-        <span class="n">target_layer</span><span class="o">.</span><span class="n">addFeature</span><span class="p">(</span><span class="n">feature</span><span class="p">)</span>
-
-    <span class="n">source_layer</span><span class="o">.</span><span class="n">commitChanges</span><span class="p">()</span>
-    <span class="n">target_layer</span><span class="o">.</span><span class="n">commitChanges</span><span class="p">()</span>
-
-    <span class="n">QgsMapLayerRegistry</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span><span class="o">.</span><span class="n">addMapLayer</span><span class="p">(</span><span class="n">source_layer</span><span class="p">)</span>
-    <span class="n">QgsMapLayerRegistry</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span><span class="o">.</span><span class="n">addMapLayer</span><span class="p">(</span><span class="n">target_layer</span><span class="p">)</span>
-
-<span class="n">create_dummy_data</span><span class="p">()</span>
-</pre></div>
-
-
-<h2>Writing values from the nearest&nbsp;neighbor</h2>
-<p>The actual nearest neighbor analysis can be done in ten lines of code! First, the <code>qgis.core.QgsSpatialIndex</code> is built from all the <code>source_layer</code> features. Then, you iterate over the <code>target_layer</code> features and for each of them, gets only one (<code>nearestNeighbor(f.geometry().asPoint(), 1)[0]</code>) nearest neighbor. At last, you just write the nearest neighbor&#8217;s attribute value to the target layer and commit changes. Just use the following code with the code&nbsp;above.</p>
-<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">write_values_from_nn</span><span class="p">():</span>
-    <span class="n">source_layer_index</span> <span class="o">=</span> <span class="n">QgsSpatialIndex</span><span class="p">(</span><span class="n">source_layer</span><span class="o">.</span><span class="n">getFeatures</span><span class="p">())</span>
-    <span class="n">source_layer_features</span> <span class="o">=</span> <span class="p">{</span><span class="n">feature</span><span class="o">.</span><span class="n">id</span><span class="p">():</span> <span class="n">feature</span> <span class="k">for</span> <span class="p">(</span><span class="n">feature</span><span class="p">)</span> <span class="ow">in</span> <span class="n">source_layer</span><span class="o">.</span><span class="n">getFeatures</span><span class="p">()}</span>
-    <span class="n">target_layer_features</span> <span class="o">=</span> <span class="n">target_layer</span><span class="o">.</span><span class="n">getFeatures</span><span class="p">()</span>
-
-    <span class="n">target_layer</span><span class="o">.</span><span class="n">startEditing</span><span class="p">()</span>
-
-    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">target_layer_features</span><span class="p">:</span>
-        <span class="n">nearest</span> <span class="o">=</span> <span class="n">source_layer_index</span><span class="o">.</span><span class="n">nearestNeighbor</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">geometry</span><span class="p">()</span><span class="o">.</span><span class="n">asPoint</span><span class="p">(),</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">value</span> <span class="o">=</span> <span class="n">source_layer_features</span><span class="p">[</span><span class="n">nearest</span><span class="p">]</span><span class="o">.</span><span class="n">attribute</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">)</span>
-        <span class="n">target_layer</span><span class="o">.</span><span class="n">changeAttributeValue</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">id</span><span class="p">(),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-
-    <span class="n">target_layer</span><span class="o">.</span><span class="n">commitChanges</span><span class="p">()</span>
-
-<span class="n">write_values_from_nn</span><span class="p">()</span>
-</pre></div>
-
-
-<h2>Missing pieces or what&#8217;s&nbsp;next</h2>
-<p>I&#8217;m one step closer to my goal. What&#8217;s&nbsp;missing?</p>
-<ul>
-<li>capabilities checks: does the target layer support edits? Check the layer data provider capabilities to find&nbsp;out.</li>
-<li>user logging: notices, warnings or errors are completely missing. It will be great to have them shown inside <code>qgis.gui.QgsMessageBar</code>.</li>
-<li>custom attributes: this version expects both layers to have the same attribute with the same data&nbsp;type.</li>
-<li><span class="caps">GUI</span>: a very simple PyQt widget will turn this console-based script into a custom plugin. That&#8217;s what&#8217;s going to be&nbsp;next.</li>
-</ul>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/author/michal-zimmermann2.html">Next page &raquo;</a>

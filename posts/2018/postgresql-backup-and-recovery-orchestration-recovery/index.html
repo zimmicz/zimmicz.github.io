@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+          <title>Michal Zimmermann | PostgreSQL Backup and Recovery Orchestration: Recovery</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+
+
+
+    <meta name="tags" content="postgresql" />
+    <meta name="tags" content="linux" />
+    <meta property="og:image" content="https://www.zimmi.cz/posts/assets/postgresql-backup-and-recovery-orchestration/postgresql_recovery.jpg" />
+  <meta property="og:title" content="PostgreSQL Backup and Recovery Orchestration: Recovery" />
+  <meta property="og:description" content="PostgreSQL continuous backups are very powerful, if you know how to use them for recovery. There’s nothing else to do to be sure about that other than actually trying it. Personally, I see recovery as a single process with two possibly..." />
+  <meta property="og:url" content="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-recovery/" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?a4089d0f">
+</head>
+<body>
+    <nav role="navigation">
+        <ul>
+            <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+            <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+            <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
+        </ul>
+    </nav>
+    <header>
+        <h1><a href="/posts">Michal Zimmermann<small>Pieces of knowledge from the world of GIS.</small></a></h1>
+    </header>
+    <main>
+<article>
+    <h1><a href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-recovery/" rel="bookmark" title="Permalink to PostgreSQL Backup and Recovery Orchestration: Recovery">PostgreSQL Backup and Recovery Orchestration:&nbsp;Recovery</a></h1>
+    <aside><span>Feb 16, 2018</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+<p>PostgreSQL continuous backups are very powerful, if you know how to use them for recovery. There&#8217;s nothing else to do to be sure about that other than <strong>actually trying it</strong>. Personally, I see recovery as a single process with two possibly different&nbsp;outcomes:</p>
+<ul>
+<li>you&#8217;re recovering to the same state your cluster is/was in (because of a hardware failure, provider switch, &hellip;) - it&#8217;s more of a data migration, but you need your backup&nbsp;anyway</li>
+<li>you&#8217;re doing a point-in-time-recovery (someone dropped the wrong table, data got corrupted,&nbsp;&hellip;)</li>
+</ul>
+<p>Both scenarios follow the same steps and differ slighty at the&nbsp;end.</p>
+<ol>
+<li>Stop the PostgreSQL&nbsp;cluster.</li>
+<li>Copy the current <code>PGDATA_DIR</code> somewhere safe, just in case you screw&nbsp;up.</li>
+<li>Replace the <code>PGDATA_DIR</code> with the full backup. If you start the cluster right away, it will boot to the last full backup state (in my case, missing a week of <span class="caps">WAL</span> segments&nbsp;tops).</li>
+</ol>
+<h2>General&nbsp;recovery</h2>
+<p>In this case, you&#8217;re trying to recover as far as possible. With previous steps done succesfully, the next&nbsp;follow:</p>
+<ul>
+<li>Copy all archived <span class="caps">WAL</span> segments created after the last full backup to <code>PGDATA_DIR/pg_xlog</code>. These can be found with <code>find -newer</code> command run against the corresponding <code>.backup</code> file in your <code>wal-archive/u/p</code> directory.</li>
+<li>If your full backup strategy includes <code>recovery.conf</code> file creation, you cane safely move it or remove&nbsp;it.</li>
+<li>Start the database cluster again. It is going to boot to the last working&nbsp;state.</li>
+</ul>
+<p>If you&#8217;re about to migrate your data, you might be better off with simple <code>pg_dump</code>, <code>pg_dumpall</code> and <code>pg_restore</code> commands rather than using full backup/<span class="caps">WAL</span> segments&nbsp;combination.</p>
+<h2>Point-in-time-recovery</h2>
+<p>PostgreSQL&#8217;s <span class="caps">PITR</span> can help you restore your accidentally deleted/corrupted data. After the first three steps mentioned above, you should follow with&nbsp;these:</p>
+<ul>
+<li>Copy all archived segments created after the last full backup somewhere the PostgreSQL user can read them (<code>/your-wal-recovery-folder/</code> for&nbsp;example).</li>
+<li>Set up the <code>recovery.conf</code> file properly. If you know something nasty happened at 2018-01-29 08:00:00, try to recover right to that point (or to any other, as <a href="https://www.postgresql.org/docs/9.6/static/recovery-target-settings.html">described in the documentation</a>).</li>
+</ul>
+<!-- -->
+
+<div class="highlight"><pre><span></span><span class="nv">restore_command</span> <span class="o">=</span> <span class="s1">&#39;cp /your-wal-recovery-folder/%f &quot;%p&quot;&#39;</span>
+<span class="nv">recovery_target_time</span> <span class="o">=</span> <span class="s1">&#39;2018-01-29 08:00:00&#39;</span>
+</pre></div>
+
+
+<ul>
+<li>Start the database cluster again. It is going to boot to the last full backup and then play all the <span class="caps">WAL</span> segments until the recovery target. Depending on how many <span class="caps">WAL</span> segments are about to be used, this might take a&nbsp;while.</li>
+</ul>
+<h2>Pitfalls</h2>
+<p>You don&#8217;t want to find yourself in the middle of the biggest database failure of the century just to find out your <strong>backups don&#8217;t work</strong>, and even if they did, you would have <strong>no idea how to use them</strong>. Or, even worse, there are no backups at all, because your <strong>backup strategy has been failing silently</strong> without a single notice for several&nbsp;months.</p>
+<h2>Tips</h2>
+<p>Try to recover from your backups once in a&nbsp;while.</p>
+<p>I forget things and make mistakes. We all do. That&#8217;s why I built an ensemble that takes care of our database automatically. Nothing fancy, just a bunch of good old Bash scripts managed with systemd rathern than cron. Next time, I&#8217;d like to show you the code and walk you through our current&nbsp;setup.</p>
+<aside>
+<h3>This post is part 2 of the "PostgreSQL Backup and Recovery Orchestration" series:</h3>
+    <ol class="parts">
+            <li>
+<a href='https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-wal-archiving/'>                PostgreSQL Backup and Recovery Orchestration: <span class="caps">WAL</span>&nbsp;Archiving
+</a>            </li>
+            <li>
+                PostgreSQL Backup and Recovery Orchestration:&nbsp;Recovery
+            </li>
+    </ol>
+
+<h3>More reading</h3>
+    <ul>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/postgresql-remote-access/">PostgreSQL Remote&nbsp;Access</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/">Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span></a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-wal-archiving/">PostgreSQL Backup and Recovery Orchestration: <span class="caps">WAL</span>&nbsp;Archiving</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/upgrading-postgresql-95-to-postgresql-96-with-postgis/">Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with&nbsp;PostGIS</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/ogr2ogr-unix-x-windows/">ogr2ogr <span class="caps">UNIX</span> x&nbsp;Windows</a></li>
+    </ul>
+<!-- Start of Async Drift Code -->
+<script>
+    !function () {
+        var t;
+        if (t = window.driftt = window.drift = window.driftt || [], !t.init) return t.invoked ? void (window.console && console.error && console.error("Drift snippet included twice.")) : (t.invoked = !0,
+            t.methods = ["identify", "config", "track", "reset", "debug", "show", "ping", "page", "hide", "off", "on"],
+            t.factory = function (e) {
+                return function () {
+                    var n;
+                    return n = Array.prototype.slice.call(arguments), n.unshift(e), t.push(n), t;
+                };
+            }, t.methods.forEach(function (e) {
+                t[e] = t.factory(e);
+            }), t.load = function (t) {
+                var e, n, o, i;
+                e = 3e5, i = Math.ceil(new Date() / e) * e, o = document.createElement("script"),
+                    o.type = "text/javascript", o.async = !0, o.crossorigin = "anonymous", o.src = "https://js.driftt.com/include/" + i + "/" + t + ".js",
+                    n = document.getElementsByTagName("script")[0], n.parentNode.insertBefore(o, n);
+            });
+    }();
+    drift.SNIPPET_VERSION = '0.3.1';
+    drift.load('caacyauy5t6b');
+
+</script>
+<!-- End of Async Drift Code --></aside>
+    </main>
+    <footer>
+        Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
+        Proudly powered by <a href="//getpelican.com/">Pelican</a>,
+        which takes great advantage of <a href="//python.org">Python</a>.
+    </footer>
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-43432739-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments)};
+  gtag('js', new Date());
+
+  gtag('config', 'UA-43432739-2');
+</script>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NW8R37N');</script>
+<!-- End Google Tag Manager -->
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NW8R37N"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<script src="https://www.zimmi.cz/posts/theme/js/echo.min.js"></script>
+<script>
+echo.init({
+  offset: 200,
+  throttle: 250,
+  unload: false
+});
+</script>
+</body>
+</html>

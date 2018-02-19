@@ -24,6 +24,53 @@
 <h2 class="text-center">Articles in the SQL category</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-recovery/" rel="bookmark" title="Permalink to PostgreSQL Backup and Recovery Orchestration: Recovery">PostgreSQL Backup and Recovery Orchestration:&nbsp;Recovery</a></h1>
+    <aside><span>Feb 16, 2018</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p>PostgreSQL continuous backups are very powerful, if you know how to use them for recovery. There&#8217;s nothing else to do to be sure about that other than <strong>actually trying it</strong>. Personally, I see recovery as a single process with two possibly different&nbsp;outcomes:</p>
+<ul>
+<li>you&#8217;re recovering to the same state your cluster is/was in (because of a hardware failure, provider switch, &hellip;) - it&#8217;s more of a data migration, but you need your backup&nbsp;anyway</li>
+<li>you&#8217;re doing a point-in-time-recovery (someone dropped the wrong table, data got corrupted,&nbsp;&hellip;)</li>
+</ul>
+<p>Both scenarios follow the same steps and differ slighty at the&nbsp;end.</p>
+<ol>
+<li>Stop the PostgreSQL&nbsp;cluster.</li>
+<li>Copy the current <code>PGDATA_DIR</code> somewhere safe, just in case you screw&nbsp;up.</li>
+<li>Replace the <code>PGDATA_DIR</code> with the full backup. If you start the cluster right away, it will boot to the last full backup state (in my case, missing a week of <span class="caps">WAL</span> segments&nbsp;tops).</li>
+</ol>
+<h2>General&nbsp;recovery</h2>
+<p>In this case, you&#8217;re trying to recover as far as possible. With previous steps done succesfully, the next&nbsp;follow:</p>
+<ul>
+<li>Copy all archived <span class="caps">WAL</span> segments created after the last full backup to <code>PGDATA_DIR/pg_xlog</code>. These can be found with <code>find -newer</code> command run against the corresponding <code>.backup</code> file in your <code>wal-archive/u/p</code> directory.</li>
+<li>If your full backup strategy includes <code>recovery.conf</code> file creation, you cane safely move it or remove&nbsp;it.</li>
+<li>Start the database cluster again. It is going to boot to the last working&nbsp;state.</li>
+</ul>
+<p>If you&#8217;re about to migrate your data, you might be better off with simple <code>pg_dump</code>, <code>pg_dumpall</code> and <code>pg_restore</code> commands rather than using full backup/<span class="caps">WAL</span> segments&nbsp;combination.</p>
+<h2>Point-in-time-recovery</h2>
+<p>PostgreSQL&#8217;s <span class="caps">PITR</span> can help you restore your accidentally deleted/corrupted data. After the first three steps mentioned above, you should follow with&nbsp;these:</p>
+<ul>
+<li>Copy all archived segments created after the last full backup somewhere the PostgreSQL user can read them (<code>/your-wal-recovery-folder/</code> for&nbsp;example).</li>
+<li>Set up the <code>recovery.conf</code> file properly. If you know something nasty happened at 2018-01-29 08:00:00, try to recover right to that point (or to any other, as <a href="https://www.postgresql.org/docs/9.6/static/recovery-target-settings.html">described in the documentation</a>).</li>
+</ul>
+<!-- -->
+
+<div class="highlight"><pre><span></span><span class="nv">restore_command</span> <span class="o">=</span> <span class="s1">&#39;cp /your-wal-recovery-folder/%f &quot;%p&quot;&#39;</span>
+<span class="nv">recovery_target_time</span> <span class="o">=</span> <span class="s1">&#39;2018-01-29 08:00:00&#39;</span>
+</pre></div>
+
+
+<ul>
+<li>Start the database cluster again. It is going to boot to the last full backup and then play all the <span class="caps">WAL</span> segments until the recovery target. Depending on how many <span class="caps">WAL</span> segments are about to be used, this might take a&nbsp;while.</li>
+</ul>
+<h2>Pitfalls</h2>
+<p>You don&#8217;t want to find yourself in the middle of the biggest database failure of the century just to find out your <strong>backups don&#8217;t work</strong>, and even if they did, you would have <strong>no idea how to use them</strong>. Or, even worse, there are no backups at all, because your <strong>backup strategy has been failing silently</strong> without a single notice for several&nbsp;months.</p>
+<h2>Tips</h2>
+<p>Try to recover from your backups once in a&nbsp;while.</p>
+<p>I forget things and make mistakes. We all do. That&#8217;s why I built an ensemble that takes care of our database automatically. Nothing fancy, just a bunch of good old Bash scripts managed with systemd rathern than cron. Next time, I&#8217;d like to show you the code and walk you through our current&nbsp;setup.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-wal-archiving/" rel="bookmark" title="Permalink to PostgreSQL Backup and Recovery Orchestration: WAL Archiving">PostgreSQL Backup and Recovery Orchestration: <span class="caps">WAL</span>&nbsp;Archiving</a></h1>
     <aside><span>Feb 12, 2018</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
@@ -64,7 +111,7 @@
 <li>If you lose or corrupt any of the archived <span class="caps">WAL</span> segments, you won&#8217;t be able to pass through. That&#8217;s why you want to be sure that your <code>archive_command</code> actually does what you think it&nbsp;does.</li>
 </ul>
 <h3>Tips</h3>
-<p>It might be a real <span class="caps">PITA</span> (fiddling around <span class="caps">WAL</span> segments included) to start a crashed database cluster with no space left. Keeping a dummy file in your <code>pg_xlog</code> location might save you a lot of trouble. Create one with following&nbsp;command.</p>
+<p>It might be a real <span class="caps">PITA</span> (fiddling around <span class="caps">WAL</span> segments included) to start a crashed database cluster with no space left. Keeping a dummy file in your <code>pg_xlog</code> location might save you a lot of trouble. Create one with following command. If you run out of space, remove this file and you get 300 <span class="caps">MB</span> for free. Don&#8217;t forget to recreate it after you start the&nbsp;cluster.</p>
 <div class="highlight"><pre><span></span>dd <span class="k">if</span><span class="o">=</span>/dev/zero <span class="nv">of</span><span class="o">=</span>/path_to_your_database_cluster/pg_xlog/DO_NOT_MOVE_THIS_FILE <span class="nv">bs</span><span class="o">=</span>1MB <span class="nv">count</span><span class="o">=</span><span class="m">300</span>
 </pre></div>
 
@@ -593,110 +640,6 @@ LINE <span class="m">2</span>: <span class="m">1111</span><span class="p">;</spa
 
 <p>All the data was obtained with the following Python script and processed inside the PostgreSQL database. Plots done with <a href="http://bokeh.pydata.org/en/latest/">Bokeh</a>, though I probably wouldn&#8217;t use it again, the docs site is absurdly sluggish and the info is just all over the&nbsp;place.</p>
 <script src="https://gist.github.com/zimmicz/f69a5ce5d3cf3a220e171553c35e0391.js"></script>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2017/postgis-as-a-mapbox-vector-tiles-generator/" rel="bookmark" title="Permalink to PostGIS as a Mapbox Vector Tiles generator">PostGIS as a Mapbox Vector Tiles&nbsp;generator</a></h1>
-    <aside><span>Aug 6, 2017</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/docker.html">docker</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p><a href="http://postgis.net/2017/08/05/postgis-2.4.0alpha/">PostGIS 2.4.0</a> was released recently bringing the possibilities to generate <strong>Mapbox Vector Tiles</strong> without any third party tools. I got a shot at it with Node.js and docker. Even if it&#8217;s not as straightforward as solely using <a href="https://postgis.net/docs/manual-dev/ST_AsMVT.html">ST_AsMVT</a>, it still looks pretty&nbsp;great.</p>
-<h2>Docker&nbsp;container</h2>
-<p>There are no Ubuntu or Debian based PostGIS 2.4.0 packages as far as I know. As installation from source (especially considering <span class="caps">GIS</span> software) is always a bit risky, I prefer using Docker to stay away from trouble. The image is based on Ubuntu 17.04, has PostgreSQL 9.6 and PostGIS 2.4.0 installed. It exposes port 5432 to the host, so you can access the database from the outside the&nbsp;container.</p>
-<div class="highlight"><pre><span></span>FROM ubuntu:17.04
-RUN apt update
-RUN apt install -y wget less systemd
-RUN touch /etc/apt/sources.list.d/pgdg.list
-RUN <span class="nb">echo</span> <span class="s2">&quot;deb http://apt.postgresql.org/pub/repos/apt/ zesty-pgdg main&quot;</span> &gt; /etc/apt/sources.list.d/pgdg.list
-RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc <span class="p">|</span> apt-key add -
-RUN apt update
-RUN apt -y install postgresql-9.6 postgresql-server-dev-9.6
-
-USER postgres
-RUN /usr/lib/postgresql/9.6/bin/pg_ctl -D /var/lib/postgresql/9.6/main -l /tmp/logfile start
-
-USER root
-RUN <span class="nb">echo</span> <span class="s2">&quot;host all  all    0.0.0.0/0  trust&quot;</span> &gt;&gt; /etc/postgresql/9.6/main/pg_hba.conf <span class="o">&amp;&amp;</span> <span class="se">\</span>
-    <span class="nb">echo</span> <span class="s2">&quot;listen_addresses=&#39;*&#39;&quot;</span> &gt;&gt; /etc/postgresql/9.6/main/postgresql.conf
-
-
-EXPOSE <span class="m">5432</span>
-RUN apt install -y netcat build-essential libxml2 libxml2-dev libgeos-3.5.1 libgdal-dev gdal-bin libgdal20 libgeos-dev libprotobuf-c1 libprotobuf-c-dev libprotobuf-dev protobuf-compiler protobuf-c-compiler
-RUN wget http://download.osgeo.org/postgis/source/postgis-2.4.0alpha.tar.gz
-RUN tar -xvzf postgis-2.4.0alpha.tar.gz
-RUN <span class="nb">cd</span> postgis-2.4.0alpha <span class="o">&amp;&amp;</span> ./configure <span class="o">&amp;&amp;</span> make <span class="o">&amp;&amp;</span> make install
-
-USER postgres
-RUN service postgresql start <span class="o">&amp;&amp;</span> psql -c <span class="s2">&quot;CREATE EXTENSION postgis&quot;</span>
-
-USER root
-COPY start.postgis.sh /start.postgis.sh
-RUN chmod <span class="m">0755</span> /start.postgis.sh
-
-CMD <span class="o">[</span><span class="s2">&quot;/start.postgis.sh&quot;</span><span class="o">]</span>
-</pre></div>
-
-
-<p><code>start.postgis.sh</code> file starts the database server and keeps it running&nbsp;forever.</p>
-<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
-
-<span class="nv">DATADIR</span><span class="o">=</span><span class="s2">&quot;/var/lib/postgresql/9.6/main&quot;</span>
-<span class="nv">CONF</span><span class="o">=</span><span class="s2">&quot;/etc/postgresql/9.6/main/postgresql.conf&quot;</span>
-<span class="nv">POSTGRES</span><span class="o">=</span><span class="s2">&quot;/usr/lib/postgresql/9.6/bin/postgres&quot;</span>
-
-su postgres sh -c <span class="s2">&quot;</span><span class="nv">$POSTGRES</span><span class="s2"> -D </span><span class="nv">$DATADIR</span><span class="s2"> -c config_file=</span><span class="nv">$CONF</span><span class="s2">&quot;</span> <span class="p">&amp;</span>
-<span class="k">until</span> nc -z localhost <span class="m">5432</span><span class="p">;</span>
-<span class="k">do</span>
-    <span class="nb">echo</span> ...
-    sleep <span class="m">5</span>
-<span class="k">done</span>
-sleep <span class="m">5</span> <span class="c1"># just for sure</span>
-su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT EXISTS postgis\&quot;&quot;</span>
-<span class="nb">echo</span> database up and running
-
-<span class="nb">wait</span> <span class="nv">$!</span>
-</pre></div>
-
-
-<h2>Data</h2>
-<p>I got a cadastre area dataset of the Czech Republic for testing, which contains ~ 13,000 polygons. The geometries should come in Web Mercator a.k.a. <span class="caps">EPSG</span>:3857 to work with <a href="https://www.mapbox.com/vector-tiles/specification/"><span class="caps">MVT</span></a>.</p>
-<h2>Vector&nbsp;tiles</h2>
-<p>I got a bit confused by the docs of <a href="https://postgis.net/docs/manual-dev/ST_AsMVT.html">ST_AsMVT</a> and <a href="https://postgis.net/docs/manual-dev/ST_AsMVTGeom.html">ST_AsMVTGeom</a>. Especially the latter one took me a few hours to get it right. What is essential (I guess) about Mapbox Vector Tiles is that you have to abstract from the real world coordinates and start thinking inside the tile coordinates. What PostGIS does with <code>ST_AsMVTGeom</code> (and what any other <span class="caps">MVT</span> implemenation should do for you) is that it takes real world coordinates and put them inside a&nbsp;tile.</p>
-<div class="text-center"><img data-echo="/posts/assets/postgis-as-a-mapbox-vector-tiles-generator/mvt.gif"/></div>
-
-<p>To make this work, you need to know every bounding box of every tile on every zoom level in a Web Mercator projection. Or you can use <a href="https://github.com/mapbox/postgis-vt-util/blob/master/src/TileBBox.sql">TileBBox procedure by Mapbox</a>, if you&nbsp;wish.</p>
-<p>The <span class="caps">SQL</span> query itself is pretty simple (this comes from an express route I&#8217;ll be discussing&nbsp;shortly).</p>
-<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">ST_AsMVT</span><span class="p">(</span><span class="s1">&#39;cadastre&#39;</span><span class="p">,</span> <span class="mi">4096</span><span class="p">,</span> <span class="s1">&#39;geom&#39;</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
-<span class="k">FROM</span> <span class="p">(</span>
-    <span class="k">SELECT</span>
-        <span class="n">code</span><span class="p">,</span>
-        <span class="n">name</span><span class="p">,</span>
-        <span class="n">ST_AsMVTGeom</span><span class="p">(</span>
-            <span class="n">geom</span><span class="p">,</span>
-            <span class="n">TileBBox</span><span class="p">(</span><span class="err">${</span><span class="n">req</span><span class="p">.</span><span class="n">params</span><span class="p">.</span><span class="n">z</span><span class="err">}</span><span class="p">,</span> <span class="err">${</span><span class="n">req</span><span class="p">.</span><span class="n">params</span><span class="p">.</span><span class="n">x</span><span class="err">}</span><span class="p">,</span> <span class="err">${</span><span class="n">req</span><span class="p">.</span><span class="n">params</span><span class="p">.</span><span class="n">y</span><span class="err">}</span><span class="p">,</span> <span class="mi">3857</span><span class="p">),</span>
-            <span class="mi">4096</span><span class="p">,</span>
-            <span class="mi">0</span><span class="p">,</span>
-            <span class="k">false</span>
-        <span class="p">)</span> <span class="n">geom</span>
-    <span class="k">FROM</span> <span class="n">cadastre_area</span>
-    <span class="k">WHERE</span> <span class="n">ST_Intersects</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span> <span class="p">(</span><span class="k">SELECT</span> <span class="n">ST_Transform</span><span class="p">(</span><span class="n">ST_MakeEnvelope</span><span class="p">(</span><span class="err">$</span><span class="mi">1</span><span class="p">,</span> <span class="err">$</span><span class="mi">2</span><span class="p">,</span> <span class="err">$</span><span class="mi">3</span><span class="p">,</span> <span class="err">$</span><span class="mi">4</span><span class="p">,</span> <span class="err">$</span><span class="mi">5</span><span class="p">),</span> <span class="mi">3857</span><span class="p">)))</span>
-<span class="p">)</span> <span class="n">q</span>
-</pre></div>
-
-
-<p>When filled with proper arguments instead of placeholders, it returns a&nbsp;bytea.</p>
-<div class="highlight"><pre><span></span><span class="se">\x</span>1aa5dbd0070a047465737412e216120400000101180322d7160987913f8db38e01aa59160e2a010412012a0624060e001410420a1a00203b0a3914190e15085912010a0f0c0f06370804080a0e0e0234090e0
-</pre></div>
-
-
-<p>This can be consumed by a Leaflet map using <a href="https://github.com/Leaflet/Leaflet.VectorGrid">Leaflet.VectorGrid plugin</a>. To keep it short, the frontend code actually boils down to three lines of&nbsp;code.</p>
-<div class="highlight"><pre><span></span><span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="s1">&#39;http://localhost:3000/mvt/{x}/{y}/{z}&#39;</span><span class="p">;</span>
-<span class="kd">var</span> <span class="nx">cadastre</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">vectorGrid</span><span class="p">.</span><span class="nx">protobuf</span><span class="p">(</span><span class="nx">url</span><span class="p">);</span>
-<span class="nx">map</span><span class="p">.</span><span class="nx">addLayer</span><span class="p">(</span><span class="nx">cadastre</span><span class="p">);</span>
-</pre></div>
-
-
-<p>The <a href="https://gist.github.com/zimmicz/9e78d9888ab73abc7e87553b77999bc8">server <span class="caps">MVP</span> is available</a> as a GitHub&nbsp;gist.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/category/sql2.html">Next page &raquo;</a>

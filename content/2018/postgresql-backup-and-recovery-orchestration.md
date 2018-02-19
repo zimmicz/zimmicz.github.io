@@ -50,7 +50,7 @@ That's it, after reloading PostgreSQL service, new WAL files should be copied to
 
 ### Tips
 
-It might be a real PITA (fiddling around WAL segments included) to start a crashed database cluster with no space left. Keeping a dummy file in your `pg_xlog` location might save you a lot of trouble. Create one with following command.
+It might be a real PITA (fiddling around WAL segments included) to start a crashed database cluster with no space left. Keeping a dummy file in your `pg_xlog` location might save you a lot of trouble. Create one with following command. If you run out of space, remove this file and you get 300 MB for free. Don't forget to recreate it after you start the cluster.
 
     :::bash
     dd if=/dev/zero of=/path_to_your_database_cluster/pg_xlog/DO_NOT_MOVE_THIS_FILE bs=1MB count=300

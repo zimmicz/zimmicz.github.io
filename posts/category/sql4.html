@@ -24,6 +24,100 @@
 <h2 class="text-center">Articles in the SQL category</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2016/syncing-two-postgresql-databases-faster/" rel="bookmark" title="Permalink to Syncing Two PostgreSQL Databases Faster">Syncing Two PostgreSQL Databases&nbsp;Faster</a></h1>
+    <aside><span>Jul 17, 2016</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p>Imagine you run two database machines hosting structurally the same databases on two separate servers and you need to transfer data from one to another. Not very often, let&#8217;s say once a month. Your tables aren&#8217;t small nor huge, let&#8217;s say millions rows in&nbsp;general.</p>
+<p>You&#8217;re going to use <code>pg_dump</code> and pipe it to <code>psql</code>, but the indices on your tables will slow you down a&nbsp;lot.</p>
+<p>That&#8217;s why you&#8217;ll want to drop all indices and constraints (<code>drop_indices_constraints.sql</code>):</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="s1">&#39;ALTER TABLE &#39;</span> <span class="o">||</span>
+    <span class="n">tc</span><span class="p">.</span><span class="n">table_schema</span> <span class="o">||</span>
+    <span class="s1">&#39;.&#39;</span> <span class="o">||</span>
+    <span class="n">tc</span><span class="p">.</span><span class="k">table_name</span> <span class="o">||</span>
+    <span class="s1">&#39; DROP CONSTRAINT &#39;</span> <span class="o">||</span>
+    <span class="n">tc</span><span class="p">.</span><span class="k">constraint_name</span>  <span class="o">||</span>
+    <span class="s1">&#39;;&#39;</span>
+<span class="k">FROM</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">table_constraints</span> <span class="n">tc</span>
+<span class="k">JOIN</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">constraint_column_usage</span> <span class="n">ccu</span> <span class="k">ON</span> <span class="p">(</span><span class="n">tc</span><span class="p">.</span><span class="k">constraint_catalog</span> <span class="o">=</span> <span class="n">ccu</span><span class="p">.</span><span class="k">constraint_catalog</span> <span class="k">AND</span> <span class="n">tc</span><span class="p">.</span><span class="k">constraint_schema</span> <span class="o">=</span> <span class="n">ccu</span><span class="p">.</span><span class="k">constraint_schema</span> <span class="k">AND</span> <span class="n">tc</span><span class="p">.</span><span class="k">constraint_name</span> <span class="o">=</span> <span class="n">ccu</span><span class="p">.</span><span class="k">constraint_name</span><span class="p">)</span>
+<span class="k">WHERE</span> <span class="n">tc</span><span class="p">.</span><span class="n">table_schema</span> <span class="k">IN</span> <span class="p">(</span><span class="k">SELECT</span> <span class="k">unnest</span><span class="p">(</span><span class="n">string_to_array</span><span class="p">(:</span><span class="s1">&#39;schemas&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">)))</span>
+<span class="k">UNION</span> <span class="k">ALL</span>
+<span class="k">SELECT</span>
+    <span class="s1">&#39;DROP INDEX IF EXISTS &#39;</span> <span class="o">||</span> <span class="n">schemaname</span> <span class="o">||</span> <span class="s1">&#39;.&#39;</span> <span class="o">||</span> <span class="n">indexname</span> <span class="o">||</span> <span class="s1">&#39;;&#39;</span>
+<span class="k">FROM</span> <span class="n">pg_indexes</span>
+<span class="k">WHERE</span> <span class="n">schemaname</span> <span class="k">IN</span> <span class="p">(</span><span class="k">SELECT</span> <span class="k">unnest</span><span class="p">(</span><span class="n">string_to_array</span><span class="p">(:</span><span class="s1">&#39;schemas&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">)));</span>
+</pre></div>
+
+
+<p>Then you will transfer the&nbsp;data:</p>
+<div class="highlight"><pre><span></span>pg_dump -a -t <span class="s2">&quot;schema1.*&quot;</span> -t <span class="s2">&quot;schema2.*&quot;</span> -O -d <span class="nb">source</span> -v <span class="p">|</span> psql -h localhost -d target
+</pre></div>
+
+
+<p>And restore the already dropped indices and constraints (<code>create_indices_constraints.sql</code>):</p>
+<div class="highlight"><pre><span></span><span class="k">WITH</span> <span class="k">constraints</span> <span class="k">AS</span> <span class="p">(</span>
+<span class="k">SELECT</span> <span class="s1">&#39;ALTER TABLE &#39;</span> <span class="o">||</span>
+    <span class="n">tc</span><span class="p">.</span><span class="n">table_schema</span> <span class="o">||</span>
+    <span class="s1">&#39;.&#39;</span> <span class="o">||</span>
+    <span class="n">tc</span><span class="p">.</span><span class="k">table_name</span> <span class="o">||</span>
+    <span class="s1">&#39; ADD CONSTRAINT &#39;</span> <span class="o">||</span>
+    <span class="n">tc</span><span class="p">.</span><span class="k">constraint_name</span> <span class="o">||</span>
+    <span class="s1">&#39; &#39;</span> <span class="o">||</span>
+    <span class="n">tc</span><span class="p">.</span><span class="n">constraint_type</span> <span class="o">||</span>
+    <span class="s1">&#39;(&#39;</span> <span class="o">||</span>
+    <span class="n">string_agg</span><span class="p">(</span><span class="n">ccu</span><span class="p">.</span><span class="k">column_name</span><span class="p">::</span><span class="nb">text</span><span class="p">,</span> <span class="s1">&#39;, &#39;</span><span class="p">)</span><span class="o">||</span> <span class="c1">-- column order should be taken into account here</span>
+    <span class="s1">&#39;);&#39;</span> <span class="n">def</span><span class="p">,</span>
+    <span class="n">tc</span><span class="p">.</span><span class="n">table_schema</span><span class="p">,</span>
+    <span class="n">tc</span><span class="p">.</span><span class="k">table_name</span><span class="p">,</span>
+    <span class="n">tc</span><span class="p">.</span><span class="k">constraint_name</span>
+<span class="k">FROM</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">table_constraints</span> <span class="n">tc</span>
+<span class="k">JOIN</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">constraint_column_usage</span> <span class="n">ccu</span> <span class="k">ON</span> <span class="p">(</span><span class="n">tc</span><span class="p">.</span><span class="k">constraint_catalog</span> <span class="o">=</span> <span class="n">ccu</span><span class="p">.</span><span class="k">constraint_catalog</span> <span class="k">AND</span> <span class="n">tc</span><span class="p">.</span><span class="k">constraint_schema</span> <span class="o">=</span> <span class="n">ccu</span><span class="p">.</span><span class="k">constraint_schema</span> <span class="k">AND</span> <span class="n">tc</span><span class="p">.</span><span class="k">constraint_name</span> <span class="o">=</span> <span class="n">ccu</span><span class="p">.</span><span class="k">constraint_name</span><span class="p">)</span>
+<span class="k">WHERE</span> <span class="n">tc</span><span class="p">.</span><span class="n">table_schema</span> <span class="k">IN</span> <span class="p">(</span><span class="k">SELECT</span> <span class="k">unnest</span><span class="p">(</span><span class="n">string_to_array</span><span class="p">(:</span><span class="s1">&#39;schemas&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">)))</span>
+    <span class="k">AND</span> <span class="n">tc</span><span class="p">.</span><span class="n">constraint_type</span> <span class="o">=</span> <span class="s1">&#39;PRIMARY KEY&#39;</span>
+<span class="k">GROUP</span> <span class="k">BY</span>
+    <span class="n">tc</span><span class="p">.</span><span class="n">table_schema</span><span class="p">,</span>
+    <span class="n">tc</span><span class="p">.</span><span class="k">table_name</span><span class="p">,</span>
+    <span class="n">tc</span><span class="p">.</span><span class="k">constraint_name</span><span class="p">,</span>
+    <span class="n">tc</span><span class="p">.</span><span class="n">constraint_type</span>
+<span class="p">)</span>
+<span class="k">SELECT</span> <span class="n">def</span> <span class="k">FROM</span> <span class="k">constraints</span>
+<span class="k">UNION</span> <span class="k">ALL</span>
+<span class="k">SELECT</span> <span class="n">indexdef</span> <span class="o">||</span> <span class="s1">&#39;;&#39;</span>
+<span class="k">FROM</span> <span class="n">pg_indexes</span>
+<span class="k">WHERE</span> <span class="n">schemaname</span> <span class="k">IN</span> <span class="p">(</span><span class="k">SELECT</span> <span class="k">unnest</span><span class="p">(</span><span class="n">string_to_array</span><span class="p">(:</span><span class="s1">&#39;schemas&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">)))</span> 
+<span class="k">AND</span> <span class="k">NOT</span> <span class="k">EXISTS</span> <span class="p">(</span>
+    <span class="k">SELECT</span> <span class="mi">1</span> <span class="k">FROM</span>
+    <span class="k">constraints</span> <span class="k">c</span>
+    <span class="k">WHERE</span> <span class="n">pg_indexes</span><span class="p">.</span><span class="n">schemaname</span> <span class="o">=</span> <span class="k">c</span><span class="p">.</span><span class="n">table_schema</span>
+        <span class="k">AND</span> <span class="n">pg_indexes</span><span class="p">.</span><span class="n">tablename</span> <span class="o">=</span> <span class="k">c</span><span class="p">.</span><span class="k">table_name</span>
+        <span class="k">AND</span> <span class="n">pg_indexes</span><span class="p">.</span><span class="n">indexname</span> <span class="o">=</span> <span class="k">c</span><span class="p">.</span><span class="k">constraint_name</span>
+<span class="p">);</span>
+</pre></div>
+
+
+<h2>Few&nbsp;sidenotes</h2>
+<ol>
+<li>Run the second piece of code first. If you forget, run that code on the source&nbsp;database.</li>
+<li>Notice the <code>:schemas</code>. Variable assignment is one of the <code>psql</code> features I really&nbsp;like.</li>
+<li>Notice <code>DROP INDEX IF EXISTS</code> and the <span class="caps">CTE</span> used in the drop code - that&#8217;s due to the fact that dropping the constraint obviously drops the underlying index as well and you don&#8217;t want to dropping something that doesn&#8217;t exist or creating something that exists&nbsp;already.</li>
+</ol>
+<p>The bash script proposal might look as&nbsp;follows:</p>
+<div class="highlight"><pre><span></span><span class="c1"># store indices and constraint definitions</span>
+psql -qAt -d target -v <span class="nv">schemas</span><span class="o">=</span><span class="s1">&#39;schema1&#39;</span>,<span class="s1">&#39;schema2&#39;</span> -f create_indices_constraints.sql &gt; create.sql
+
+<span class="c1"># drop indices and constraints</span>
+psql -qAt -d target -v <span class="nv">schemas</span><span class="o">=</span><span class="s1">&#39;schema1&#39;</span>,<span class="s1">&#39;schema2&#39;</span> -f drop_indices_constraints.sql <span class="p">|</span> psql -d target
+
+​# load data
+pg_dump -a -t <span class="s2">&quot;schema1.*&quot;</span> -t <span class="s2">&quot;schema2.*&quot;</span> -O -d <span class="nb">source</span> -v <span class="p">|</span> psql -h localhost -d target
+
+<span class="c1">#renew indices and constraints</span>
+psql -qAt -d target -f create.sql
+​
+</pre></div>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2016/testing-postgresql-ogr-fdw/" rel="bookmark" title="Permalink to Testing PostgreSQL OGR FDW">Testing PostgreSQL <span class="caps">OGR</span> <span class="caps">FDW</span></a></h1>
     <aside><span>Jul 1, 2016</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
@@ -291,63 +385,6 @@ JOIN ints
 <li><code>DISTINCT ON</code> cleans up the list so the same owners don&#8217;t appear more than once for any given c.&nbsp;community.</li>
 </ul>
 <p>Writing this makes me realize the list should be probably sorted by area so only the occurence with the biggest value is kept for each c. community. Simple <code>ORDER BY</code> should deal with this just fine. Or even more sophisticated, using <code>GROUP BY</code> to output the total acreage in all surrounding c.&nbsp;communities.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2015/postgis-count-line-self-intersections/" rel="bookmark" title="Permalink to PostGIS: Count Line Self-Intersections">PostGIS: Count Line&nbsp;Self-Intersections</a></h1>
-    <aside><span>Mar 30, 2015</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p><a href="https://gis.stackexchange.com/questions/107927/counting-self-intersections-of-linestring-using-postgis/140674#140674">Is there a way of using PostgreSQL + PostGIS for finding the number of self intersections in a linestring?</a> was a question that made me think of this problem. I came up with a solution that takes just a few lines of&nbsp;code.</p>
-<p>Assume the following&nbsp;geometries:</p>
-<div class="highlight"><pre><span></span>CREATE TABLE test2 (
-    id integer NOT NULL,
-    wkb_geometry geometry(LineString,5514)
-);
-COPY test2 (id, wkb_geometry) FROM stdin;
-1   01020000208A15000004000000CCDC7845E339EEBFF2003B4A8A08E1BFE4154DAB7C31DCBF24C2042773E3E53F2287BA2CC591E43F604749BFE3B2E2BF2AE9770A11B8F0BF9C91435D56C0C63F
-2   01020000208A1500000600000050212BF9E63EC03F1FA046FD69F1EA3F504D44212915EA3F74A99EDF44E3F33F2CE2805DFAB1F33F805D24B1B189DC3F9834DE5938C1F53FB56F1FBF8AAFEC3F24D0C85B4666EA3FF311B0D8D75BE93F306EAA073894D23FA841B27E3404F33F
-\.
-</pre></div>
-
-
-<p><img data-echo="/posts/assets/postgis-count-line-self-intersections/lines.png" title="Self-intersecting lines" class="img-responsive centered"></p>
-<p>Note that those geometries are valid while not being simple, thus, <code>ST_IsValidReason()</code> wouldn&#8217;t help much. What if we compared it to their single counterparts? Those would have had vertices at intersections. Once you know the original number of vertices and the number of simple geometry vertices, it is fairly easy to subtract those&nbsp;two.</p>
-<div class="highlight"><pre><span></span>WITH noded AS (
-SELECT id, COUNT(id)
-FROM (
-    SELECT DISTINCT (ST_DumpPoints(ST_Node(wkb_geometry))).geom, id
-    FROM test
-) tmp  group by id
-),
-test AS (
-    SELECT id, COUNT(id)
-        FROM (
-            SELECT DISTINCT (ST_DumpPoints(wkb_geometry)).geom, id
-            FROM test
-        ) tmp  group by id
-)
-
-SELECT noded.id, noded.count - test.count cnt FROM noded JOIN test USING (id);
-</pre></div>
-
-
-<p>This query gives you geometry id and the difference in number of vertices between the original and simple geometry. Note the <code>DISTINCT</code> in the <code>noded</code> <span class="caps">CTE</span> - with <code>ST_Node()</code> you get <code>one vertex x number of intersecting lines</code> for each intersection. <code>DISTINCT</code> gives you just one of&nbsp;them.</p>
-<p>The query result on my <code>test</code> table:
-<table>
-    <tr>
-        <th>id</th>
-        <th>cnt</th>
-    </tr>
-    <tr>
-        <td>1</td>
-        <td>1</td>
-    </tr>
-    <tr>
-        <td>2</td>
-        <td>2</td>
-    </tr>
-</table></p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/category/sql3.html">&laquo; Previous page</a>
