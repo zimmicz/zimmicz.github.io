@@ -24,6 +24,165 @@
 <h2 class="text-center">Articles tagged with postgresql tag</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-bash-automation/" rel="bookmark" title="Permalink to PostgreSQL Backup and Recovery Orchestration: Bash Automation">PostgreSQL Backup and Recovery Orchestration: Bash&nbsp;Automation</a></h1>
+    <aside><span>Mar 2, 2018</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p>There is a bunch of periodic database-related tasks in a life of PostgreSQL administrator. Some should be done daily, others weekly, others can wait for a whole month. Many of them are essential for your database health. Forget to run such a task or screw up the run accidentally, and you&#8217;ll be snowed under with fixing your&nbsp;database.</p>
+<p>Those tasks are easily done with bash, which is the first step to full automation. Following tasks are perfect candidates to be implemented as bash&nbsp;scripts:</p>
+<ul>
+<li>full backups (both creation and&nbsp;removal)</li>
+<li><span class="caps">WAL</span> backups (both creation and&nbsp;removal)</li>
+<li>vacuum</li>
+<li>pgBadger log analysis (both creation and&nbsp;removal)</li>
+<li>log maintenance (if you don&#8217;t use log&nbsp;rotate)</li>
+</ul>
+<!-- -->
+
+<p>Full backup creation is just one example of how powerful bash can&nbsp;be.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="c1">#</span>
+<span class="c1"># @author: Michal Zimmermann &lt;michal.zimmermann@clevermaps.cz&gt;</span>
+<span class="c1"># Creates base backup.</span>
+
+<span class="nv">CUR_DIR</span><span class="o">=</span><span class="k">$(</span>dirname <span class="s2">&quot;</span><span class="nv">$0</span><span class="s2">&quot;</span><span class="k">)</span>
+<span class="k">if</span> <span class="o">[[</span> ! -f <span class="si">${</span><span class="nv">CUR_DIR</span><span class="si">}</span>/pgsql-common.sh <span class="o">]]</span>
+<span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;pgsql-common.sh not found!&quot;</span>
+    <span class="nb">exit</span> <span class="m">1</span>
+<span class="k">fi</span>
+
+<span class="nb">source</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">CUR_DIR</span><span class="si">}</span><span class="s2">/pgsql-common.sh&quot;</span>
+<span class="nb">source</span> <span class="s2">&quot;</span><span class="nv">$CONFIG</span><span class="s2">&quot;</span>
+
+<span class="k">if</span> <span class="o">[[</span> -d <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span> <span class="o">]]</span>
+<span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span><span class="s2">/</span><span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span><span class="s2"> already exists and is not empty!&quot;</span>
+    <span class="nb">exit</span> <span class="m">2</span>
+<span class="k">fi</span>
+
+pg_basebackup <span class="se">\</span>
+    --pgdata<span class="o">=</span><span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span> <span class="se">\</span>
+    --format<span class="o">=</span>plain <span class="se">\</span>
+    --write-recovery-conf <span class="se">\</span>
+    --wal-method<span class="o">=</span>stream <span class="se">\</span>
+    --label<span class="o">=</span><span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span> <span class="se">\</span>
+    --checkpoint<span class="o">=</span>fast <span class="se">\</span>
+    --progress <span class="se">\</span>
+    --verbose
+
+<span class="k">if</span> <span class="o">[[</span> <span class="nv">$?</span> -gt <span class="m">0</span> <span class="o">]]</span>
+<span class="k">then</span>
+    rm -rf <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span>
+    <span class="nb">echo</span> <span class="s2">&quot;pg_basebackup on </span><span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span><span class="s2"> failed!&quot;</span>
+    <span class="nb">exit</span> <span class="m">3</span>
+<span class="k">fi</span>
+
+tar -czf <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span>.tar.gz <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span> <span class="o">&amp;&amp;</span> rm -rf <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span>
+</pre></div>
+
+
+<p>As you probably noticed, a <code>pgsql-common.sh</code> file is sourced at the beginning of the script. This script in turn just loads the proper config file that provides variables to other, devops, scripts. As you might need those variables in several of your scripts, it is a good idea to put their load to a separate&nbsp;file.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="c1">#</span>
+<span class="c1"># @author: Michal Zimmermann &lt;michal.zimmermann@clevermaps.cz&gt;</span>
+<span class="c1"># Sourced in pgsql-*.sh scripts.</span>
+
+<span class="k">while</span> <span class="o">[[</span> <span class="nv">$#</span> &gt; <span class="m">0</span> <span class="o">]]</span>
+<span class="k">do</span>
+    <span class="nv">key</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>
+
+    <span class="k">case</span> <span class="nv">$key</span> in
+        -c<span class="p">|</span>--config<span class="o">)</span>
+            <span class="nv">CONFIG</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$2</span><span class="s2">&quot;</span>
+            <span class="nb">shift</span>
+            <span class="p">;;</span>
+        *<span class="o">)</span>
+            <span class="nb">echo</span> <span class="s2">&quot;Usage: `basename </span><span class="nv">$0</span><span class="s2">` --config|-c [config_file]&quot;</span>
+            <span class="nb">exit</span> <span class="m">1</span>
+            <span class="p">;;</span>
+    <span class="k">esac</span>
+    <span class="nb">shift</span>
+<span class="k">done</span>
+<span class="c1"># /Input parameters</span>
+
+<span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;</span><span class="nv">$CONFIG</span><span class="s2">&quot;</span> <span class="o">]]</span>
+<span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;Config file is not set! See the script usage below.&quot;</span>
+    <span class="nv">$0</span> *
+    <span class="nb">exit</span> <span class="m">2</span>
+<span class="k">fi</span>
+
+<span class="k">if</span> <span class="o">[[</span> ! -f <span class="s2">&quot;</span><span class="nv">$CONFIG</span><span class="s2">&quot;</span> <span class="o">]]</span>
+<span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$CONFIG</span><span class="s2"> not found!&quot;</span>
+    <span class="nb">exit</span> <span class="m">3</span>
+<span class="k">fi</span>
+</pre></div>
+
+
+<p>A config file might remain as simple as&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="c1"># Base backup location</span>
+<span class="nb">export</span> <span class="nv">CR_BASE_BACKUP_DIR</span><span class="o">=</span><span class="s2">&quot;/mnt/backup/symap/base/&quot;</span>
+<span class="c1"># WAL backup location</span>
+<span class="nb">export</span> <span class="nv">CR_WAL_BACKUP_DIR</span><span class="o">=</span><span class="s2">&quot;/mnt/backup/symap/wal&quot;</span>
+<span class="c1"># PostgreSQL WAL location</span>
+<span class="nb">export</span> <span class="nv">CR_PG_XLOG_DIR</span><span class="o">=</span><span class="s2">&quot;/var/lib/postgresql/10/symap/pg_wal&quot;</span>
+<span class="nb">export</span> <span class="nv">CR_PG_LOG_DIR</span><span class="o">=</span><span class="s2">&quot;/var/lib/postgresql/10/symap/pg_log&quot;</span>
+<span class="c1"># Base backup pattern (set to YYYYMMDD)</span>
+<span class="nb">export</span> <span class="nv">CR_LABEL</span><span class="o">=</span>symap_<span class="k">$(</span>date +%Y%m%d<span class="k">)</span>
+<span class="nb">export</span> <span class="nv">PGPORT</span><span class="o">=</span><span class="m">5432</span>
+</pre></div>
+
+
+<p>Another, likely the simplest, example is a vacuumdb&nbsp;task:</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="c1">#</span>
+<span class="c1"># @author: Michal Zimmermann &lt;michal.zimmermann@clevermaps.cz&gt;</span>
+<span class="c1"># Vacuums the whole database cluster running on a given port.</span>
+
+<span class="k">while</span> <span class="o">[[</span> <span class="nv">$#</span> &gt; <span class="m">0</span> <span class="o">]]</span>
+<span class="k">do</span>
+    <span class="nv">key</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>
+
+    <span class="k">case</span> <span class="nv">$key</span> in
+        -p<span class="p">|</span>--port<span class="o">)</span>
+            <span class="nv">PORT</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$2</span><span class="s2">&quot;</span>
+            <span class="nb">shift</span>
+            <span class="p">;;</span>
+        *<span class="o">)</span>
+            <span class="nb">echo</span> <span class="s2">&quot;Usage: `basename </span><span class="nv">$0</span><span class="s2">` --port|-p [port_number]&quot;</span>
+            <span class="nb">exit</span> <span class="m">1</span>
+            <span class="p">;;</span>
+    <span class="k">esac</span>
+    <span class="nb">shift</span>
+<span class="k">done</span>
+
+<span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;</span><span class="nv">$PORT</span><span class="s2">&quot;</span> <span class="o">]]</span>
+<span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;Port not provided!&quot;</span>
+    <span class="nv">$0</span> *
+    <span class="nb">exit</span> <span class="m">2</span>
+<span class="k">fi</span>
+
+/usr/bin/vacuumdb -U postgres -p <span class="nv">$PORT</span> --all --full --analyze
+</pre></div>
+
+
+<h2>Tips</h2>
+<ul>
+<li>Always test your bash scripts before production deployment. Even a single line of code might lead to a very different, possibly unexpected,&nbsp;outcome.</li>
+<li>Try to stay as defensive as possible. Imagine a variable did not get sourced properly. Is it going to blow your database? Trust me, I know what I am talking about (see the tweet&nbsp;below).</li>
+</ul>
+<blockquote class="twitter-tweet" data-lang="cs"><p lang="en" dir="ltr">that feeling when you blog about keeping your <a href="https://twitter.com/hashtag/postgresql?src=hash&amp;ref_src=twsrc%5Etfw">#postgresql</a> data safe and few days later you accidentally bzip all postgres-owned files <span class="caps">WHILE</span> the database is running with untested <a href="https://twitter.com/hashtag/bash?src=hash&amp;ref_src=twsrc%5Etfw">#bash</a> script. What a <a href="https://twitter.com/hashtag/tuesday?src=hash&amp;ref_src=twsrc%5Etfw">#tuesday</a>!</p>&mdash; Michal Zimmermann (@zimmicz) <a href="https://twitter.com/zimmicz/status/968546584567996416?ref_src=twsrc%5Etfw">27. února 2018</a></blockquote>
+
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<h2>Pitfalls</h2>
+<p>You do not want to run your bash scripts by hand. You probably do not want them to be run by cron. You want to run them with systemd. More on this next&nbsp;time.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-recovery/" rel="bookmark" title="Permalink to PostgreSQL Backup and Recovery Orchestration: Recovery">PostgreSQL Backup and Recovery Orchestration:&nbsp;Recovery</a></h1>
     <aside><span>Feb 16, 2018</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
@@ -507,106 +666,6 @@ LINE <span class="m">2</span>: <span class="m">1111</span><span class="p">;</spa
 
 <p>All the data was obtained with the following Python script and processed inside the PostgreSQL database. Plots done with <a href="http://bokeh.pydata.org/en/latest/">Bokeh</a>, though I probably wouldn&#8217;t use it again, the docs site is absurdly sluggish and the info is just all over the&nbsp;place.</p>
 <script src="https://gist.github.com/zimmicz/f69a5ce5d3cf3a220e171553c35e0391.js"></script>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2017/upgrading-postgresql-95-to-postgresql-96-with-postgis/" rel="bookmark" title="Permalink to Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with PostGIS">Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with&nbsp;PostGIS</a></h1>
-    <aside><span>Mar 1, 2017</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p>Thanks to <code>pg_upgrade</code> tool the PostgreSQL upgrade on Ubuntu is pretty straightforward. Different PostGIS versions might cause troubles though. This post covers PostgreSQL 9.5, PostGIS 2.2 to PostgreSQL 9.6, PostGIS 2.3&nbsp;migration.</p>
-<p>First of all, install the PostgreSQL 9.6 with PostGIS&nbsp;2.3.</p>
-<div class="highlight"><pre><span></span>apt install postgresql-9.6 postgresql-9.6-postgis-2.3
-</pre></div>
-
-
-<p>Mind that newly installed database cluster runs on port <code>5433</code>.</p>
-<p>If you run <code>pg_upgrade</code> at this stage, it will fail with the following&nbsp;error.</p>
-<div class="highlight"><pre><span></span>could not load library <span class="s2">&quot;</span><span class="nv">$libdir</span><span class="s2">/postgis_topology-2.2&quot;</span>:
-ERROR:  could not access file <span class="s2">&quot;</span><span class="nv">$libdir</span><span class="s2">/postgis_topology-2.2&quot;</span>: No such file or directory
-</pre></div>
-
-
-<p><code>pg_upgrade</code> can&#8217;t run the upgrade because PostGIS versions don&#8217;t match. Install the PostGIS 2.3 for PostgreSQL 9.5 and update extensions in all your&nbsp;databases.</p>
-<div class="highlight"><pre><span></span>apt install postgresql-9.5-postgis-2.3
-
-:::sql
-ALTER EXTENSION postgis UPDATE<span class="p">;</span>
-</pre></div>
-
-
-<p>With both clusters using the same PostGIS version, the upgrade can begin. First, stop them&nbsp;with</p>
-<div class="highlight"><pre><span></span>service postgresql stop
-</pre></div>
-
-
-<p>Then, run the actual <code>pg_upgrade</code> command as <code>postgres</code> user. Make sure the <code>pg_hba.conf</code> file is set to allow local&nbsp;connections.</p>
-<div class="highlight"><pre><span></span>/usr/lib/postgresql/9.6/bin/pg_upgrade <span class="se">\</span>
--b /usr/lib/postgresql/9.5/bin/ <span class="se">\</span>
--B /usr/lib/postgresql/9.6/bin/ <span class="se">\</span>
--d /var/lib/postgresql/9.5/main <span class="se">\</span>
--D /var/lib/postgresql/9.6/main <span class="se">\</span>
--o <span class="s1">&#39; -c config_file=/etc/postgresql/9.5/main/postgresql.conf&#39;</span> <span class="se">\</span>
--O <span class="s1">&#39; -c config_file=/etc/postgresql/9.6/main/postgresql.conf&#39;</span>
-</pre></div>
-
-
-<p>The following result means the upgrade was&nbsp;smooth.</p>
-<div class="highlight"><pre><span></span>Performing Consistency Checks
------------------------------
-Checking cluster versions                                   ok
-Checking database user is the install user                  ok
-Checking database connection settings                       ok
-Checking <span class="k">for</span> prepared transactions                          ok
-Checking <span class="k">for</span> reg* system OID user data types                ok
-Checking <span class="k">for</span> contrib/isn with bigint-passing mismatch       ok
-Checking <span class="k">for</span> roles starting with <span class="s1">&#39;pg_&#39;</span>                      ok
-Creating dump of global objects                             ok
-Creating dump of database schemas
-                                                            ok
-Checking <span class="k">for</span> presence of required libraries                 ok
-Checking database user is the install user                  ok
-Checking <span class="k">for</span> prepared transactions                          ok
-
-If pg_upgrade fails after this point, you must re-initdb the
-new cluster before continuing.
-
-Performing Upgrade
-------------------
-Analyzing all rows in the new cluster                       ok
-Freezing all rows on the new cluster                        ok
-Deleting files from new pg_clog                             ok
-Copying old pg_clog to new server                           ok
-Setting next transaction ID and epoch <span class="k">for</span> new cluster       ok
-Deleting files from new pg_multixact/offsets                ok
-Copying old pg_multixact/offsets to new server              ok
-Deleting files from new pg_multixact/members                ok
-Copying old pg_multixact/members to new server              ok
-Setting next multixact ID and offset <span class="k">for</span> new cluster        ok
-Resetting WAL archives                                      ok
-Setting frozenxid and minmxid counters in new cluster       ok
-Restoring global objects in the new cluster                 ok
-Restoring database schemas in the new cluster
-                                                            ok
-Copying user relation files
-                                                            ok
-Setting next OID <span class="k">for</span> new cluster                            ok
-Sync data directory to disk                                 ok
-Creating script to analyze new cluster                      ok
-Creating script to delete old cluster                       ok
-
-Upgrade Complete
-----------------
-Optimizer statistics are not transferred by pg_upgrade so,
-once you start the new server, consider running:
-    ./analyze_new_cluster.sh
-
-Running this script will delete the old cluster<span class="err">&#39;</span>s data files:
-    ./delete_old_cluster.sh
-</pre></div>
-
-
-<p>The old cluster can be removed and the new one switched back to port <code>5432</code>. Run <code>/usr/lib/postgresql/9.6/bin/vacuumdb -p 5433 --all --analyze-in-stages</code> to collect&nbsp;statistics.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/tag/postgresql2.html">Next page &raquo;</a>

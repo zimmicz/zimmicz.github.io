@@ -24,6 +24,106 @@
 <h2 class="text-center">Articles tagged with postgresql tag</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2017/upgrading-postgresql-95-to-postgresql-96-with-postgis/" rel="bookmark" title="Permalink to Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with PostGIS">Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with&nbsp;PostGIS</a></h1>
+    <aside><span>Mar 1, 2017</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p>Thanks to <code>pg_upgrade</code> tool the PostgreSQL upgrade on Ubuntu is pretty straightforward. Different PostGIS versions might cause troubles though. This post covers PostgreSQL 9.5, PostGIS 2.2 to PostgreSQL 9.6, PostGIS 2.3&nbsp;migration.</p>
+<p>First of all, install the PostgreSQL 9.6 with PostGIS&nbsp;2.3.</p>
+<div class="highlight"><pre><span></span>apt install postgresql-9.6 postgresql-9.6-postgis-2.3
+</pre></div>
+
+
+<p>Mind that newly installed database cluster runs on port <code>5433</code>.</p>
+<p>If you run <code>pg_upgrade</code> at this stage, it will fail with the following&nbsp;error.</p>
+<div class="highlight"><pre><span></span>could not load library <span class="s2">&quot;</span><span class="nv">$libdir</span><span class="s2">/postgis_topology-2.2&quot;</span>:
+ERROR:  could not access file <span class="s2">&quot;</span><span class="nv">$libdir</span><span class="s2">/postgis_topology-2.2&quot;</span>: No such file or directory
+</pre></div>
+
+
+<p><code>pg_upgrade</code> can&#8217;t run the upgrade because PostGIS versions don&#8217;t match. Install the PostGIS 2.3 for PostgreSQL 9.5 and update extensions in all your&nbsp;databases.</p>
+<div class="highlight"><pre><span></span>apt install postgresql-9.5-postgis-2.3
+
+:::sql
+ALTER EXTENSION postgis UPDATE<span class="p">;</span>
+</pre></div>
+
+
+<p>With both clusters using the same PostGIS version, the upgrade can begin. First, stop them&nbsp;with</p>
+<div class="highlight"><pre><span></span>service postgresql stop
+</pre></div>
+
+
+<p>Then, run the actual <code>pg_upgrade</code> command as <code>postgres</code> user. Make sure the <code>pg_hba.conf</code> file is set to allow local&nbsp;connections.</p>
+<div class="highlight"><pre><span></span>/usr/lib/postgresql/9.6/bin/pg_upgrade <span class="se">\</span>
+-b /usr/lib/postgresql/9.5/bin/ <span class="se">\</span>
+-B /usr/lib/postgresql/9.6/bin/ <span class="se">\</span>
+-d /var/lib/postgresql/9.5/main <span class="se">\</span>
+-D /var/lib/postgresql/9.6/main <span class="se">\</span>
+-o <span class="s1">&#39; -c config_file=/etc/postgresql/9.5/main/postgresql.conf&#39;</span> <span class="se">\</span>
+-O <span class="s1">&#39; -c config_file=/etc/postgresql/9.6/main/postgresql.conf&#39;</span>
+</pre></div>
+
+
+<p>The following result means the upgrade was&nbsp;smooth.</p>
+<div class="highlight"><pre><span></span>Performing Consistency Checks
+-----------------------------
+Checking cluster versions                                   ok
+Checking database user is the install user                  ok
+Checking database connection settings                       ok
+Checking <span class="k">for</span> prepared transactions                          ok
+Checking <span class="k">for</span> reg* system OID user data types                ok
+Checking <span class="k">for</span> contrib/isn with bigint-passing mismatch       ok
+Checking <span class="k">for</span> roles starting with <span class="s1">&#39;pg_&#39;</span>                      ok
+Creating dump of global objects                             ok
+Creating dump of database schemas
+                                                            ok
+Checking <span class="k">for</span> presence of required libraries                 ok
+Checking database user is the install user                  ok
+Checking <span class="k">for</span> prepared transactions                          ok
+
+If pg_upgrade fails after this point, you must re-initdb the
+new cluster before continuing.
+
+Performing Upgrade
+------------------
+Analyzing all rows in the new cluster                       ok
+Freezing all rows on the new cluster                        ok
+Deleting files from new pg_clog                             ok
+Copying old pg_clog to new server                           ok
+Setting next transaction ID and epoch <span class="k">for</span> new cluster       ok
+Deleting files from new pg_multixact/offsets                ok
+Copying old pg_multixact/offsets to new server              ok
+Deleting files from new pg_multixact/members                ok
+Copying old pg_multixact/members to new server              ok
+Setting next multixact ID and offset <span class="k">for</span> new cluster        ok
+Resetting WAL archives                                      ok
+Setting frozenxid and minmxid counters in new cluster       ok
+Restoring global objects in the new cluster                 ok
+Restoring database schemas in the new cluster
+                                                            ok
+Copying user relation files
+                                                            ok
+Setting next OID <span class="k">for</span> new cluster                            ok
+Sync data directory to disk                                 ok
+Creating script to analyze new cluster                      ok
+Creating script to delete old cluster                       ok
+
+Upgrade Complete
+----------------
+Optimizer statistics are not transferred by pg_upgrade so,
+once you start the new server, consider running:
+    ./analyze_new_cluster.sh
+
+Running this script will delete the old cluster<span class="err">&#39;</span>s data files:
+    ./delete_old_cluster.sh
+</pre></div>
+
+
+<p>The old cluster can be removed and the new one switched back to port <code>5432</code>. Run <code>/usr/lib/postgresql/9.6/bin/vacuumdb -p 5433 --all --analyze-in-stages</code> to collect&nbsp;statistics.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2017/executing-dynamic-sql-query-right-away/" rel="bookmark" title="Permalink to Executing dynamic SQL query right away">Executing dynamic <span class="caps">SQL</span> query right&nbsp;away</a></h1>
     <aside><span>Feb 28, 2017</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
@@ -175,163 +275,6 @@ cat <span class="s">&lt;&lt; EOF | psql -qAt --no-psqlrc</span>
 
 
 <p>That&#8217;s the whole <span class="caps">ETL</span> process! Next time, I&#8217;ll cover the d3.js&nbsp;viz.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii" rel="bookmark" title="Permalink to Plotting the Czech Cadastre Land Use with d3: Data Transformation (part II)">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></h1>
-    <aside><span>Nov 14, 2016</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/d3.html">d3</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/data.html">data</a></span>
-    </aside>
-    <p>This post is the second part of the series summarizing the process of visualizing landuse data with bash, PostgreSQL and d3.js. Read other&nbsp;parts:</p>
-<ol>
-<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part&nbsp;I)</a></li>
-<li>you&#8217;re reading it&nbsp;now</li>
-<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">III</span>)</a></li>
-</ol>
-<h2><span class="caps">ETL</span>&nbsp;process</h2>
-<p>Before the d3 viz can be crafted, it&#8217;s necessary&nbsp;to:</p>
-<ol>
-<li>extract <span class="caps">CSV</span> data from the URLs provided via the Atom&nbsp;feed</li>
-<li>transform those data into a relational database, do some&nbsp;math</li>
-<li>load data into a d3.js&nbsp;viz</li>
-<li>profit (as&nbsp;usual)</li>
-</ol>
-<h3>Extract</h3>
-<p>See <a href="{filename}../2016/plotting-czech-cadastre-landuse-with-d3-part-i.md">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)</a>.</p>
-<h3>Transform</h3>
-<p>Last time, I extracted the data from multiple <span class="caps">CSV</span> files to separate PostgreSQL tables named by <code>data_YYYYMMDD</code> pattern. My current goal is to transform it into the one big <code>data</code> table, where each row represents one cadastral area. Here&#8217;s what I&#8217;m trying to&nbsp;achieve:</p>
-<div class="highlight"><pre><span></span>-<span class="o">[</span> RECORD <span class="m">1</span> <span class="o">]</span>----------+----------------------------------
-ku_kod                 <span class="p">|</span> <span class="m">600881</span>
-ku_nazev               <span class="p">|</span> Bantice
-celkova_vymera         <span class="p">|</span> <span class="o">{</span><span class="m">3763255</span>,3763255,3763256,3763256<span class="o">}</span>
-celkovy_pocet_parcel   <span class="p">|</span> <span class="o">{</span><span class="m">670</span>,668,664,667<span class="o">}</span>
-chmelnice_pp           <span class="p">|</span> <span class="o">{</span><span class="m">0</span>,0,0,0<span class="o">}</span>
-chmelnice_pp_r         <span class="p">|</span> <span class="o">{</span><span class="m">0</span>.00,0.00,0.00,0.00<span class="o">}</span>
-chmelnice_v            <span class="p">|</span> <span class="o">{</span><span class="m">0</span>,0,0,0<span class="o">}</span>
-chmelnice_v_avg        <span class="p">|</span> <span class="o">{</span><span class="m">0</span>,0,0,0<span class="o">}</span>
-chmelnice_v_r          <span class="p">|</span> <span class="o">{</span><span class="m">0</span>.00,0.00,0.00,0.00<span class="o">}</span>
-lesni_pozemek_pp       <span class="p">|</span> <span class="o">{</span><span class="m">25</span>,25,25,25<span class="o">}</span>
-lesni_pozemek_pp_r     <span class="p">|</span> <span class="o">{</span><span class="m">3</span>.73,3.74,3.77,3.75<span class="o">}</span>
-lesni_pozemek_v        <span class="p">|</span> <span class="o">{</span><span class="m">83879</span>,83879,83879,83879<span class="o">}</span>
-lesni_pozemek_v_avg    <span class="p">|</span> <span class="o">{</span><span class="m">3355</span>,3355,3355,3355<span class="o">}</span>
-lesni_pozemek_v_r      <span class="p">|</span> <span class="o">{</span><span class="m">2</span>.23,2.23,2.23,2.23<span class="o">}</span>
-orna_puda_pp           <span class="p">|</span> <span class="o">{</span><span class="m">88</span>,88,89,89<span class="o">}</span>
-orna_puda_pp_r         <span class="p">|</span> <span class="o">{</span><span class="m">13</span>.13,13.17,13.40,13.34<span class="o">}</span>
-orna_puda_v            <span class="p">|</span> <span class="o">{</span><span class="m">3066230</span>,3066230,3066230,3066230<span class="o">}</span>
-orna_puda_v_avg        <span class="p">|</span> <span class="o">{</span><span class="m">34844</span>,34844,34452,34452<span class="o">}</span>
-orna_puda_v_r          <span class="p">|</span> <span class="o">{</span><span class="m">81</span>.48,81.48,81.48,81.48<span class="o">}</span>
-ostatni_plocha_pp      <span class="p">|</span> <span class="o">{</span><span class="m">201</span>,199,199,201<span class="o">}</span>
-ostatni_plocha_pp_r    <span class="p">|</span> <span class="o">{</span><span class="m">30</span>.00,29.79,29.97,30.13<span class="o">}</span>
-ostatni_plocha_v       <span class="p">|</span> <span class="o">{</span><span class="m">283468</span>,283468,283468,284562<span class="o">}</span>
-ostatni_plocha_v_avg   <span class="p">|</span> <span class="o">{</span><span class="m">1410</span>,1424,1424,1416<span class="o">}</span>
-ostatni_plocha_v_r     <span class="p">|</span> <span class="o">{</span><span class="m">7</span>.53,7.53,7.53,7.56<span class="o">}</span>
-ovocny_sad_pp          <span class="p">|</span> <span class="o">{</span><span class="m">0</span>,0,0,0<span class="o">}</span>
-ovocny_sad_pp_r        <span class="p">|</span> <span class="o">{</span><span class="m">0</span>.00,0.00,0.00,0.00<span class="o">}</span>
-ovocny_sad_v           <span class="p">|</span> <span class="o">{</span><span class="m">0</span>,0,0,0<span class="o">}</span>
-ovocny_sad_v_avg       <span class="p">|</span> <span class="o">{</span><span class="m">0</span>,0,0,0<span class="o">}</span>
-ovocny_sad_v_r         <span class="p">|</span> <span class="o">{</span><span class="m">0</span>.00,0.00,0.00,0.00<span class="o">}</span>
-ttp_pp                 <span class="p">|</span> <span class="o">{</span><span class="m">44</span>,44,44,45<span class="o">}</span>
-ttp_pp_r               <span class="p">|</span> <span class="o">{</span><span class="m">6</span>.57,6.59,6.63,6.75<span class="o">}</span>
-ttp_v                  <span class="p">|</span> <span class="o">{</span><span class="m">49002</span>,49002,49002,47908<span class="o">}</span>
-ttp_v_avg              <span class="p">|</span> <span class="o">{</span><span class="m">1114</span>,1114,1114,1065<span class="o">}</span>
-ttp_v_r                <span class="p">|</span> <span class="o">{</span><span class="m">1</span>.30,1.30,1.30,1.27<span class="o">}</span>
-vinice_pp              <span class="p">|</span> <span class="o">{</span><span class="m">1</span>,1,1,1<span class="o">}</span>
-vinice_pp_r            <span class="p">|</span> <span class="o">{</span><span class="m">0</span>.15,0.15,0.15,0.15<span class="o">}</span>
-vinice_v               <span class="p">|</span> <span class="o">{</span><span class="m">106178</span>,106178,106178,106178<span class="o">}</span>
-vinice_v_avg           <span class="p">|</span> <span class="o">{</span><span class="m">106178</span>,106178,106178,106178<span class="o">}</span>
-vinice_v_r             <span class="p">|</span> <span class="o">{</span><span class="m">2</span>.82,2.82,2.82,2.82<span class="o">}</span>
-vodni_plocha_pp        <span class="p">|</span> <span class="o">{</span><span class="m">23</span>,23,23,23<span class="o">}</span>
-vodni_plocha_pp_r      <span class="p">|</span> <span class="o">{</span><span class="m">3</span>.43,3.44,3.46,3.45<span class="o">}</span>
-vodni_plocha_v         <span class="p">|</span> <span class="o">{</span><span class="m">27877</span>,27877,27877,27877<span class="o">}</span>
-vodni_plocha_v_avg     <span class="p">|</span> <span class="o">{</span><span class="m">1212</span>,1212,1212,1212<span class="o">}</span>
-vodni_plocha_v_r       <span class="p">|</span> <span class="o">{</span><span class="m">0</span>.74,0.74,0.74,0.74<span class="o">}</span>
-zahrada_pp             <span class="p">|</span> <span class="o">{</span><span class="m">115</span>,115,115,115<span class="o">}</span>
-zahrada_pp_r           <span class="p">|</span> <span class="o">{</span><span class="m">17</span>.16,17.22,17.32,17.24<span class="o">}</span>
-zahrada_v              <span class="p">|</span> <span class="o">{</span><span class="m">77381</span>,77381,77353,77353<span class="o">}</span>
-zahrada_v_avg          <span class="p">|</span> <span class="o">{</span><span class="m">673</span>,673,673,673<span class="o">}</span>
-zahrada_v_r            <span class="p">|</span> <span class="o">{</span><span class="m">2</span>.06,2.06,2.06,2.06<span class="o">}</span>
-zastavena_plocha_pp    <span class="p">|</span> <span class="o">{</span><span class="m">173</span>,173,168,168<span class="o">}</span>
-zastavena_plocha_pp_r  <span class="p">|</span> <span class="o">{</span><span class="m">25</span>.82,25.90,25.30,25.19<span class="o">}</span>
-zastavena_plocha_v     <span class="p">|</span> <span class="o">{</span><span class="m">69240</span>,69240,69269,69269<span class="o">}</span>
-zastavena_plocha_v_avg <span class="p">|</span> <span class="o">{</span><span class="m">400</span>,400,412,412<span class="o">}</span>
-zastavena_plocha_v_r   <span class="p">|</span> <span class="o">{</span><span class="m">1</span>.84,1.84,1.84,1.84<span class="o">}</span>
-</pre></div>
-
-
-<p>Several stats were calculated for each land use category (vinice &rarr; vineyard, ovocny_sad &rarr; orchard,&nbsp;&#8230;):</p>
-<ul>
-<li><code>v_r</code> suffix stands for land use area&nbsp;ratio</li>
-<li><code>pp_r</code> suffix stands for land use parcel count&nbsp;ratio</li>
-<li><code>v_avg</code> stands for average parcel&nbsp;area</li>
-</ul>
-<p>All statistical columns are kept as PostgreSQL <code>ARRAY</code>s, ordered by dates (very handy for the future d3.js viz by the&nbsp;way).</p>
-<blockquote>
-<p>Note that since the <code>FULL OUTER JOIN</code> is needed in the next step, SQLite can&#8217;t be used. Pity&nbsp;though.</p>
-</blockquote>
-<p>The whole transformation bash script is the&nbsp;plain:</p>
-<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
-
-psql -qAt --no-psqlrc -f transform.sql <span class="p">|</span> psql -qAt --no-psqlrc
-</pre></div>
-
-
-<p>The <code>transform.sql</code> file is used to build the dynamic <span class="caps">SQL</span> query, which - once built - is piped to another <code>psql</code> command. I admit, pipes are super&nbsp;awesome.</p>
-<div class="highlight"><pre><span></span><span class="k">WITH</span> <span class="n">tables</span> <span class="k">AS</span> <span class="p">(</span>
-<span class="c1">-- FULL OUTER JOIN all the data_YYYYMMDD tables</span>
-<span class="k">SELECT</span>
-    <span class="k">table_name</span><span class="p">,</span>
-    <span class="n">table_schema</span><span class="p">,</span>
-    <span class="s1">&#39;d&#39;</span> <span class="o">||</span> <span class="n">id</span> <span class="n">tbl</span><span class="p">,</span>
-    <span class="k">CASE</span> <span class="k">WHEN</span> <span class="n">id</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="k">THEN</span> <span class="n">table_schema</span> <span class="o">||</span> <span class="s1">&#39;.&#39;</span> <span class="o">||</span> <span class="k">table_name</span> <span class="o">||</span> <span class="s1">&#39; d&#39;</span> <span class="o">||</span> <span class="n">id</span>
-        <span class="k">ELSE</span> <span class="s1">&#39;FULL OUTER JOIN &#39;</span> <span class="o">||</span> <span class="n">table_schema</span> <span class="o">||</span> <span class="s1">&#39;.&#39;</span> <span class="o">||</span> <span class="k">table_name</span> <span class="o">||</span> <span class="s1">&#39; d&#39;</span> <span class="o">||</span> <span class="n">id</span> <span class="o">||</span> <span class="s1">&#39; ON (d1.ku_kod = d&#39;</span> <span class="o">||</span> <span class="n">id</span> <span class="o">||</span> <span class="s1">&#39;.ku_kod)&#39;</span>
-    <span class="k">END</span> <span class="n">tbl_join</span>
-<span class="k">FROM</span> <span class="p">(</span>
-    <span class="k">SELECT</span>
-        <span class="k">table_name</span><span class="p">,</span>
-        <span class="n">table_schema</span><span class="p">,</span>
-        <span class="n">row_number</span><span class="p">()</span> <span class="n">OVER</span> <span class="p">(</span><span class="k">ORDER</span> <span class="k">BY</span> <span class="k">table_name</span><span class="p">)</span> <span class="n">id</span>
-    <span class="k">FROM</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">tables</span>
-    <span class="k">WHERE</span> <span class="k">table_name</span> <span class="k">LIKE</span> <span class="s1">&#39;data_%&#39;</span>
-        <span class="k">AND</span> <span class="n">table_type</span> <span class="o">=</span> <span class="s1">&#39;BASE TABLE&#39;</span>
-        <span class="k">AND</span> <span class="n">table_schema</span> <span class="o">=</span> <span class="s1">&#39;public&#39;</span>
-<span class="p">)</span> <span class="n">a</span>
-<span class="p">)</span>
-<span class="c1">-- create data table with the correct values order for each statistical column</span>
-<span class="c1">-- note that the whole process would crash if d1.ku_kod would be NULL -&gt; @todo fix me</span>
-<span class="k">SELECT</span> <span class="s1">&#39;DROP TABLE IF EXISTS data;</span>
-<span class="s1">    CREATE TABLE data AS</span>
-<span class="s1">    SELECT d1.ku_kod, d1.ku_nazev,&#39;</span>
-<span class="k">UNION</span> <span class="k">ALL</span>
-<span class="k">SELECT</span>
-    <span class="n">array_to_string</span><span class="p">(</span><span class="n">array_agg</span><span class="p">(</span><span class="n">r</span><span class="p">),</span> <span class="s1">&#39;, &#39;</span><span class="p">)</span> <span class="n">r</span>
-<span class="k">FROM</span> <span class="p">(</span>
-    <span class="k">SELECT</span>
-    <span class="s1">&#39;ARRAY[&#39;</span> <span class="o">||</span> <span class="n">array_to_string</span><span class="p">(</span><span class="n">array_agg</span><span class="p">(</span><span class="n">tables</span><span class="p">.</span><span class="n">tbl</span> <span class="o">||</span> <span class="s1">&#39;.&#39;</span> <span class="o">||</span> <span class="n">columns</span><span class="p">.</span><span class="k">column_name</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">tables</span><span class="p">.</span><span class="k">table_name</span><span class="p">),</span> <span class="s1">&#39;, &#39;</span><span class="p">)</span> <span class="o">||</span> <span class="s1">&#39;]&#39;</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span> <span class="n">columns</span><span class="p">.</span><span class="k">column_name</span> <span class="n">r</span>
-    <span class="k">FROM</span> <span class="n">tables</span>
-    <span class="k">JOIN</span> <span class="p">(</span>
-    <span class="k">SELECT</span>
-        <span class="n">table_schema</span><span class="p">,</span>
-        <span class="k">table_name</span><span class="p">,</span>
-        <span class="k">column_name</span>
-    <span class="k">FROM</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">columns</span>
-    <span class="k">WHERE</span> <span class="k">column_name</span> <span class="k">NOT</span> <span class="k">LIKE</span> <span class="s1">&#39;ku_%&#39;</span>
-    <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">ordinal_position</span>
-    <span class="p">)</span> <span class="n">columns</span>
-    <span class="k">ON</span> <span class="p">(</span><span class="n">tables</span><span class="p">.</span><span class="k">table_name</span> <span class="o">=</span> <span class="n">columns</span><span class="p">.</span><span class="k">table_name</span> <span class="k">AND</span> <span class="n">columns</span><span class="p">.</span><span class="n">table_schema</span> <span class="o">=</span> <span class="n">tables</span><span class="p">.</span><span class="n">table_schema</span><span class="p">)</span>
-    <span class="k">GROUP</span> <span class="k">BY</span> <span class="n">columns</span><span class="p">.</span><span class="k">column_name</span>
-<span class="p">)</span> <span class="n">a</span>
-<span class="k">UNION</span> <span class="k">ALL</span>
-<span class="k">SELECT</span> <span class="s1">&#39;FROM&#39;</span>
-<span class="k">UNION</span> <span class="k">ALL</span>
-<span class="k">SELECT</span> <span class="n">tbl_join</span> <span class="k">FROM</span> <span class="n">tables</span><span class="p">;</span>
-</pre></div>
-
-
-<p><code>psql -qAt --no-psqlrc -f transform.sql</code> builds the actual query from the query above, <code>| psql -qAt --no-psqlrc</code> sends it to the database again. This part was really fun to&nbsp;implement!</p>
-<p>I&#8217;m still considering to store diff values instead of absolute values in those <code>ARRAY</code>s - that would save some serious&nbsp;bandwidth!</p>
-<h2>Load</h2>
-<p>See <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">III</span>)</a>.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/tag/postgresql.html">&laquo; Previous page</a>

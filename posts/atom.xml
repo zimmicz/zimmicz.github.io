@@ -1,5 +1,156 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Michal Zimmermann</title><link href="https://www.zimmi.cz/posts/" rel="alternate"></link><link href="https://www.zimmi.cz/posts/atom.xml" rel="self"></link><id>https://www.zimmi.cz/posts/</id><updated>2018-02-16T16:00:00+01:00</updated><entry><title>PostgreSQL Backup and Recovery Orchestration: Recovery</title><link href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-recovery/" rel="alternate"></link><published>2018-02-16T16:00:00+01:00</published><updated>2018-02-16T16:00:00+01:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2018-02-16:/posts/2018/postgresql-backup-and-recovery-orchestration-recovery/</id><summary type="html">&lt;p&gt;PostgreSQL continuous backups are very powerful, if you know how to use them for recovery. There&amp;#8217;s nothing else to do to be sure about that other than &lt;strong&gt;actually trying it&lt;/strong&gt;. Personally, I see recovery as a single process with two possibly different&amp;nbsp;outcomes:&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Michal Zimmermann</title><link href="https://www.zimmi.cz/posts/" rel="alternate"></link><link href="https://www.zimmi.cz/posts/atom.xml" rel="self"></link><id>https://www.zimmi.cz/posts/</id><updated>2018-03-02T16:00:00+01:00</updated><entry><title>PostgreSQL Backup and Recovery Orchestration: Bash Automation</title><link href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-bash-automation/" rel="alternate"></link><published>2018-03-02T16:00:00+01:00</published><updated>2018-03-02T16:00:00+01:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2018-03-02:/posts/2018/postgresql-backup-and-recovery-orchestration-bash-automation/</id><summary type="html">&lt;p&gt;There is a bunch of periodic database-related tasks in a life of PostgreSQL administrator. Some should be done daily, others weekly, others can wait for a whole month. Many of them are essential for your database health. Forget to run such a task or screw up the run accidentally, and …&lt;/p&gt;</summary><content type="html">&lt;p&gt;There is a bunch of periodic database-related tasks in a life of PostgreSQL administrator. Some should be done daily, others weekly, others can wait for a whole month. Many of them are essential for your database health. Forget to run such a task or screw up the run accidentally, and you&amp;#8217;ll be snowed under with fixing your&amp;nbsp;database.&lt;/p&gt;
+&lt;p&gt;Those tasks are easily done with bash, which is the first step to full automation. Following tasks are perfect candidates to be implemented as bash&amp;nbsp;scripts:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;full backups (both creation and&amp;nbsp;removal)&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;WAL&lt;/span&gt; backups (both creation and&amp;nbsp;removal)&lt;/li&gt;
+&lt;li&gt;vacuum&lt;/li&gt;
+&lt;li&gt;pgBadger log analysis (both creation and&amp;nbsp;removal)&lt;/li&gt;
+&lt;li&gt;log maintenance (if you don&amp;#8217;t use log&amp;nbsp;rotate)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;!-- --&gt;
+
+&lt;p&gt;Full backup creation is just one example of how powerful bash can&amp;nbsp;be.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# @author: Michal Zimmermann &amp;lt;michal.zimmermann@clevermaps.cz&amp;gt;&lt;/span&gt;
+&lt;span class="c1"&gt;# Creates base backup.&lt;/span&gt;
+
+&lt;span class="nv"&gt;CUR_DIR&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;dirname &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$0&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; ! -f &lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;CUR_DIR&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;/pgsql-common.sh &lt;span class="o"&gt;]]&lt;/span&gt;
+&lt;span class="k"&gt;then&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;pgsql-common.sh not found!&amp;quot;&lt;/span&gt;
+    &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;
+&lt;span class="k"&gt;fi&lt;/span&gt;
+
+&lt;span class="nb"&gt;source&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;CUR_DIR&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;/pgsql-common.sh&amp;quot;&lt;/span&gt;
+&lt;span class="nb"&gt;source&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$CONFIG&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; -d &lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;CR_BASE_BACKUP_DIR&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;/&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;CR_LABEL&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;
+&lt;span class="k"&gt;then&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;CR_BASE_BACKUP_DIR&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;/&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;CR_LABEL&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt; already exists and is not empty!&amp;quot;&lt;/span&gt;
+    &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;
+&lt;span class="k"&gt;fi&lt;/span&gt;
+
+pg_basebackup &lt;span class="se"&gt;\&lt;/span&gt;
+    --pgdata&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;CR_BASE_BACKUP_DIR&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;/&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;CR_LABEL&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+    --format&lt;span class="o"&gt;=&lt;/span&gt;plain &lt;span class="se"&gt;\&lt;/span&gt;
+    --write-recovery-conf &lt;span class="se"&gt;\&lt;/span&gt;
+    --wal-method&lt;span class="o"&gt;=&lt;/span&gt;stream &lt;span class="se"&gt;\&lt;/span&gt;
+    --label&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;CR_LABEL&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+    --checkpoint&lt;span class="o"&gt;=&lt;/span&gt;fast &lt;span class="se"&gt;\&lt;/span&gt;
+    --progress &lt;span class="se"&gt;\&lt;/span&gt;
+    --verbose
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; &lt;span class="nv"&gt;$?&lt;/span&gt; -gt &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;
+&lt;span class="k"&gt;then&lt;/span&gt;
+    rm -rf &lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;CR_BASE_BACKUP_DIR&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;/&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;CR_LABEL&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;pg_basebackup on &lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;CR_LABEL&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt; failed!&amp;quot;&lt;/span&gt;
+    &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="m"&gt;3&lt;/span&gt;
+&lt;span class="k"&gt;fi&lt;/span&gt;
+
+tar -czf &lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;CR_BASE_BACKUP_DIR&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;/&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;CR_LABEL&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;.tar.gz &lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;CR_BASE_BACKUP_DIR&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;/&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;CR_LABEL&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; rm -rf &lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;CR_BASE_BACKUP_DIR&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;/&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;CR_LABEL&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;As you probably noticed, a &lt;code&gt;pgsql-common.sh&lt;/code&gt; file is sourced at the beginning of the script. This script in turn just loads the proper config file that provides variables to other, devops, scripts. As you might need those variables in several of your scripts, it is a good idea to put their load to a separate&amp;nbsp;file.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# @author: Michal Zimmermann &amp;lt;michal.zimmermann@clevermaps.cz&amp;gt;&lt;/span&gt;
+&lt;span class="c1"&gt;# Sourced in pgsql-*.sh scripts.&lt;/span&gt;
+
+&lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; &lt;span class="nv"&gt;$#&lt;/span&gt; &amp;gt; &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;
+&lt;span class="k"&gt;do&lt;/span&gt;
+    &lt;span class="nv"&gt;key&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$1&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+
+    &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="nv"&gt;$key&lt;/span&gt; in
+        -c&lt;span class="p"&gt;|&lt;/span&gt;--config&lt;span class="o"&gt;)&lt;/span&gt;
+            &lt;span class="nv"&gt;CONFIG&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$2&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+            &lt;span class="nb"&gt;shift&lt;/span&gt;
+            &lt;span class="p"&gt;;;&lt;/span&gt;
+        *&lt;span class="o"&gt;)&lt;/span&gt;
+            &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Usage: `basename &lt;/span&gt;&lt;span class="nv"&gt;$0&lt;/span&gt;&lt;span class="s2"&gt;` --config|-c [config_file]&amp;quot;&lt;/span&gt;
+            &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;
+            &lt;span class="p"&gt;;;&lt;/span&gt;
+    &lt;span class="k"&gt;esac&lt;/span&gt;
+    &lt;span class="nb"&gt;shift&lt;/span&gt;
+&lt;span class="k"&gt;done&lt;/span&gt;
+&lt;span class="c1"&gt;# /Input parameters&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; -z &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$CONFIG&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;
+&lt;span class="k"&gt;then&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Config file is not set! See the script usage below.&amp;quot;&lt;/span&gt;
+    &lt;span class="nv"&gt;$0&lt;/span&gt; *
+    &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;
+&lt;span class="k"&gt;fi&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; ! -f &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$CONFIG&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;
+&lt;span class="k"&gt;then&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$CONFIG&lt;/span&gt;&lt;span class="s2"&gt; not found!&amp;quot;&lt;/span&gt;
+    &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="m"&gt;3&lt;/span&gt;
+&lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;A config file might remain as simple as&amp;nbsp;this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# Base backup location&lt;/span&gt;
+&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;CR_BASE_BACKUP_DIR&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/mnt/backup/symap/base/&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;# WAL backup location&lt;/span&gt;
+&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;CR_WAL_BACKUP_DIR&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/mnt/backup/symap/wal&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;# PostgreSQL WAL location&lt;/span&gt;
+&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;CR_PG_XLOG_DIR&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/var/lib/postgresql/10/symap/pg_wal&amp;quot;&lt;/span&gt;
+&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;CR_PG_LOG_DIR&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/var/lib/postgresql/10/symap/pg_log&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;# Base backup pattern (set to YYYYMMDD)&lt;/span&gt;
+&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;CR_LABEL&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;symap_&lt;span class="k"&gt;$(&lt;/span&gt;date +%Y%m%d&lt;span class="k"&gt;)&lt;/span&gt;
+&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;PGPORT&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;5432&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Another, likely the simplest, example is a vacuumdb&amp;nbsp;task:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# @author: Michal Zimmermann &amp;lt;michal.zimmermann@clevermaps.cz&amp;gt;&lt;/span&gt;
+&lt;span class="c1"&gt;# Vacuums the whole database cluster running on a given port.&lt;/span&gt;
+
+&lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; &lt;span class="nv"&gt;$#&lt;/span&gt; &amp;gt; &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;
+&lt;span class="k"&gt;do&lt;/span&gt;
+    &lt;span class="nv"&gt;key&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$1&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+
+    &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="nv"&gt;$key&lt;/span&gt; in
+        -p&lt;span class="p"&gt;|&lt;/span&gt;--port&lt;span class="o"&gt;)&lt;/span&gt;
+            &lt;span class="nv"&gt;PORT&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$2&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+            &lt;span class="nb"&gt;shift&lt;/span&gt;
+            &lt;span class="p"&gt;;;&lt;/span&gt;
+        *&lt;span class="o"&gt;)&lt;/span&gt;
+            &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Usage: `basename &lt;/span&gt;&lt;span class="nv"&gt;$0&lt;/span&gt;&lt;span class="s2"&gt;` --port|-p [port_number]&amp;quot;&lt;/span&gt;
+            &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;
+            &lt;span class="p"&gt;;;&lt;/span&gt;
+    &lt;span class="k"&gt;esac&lt;/span&gt;
+    &lt;span class="nb"&gt;shift&lt;/span&gt;
+&lt;span class="k"&gt;done&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; -z &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$PORT&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;
+&lt;span class="k"&gt;then&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Port not provided!&amp;quot;&lt;/span&gt;
+    &lt;span class="nv"&gt;$0&lt;/span&gt; *
+    &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;
+&lt;span class="k"&gt;fi&lt;/span&gt;
+
+/usr/bin/vacuumdb -U postgres -p &lt;span class="nv"&gt;$PORT&lt;/span&gt; --all --full --analyze
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Tips&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Always test your bash scripts before production deployment. Even a single line of code might lead to a very different, possibly unexpected,&amp;nbsp;outcome.&lt;/li&gt;
+&lt;li&gt;Try to stay as defensive as possible. Imagine a variable did not get sourced properly. Is it going to blow your database? Trust me, I know what I am talking about (see the tweet&amp;nbsp;below).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote class="twitter-tweet" data-lang="cs"&gt;&lt;p lang="en" dir="ltr"&gt;that feeling when you blog about keeping your &lt;a href="https://twitter.com/hashtag/postgresql?src=hash&amp;amp;ref_src=twsrc%5Etfw"&gt;#postgresql&lt;/a&gt; data safe and few days later you accidentally bzip all postgres-owned files &lt;span class="caps"&gt;WHILE&lt;/span&gt; the database is running with untested &lt;a href="https://twitter.com/hashtag/bash?src=hash&amp;amp;ref_src=twsrc%5Etfw"&gt;#bash&lt;/a&gt; script. What a &lt;a href="https://twitter.com/hashtag/tuesday?src=hash&amp;amp;ref_src=twsrc%5Etfw"&gt;#tuesday&lt;/a&gt;!&lt;/p&gt;&amp;mdash; Michal Zimmermann (@zimmicz) &lt;a href="https://twitter.com/zimmicz/status/968546584567996416?ref_src=twsrc%5Etfw"&gt;27. února 2018&lt;/a&gt;&lt;/blockquote&gt;
+
+&lt;script async src="https://platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt;
+
+&lt;h2&gt;Pitfalls&lt;/h2&gt;
+&lt;p&gt;You do not want to run your bash scripts by hand. You probably do not want them to be run by cron. You want to run them with systemd. More on this next&amp;nbsp;time.&lt;/p&gt;</content><category term="postgresql"></category><category term="linux"></category></entry><entry><title>PostgreSQL Backup and Recovery Orchestration: Recovery</title><link href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-recovery/" rel="alternate"></link><published>2018-02-16T16:00:00+01:00</published><updated>2018-02-16T16:00:00+01:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2018-02-16:/posts/2018/postgresql-backup-and-recovery-orchestration-recovery/</id><summary type="html">&lt;p&gt;PostgreSQL continuous backups are very powerful, if you know how to use them for recovery. There&amp;#8217;s nothing else to do to be sure about that other than &lt;strong&gt;actually trying it&lt;/strong&gt;. Personally, I see recovery as a single process with two possibly different&amp;nbsp;outcomes:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;you&amp;#8217;re recovering to the same …&lt;/li&gt;&lt;/ul&gt;</summary><content type="html">&lt;p&gt;PostgreSQL continuous backups are very powerful, if you know how to use them for recovery. There&amp;#8217;s nothing else to do to be sure about that other than &lt;strong&gt;actually trying it&lt;/strong&gt;. Personally, I see recovery as a single process with two possibly different&amp;nbsp;outcomes:&lt;/p&gt;
 &lt;ul&gt;

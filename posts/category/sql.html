@@ -24,6 +24,165 @@
 <h2 class="text-center">Articles in the SQL category</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-bash-automation/" rel="bookmark" title="Permalink to PostgreSQL Backup and Recovery Orchestration: Bash Automation">PostgreSQL Backup and Recovery Orchestration: Bash&nbsp;Automation</a></h1>
+    <aside><span>Mar 2, 2018</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p>There is a bunch of periodic database-related tasks in a life of PostgreSQL administrator. Some should be done daily, others weekly, others can wait for a whole month. Many of them are essential for your database health. Forget to run such a task or screw up the run accidentally, and you&#8217;ll be snowed under with fixing your&nbsp;database.</p>
+<p>Those tasks are easily done with bash, which is the first step to full automation. Following tasks are perfect candidates to be implemented as bash&nbsp;scripts:</p>
+<ul>
+<li>full backups (both creation and&nbsp;removal)</li>
+<li><span class="caps">WAL</span> backups (both creation and&nbsp;removal)</li>
+<li>vacuum</li>
+<li>pgBadger log analysis (both creation and&nbsp;removal)</li>
+<li>log maintenance (if you don&#8217;t use log&nbsp;rotate)</li>
+</ul>
+<!-- -->
+
+<p>Full backup creation is just one example of how powerful bash can&nbsp;be.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="c1">#</span>
+<span class="c1"># @author: Michal Zimmermann &lt;michal.zimmermann@clevermaps.cz&gt;</span>
+<span class="c1"># Creates base backup.</span>
+
+<span class="nv">CUR_DIR</span><span class="o">=</span><span class="k">$(</span>dirname <span class="s2">&quot;</span><span class="nv">$0</span><span class="s2">&quot;</span><span class="k">)</span>
+<span class="k">if</span> <span class="o">[[</span> ! -f <span class="si">${</span><span class="nv">CUR_DIR</span><span class="si">}</span>/pgsql-common.sh <span class="o">]]</span>
+<span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;pgsql-common.sh not found!&quot;</span>
+    <span class="nb">exit</span> <span class="m">1</span>
+<span class="k">fi</span>
+
+<span class="nb">source</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">CUR_DIR</span><span class="si">}</span><span class="s2">/pgsql-common.sh&quot;</span>
+<span class="nb">source</span> <span class="s2">&quot;</span><span class="nv">$CONFIG</span><span class="s2">&quot;</span>
+
+<span class="k">if</span> <span class="o">[[</span> -d <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span> <span class="o">]]</span>
+<span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span><span class="s2">/</span><span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span><span class="s2"> already exists and is not empty!&quot;</span>
+    <span class="nb">exit</span> <span class="m">2</span>
+<span class="k">fi</span>
+
+pg_basebackup <span class="se">\</span>
+    --pgdata<span class="o">=</span><span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span> <span class="se">\</span>
+    --format<span class="o">=</span>plain <span class="se">\</span>
+    --write-recovery-conf <span class="se">\</span>
+    --wal-method<span class="o">=</span>stream <span class="se">\</span>
+    --label<span class="o">=</span><span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span> <span class="se">\</span>
+    --checkpoint<span class="o">=</span>fast <span class="se">\</span>
+    --progress <span class="se">\</span>
+    --verbose
+
+<span class="k">if</span> <span class="o">[[</span> <span class="nv">$?</span> -gt <span class="m">0</span> <span class="o">]]</span>
+<span class="k">then</span>
+    rm -rf <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span>
+    <span class="nb">echo</span> <span class="s2">&quot;pg_basebackup on </span><span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span><span class="s2"> failed!&quot;</span>
+    <span class="nb">exit</span> <span class="m">3</span>
+<span class="k">fi</span>
+
+tar -czf <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span>.tar.gz <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span> <span class="o">&amp;&amp;</span> rm -rf <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span>
+</pre></div>
+
+
+<p>As you probably noticed, a <code>pgsql-common.sh</code> file is sourced at the beginning of the script. This script in turn just loads the proper config file that provides variables to other, devops, scripts. As you might need those variables in several of your scripts, it is a good idea to put their load to a separate&nbsp;file.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="c1">#</span>
+<span class="c1"># @author: Michal Zimmermann &lt;michal.zimmermann@clevermaps.cz&gt;</span>
+<span class="c1"># Sourced in pgsql-*.sh scripts.</span>
+
+<span class="k">while</span> <span class="o">[[</span> <span class="nv">$#</span> &gt; <span class="m">0</span> <span class="o">]]</span>
+<span class="k">do</span>
+    <span class="nv">key</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>
+
+    <span class="k">case</span> <span class="nv">$key</span> in
+        -c<span class="p">|</span>--config<span class="o">)</span>
+            <span class="nv">CONFIG</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$2</span><span class="s2">&quot;</span>
+            <span class="nb">shift</span>
+            <span class="p">;;</span>
+        *<span class="o">)</span>
+            <span class="nb">echo</span> <span class="s2">&quot;Usage: `basename </span><span class="nv">$0</span><span class="s2">` --config|-c [config_file]&quot;</span>
+            <span class="nb">exit</span> <span class="m">1</span>
+            <span class="p">;;</span>
+    <span class="k">esac</span>
+    <span class="nb">shift</span>
+<span class="k">done</span>
+<span class="c1"># /Input parameters</span>
+
+<span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;</span><span class="nv">$CONFIG</span><span class="s2">&quot;</span> <span class="o">]]</span>
+<span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;Config file is not set! See the script usage below.&quot;</span>
+    <span class="nv">$0</span> *
+    <span class="nb">exit</span> <span class="m">2</span>
+<span class="k">fi</span>
+
+<span class="k">if</span> <span class="o">[[</span> ! -f <span class="s2">&quot;</span><span class="nv">$CONFIG</span><span class="s2">&quot;</span> <span class="o">]]</span>
+<span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$CONFIG</span><span class="s2"> not found!&quot;</span>
+    <span class="nb">exit</span> <span class="m">3</span>
+<span class="k">fi</span>
+</pre></div>
+
+
+<p>A config file might remain as simple as&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="c1"># Base backup location</span>
+<span class="nb">export</span> <span class="nv">CR_BASE_BACKUP_DIR</span><span class="o">=</span><span class="s2">&quot;/mnt/backup/symap/base/&quot;</span>
+<span class="c1"># WAL backup location</span>
+<span class="nb">export</span> <span class="nv">CR_WAL_BACKUP_DIR</span><span class="o">=</span><span class="s2">&quot;/mnt/backup/symap/wal&quot;</span>
+<span class="c1"># PostgreSQL WAL location</span>
+<span class="nb">export</span> <span class="nv">CR_PG_XLOG_DIR</span><span class="o">=</span><span class="s2">&quot;/var/lib/postgresql/10/symap/pg_wal&quot;</span>
+<span class="nb">export</span> <span class="nv">CR_PG_LOG_DIR</span><span class="o">=</span><span class="s2">&quot;/var/lib/postgresql/10/symap/pg_log&quot;</span>
+<span class="c1"># Base backup pattern (set to YYYYMMDD)</span>
+<span class="nb">export</span> <span class="nv">CR_LABEL</span><span class="o">=</span>symap_<span class="k">$(</span>date +%Y%m%d<span class="k">)</span>
+<span class="nb">export</span> <span class="nv">PGPORT</span><span class="o">=</span><span class="m">5432</span>
+</pre></div>
+
+
+<p>Another, likely the simplest, example is a vacuumdb&nbsp;task:</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="c1">#</span>
+<span class="c1"># @author: Michal Zimmermann &lt;michal.zimmermann@clevermaps.cz&gt;</span>
+<span class="c1"># Vacuums the whole database cluster running on a given port.</span>
+
+<span class="k">while</span> <span class="o">[[</span> <span class="nv">$#</span> &gt; <span class="m">0</span> <span class="o">]]</span>
+<span class="k">do</span>
+    <span class="nv">key</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>
+
+    <span class="k">case</span> <span class="nv">$key</span> in
+        -p<span class="p">|</span>--port<span class="o">)</span>
+            <span class="nv">PORT</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$2</span><span class="s2">&quot;</span>
+            <span class="nb">shift</span>
+            <span class="p">;;</span>
+        *<span class="o">)</span>
+            <span class="nb">echo</span> <span class="s2">&quot;Usage: `basename </span><span class="nv">$0</span><span class="s2">` --port|-p [port_number]&quot;</span>
+            <span class="nb">exit</span> <span class="m">1</span>
+            <span class="p">;;</span>
+    <span class="k">esac</span>
+    <span class="nb">shift</span>
+<span class="k">done</span>
+
+<span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;</span><span class="nv">$PORT</span><span class="s2">&quot;</span> <span class="o">]]</span>
+<span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;Port not provided!&quot;</span>
+    <span class="nv">$0</span> *
+    <span class="nb">exit</span> <span class="m">2</span>
+<span class="k">fi</span>
+
+/usr/bin/vacuumdb -U postgres -p <span class="nv">$PORT</span> --all --full --analyze
+</pre></div>
+
+
+<h2>Tips</h2>
+<ul>
+<li>Always test your bash scripts before production deployment. Even a single line of code might lead to a very different, possibly unexpected,&nbsp;outcome.</li>
+<li>Try to stay as defensive as possible. Imagine a variable did not get sourced properly. Is it going to blow your database? Trust me, I know what I am talking about (see the tweet&nbsp;below).</li>
+</ul>
+<blockquote class="twitter-tweet" data-lang="cs"><p lang="en" dir="ltr">that feeling when you blog about keeping your <a href="https://twitter.com/hashtag/postgresql?src=hash&amp;ref_src=twsrc%5Etfw">#postgresql</a> data safe and few days later you accidentally bzip all postgres-owned files <span class="caps">WHILE</span> the database is running with untested <a href="https://twitter.com/hashtag/bash?src=hash&amp;ref_src=twsrc%5Etfw">#bash</a> script. What a <a href="https://twitter.com/hashtag/tuesday?src=hash&amp;ref_src=twsrc%5Etfw">#tuesday</a>!</p>&mdash; Michal Zimmermann (@zimmicz) <a href="https://twitter.com/zimmicz/status/968546584567996416?ref_src=twsrc%5Etfw">27. února 2018</a></blockquote>
+
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<h2>Pitfalls</h2>
+<p>You do not want to run your bash scripts by hand. You probably do not want them to be run by cron. You want to run them with systemd. More on this next&nbsp;time.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-recovery/" rel="bookmark" title="Permalink to PostgreSQL Backup and Recovery Orchestration: Recovery">PostgreSQL Backup and Recovery Orchestration:&nbsp;Recovery</a></h1>
     <aside><span>Feb 16, 2018</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
@@ -313,333 +472,6 @@ LINE <span class="m">2</span>: <span class="m">1111</span><span class="p">;</spa
 <span class="err">\$\$</span><span class="p">;</span>
 <span class="n">BACKUP</span>
 </pre></div>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2017/postgresql-development-history-revealed-with-postgresql/" rel="bookmark" title="Permalink to PostgreSQL Development History Revealed with PostgreSQL">PostgreSQL Development History Revealed with&nbsp;PostgreSQL</a></h1>
-    <aside><span>Aug 9, 2017</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p>I spend a lot of time reading <a href="https://www.postgresql.org/docs/manuals/">PostgreSQL docs</a>. It occurred to me just a few weeks ago that those versioned manuals are great opportunity to get an insight into PostgreSQL development history. Using PostgreSQL, of&nbsp;course.</p>
-<h2><span class="caps">TOP</span> 5 functions with the most verbose docs in each&nbsp;version</h2>
-<div class="highlight"><pre><span></span><span class="k">SELECT</span>
-    <span class="k">version</span><span class="p">,</span>
-    <span class="n">string_agg</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="s1">&#39; | &#39;</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">letter_count</span> <span class="k">DESC</span><span class="p">)</span>
-<span class="k">FROM</span> <span class="p">(</span>
-    <span class="k">SELECT</span>
-        <span class="k">version</span><span class="p">,</span>
-        <span class="n">func</span><span class="p">,</span>
-        <span class="n">letter_count</span><span class="p">,</span>
-        <span class="n">row_number</span><span class="p">()</span> <span class="n">OVER</span> <span class="p">(</span><span class="n">PARTITION</span> <span class="k">BY</span> <span class="k">version</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">letter_count</span> <span class="k">DESC</span><span class="p">)</span>
-    <span class="k">FROM</span> <span class="n">postgresql_development</span><span class="p">.</span><span class="k">data</span>
-<span class="p">)</span> <span class="n">a</span>
-<span class="k">WHERE</span> <span class="n">row_number</span> <span class="o">&lt;=</span> <span class="mi">10</span>
-<span class="k">GROUP</span> <span class="k">BY</span> <span class="k">version</span>
-<span class="k">ORDER</span> <span class="k">BY</span> <span class="k">version</span> <span class="k">DESC</span>
-</pre></div>
-
-
-<p>Seems like a huge comeback for <code>CREATE TABLE</code>.</p>
-<table>
-<thead>
-<tr>
-<th><span class="caps">VERSION</span></th>
-<th>1st</th>
-<th>2nd</th>
-<th>3rd</th>
-<th>4th</th>
-<th>5th</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>10.0</td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">REVOKE</span></td>
-<td><span class="caps">GRANT</span></td>
-<td><span class="caps">SELECT</span></td>
-</tr>
-<tr>
-<td>9.6</td>
-<td><span class="caps">REVOKE</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">GRANT</span></td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">SELECT</span></td>
-</tr>
-<tr>
-<td>9.5</td>
-<td><span class="caps">REVOKE</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">GRANT</span></td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">SELECT</span></td>
-</tr>
-<tr>
-<td>9.4</td>
-<td><span class="caps">REVOKE</span></td>
-<td><span class="caps">GRANT</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">SELECT</span></td>
-</tr>
-<tr>
-<td>9.3</td>
-<td><span class="caps">REVOKE</span></td>
-<td><span class="caps">GRANT</span></td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">DEFAULT</span> <span class="caps">PRIVILEGES</span></td>
-</tr>
-<tr>
-<td>9.2</td>
-<td><span class="caps">REVOKE</span></td>
-<td><span class="caps">GRANT</span></td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">DEFAULT</span> <span class="caps">PRIVILEGES</span></td>
-</tr>
-<tr>
-<td>9.1</td>
-<td><span class="caps">REVOKE</span></td>
-<td><span class="caps">GRANT</span></td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">DEFAULT</span> <span class="caps">PRIVILEGES</span></td>
-</tr>
-<tr>
-<td>9.0</td>
-<td><span class="caps">REVOKE</span></td>
-<td><span class="caps">GRANT</span></td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">DEFAULT</span> <span class="caps">PRIVILEGES</span></td>
-</tr>
-<tr>
-<td>8.4</td>
-<td><span class="caps">REVOKE</span></td>
-<td><span class="caps">GRANT</span></td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">SELECT</span></td>
-</tr>
-<tr>
-<td>8.3</td>
-<td><span class="caps">REVOKE</span></td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">GRANT</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">COMMENT</span></td>
-</tr>
-<tr>
-<td>8.2</td>
-<td><span class="caps">REVOKE</span></td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">GRANT</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">SELECT</span></td>
-</tr>
-<tr>
-<td>8.1</td>
-<td><span class="caps">REVOKE</span></td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">GRANT</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">SELECT</span></td>
-</tr>
-<tr>
-<td>8</td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">REVOKE</span></td>
-<td><span class="caps">GRANT</span></td>
-<td><span class="caps">SELECT</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-</tr>
-<tr>
-<td>7.4</td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">REVOKE</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">GRANT</span></td>
-<td><span class="caps">SELECT</span></td>
-</tr>
-<tr>
-<td>7.3</td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">SELECT</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">REVOKE</span></td>
-<td><span class="caps">GRANT</span></td>
-</tr>
-<tr>
-<td>7.2</td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">SELECT</span> <span class="caps">INTO</span></td>
-<td><span class="caps">SELECT</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">CREATE</span> <span class="caps">TYPE</span></td>
-</tr>
-<tr>
-<td>7.1</td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">SELECT</span> <span class="caps">INTO</span></td>
-<td><span class="caps">SELECT</span></td>
-<td><span class="caps">CREATE</span> <span class="caps">TYPE</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-</tr>
-<tr>
-<td>7.0</td>
-<td><span class="caps">SELECT</span></td>
-<td><span class="caps">SELECT</span> <span class="caps">INTO</span></td>
-<td><span class="caps">CREATE</span> <span class="caps">TYPE</span></td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">COMMENT</span></td>
-</tr>
-</tbody>
-</table>
-<h2>Number of functions available in each&nbsp;version</h2>
-<div class="highlight"><pre><span></span><span class="k">SELECT</span>
-    <span class="k">version</span><span class="p">,</span>
-    <span class="k">count</span><span class="p">(</span><span class="n">func</span><span class="p">),</span>
-    <span class="k">sum</span><span class="p">(</span><span class="n">letter_count</span><span class="p">)</span>
-<span class="k">FROM</span> <span class="n">postgresql_development</span><span class="p">.</span><span class="k">data</span>
-<span class="k">GROUP</span> <span class="k">BY</span> <span class="k">version</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="k">version</span><span class="p">;</span>
-</pre></div>
-
-
-<div class="text-center"><img data-echo="/posts/assets/postgresql-development-history-revealed-with-postgresql/plot1.png"/></div>
-
-<h2>The most verbose docs in each&nbsp;version</h2>
-<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="k">DISTINCT</span> <span class="k">ON</span> <span class="p">(</span><span class="k">version</span><span class="p">)</span>
-    <span class="k">version</span><span class="p">,</span>
-    <span class="n">func</span><span class="p">,</span>
-    <span class="n">letter_count</span>
-<span class="k">FROM</span> <span class="n">postgresql_development</span><span class="p">.</span><span class="k">data</span>
-<span class="k">ORDER</span> <span class="k">BY</span> <span class="k">version</span><span class="p">,</span> <span class="n">letter_count</span> <span class="k">DESC</span><span class="p">;</span>
-</pre></div>
-
-
-<p>Poor <code>REVOKE</code>, the defeated&nbsp;champion.</p>
-<div class="text-center">
-    <table style="margin-left:auto; margin-right: auto">
-    <thead>
-    <tr>
-    <th><span class="caps"><span class="caps">VERSION</span></span></th>
-    <th><span class="caps"><span class="caps">FUNCTION</span></span></th>
-    <th><span class="caps"><span class="caps">LETTER</span></span> <span class="caps"><span class="caps">COUNT</span></span></th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-    <td>10</td>
-    <td><span class="caps"><span class="caps">CREATE</span></span> <span class="caps"><span class="caps">TABLE</span></span></td>
-    <td>3142</td>
-    </tr>
-    <tr>
-    <td>9.6</td>
-    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
-    <td>2856</td>
-    </tr>
-    <tr>
-    <td>9.5</td>
-    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
-    <td>2856</td>
-    </tr>
-    <tr>
-    <td>9.4</td>
-    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
-    <td>2856</td>
-    </tr>
-    <tr>
-    <td>9.3</td>
-    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
-    <td>2856</td>
-    </tr>
-    <tr>
-    <td>9.2</td>
-    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
-    <td>2856</td>
-    </tr>
-    <tr>
-    <td>9.1</td>
-    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
-    <td>2508</td>
-    </tr>
-    <tr>
-    <td>9</td>
-    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
-    <td>2502</td>
-    </tr>
-    <tr>
-    <td>8.4</td>
-    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
-    <td>2105</td>
-    </tr>
-    <tr>
-    <td>8.3</td>
-    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
-    <td>1485</td>
-    </tr>
-    <tr>
-    <td>8.2</td>
-    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
-    <td>1527</td>
-    </tr>
-    <tr>
-    <td>8.1</td>
-    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
-    <td>1312</td>
-    </tr>
-    <tr>
-    <td>8</td>
-    <td><span class="caps"><span class="caps">CREATE</span></span> <span class="caps"><span class="caps">TABLE</span></span></td>
-    <td>1251</td>
-    </tr>
-    <tr>
-    <td>7.4</td>
-    <td><span class="caps"><span class="caps">CREATE</span></span> <span class="caps"><span class="caps">TABLE</span></span></td>
-    <td>1075</td>
-    </tr>
-    <tr>
-    <td>7.3</td>
-    <td><span class="caps"><span class="caps">CREATE</span></span> <span class="caps"><span class="caps">TABLE</span></span></td>
-    <td>929</td>
-    </tr>
-    <tr>
-    <td>7.2</td>
-    <td><span class="caps"><span class="caps">CREATE</span></span> <span class="caps"><span class="caps">TABLE</span></span></td>
-    <td>929</td>
-    </tr>
-    <tr>
-    <td>7.1</td>
-    <td><span class="caps"><span class="caps">CREATE</span></span> <span class="caps"><span class="caps">TABLE</span></span></td>
-    <td>871</td>
-    </tr>
-    <tr>
-    <td>7</td>
-    <td><span class="caps"><span class="caps">SELECT</span></span></td>
-    <td>450</td>
-    </tr>
-    </tbody>
-    </table>
-</div>
-
-<h2><span class="caps">CREATE</span> <span class="caps">TABLE</span> docs&nbsp;evolution</h2>
-<div class="highlight"><pre><span></span><span class="k">SELECT</span>
-    <span class="k">version</span><span class="p">,</span>
-    <span class="n">letter_count</span>
-<span class="k">FROM</span> <span class="n">postgresql_development</span><span class="p">.</span><span class="k">data</span>
-<span class="k">WHERE</span> <span class="n">func</span> <span class="o">=</span> <span class="s1">&#39;CREATE TABLE&#39;</span>
-<span class="k">ORDER</span> <span class="k">BY</span> <span class="n">func</span><span class="p">,</span> <span class="k">version</span><span class="p">;</span>
-</pre></div>
-
-
-<p>Something&#8217;s going on in an upcoming 10.0&nbsp;version.</p>
-<div class="text-center"><img data-echo="/posts/assets/postgresql-development-history-revealed-with-postgresql/plot2.png"/></div>
-
-<p>All the data was obtained with the following Python script and processed inside the PostgreSQL database. Plots done with <a href="http://bokeh.pydata.org/en/latest/">Bokeh</a>, though I probably wouldn&#8217;t use it again, the docs site is absurdly sluggish and the info is just all over the&nbsp;place.</p>
-<script src="https://gist.github.com/zimmicz/f69a5ce5d3cf3a220e171553c35e0391.js"></script>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/category/sql2.html">Next page &raquo;</a>

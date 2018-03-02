@@ -23,6 +23,121 @@
     <main>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2017/wifileaks-wi-fi-networks-dataviz/" rel="bookmark" title="Permalink to Wifileaks Wi-Fi Networks Dataviz">Wifileaks Wi-Fi Networks&nbsp;Dataviz</a></h1>
+    <aside><span>May 2, 2017</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/visualization.html">visualization</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
+    </aside>
+    <p><a href="http://www.wifileaks.cz">Wifileaks</a> is a project by Jakub Čížek aimed to map the Czech wi-fi networks with Android/iOS app. The data gathered by people using the app <a href="http://download.wifileaks.cz/data/wifileaks_raw_170416.tar.gz">is available to download</a> and features ~&nbsp;90,000,000 records, each representing the position of the cellphone when connecting to the network. Just about perfect to craft some&nbsp;maps!</p>
+<div class="text-center"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/cr.png"/></div>
+
+<h2>Using PostgreSQL&nbsp;cstore_fdw</h2>
+<p>I ran out of disk space immediately after loading the dataset into the PostgreSQL database. After fiddling around I remembered that columnar store should be a bit space-friendlier than the old fashioned relational database. Thus, I installed the <a href="https://github.com/citusdata/cstore_fdw">cstore_fdw</a> by Citus Data in just few&nbsp;steps.</p>
+<div class="highlight"><pre><span></span>sudo apt install libprotobuf-c-dev libprotobuf-c1 protobuf-c-compiler postgresql-server-dev-9.6
+git clone git@github.com:citusdata/cstore_fdw.git
+<span class="nv">PATH</span><span class="o">=</span>/usr/bin/:<span class="nv">$PATH</span> make
+<span class="nv">PATH</span><span class="o">=</span>/usr/bin/:<span class="nv">$PATH</span> make install
+
+<span class="c1"># when the cstore_fdw installation finishes, add the following line to your postgresql.conf and restart the database cluster</span>
+<span class="nv">shared_preload_libraries</span> <span class="o">=</span> <span class="s1">&#39;cstore_fdw&#39;</span>
+</pre></div>
+
+
+<p>This makes <a href="https://www.zimmi.cz/posts/2016/testing-postgresql-ogr-fdw/">another <span class="caps">FDW</span> available</a> to you inside the PostgreSQL. The actual foreign server has to be created before loading the data into a foreign&nbsp;table.</p>
+<div class="highlight"><pre><span></span>cat <span class="s">&lt;&lt;END | psql -qAt --no-psqlrc</span>
+<span class="s">    CREATE SERVER cstore_server FOREIGN DATA WRAPPER cstore_fdw;</span>
+<span class="s">    CREATE SCHEMA data_cstore;</span>
+<span class="s">    CREATE FOREIGN TABLE data_cstore.wifi (</span>
+<span class="s">        id integer,</span>
+<span class="s">        mac text,</span>
+<span class="s">        ssid text,</span>
+<span class="s">        signal_strength numeric,</span>
+<span class="s">        security integer,</span>
+<span class="s">        lat numeric,</span>
+<span class="s">        lon numeric,</span>
+<span class="s">        alt numeric,</span>
+<span class="s">        unixtime bigint,</span>
+<span class="s">        filename text</span>
+<span class="s">    )</span>
+<span class="s">    SERVER cstore_server</span>
+<span class="s">    OPTIONS (compression &#39;pglz&#39;);</span>
+<span class="s">END</span>
+</pre></div>
+
+
+<p>The foreign table <strong>is 3&times; smaller</strong> than it&#8217;s standard counterpart. However, this comes with some&nbsp;costs:</p>
+<ul>
+<li>neither <code>UPDATE</code> nor <code>DELETE</code> can be&nbsp;used</li>
+<li>no <code>CREATE INDEX</code></li>
+<li>no <code>SERIAL</code></li>
+</ul>
+<p>To overcome these shortcomings I used <code>COPY</code> statement to spit out the slightly modified table and immediately loaded it back&nbsp;in.</p>
+<div class="highlight"><pre><span></span>cat <span class="s">&lt;&lt;END | psql -qAt --no-psqlrc</span>
+<span class="s">COPY (</span>
+<span class="s">    SELECT</span>
+<span class="s">        row_number() OVER (),</span>
+<span class="s">        mac,</span>
+<span class="s">        ssid,</span>
+<span class="s">        signal_strength,</span>
+<span class="s">        security,</span>
+<span class="s">        split_part(filename, &#39;_&#39;, 2)::integer,</span>
+<span class="s">        to_timestamp(unixtime),</span>
+<span class="s">        ST_Transform(ST_SetSRID(ST_MakePoint(lon, lat, alt), 4326), 32633)</span>
+<span class="s">    FROM data_cstore.wifi</span>
+<span class="s">    WHERE lon BETWEEN 0 AND 20</span>
+<span class="s">        AND lat BETWEEN 18 AND 84</span>
+<span class="s">) TO &#39;/tmp/wifileaks.db&#39; WITH CSV DELIMITER &#39;;&#39;</span>
+<span class="s">    DROP SCHEMA IF EXISTS data_cstore CASCADE;</span>
+
+<span class="s">DROP SCHEMA data_cstore;</span>
+<span class="s">CREATE SCHEMA data_cstore;</span>
+<span class="s">CREATE FOREIGN TABLE data_cstore.wifi (</span>
+<span class="s">    id integer,</span>
+<span class="s">    mac text,</span>
+<span class="s">    ssid text,</span>
+<span class="s">    signal_strength numeric,</span>
+<span class="s">    security integer,</span>
+<span class="s">    userid integer,</span>
+<span class="s">    unixtime timestamp without time zone,</span>
+<span class="s">    geom geometry(POINTZ, 32633)</span>
+<span class="s">)</span>
+<span class="s">SERVER cstore_server</span>
+<span class="s">OPTIONS (compression &#39;pglz&#39;);</span>
+<span class="s">END</span>
+</pre></div>
+
+
+<h2>Putting the networks on the&nbsp;map</h2>
+<table>
+    <tr>
+        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"></a></td>
+        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"></a></td>
+        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"></a></td>
+    </tr>
+    <tr>
+        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"></a></td>
+        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"></a></td>
+        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"></a></td>
+    </tr>
+</table>
+
+<p>As mentioned, each row of data represents the cellphone&#8217;s location when connecting to a wi-fi network. To get real wi-fi transmitter position, I calculated the average of location of each cellphone ever connected (although the signal strength should be taken into account here as&nbsp;well).</p>
+<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="n">UNLOGGED</span> <span class="k">TABLE</span> <span class="n">data_cstore</span><span class="p">.</span><span class="n">wifi_avg_loc</span> <span class="k">AS</span>
+<span class="k">SELECT</span>
+    <span class="n">row_number</span><span class="p">()</span> <span class="n">OVER</span> <span class="p">()</span> <span class="n">id</span><span class="p">,</span>
+    <span class="n">mac</span><span class="p">,</span>
+    <span class="n">ST_SetSRID</span><span class="p">(</span><span class="n">ST_MakePoint</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="mi">32633</span><span class="p">)</span> <span class="n">geom</span>
+<span class="k">FROM</span> <span class="p">(</span>
+    <span class="k">SELECT</span>
+        <span class="n">mac</span><span class="p">,</span>
+        <span class="k">AVG</span><span class="p">(</span><span class="n">ST_X</span><span class="p">(</span><span class="n">geom</span><span class="p">))</span> <span class="n">x</span><span class="p">,</span>
+        <span class="k">AVG</span><span class="p">(</span><span class="n">ST_Y</span><span class="p">(</span><span class="n">geom</span><span class="p">))</span> <span class="n">y</span>
+    <span class="k">FROM</span> <span class="n">data_cstore</span><span class="p">.</span><span class="n">wifi_loc</span>
+    <span class="k">GROUP</span> <span class="k">BY</span> <span class="mi">1</span>
+<span class="p">)</span> <span class="n">a</span><span class="p">;</span>
+</pre></div>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2017/routing-with-grass-gis-catchment-area-calculation/" rel="bookmark" title="Permalink to Routing with GRASS GIS: Catchment Area Calculation">Routing with <span class="caps">GRASS</span> <span class="caps">GIS</span>: Catchment Area&nbsp;Calculation</a></h1>
     <aside><span>Apr 20, 2017</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/grass.html">grass</a>    </span>
@@ -403,24 +518,6 @@ Running this script will delete the old cluster<span class="err">&#39;</span>s d
 
 
 <p>The old cluster can be removed and the new one switched back to port <code>5432</code>. Run <code>/usr/lib/postgresql/9.6/bin/vacuumdb -p 5433 --all --analyze-in-stages</code> to collect&nbsp;statistics.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2017/executing-dynamic-sql-query-right-away/" rel="bookmark" title="Permalink to Executing dynamic SQL query right away">Executing dynamic <span class="caps">SQL</span> query right&nbsp;away</a></h1>
-    <aside><span>Feb 28, 2017</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p>PostgreSQL 9.6 comes with a handy <code>psql</code> command called <code>\gexec</code> that <em>sends the current query input buffer to the server and treats the result as a <span class="caps">SQL</span> statement to be executed</em> (right, whatever). What that means is that instead of doing&nbsp;this</p>
-<div class="highlight"><pre><span></span>psql -c <span class="s2">&quot;SELECT &#39;DROP TABLE &#39; || tablename FROM information_schema.tables WHERE table_name LIKE &#39;%to_be_dropped%&quot;</span> <span class="p">|</span> psql
-</pre></div>
-
-
-<p>you&#8217;ll do&nbsp;that</p>
-<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="s1">&#39;DROP TABLE &#39;</span> <span class="o">||</span> <span class="n">tablename</span> <span class="k">FROM</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">tables</span> <span class="k">WHERE</span> <span class="k">table_name</span> <span class="k">LIKE</span> <span class="s1">&#39;%to_be_dropped%&#39;</span><span class="err">\</span><span class="n">gexec</span>
-</pre></div>
-
-
-<p>Brilliant.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/index3.html">&laquo; Previous page</a>

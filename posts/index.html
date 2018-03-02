@@ -23,6 +23,165 @@
     <main>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-bash-automation/" rel="bookmark" title="Permalink to PostgreSQL Backup and Recovery Orchestration: Bash Automation">PostgreSQL Backup and Recovery Orchestration: Bash&nbsp;Automation</a></h1>
+    <aside><span>Mar 2, 2018</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p>There is a bunch of periodic database-related tasks in a life of PostgreSQL administrator. Some should be done daily, others weekly, others can wait for a whole month. Many of them are essential for your database health. Forget to run such a task or screw up the run accidentally, and you&#8217;ll be snowed under with fixing your&nbsp;database.</p>
+<p>Those tasks are easily done with bash, which is the first step to full automation. Following tasks are perfect candidates to be implemented as bash&nbsp;scripts:</p>
+<ul>
+<li>full backups (both creation and&nbsp;removal)</li>
+<li><span class="caps">WAL</span> backups (both creation and&nbsp;removal)</li>
+<li>vacuum</li>
+<li>pgBadger log analysis (both creation and&nbsp;removal)</li>
+<li>log maintenance (if you don&#8217;t use log&nbsp;rotate)</li>
+</ul>
+<!-- -->
+
+<p>Full backup creation is just one example of how powerful bash can&nbsp;be.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="c1">#</span>
+<span class="c1"># @author: Michal Zimmermann &lt;michal.zimmermann@clevermaps.cz&gt;</span>
+<span class="c1"># Creates base backup.</span>
+
+<span class="nv">CUR_DIR</span><span class="o">=</span><span class="k">$(</span>dirname <span class="s2">&quot;</span><span class="nv">$0</span><span class="s2">&quot;</span><span class="k">)</span>
+<span class="k">if</span> <span class="o">[[</span> ! -f <span class="si">${</span><span class="nv">CUR_DIR</span><span class="si">}</span>/pgsql-common.sh <span class="o">]]</span>
+<span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;pgsql-common.sh not found!&quot;</span>
+    <span class="nb">exit</span> <span class="m">1</span>
+<span class="k">fi</span>
+
+<span class="nb">source</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">CUR_DIR</span><span class="si">}</span><span class="s2">/pgsql-common.sh&quot;</span>
+<span class="nb">source</span> <span class="s2">&quot;</span><span class="nv">$CONFIG</span><span class="s2">&quot;</span>
+
+<span class="k">if</span> <span class="o">[[</span> -d <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span> <span class="o">]]</span>
+<span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span><span class="s2">/</span><span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span><span class="s2"> already exists and is not empty!&quot;</span>
+    <span class="nb">exit</span> <span class="m">2</span>
+<span class="k">fi</span>
+
+pg_basebackup <span class="se">\</span>
+    --pgdata<span class="o">=</span><span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span> <span class="se">\</span>
+    --format<span class="o">=</span>plain <span class="se">\</span>
+    --write-recovery-conf <span class="se">\</span>
+    --wal-method<span class="o">=</span>stream <span class="se">\</span>
+    --label<span class="o">=</span><span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span> <span class="se">\</span>
+    --checkpoint<span class="o">=</span>fast <span class="se">\</span>
+    --progress <span class="se">\</span>
+    --verbose
+
+<span class="k">if</span> <span class="o">[[</span> <span class="nv">$?</span> -gt <span class="m">0</span> <span class="o">]]</span>
+<span class="k">then</span>
+    rm -rf <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span>
+    <span class="nb">echo</span> <span class="s2">&quot;pg_basebackup on </span><span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span><span class="s2"> failed!&quot;</span>
+    <span class="nb">exit</span> <span class="m">3</span>
+<span class="k">fi</span>
+
+tar -czf <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span>.tar.gz <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span> <span class="o">&amp;&amp;</span> rm -rf <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span>
+</pre></div>
+
+
+<p>As you probably noticed, a <code>pgsql-common.sh</code> file is sourced at the beginning of the script. This script in turn just loads the proper config file that provides variables to other, devops, scripts. As you might need those variables in several of your scripts, it is a good idea to put their load to a separate&nbsp;file.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="c1">#</span>
+<span class="c1"># @author: Michal Zimmermann &lt;michal.zimmermann@clevermaps.cz&gt;</span>
+<span class="c1"># Sourced in pgsql-*.sh scripts.</span>
+
+<span class="k">while</span> <span class="o">[[</span> <span class="nv">$#</span> &gt; <span class="m">0</span> <span class="o">]]</span>
+<span class="k">do</span>
+    <span class="nv">key</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>
+
+    <span class="k">case</span> <span class="nv">$key</span> in
+        -c<span class="p">|</span>--config<span class="o">)</span>
+            <span class="nv">CONFIG</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$2</span><span class="s2">&quot;</span>
+            <span class="nb">shift</span>
+            <span class="p">;;</span>
+        *<span class="o">)</span>
+            <span class="nb">echo</span> <span class="s2">&quot;Usage: `basename </span><span class="nv">$0</span><span class="s2">` --config|-c [config_file]&quot;</span>
+            <span class="nb">exit</span> <span class="m">1</span>
+            <span class="p">;;</span>
+    <span class="k">esac</span>
+    <span class="nb">shift</span>
+<span class="k">done</span>
+<span class="c1"># /Input parameters</span>
+
+<span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;</span><span class="nv">$CONFIG</span><span class="s2">&quot;</span> <span class="o">]]</span>
+<span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;Config file is not set! See the script usage below.&quot;</span>
+    <span class="nv">$0</span> *
+    <span class="nb">exit</span> <span class="m">2</span>
+<span class="k">fi</span>
+
+<span class="k">if</span> <span class="o">[[</span> ! -f <span class="s2">&quot;</span><span class="nv">$CONFIG</span><span class="s2">&quot;</span> <span class="o">]]</span>
+<span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$CONFIG</span><span class="s2"> not found!&quot;</span>
+    <span class="nb">exit</span> <span class="m">3</span>
+<span class="k">fi</span>
+</pre></div>
+
+
+<p>A config file might remain as simple as&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="c1"># Base backup location</span>
+<span class="nb">export</span> <span class="nv">CR_BASE_BACKUP_DIR</span><span class="o">=</span><span class="s2">&quot;/mnt/backup/symap/base/&quot;</span>
+<span class="c1"># WAL backup location</span>
+<span class="nb">export</span> <span class="nv">CR_WAL_BACKUP_DIR</span><span class="o">=</span><span class="s2">&quot;/mnt/backup/symap/wal&quot;</span>
+<span class="c1"># PostgreSQL WAL location</span>
+<span class="nb">export</span> <span class="nv">CR_PG_XLOG_DIR</span><span class="o">=</span><span class="s2">&quot;/var/lib/postgresql/10/symap/pg_wal&quot;</span>
+<span class="nb">export</span> <span class="nv">CR_PG_LOG_DIR</span><span class="o">=</span><span class="s2">&quot;/var/lib/postgresql/10/symap/pg_log&quot;</span>
+<span class="c1"># Base backup pattern (set to YYYYMMDD)</span>
+<span class="nb">export</span> <span class="nv">CR_LABEL</span><span class="o">=</span>symap_<span class="k">$(</span>date +%Y%m%d<span class="k">)</span>
+<span class="nb">export</span> <span class="nv">PGPORT</span><span class="o">=</span><span class="m">5432</span>
+</pre></div>
+
+
+<p>Another, likely the simplest, example is a vacuumdb&nbsp;task:</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="c1">#</span>
+<span class="c1"># @author: Michal Zimmermann &lt;michal.zimmermann@clevermaps.cz&gt;</span>
+<span class="c1"># Vacuums the whole database cluster running on a given port.</span>
+
+<span class="k">while</span> <span class="o">[[</span> <span class="nv">$#</span> &gt; <span class="m">0</span> <span class="o">]]</span>
+<span class="k">do</span>
+    <span class="nv">key</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>
+
+    <span class="k">case</span> <span class="nv">$key</span> in
+        -p<span class="p">|</span>--port<span class="o">)</span>
+            <span class="nv">PORT</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$2</span><span class="s2">&quot;</span>
+            <span class="nb">shift</span>
+            <span class="p">;;</span>
+        *<span class="o">)</span>
+            <span class="nb">echo</span> <span class="s2">&quot;Usage: `basename </span><span class="nv">$0</span><span class="s2">` --port|-p [port_number]&quot;</span>
+            <span class="nb">exit</span> <span class="m">1</span>
+            <span class="p">;;</span>
+    <span class="k">esac</span>
+    <span class="nb">shift</span>
+<span class="k">done</span>
+
+<span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;</span><span class="nv">$PORT</span><span class="s2">&quot;</span> <span class="o">]]</span>
+<span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;Port not provided!&quot;</span>
+    <span class="nv">$0</span> *
+    <span class="nb">exit</span> <span class="m">2</span>
+<span class="k">fi</span>
+
+/usr/bin/vacuumdb -U postgres -p <span class="nv">$PORT</span> --all --full --analyze
+</pre></div>
+
+
+<h2>Tips</h2>
+<ul>
+<li>Always test your bash scripts before production deployment. Even a single line of code might lead to a very different, possibly unexpected,&nbsp;outcome.</li>
+<li>Try to stay as defensive as possible. Imagine a variable did not get sourced properly. Is it going to blow your database? Trust me, I know what I am talking about (see the tweet&nbsp;below).</li>
+</ul>
+<blockquote class="twitter-tweet" data-lang="cs"><p lang="en" dir="ltr">that feeling when you blog about keeping your <a href="https://twitter.com/hashtag/postgresql?src=hash&amp;ref_src=twsrc%5Etfw">#postgresql</a> data safe and few days later you accidentally bzip all postgres-owned files <span class="caps">WHILE</span> the database is running with untested <a href="https://twitter.com/hashtag/bash?src=hash&amp;ref_src=twsrc%5Etfw">#bash</a> script. What a <a href="https://twitter.com/hashtag/tuesday?src=hash&amp;ref_src=twsrc%5Etfw">#tuesday</a>!</p>&mdash; Michal Zimmermann (@zimmicz) <a href="https://twitter.com/zimmicz/status/968546584567996416?ref_src=twsrc%5Etfw">27. února 2018</a></blockquote>
+
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<h2>Pitfalls</h2>
+<p>You do not want to run your bash scripts by hand. You probably do not want them to be run by cron. You want to run them with systemd. More on this next&nbsp;time.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-recovery/" rel="bookmark" title="Permalink to PostgreSQL Backup and Recovery Orchestration: Recovery">PostgreSQL Backup and Recovery Orchestration:&nbsp;Recovery</a></h1>
     <aside><span>Feb 16, 2018</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
@@ -305,33 +464,6 @@ find <span class="nv">$CR_WAL_BACKUP_DIR</span> <span class="se">\</span>
 
 <p>Right now, I&#8217;m working on <a href="https://github.com/zimmicz/qgis-attribute-transfer-plugin/issues/3">finding the nearest feature even if no bounding box intersection is found</a>. Meanwhile, <a href="https://github.com/zimmicz/qgis-attribute-transfer-plugin/issues/2">the plugin is being reviewed</a> to be featured in <a href="https://plugins.qgis.org"><span class="caps">QGIS</span> Plugins repository</a>. Fingers&nbsp;crossed.</p>
 <p>I thought this was going to be the last part of the series. But how could one possibly claim the coding project done without writing <em>tests</em>? Stay tuned for the next&nbsp;episode.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-creating-gui-with-qt-designer/" rel="bookmark" title="Permalink to QGIS Plugin Development: Creating GUI with Qt Designer"><span class="caps">QGIS</span> Plugin Development: Creating <span class="caps">GUI</span> with Qt&nbsp;Designer</a></h1>
-    <aside><span>Nov 16, 2017</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">QGIS</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/qgis.html">QGIS</a></span>
-    </aside>
-    <p>After fiddling with <a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/"><span class="caps">QGIS</span> Python console</a> and implementing <a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/">nearest neighbor analysis</a>, I&#8217;m going to create a very simple <span class="caps">GUI</span> for the plugin at&nbsp;last.</p>
-<p>While <span class="caps">QGIS</span> <span class="caps">API</span> docs took me few hours to grasp, the PyQGIS ecosystem knocked my socks off. Here comes the list of tools you should incorporate into your development process as soon as&nbsp;possible.</p>
-<h2>Plugin&nbsp;Builder</h2>
-<p>The <a href="https://plugins.qgis.org/plugins/pluginbuilder/"><span class="caps">QGIS</span> Plugin Builder</a> is a plugin created to create&hellip; well, other plugins. It gets you going in minutes and lets you code instead of setting up things you don&#8217;t want to be setting up. A definite must-have. Note you should put the plugin inside the <span class="caps">QGIS</span> plugins folder (defaults to ~/.qgis2/python/plugins) in&nbsp;Linux.</p>
-<div class="text-center"><img data-echo="/posts/assets/qgis-plugin-development-creating-gui-with-qt-designer/qgis.gif"/></div>
-
-<p>Remember to run <code>pyrcc4 -o resources.py resources.qrc</code> inside your plugin folder before you add it to <span class="caps">QGIS</span>.</p>
-<h2>Plugin&nbsp;Reloader</h2>
-<p>The <a href="https://plugins.qgis.org/plugins/plugin_reloader/"><span class="caps">QGIS</span> Plugin Reloader</a> is a plugin (possibly created with <span class="caps">QGIS</span> Plugin Builder) that lets you live reload your plugin while you code. No <span class="caps">QGIS</span> restarts needed. A definite&nbsp;must-have.</p>
-<h2>Qt&nbsp;Designer</h2>
-<p><a href="https://www.qt.io/qt-features-libraries-apis-tools-and-ide/">Qt Designer</a> comes with <code>qt4-designer</code> package in Ubuntu. It is tailored to design and build GUIs from Qt components that can be used within <span class="caps">QGIS</span>. Its drag&amp;drop interface lets you prototype&nbsp;quickly.</p>
-<p>Thanks to the Plugin Builder you can load the <code>attribute_transfer_dialog_base.ui</code> file straight into the Qt Designer and adjust it to your&nbsp;needs.</p>
-<div class="text-center"><img data-echo="/posts/assets/qgis-plugin-development-creating-gui-with-qt-designer/qt.gif"/></div>
-
-<p>It doesn&#8217;t take much, just one <code>QLineEdit</code> and a few <code>QComboBox</code> widgets. Those will be available in the <code>attribute_transfer.py</code> file as properties of the <code>AttributeTransferDialog</code> class.</p>
-<p>The widget name can be customized in the right sidebar and I advise you to do so. I chose the&nbsp;following:</p>
-<div class="text-center"><img data-echo="/posts/assets/qgis-plugin-development-creating-gui-with-qt-designer/qt.png"/></div>
-
-<p>Once loaded with Plugins -&gt; Manage and Install Plugins -&gt; AttributeTransfer, the plugin is available right from the toolbar or Vector menu. It is missing the business logic completely, but I have this covered in <a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/">the previous part</a>.</p>
-<p>All that is to be done is to bind those two parts&nbsp;together.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/index2.html">Next page &raquo;</a>

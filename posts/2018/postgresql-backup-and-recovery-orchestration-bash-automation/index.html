@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+          <title>Michal Zimmermann | PostgreSQL Backup and Recovery Orchestration: Bash Automation</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+
+
+
+    <meta name="tags" content="postgresql" />
+    <meta name="tags" content="linux" />
+    <meta property="og:image" content="https://www.zimmi.cz/posts/assets/postgresql-backup-and-recovery-orchestration/postgresql_recovery.jpg" />
+  <meta property="og:title" content="PostgreSQL Backup and Recovery Orchestration: Bash Automation" />
+  <meta property="og:description" content="There is a bunch of periodic database-related tasks in a life of PostgreSQL administrator. Some should be done daily, others weekly, others can wait for a whole month. Many of them are essential for your database health. Forget to run such a task or..." />
+  <meta property="og:url" content="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-bash-automation/" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?a4089d0f">
+</head>
+<body>
+    <nav role="navigation">
+        <ul>
+            <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+            <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+            <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
+        </ul>
+    </nav>
+    <header>
+        <h1><a href="/posts">Michal Zimmermann<small>Pieces of knowledge from the world of GIS.</small></a></h1>
+    </header>
+    <main>
+<article>
+    <h1><a href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-bash-automation/" rel="bookmark" title="Permalink to PostgreSQL Backup and Recovery Orchestration: Bash Automation">PostgreSQL Backup and Recovery Orchestration: Bash&nbsp;Automation</a></h1>
+    <aside><span>Mar 2, 2018</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+<p>There is a bunch of periodic database-related tasks in a life of PostgreSQL administrator. Some should be done daily, others weekly, others can wait for a whole month. Many of them are essential for your database health. Forget to run such a task or screw up the run accidentally, and you&#8217;ll be snowed under with fixing your&nbsp;database.</p>
+<p>Those tasks are easily done with bash, which is the first step to full automation. Following tasks are perfect candidates to be implemented as bash&nbsp;scripts:</p>
+<ul>
+<li>full backups (both creation and&nbsp;removal)</li>
+<li><span class="caps">WAL</span> backups (both creation and&nbsp;removal)</li>
+<li>vacuum</li>
+<li>pgBadger log analysis (both creation and&nbsp;removal)</li>
+<li>log maintenance (if you don&#8217;t use log&nbsp;rotate)</li>
+</ul>
+<!-- -->
+
+<p>Full backup creation is just one example of how powerful bash can&nbsp;be.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="c1">#</span>
+<span class="c1"># @author: Michal Zimmermann &lt;michal.zimmermann@clevermaps.cz&gt;</span>
+<span class="c1"># Creates base backup.</span>
+
+<span class="nv">CUR_DIR</span><span class="o">=</span><span class="k">$(</span>dirname <span class="s2">&quot;</span><span class="nv">$0</span><span class="s2">&quot;</span><span class="k">)</span>
+<span class="k">if</span> <span class="o">[[</span> ! -f <span class="si">${</span><span class="nv">CUR_DIR</span><span class="si">}</span>/pgsql-common.sh <span class="o">]]</span>
+<span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;pgsql-common.sh not found!&quot;</span>
+    <span class="nb">exit</span> <span class="m">1</span>
+<span class="k">fi</span>
+
+<span class="nb">source</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">CUR_DIR</span><span class="si">}</span><span class="s2">/pgsql-common.sh&quot;</span>
+<span class="nb">source</span> <span class="s2">&quot;</span><span class="nv">$CONFIG</span><span class="s2">&quot;</span>
+
+<span class="k">if</span> <span class="o">[[</span> -d <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span> <span class="o">]]</span>
+<span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span><span class="s2">/</span><span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span><span class="s2"> already exists and is not empty!&quot;</span>
+    <span class="nb">exit</span> <span class="m">2</span>
+<span class="k">fi</span>
+
+pg_basebackup <span class="se">\</span>
+    --pgdata<span class="o">=</span><span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span> <span class="se">\</span>
+    --format<span class="o">=</span>plain <span class="se">\</span>
+    --write-recovery-conf <span class="se">\</span>
+    --wal-method<span class="o">=</span>stream <span class="se">\</span>
+    --label<span class="o">=</span><span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span> <span class="se">\</span>
+    --checkpoint<span class="o">=</span>fast <span class="se">\</span>
+    --progress <span class="se">\</span>
+    --verbose
+
+<span class="k">if</span> <span class="o">[[</span> <span class="nv">$?</span> -gt <span class="m">0</span> <span class="o">]]</span>
+<span class="k">then</span>
+    rm -rf <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span>
+    <span class="nb">echo</span> <span class="s2">&quot;pg_basebackup on </span><span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span><span class="s2"> failed!&quot;</span>
+    <span class="nb">exit</span> <span class="m">3</span>
+<span class="k">fi</span>
+
+tar -czf <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span>.tar.gz <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span> <span class="o">&amp;&amp;</span> rm -rf <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span>
+</pre></div>
+
+
+<p>As you probably noticed, a <code>pgsql-common.sh</code> file is sourced at the beginning of the script. This script in turn just loads the proper config file that provides variables to other, devops, scripts. As you might need those variables in several of your scripts, it is a good idea to put their load to a separate&nbsp;file.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="c1">#</span>
+<span class="c1"># @author: Michal Zimmermann &lt;michal.zimmermann@clevermaps.cz&gt;</span>
+<span class="c1"># Sourced in pgsql-*.sh scripts.</span>
+
+<span class="k">while</span> <span class="o">[[</span> <span class="nv">$#</span> &gt; <span class="m">0</span> <span class="o">]]</span>
+<span class="k">do</span>
+    <span class="nv">key</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>
+
+    <span class="k">case</span> <span class="nv">$key</span> in
+        -c<span class="p">|</span>--config<span class="o">)</span>
+            <span class="nv">CONFIG</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$2</span><span class="s2">&quot;</span>
+            <span class="nb">shift</span>
+            <span class="p">;;</span>
+        *<span class="o">)</span>
+            <span class="nb">echo</span> <span class="s2">&quot;Usage: `basename </span><span class="nv">$0</span><span class="s2">` --config|-c [config_file]&quot;</span>
+            <span class="nb">exit</span> <span class="m">1</span>
+            <span class="p">;;</span>
+    <span class="k">esac</span>
+    <span class="nb">shift</span>
+<span class="k">done</span>
+<span class="c1"># /Input parameters</span>
+
+<span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;</span><span class="nv">$CONFIG</span><span class="s2">&quot;</span> <span class="o">]]</span>
+<span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;Config file is not set! See the script usage below.&quot;</span>
+    <span class="nv">$0</span> *
+    <span class="nb">exit</span> <span class="m">2</span>
+<span class="k">fi</span>
+
+<span class="k">if</span> <span class="o">[[</span> ! -f <span class="s2">&quot;</span><span class="nv">$CONFIG</span><span class="s2">&quot;</span> <span class="o">]]</span>
+<span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$CONFIG</span><span class="s2"> not found!&quot;</span>
+    <span class="nb">exit</span> <span class="m">3</span>
+<span class="k">fi</span>
+</pre></div>
+
+
+<p>A config file might remain as simple as&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="c1"># Base backup location</span>
+<span class="nb">export</span> <span class="nv">CR_BASE_BACKUP_DIR</span><span class="o">=</span><span class="s2">&quot;/mnt/backup/symap/base/&quot;</span>
+<span class="c1"># WAL backup location</span>
+<span class="nb">export</span> <span class="nv">CR_WAL_BACKUP_DIR</span><span class="o">=</span><span class="s2">&quot;/mnt/backup/symap/wal&quot;</span>
+<span class="c1"># PostgreSQL WAL location</span>
+<span class="nb">export</span> <span class="nv">CR_PG_XLOG_DIR</span><span class="o">=</span><span class="s2">&quot;/var/lib/postgresql/10/symap/pg_wal&quot;</span>
+<span class="nb">export</span> <span class="nv">CR_PG_LOG_DIR</span><span class="o">=</span><span class="s2">&quot;/var/lib/postgresql/10/symap/pg_log&quot;</span>
+<span class="c1"># Base backup pattern (set to YYYYMMDD)</span>
+<span class="nb">export</span> <span class="nv">CR_LABEL</span><span class="o">=</span>symap_<span class="k">$(</span>date +%Y%m%d<span class="k">)</span>
+<span class="nb">export</span> <span class="nv">PGPORT</span><span class="o">=</span><span class="m">5432</span>
+</pre></div>
+
+
+<p>Another, likely the simplest, example is a vacuumdb&nbsp;task:</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="c1">#</span>
+<span class="c1"># @author: Michal Zimmermann &lt;michal.zimmermann@clevermaps.cz&gt;</span>
+<span class="c1"># Vacuums the whole database cluster running on a given port.</span>
+
+<span class="k">while</span> <span class="o">[[</span> <span class="nv">$#</span> &gt; <span class="m">0</span> <span class="o">]]</span>
+<span class="k">do</span>
+    <span class="nv">key</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>
+
+    <span class="k">case</span> <span class="nv">$key</span> in
+        -p<span class="p">|</span>--port<span class="o">)</span>
+            <span class="nv">PORT</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$2</span><span class="s2">&quot;</span>
+            <span class="nb">shift</span>
+            <span class="p">;;</span>
+        *<span class="o">)</span>
+            <span class="nb">echo</span> <span class="s2">&quot;Usage: `basename </span><span class="nv">$0</span><span class="s2">` --port|-p [port_number]&quot;</span>
+            <span class="nb">exit</span> <span class="m">1</span>
+            <span class="p">;;</span>
+    <span class="k">esac</span>
+    <span class="nb">shift</span>
+<span class="k">done</span>
+
+<span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;</span><span class="nv">$PORT</span><span class="s2">&quot;</span> <span class="o">]]</span>
+<span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;Port not provided!&quot;</span>
+    <span class="nv">$0</span> *
+    <span class="nb">exit</span> <span class="m">2</span>
+<span class="k">fi</span>
+
+/usr/bin/vacuumdb -U postgres -p <span class="nv">$PORT</span> --all --full --analyze
+</pre></div>
+
+
+<h2>Tips</h2>
+<ul>
+<li>Always test your bash scripts before production deployment. Even a single line of code might lead to a very different, possibly unexpected,&nbsp;outcome.</li>
+<li>Try to stay as defensive as possible. Imagine a variable did not get sourced properly. Is it going to blow your database? Trust me, I know what I am talking about (see the tweet&nbsp;below).</li>
+</ul>
+<blockquote class="twitter-tweet" data-lang="cs"><p lang="en" dir="ltr">that feeling when you blog about keeping your <a href="https://twitter.com/hashtag/postgresql?src=hash&amp;ref_src=twsrc%5Etfw">#postgresql</a> data safe and few days later you accidentally bzip all postgres-owned files <span class="caps">WHILE</span> the database is running with untested <a href="https://twitter.com/hashtag/bash?src=hash&amp;ref_src=twsrc%5Etfw">#bash</a> script. What a <a href="https://twitter.com/hashtag/tuesday?src=hash&amp;ref_src=twsrc%5Etfw">#tuesday</a>!</p>&mdash; Michal Zimmermann (@zimmicz) <a href="https://twitter.com/zimmicz/status/968546584567996416?ref_src=twsrc%5Etfw">27. února 2018</a></blockquote>
+
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<h2>Pitfalls</h2>
+<p>You do not want to run your bash scripts by hand. You probably do not want them to be run by cron. You want to run them with systemd. More on this next&nbsp;time.</p>
+<aside>
+<h3>This post is part 3 of the "PostgreSQL Backup and Recovery Orchestration" series:</h3>
+    <ol class="parts">
+            <li>
+<a href='https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-wal-archiving/'>                PostgreSQL Backup and Recovery Orchestration: <span class="caps">WAL</span>&nbsp;Archiving
+</a>            </li>
+            <li>
+<a href='https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-recovery/'>                PostgreSQL Backup and Recovery Orchestration:&nbsp;Recovery
+</a>            </li>
+            <li>
+                PostgreSQL Backup and Recovery Orchestration: Bash&nbsp;Automation
+            </li>
+    </ol>
+
+<h3>More reading</h3>
+    <ul>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/">Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span></a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-recovery/">PostgreSQL Backup and Recovery Orchestration:&nbsp;Recovery</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/postgresql-remote-access/">PostgreSQL Remote&nbsp;Access</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-wal-archiving/">PostgreSQL Backup and Recovery Orchestration: <span class="caps">WAL</span>&nbsp;Archiving</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/blogging-on-docker-piecrust-to-the-rescue/">Blogging On Docker: Piecrust To The&nbsp;Rescue</a></li>
+    </ul>
+<!-- Start of Async Drift Code -->
+<script>
+    !function () {
+        var t;
+        if (t = window.driftt = window.drift = window.driftt || [], !t.init) return t.invoked ? void (window.console && console.error && console.error("Drift snippet included twice.")) : (t.invoked = !0,
+            t.methods = ["identify", "config", "track", "reset", "debug", "show", "ping", "page", "hide", "off", "on"],
+            t.factory = function (e) {
+                return function () {
+                    var n;
+                    return n = Array.prototype.slice.call(arguments), n.unshift(e), t.push(n), t;
+                };
+            }, t.methods.forEach(function (e) {
+                t[e] = t.factory(e);
+            }), t.load = function (t) {
+                var e, n, o, i;
+                e = 3e5, i = Math.ceil(new Date() / e) * e, o = document.createElement("script"),
+                    o.type = "text/javascript", o.async = !0, o.crossorigin = "anonymous", o.src = "https://js.driftt.com/include/" + i + "/" + t + ".js",
+                    n = document.getElementsByTagName("script")[0], n.parentNode.insertBefore(o, n);
+            });
+    }();
+    drift.SNIPPET_VERSION = '0.3.1';
+    drift.load('caacyauy5t6b');
+
+</script>
+<!-- End of Async Drift Code --></aside>
+    </main>
+    <footer>
+        Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
+        Proudly powered by <a href="//getpelican.com/">Pelican</a>,
+        which takes great advantage of <a href="//python.org">Python</a>.
+    </footer>
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-43432739-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments)};
+  gtag('js', new Date());
+
+  gtag('config', 'UA-43432739-2');
+</script>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NW8R37N');</script>
+<!-- End Google Tag Manager -->
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NW8R37N"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<script src="https://www.zimmi.cz/posts/theme/js/echo.min.js"></script>
+<script>
+echo.init({
+  offset: 200,
+  throttle: 250,
+  unload: false
+});
+</script>
+</body>
+</html>

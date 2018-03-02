@@ -24,6 +24,34 @@
 <h2>Articles by Michal Zimmermann</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2015/hosting-website-on-openshift/" rel="bookmark" title="Permalink to Hosting Website On Openshift">Hosting Website On&nbsp;Openshift</a></h1>
+    <aside><span>Feb 23, 2015</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/openshift.html">openshift</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+    </aside>
+    <p>I decided to migrate <a href="http://www.zimmi.cz">my web</a> to <a href="http://openshift.com">OpenShift</a>. It was a bit frustrating but I got it working&nbsp;eventually.</p>
+<h2>Things to know before taking the&nbsp;leap</h2>
+<p>Some domain providers don&#8217;t support <span class="caps">CNAME</span> changes for root domains (zimmi.cz in my case). This means you can&#8217;t simply tell your domain to serve content from OpenShift address. But what you can do is to tell your <code>www</code> subdomain to do&nbsp;so:</p>
+<div class="highlight"><pre><span></span>www.zimmi.cz CNAME hp-zimmi.rhcloud.com
+</pre></div>
+
+
+<p>Which is great until you realize you&#8217;ve just created two different websites. That&#8217;s where <a href="http://wwwizer.com/">wwwizer</a> lends you a hand and lets you redirect your naked domain to your <code>www</code> domain:</p>
+<div class="highlight"><pre><span></span>zimmi.cz A 174.129.25.170
+</pre></div>
+
+
+<p>Now everything works fine and you have your <code>www.domain.tld</code> up and&nbsp;running.</p>
+<h2>OpenShift&nbsp;subdomains</h2>
+<p>I wasn&#8217;t successful creating a subdomain on the same application where I run my domain. This can be easily solved by creating another application and pointing <span class="caps">DNS</span> to&nbsp;it:</p>
+<div class="highlight"><pre><span></span>posts.zimmi.cz A 174.179.25.170
+www.posts.zimmi.cz CNAME posts-zimmi.rhcloud.com
+</pre></div>
+
+
+<p>Just don&#8217;t forget to handle both naked and <code>www</code> version. When Google reindexes new URLs (http://www.zimmi.cz/posts instead of http://posts.zimmi.cz) subdomain application might be&nbsp;deleted.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-ii/" rel="bookmark" title="Permalink to PostGIS Case Study: Vozejkmap Open Data (Part II)">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">II</span>)</a></h1>
     <aside><span>Feb 21, 2015</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
@@ -291,64 +319,6 @@ UPDATE vozejkmap SET geom = ST_SetSRID(ST_MakePoint(lng, lat), 4326);
 
 <p><strong>And here we are, ready to use our spatial&nbsp;data!</strong></p>
 <p>Feel free to <a href="https://github.com/zimmicz/vozejkmap-to-postgis">grab the code</a> at&nbsp;GitHub.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2014/postgis-spatial-indexing-with-st_intersects/" rel="bookmark" title="Permalink to PostGIS Spatial Indexing With ST_Intersects">PostGIS Spatial Indexing With&nbsp;ST_Intersects</a></h1>
-    <aside><span>Nov 23, 2014</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p><a href="http://postgis.net/docs/ST_Intersects.html">PostGIS docs</a> clearly states that:
-    &gt; This function call will automatically include a bounding box comparison that will make use of any indexes that are available on the&nbsp;geometries.</p>
-<p>That means (or at least I think so) that you shouldn&#8217;t bother with using <a href="http://postgis.net/docs/reference.html#Operators">operators</a> before calling this&nbsp;function.</p>
-<p><a href="http://slides.com/michalzimmermann">I was preparing</a> my second lecture on PostGIS and I was experimenting a bit and came up with an interesting thing on this&nbsp;matter:</p>
-<p>Let&#8217;s have two <span class="caps">SQL</span> relations, <code>roads</code> and <code>regions</code>. I would like to retrieve every road that intersects a certain region. Spatial indexes were built beforehand on both&nbsp;tables.</p>
-<p>First&nbsp;try:</p>
-<div class="highlight"><pre><span></span>EXPLAIN ANALYZE SELECT roads.* FROM roads
-JOIN regions ON ST_Intersects(roads.geom, regions.geom)
-WHERE regions.&quot;NAZEV&quot; = &#39;Jihomoravský&#39;;`
-</pre></div>
-
-
-<p>And here comes the&nbsp;result:</p>
-<div class="highlight"><pre><span></span>Nested Loop  (cost=4.85..324.26 rows=249 width=214) (actual time=45.102..5101.472 rows=74253 loops=1)
--&gt;  Seq Scan on regions  (cost=0.00..12.62 rows=1 width=32) (actual time=0.015..0.018 rows=1 loops=1)
-     Filter: ((&quot;NAZEV&quot;)::text = &#39;Jihomoravský&#39;::text)
-     Rows Removed by Filter: 13
--&gt;  Bitmap Heap Scan on roads  (cost=4.85..311.38 rows=25 width=214) (actual time=45.079..4931.495 rows=74253 loops=1)
-     Recheck Cond: (geom &amp;&amp; regions.geom)
-     Rows Removed by Index Recheck: 154841
-     Filter: _st_intersects(geom, regions.geom)
-     Rows Removed by Filter: 71212
-     -&gt;  Bitmap Index Scan on roads_idx  (cost=0.00..4.85 rows=75 width=0) (actual time=40.142..40.142 rows=145465 loops=1)
-           Index Cond: (geom &amp;&amp; regions.geom)
-Total runtime: 5181.459 ms
-</pre></div>
-
-
-<p>I was pretty satisfied with the result, I kept digging deeper&nbsp;though.</p>
-<p>Second&nbsp;try:</p>
-<div class="highlight"><pre><span></span>EXPLAIN ANALYZE SELECT roads.* FROM roads
-JOIN regions ON roads.geom &amp;&amp; regions.geom
-WHERE regions.&quot;NAZEV&quot; = &#39;Jihomoravský&#39; AND ST_Intersects(roads.geom, regions.geom);
-</pre></div>
-
-
-<p>And the&nbsp;result:</p>
-<div class="highlight"><pre><span></span>Nested Loop  (cost=0.29..21.19 rows=1 width=214) (actual time=3.041..3850.302 rows=74253 loops=1)
--&gt;  Seq Scan on regions  (cost=0.00..12.62 rows=1 width=32) (actual time=0.021..0.024 rows=1 loops=1)
-     Filter: ((&quot;NAZEV&quot;)::text = &#39;Jihomoravský&#39;::text)
-     Rows Removed by Filter: 13
--&gt;  Index Scan using roads_idx on roads  (cost=0.29..8.55 rows=1 width=214) (actual time=2.938..3681.432 rows=74253 loops=1)
-     Index Cond: ((geom &amp;&amp; regions.geom) AND (geom &amp;&amp; regions.geom))
-     Filter: _st_intersects(geom, regions.geom)
-     Rows Removed by Filter: 71212
-Total runtime: 3930.270 ms
-</pre></div>
-
-
-<p>Now there&#8217;s a significant difference between total runtimes of both queries and - more important - also a difference between their query plans. The latter is like <strong>20 % faster</strong>.</p>
-<p>I&#8217;m puzzled about this behavior and would appreciate any thoughts on this. Reach me at <a href="http://twitter.com/zimmicz">Twitter</a>, <a href="https://www.linkedin.com/pub/michal-zimmermann/29/8/b30">LinkedIn</a> or e-mail&nbsp;(zimmicz[at]gmail.com).</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/author/michal-zimmermann12.html">&laquo; Previous page</a>

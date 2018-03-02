@@ -24,6 +24,31 @@
 <h2 class="text-center">Articles tagged with linux tag</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2015/how-to-use-queue-with-rsync/" rel="bookmark" title="Permalink to How to Use Queue with Rsync">How to Use Queue with&nbsp;Rsync</a></h1>
+    <aside><span>Oct 1, 2015</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
+    </aside>
+    <p>Having more than 120K <span class="caps">5MB</span>+ images that should be moved to the server is a great oportunity for some automatic bash processing. It might be good idea to use <a href="http://www.imagemagick.org/script/index.php">ImageMagick</a> <a href="http://www.imagemagick.org/script/convert.php">convert tool</a> to make images smaller in a simple for loop. <a href="http://www.gnu.org/software/parallel/"><span class="caps">GNU</span> Parallel</a> can significantly increase the performance by running one job per <span class="caps">CPU</span>&nbsp;core.</p>
+<div class="highlight"><pre><span></span>parallel --verbose convert <span class="o">{}</span> -quality <span class="m">40</span>% <span class="o">{}</span> ::: *.jpg
+</pre></div>
+
+
+<p>The <code>parallel</code> modifies several images per second. Uploading these right away seems to be the next step. But how do you tell <code>rsync</code> to check for modified files every now and then? Another for loop mixed with <code>sleep</code> would work, but it just doesn&#8217;t feel&nbsp;right.</p>
+<p>Luckily, there&#8217;s a <a href="http://linux.die.net/man/1/inotifywait"><code>inotifywait</code></a> tool capable of watching changes to files and taking actions based on those&nbsp;changes.</p>
+<div class="highlight"><pre><span></span>inotifywait -e close_write -m --format <span class="s1">&#39;%f&#39;</span> . <span class="p">|</span> <span class="se">\</span>
+<span class="k">while</span> <span class="nb">read</span> file
+<span class="k">do</span>
+    <span class="nb">echo</span> <span class="nv">$file</span>
+    rsync -OWRD0Pq --ignore-existing <span class="nv">$file</span> data@localhost
+<span class="k">done</span>
+</pre></div>
+
+
+<p>By default, <code>inotifywait</code> stops after receiving a single event, while <code>-m</code> flag runs it indefinitely. <code>-e</code> flag defines an event to watch for, in my case that&#8217;s a <code>close_write</code> event. The <code>inotifywait</code> output can be piped to <code>rsync</code> that takes care of syncing local files to remote&nbsp;server.</p>
+<p>The last step, as usual, is&nbsp;profit.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/" rel="bookmark" title="Permalink to Automated Map Creation With QGIS, PostGIS, Python, SVG and ImageMagick">Automated Map Creation With <span class="caps">QGIS</span>, PostGIS, Python, <span class="caps">SVG</span> and&nbsp;ImageMagick</a></h1>
     <aside><span>Aug 9, 2015</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
@@ -250,21 +275,6 @@ gdalwarp -dstalpha -s_srs <span class="s1">&#39;EPSG:5514&#39;</span> -t_srs <sp
 
 
 <p>Whenever you need to prepend anything to your&nbsp;files.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2014/ogr2ogr-unix-x-windows/" rel="bookmark" title="Permalink to ogr2ogr UNIX x Windows">ogr2ogr <span class="caps">UNIX</span> x&nbsp;Windows</a></h1>
-    <aside><span>Sep 23, 2014</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/spatial.html">spatial</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
-    </aside>
-    <p><span class="caps">GDAL</span> with its ogr2ogr, ogrinfo and many more is one of the best open source tools to do anything to your spatial data. It is a&nbsp;command line tool, which sort of determines it to be used with <span class="caps">UNIX</span> systems, but you might bump into a Windows guy trying to use it as well once in a&nbsp;while.</p>
-<p>Be careful, it behaves differently on different <span class="caps">OS</span>. Let&#8217;s say you do something like this on <span class="caps">UNIX</span>:</p>
-<div class="highlight"><pre><span></span>ogr2ogr -f GeoJSON -where &quot;attribute IN (&#39;value1&#39;, &#39;value2&#39;)&quot; output.json input.json
-</pre></div>
-
-
-<p>What you <abbr title="But you might get expected result as well">might get is a big nothing</abbr>. Executed on Windows it gives you the result you&#8217;ve expected. <em>Aargh</em>, what is that supposed to&nbsp;mean?</p>
-<p>Well, that&#8217;s the ogr2ogr&#8217;s way to tell you: <em>Hello there, you need to switch single quotes for double quotes and vice versa, you dumb!</em> I don&#8217;t know why and I find it really annoying. Just in case you get stuck with ogr2ogr (or probably any other command line tool), try&nbsp;this.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/tag/linux.html">&laquo; Previous page</a>

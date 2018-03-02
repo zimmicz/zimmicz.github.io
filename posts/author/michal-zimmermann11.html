@@ -24,6 +24,64 @@
 <h2>Articles by Michal Zimmermann</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2015/filtering-points-by-distance-in-postgis/" rel="bookmark" title="Permalink to Filtering points by distance in PostGIS">Filtering points by distance in&nbsp;PostGIS</a></h1>
+    <aside><span>Jul 21, 2015</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p>Filtering really big (millions of rows) point datasets by distance might get catchy when solved with wrong PostGIS functions. Without spatial indexes PostGIS would take ages to finish such&nbsp;task.</p>
+<p><a href="https://gis.stackexchange.com/questions/148184/why-the-execution-of-a-query-is-very-slow-using-postgis">Someone over StackExchange asked</a> why the next query had been running for 15 hours (!) with no&nbsp;result:</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span>
+    <span class="n">a</span><span class="p">.</span><span class="n">gid</span><span class="p">,</span>
+    <span class="n">b</span><span class="p">.</span><span class="n">gid</span><span class="p">,</span>
+    <span class="n">ST_Distance</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span><span class="n">b</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span>
+<span class="k">FROM</span>
+    <span class="n">shp1</span> <span class="n">a</span><span class="p">,</span>
+    <span class="n">shp2</span> <span class="n">b</span>
+<span class="k">WHERE</span>
+    <span class="n">ST_Intersects</span><span class="p">(</span>
+        <span class="n">ST_Difference</span><span class="p">(</span>
+            <span class="n">ST_Buffer</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span><span class="mi">2000</span><span class="p">),</span>
+            <span class="n">ST_Buffer</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span><span class="mi">500</span><span class="p">)</span>
+        <span class="p">),</span>
+        <span class="n">b</span><span class="p">.</span><span class="n">geom</span>
+    <span class="p">)</span> <span class="k">AND</span>
+    <span class="k">abs</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">value</span> <span class="o">-</span> <span class="n">b</span><span class="p">.</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">400</span>
+</pre></div>
+
+
+<p>The answer is quite simple: because it was using wrong functions. Let&#8217;s&nbsp;see:</p>
+<ol>
+<li><code>ST_Distance()</code> does not use spatial index, it&#8217;s a simple mathematical calculation, it&#8217;s expensive and it can be replaced by spatial operator for point&nbsp;datasets.</li>
+<li><code>ST_Buffer()</code> will definitely take time to build polygons around points. And it&#8217;s being run&nbsp;twice!</li>
+<li><code>ST_Difference()</code> needs more time to compare the buffers and return just the portion of space they don&#8217;t share. Isn&#8217;t it a huge waste to create buffers and then throw them&nbsp;away?</li>
+<li><code>ST_Intersects()</code> finally checks whether the point should be included in the&nbsp;result.</li>
+</ol>
+<p>That was a great challenge to test my knowledge of how PostGIS works and here&#8217;s my shot at&nbsp;it:</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="p">(</span>
+    <span class="k">SELECT</span>
+        <span class="n">a</span><span class="p">.</span><span class="n">gid</span><span class="p">,</span>
+        <span class="n">b</span><span class="p">.</span><span class="n">gid</span><span class="p">,</span>
+        <span class="n">a</span><span class="p">.</span><span class="n">geom</span> <span class="o">&lt;-&gt;</span> <span class="n">b</span><span class="p">.</span><span class="n">geom</span> <span class="n">distance</span>
+    <span class="k">FROM</span>
+        <span class="n">shp1</span> <span class="n">a</span><span class="p">,</span> <span class="n">shp2</span> <span class="n">b</span>
+    <span class="k">WHERE</span>
+        <span class="k">abs</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">value</span> <span class="o">-</span> <span class="n">b</span><span class="p">.</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">400</span> <span class="k">AND</span>
+        <span class="n">ST_DWithin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="mi">2000</span><span class="p">)</span>
+    <span class="p">)</span> <span class="n">sq</span>
+<span class="k">WHERE</span>
+    <span class="n">distance</span> <span class="o">&gt;</span> <span class="mi">500</span><span class="p">;</span>
+</pre></div>
+
+
+<ol>
+<li>I use <a href="http://postgis.net/docs/geometry_distance_centroid.html"><code>&lt;-&gt;</code></a>, a.k.a geometry distance centroid instead of <code>ST_Distance()</code>. It takes advantage of spatial indexes, thus it&#8217;s fast. And it&#8217;s perfectly fine to use it with point dataset, because the centroid of a bounding box of a point is? That point, exactly. <strong>Spatial indexes have to be built&nbsp;beforehand.</strong></li>
+<li>Buffers are not necessary to check whether a geometry lies in a certain distance from another one. That&#8217;s what <code>ST_Dwithin()</code> was made for. With the inner <code>WHERE</code> clause I get all the points lying at most 2,000 meters from the current, having the absolute value difference bigger than 400. <code>ST_Dwithin()</code> will make use of any spatial index available, unlike <code>ST_Distance()</code>.</li>
+<li>The outer <code>WHERE</code> clause throws away all the points closer than 500 meters. Remember, we already got only those not further than 2,000 meters from the previous&nbsp;step.</li>
+</ol>
+<p>It took PostGIS 1060545,590 ms (~ 17 minutes) on my Quad-Core Intel® Core™ i5-4210M <span class="caps">CPU</span> @ 2.60GHz, 4 <span class="caps">GB</span> <span class="caps">RAM</span>, 500 <span class="caps">GB</span> <span class="caps">SSD</span> hard drive, PostgreSQL 9.3 and PostGIS 2.1 with two point datasets having 4M and 300K rows,&nbsp;respectively.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2015/qgis-tips-for-collaborative-mapping/" rel="bookmark" title="Permalink to QGIS Tips For Collaborative Mapping"><span class="caps">QGIS</span> Tips For Collaborative&nbsp;Mapping</a></h1>
     <aside><span>Jul 21, 2015</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>    </span>
@@ -351,66 +409,6 @@ v.out.postgis <span class="nv">input</span><span class="o">=</span>buffer_050_gr
 <li>It is great to exploit synergy of different <span class="caps">GIS</span> tools used for what they&#8217;re best&nbsp;at.</li>
 </ul>
 <p>The more I work with big data, the more I get used to not seeing them. That&#8217;s kind of a twist after crafting maps at&nbsp;university.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2015/postgis-finding-biggest-land-users-nearby/" rel="bookmark" title="Permalink to PostGIS: Finding Biggest Land Users Nearby">PostGIS: Finding Biggest Land Users&nbsp;Nearby</a></h1>
-    <aside><span>Apr 3, 2015</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p>At <a href="http://clevermaps.cz">CleverMaps</a> we heavily rely on the cadastre of real estate, which is probably the biggest data source in my country. Using their excellent knowledge of this data set, my teammates often supply me with all kinds of weird&nbsp;challenges.</p>
-<h2>Give me the biggest land users&nbsp;nearby</h2>
-<p><em>Find the biggest land users in surrounding cadastral communities for each cadastral community (~ 13K)</em> being the latest task, here&#8217;s the query I tackled it&nbsp;with:</p>
-<div class="highlight"><pre><span></span>WITH users_ AS (
-    SELECT
-        cad_code,
-        id,
-        zipcode,
-        city,
-        concat_ws(&#39; &#39;,street, concat_ws(&#39;/&#39;, house_number, street_number)) as street,
-        name,
-        &#39;Users with more than 10 ha&#39;::text note,
-        SUM(acreage) area
-        FROM land_blocks -- being a table with info about all the agricultural land blocks
-        JOIN users u ON id_uz = id
-        GROUP BY cad_code, u.id
-        HAVING SUM(acreage) &gt; 10
-),
-ints AS (
-    SELECT
-        ku.cad_code as community,
-        ku2.cad_code as surrounding,
-        ku2.cad_name
-    FROM cadastral_community ku
-    JOIN cadastral_community ku2
-        ON ST_Intersects(ku.geom, ku2.geom)
-    WHERE ku.cad_code &lt;&gt; ku2.cad_code
-)
-SELECT
-    DISTINCT ON (surrounding, cad_name, u.zipcode, u.city, u.street, u.name)
-    surrounding,
-    cad_name,
-    u.zipcode,
-    u.city,
-    u.street,
-    u.name,
-    u.note,
-    u.area
-FROM
-    users_ u
-JOIN ints
-    ON cad_code = community;
-</pre></div>
-
-
-<p>Few things to&nbsp;note:</p>
-<ul>
-<li><code>concat_ws()</code> is a great function for joining values that might be <code>NULL</code>. If such a value is found, it is skipped and the function continues with the next one (if any). Thus, you&#8217;ll never get a string ending with a trailing slash (<code>Street name 55/</code>).</li>
-<li>With <code>users_</code> <span class="caps">CTE</span> I get a list of owners having more than 10 hectares of land for each cadastral community. This gives me the inverse result of what I want (if I know the biggest owners in the cadastral community, I know these are the ones that should be listed for surrounding c.&nbsp;communities).</li>
-<li>This <em>putting-it-all-together</em> step is done with <code>ints</code> <span class="caps">CTE</span> that outputs the list of surrounding c. communities for each of&nbsp;them.</li>
-<li><code>DISTINCT ON</code> cleans up the list so the same owners don&#8217;t appear more than once for any given c.&nbsp;community.</li>
-</ul>
-<p>Writing this makes me realize the list should be probably sorted by area so only the occurence with the biggest value is kept for each c. community. Simple <code>ORDER BY</code> should deal with this just fine. Or even more sophisticated, using <code>GROUP BY</code> to output the total acreage in all surrounding c.&nbsp;communities.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/author/michal-zimmermann10.html">&laquo; Previous page</a>
