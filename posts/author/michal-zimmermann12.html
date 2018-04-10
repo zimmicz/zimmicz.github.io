@@ -24,6 +24,77 @@
 <h2>Articles by Michal Zimmermann</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2015/grass-big-buffers-made-easy/" rel="bookmark" title="Permalink to GRASS: Big Buffers Made Easy"><span class="caps">GRASS</span>: Big Buffers Made&nbsp;Easy</a></h1>
+    <aside><span>Apr 20, 2015</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/grass.html">grass</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
+    </aside>
+    <p>Recently I&#8217;ve written about <a href="/2015/postgis-buffers-intersections-differences-and-collections/">struggling with fairly complex geometries in PostGIS</a>. Lesson learned from the last time was to use more smaller geometries instead of several really huge. You can obtain the small ones from the big by <a href="/2015/postgis-rectangular-grid-creation/">cutting it with a grid</a>.</p>
+<p>A supervisor of a project I&#8217;ve been working on came up with a task that totally buried the previous process in a blink of an eye: <strong>Give me the buffer (diffed with original geometries) that is smoothed on the outer bounds so there are no edges shorter than 10 cm.</strong> I sighed. Then, I cursed. Then, I gave it a try with PostGIS. Achieving this goal involves these&nbsp;steps:</p>
+<ul>
+<li>Dissolve intersecting&nbsp;buffers</li>
+<li>Run some kind of generalization algorithm that is not defined in&nbsp;PostGIS</li>
+<li>Diff original&nbsp;geometries</li>
+<li>Cut buffer with grid so it works <del>faster</del> not so slow for the next&nbsp;steps</li>
+</ul>
+<p>Two of those four are rather problematic with PostGIS: line smoothing and diffing the original geometries (I didn&#8217;t get to the last one, so it might be 3 of 4 as&nbsp;well).</p>
+<h2>Hello, I&#8217;m <span class="caps">GRASS</span></h2>
+<p>I haven&#8217;t used <span class="caps">GRASS</span> for ages and even back then I didn&#8217;t get to know it much, but it saved the day for me this&nbsp;time.</p>
+<div class="highlight"><pre><span></span>grass -text path/to/mapset -c
+
+v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&quot;PG:host=localhost dbname=db user=postgres password=postgres&quot;</span> <span class="nv">output</span><span class="o">=</span>ilot_050 <span class="nv">layer</span><span class="o">=</span>ilot_2015_050 <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
+<span class="c1"># turn the snapping off, I don&#39;t want the input changed in any way, even though it is not topologically valid</span>
+v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&quot;PG:host=localhost dbname=db user=postgres password=postgres&quot;</span> <span class="nv">output</span><span class="o">=</span>lollipops_050 <span class="nv">layer</span><span class="o">=</span>lollipops.lollipops_2015_050_tmp <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
+v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&quot;PG:host=localhost dbname=db user=postgres password=postgres&quot;</span> <span class="nv">output</span><span class="o">=</span>holes_050 <span class="nv">layer</span><span class="o">=</span>phase_3.holes_050 <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
+v.db.addcolumn <span class="nv">map</span><span class="o">=</span>ilot_050 <span class="nv">columns</span><span class="o">=</span><span class="s2">&quot;id_0 int&quot;</span>
+v.db.update <span class="nv">map</span><span class="o">=</span>ilot_050 <span class="nv">column</span><span class="o">=</span>id_0 <span class="nv">value</span><span class="o">=</span><span class="m">1</span>
+
+<span class="c1"># dissolve didn&#39;t work without a column specified, dunno why</span>
+v.dissolve <span class="nv">input</span><span class="o">=</span>ilot_050 <span class="nv">column</span><span class="o">=</span>id_0 <span class="nv">output</span><span class="o">=</span>ilot_050_dissolve --overwrite
+v.buffer <span class="nv">input</span><span class="o">=</span>ilot_050_dissolve <span class="nv">output</span><span class="o">=</span>ilot_050_buffer <span class="nv">distance</span><span class="o">=</span><span class="m">20</span> --overwrite
+
+<span class="c1"># v.out and v.in routine used just because I didn&#39;t get the way attributes work in GRASS, would do it differently next time</span>
+v.out.ogr <span class="nv">input</span><span class="o">=</span>ilot_050_buffer <span class="nv">output</span><span class="o">=</span>ilot_050_buffer <span class="nv">format</span><span class="o">=</span>ESRI_Shapefile --overwrite
+v.in.ogr <span class="nv">input</span><span class="o">=</span>ilot_050_buffer <span class="nv">output</span><span class="o">=</span>ilot_050_buffer <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
+v.overlay <span class="nv">ainput</span><span class="o">=</span>ilot_050_buffer <span class="nv">binput</span><span class="o">=</span>holes_050 <span class="nv">operator</span><span class="o">=</span>or <span class="nv">output</span><span class="o">=</span>combined_050_01 <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
+
+<span class="c1"># tried v.patch to combine the three layers, it gave some strange results in the final overlay</span>
+v.overlay <span class="nv">ainput</span><span class="o">=</span>combined_050_01 <span class="nv">binput</span><span class="o">=</span>lollipops_050 <span class="nv">operator</span><span class="o">=</span>or <span class="nv">output</span><span class="o">=</span>combined_050_02 <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
+v.out.ogr <span class="nv">input</span><span class="o">=</span>combined_050_02 <span class="nv">output</span><span class="o">=</span>combined_050 <span class="nv">format</span><span class="o">=</span>ESRI_Shapefile --overwrite
+v.in.ogr <span class="nv">input</span><span class="o">=</span>combined_050 <span class="nv">output</span><span class="o">=</span>combined_050_in <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
+v.db.addcolumn <span class="nv">map</span><span class="o">=</span>combined_050_in <span class="nv">columns</span><span class="o">=</span><span class="s2">&quot;id_1 int&quot;</span>
+v.db.update <span class="nv">map</span><span class="o">=</span>combined_050_in <span class="nv">column</span><span class="o">=</span>id_1 <span class="nv">value</span><span class="o">=</span><span class="m">1</span>
+v.dissolve <span class="nv">input</span><span class="o">=</span>combined_050_in <span class="nv">column</span><span class="o">=</span>id_1 <span class="nv">output</span><span class="o">=</span>combined_050_dissolve --overwrite
+
+<span class="c1"># get rid of &lt; 10cm edges</span>
+v.generalize <span class="nv">input</span><span class="o">=</span>combined_050_dissolve <span class="nv">output</span><span class="o">=</span>combined_050_gen <span class="nv">method</span><span class="o">=</span>reduction <span class="nv">threshold</span><span class="o">=</span><span class="m">0</span>.1 --overwrite
+v.out.ogr <span class="nv">input</span><span class="o">=</span>combined_050_gen <span class="nv">output</span><span class="o">=</span>combined_050_gen <span class="nv">format</span><span class="o">=</span>ESRI_Shapefile --overwrite
+v.in.ogr <span class="nv">input</span><span class="o">=</span>combined_050_gen <span class="nv">output</span><span class="o">=</span>combined_050_gen <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
+v.overlay <span class="nv">ainput</span><span class="o">=</span>combined_050_gen <span class="nv">binput</span><span class="o">=</span>ilot_050 <span class="nv">operator</span><span class="o">=</span>not <span class="nv">snap</span><span class="o">=</span>1e-05 --overwrite <span class="nv">output</span><span class="o">=</span>ilot_050_diff
+v.out.postgis <span class="nv">input</span><span class="o">=</span>ilot_050_diff <span class="nv">output</span><span class="o">=</span><span class="s2">&quot;PG:dbname=db user=postgres password=postgres&quot;</span> <span class="nv">output_layer</span><span class="o">=</span>onf3.buffer_050_diff <span class="nv">options</span><span class="o">=</span><span class="s2">&quot;GEOMETRY_NAME=wkb_geometry,SRID=2154&quot;</span> --overwrite
+v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&quot;PG:host=localhost dbname=ign user=postgres password=postgres&quot;</span> <span class="nv">output</span><span class="o">=</span>buffer_050 <span class="nv">layer</span><span class="o">=</span>onf3.buffer_050_diff <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
+v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&quot;PG:host=localhost dbname=ign user=postgres password=postgres&quot;</span> <span class="nv">output</span><span class="o">=</span>grid <span class="nv">layer</span><span class="o">=</span>grid <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
+v.db.connect -d <span class="nv">map</span><span class="o">=</span>buffer_050
+
+<span class="c1"># instead of v.out and v.in routine</span>
+db.connect <span class="nv">driver</span><span class="o">=</span>sqlite <span class="nv">database</span><span class="o">=</span><span class="s1">&#39;$GISDBASE/$LOCATION_NAME/$MAPSET/sqlite.db&#39;</span>
+v.db.addtable <span class="nv">map</span><span class="o">=</span>buffer_050
+v.overlay <span class="nv">ainput</span><span class="o">=</span>buffer_050 <span class="nv">binput</span><span class="o">=</span>grid <span class="nv">operator</span><span class="o">=</span>and <span class="nv">output</span><span class="o">=</span>buffer_050_grid <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
+v.out.postgis <span class="nv">input</span><span class="o">=</span>buffer_050_grid <span class="nv">output</span><span class="o">=</span><span class="s2">&quot;PG:dbname=ign user=postgres password=postgres&quot;</span> <span class="nv">output_layer</span><span class="o">=</span>onf3.buffer_050_diff_grid <span class="nv">options</span><span class="o">=</span><span class="s2">&quot;GEOMETRY_NAME=wkb_geometry,SRID=2154&quot;</span> --overwrite
+</pre></div>
+
+
+<p><strong>It is damn fast</strong> compared to PostGIS. It can be automated. It can be parametrized. It is robust. It is&nbsp;great!</p>
+<h2>Lesson&nbsp;learned</h2>
+<ul>
+<li>You cannot smooth lines by deleting edges shorter than <code>n</code> in PostGIS. At least I haven&#8217;t found the way to do so without defining your own procedure. You can with <span class="caps">GRASS</span>.</li>
+<li><span class="caps">GRASS</span> reduction algorithm always keep first and last node untouched. Thus, if they&#8217;re closer than <code>n</code>, they&#8217;ll stay even if you&#8217;d like to have them&nbsp;deleted.</li>
+<li>Getting to grips with <span class="caps">GRASS</span> attribute data is rather hard after using shapefiles all your <span class="caps">GIS</span>&nbsp;life.</li>
+<li>It is great to exploit synergy of different <span class="caps">GIS</span> tools used for what they&#8217;re best&nbsp;at.</li>
+</ul>
+<p>The more I work with big data, the more I get used to not seeing them. That&#8217;s kind of a twist after crafting maps at&nbsp;university.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2015/postgis-finding-biggest-land-users-nearby/" rel="bookmark" title="Permalink to PostGIS: Finding Biggest Land Users Nearby">PostGIS: Finding Biggest Land Users&nbsp;Nearby</a></h1>
     <aside><span>Apr 3, 2015</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
@@ -420,107 +491,6 @@ ALTER TABLE uni ADD PRIMARY KEY(id);
 <li>Never stop learning and trying different&nbsp;approaches.</li>
 <li>Although using <code>CTE</code> might be tempting, creating separate tables for separate steps of the whole process is much more comfortable for&nbsp;debugging.</li>
 </ul>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2015/wms-download-for-future-offline-use/" rel="bookmark" title="Permalink to WMS Download For Future Offline Use"><span class="caps">WMS</span> Download For Future Offline&nbsp;Use</a></h1>
-    <aside><span>Mar 15, 2015</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/ogc.html">ogc</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/wms.html">wms</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
-    </aside>
-    <p>Using <span class="caps">WMS</span> in real time might easily become pain in the ass due to low connection speed or slow server response. Downloading images beforehand seems to be a reasonable choice both to avoid any slowdowns and to improve user experience when working with <span class="caps">WMS</span>&nbsp;layers.</p>
-<p><a href="https://geopython.github.io/OWSLib/">OWSLib</a> is a great tool to help you get images from <span class="caps">WMS</span> server. Code and some comments&nbsp;follow.</p>
-<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">random</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">owslib.wms</span> <span class="kn">import</span> <span class="n">WebMapService</span>
-
-<span class="n">BOTTOM_LEFT</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">679363</span><span class="p">,</span><span class="o">-</span><span class="mi">1120688</span><span class="p">)</span>
-<span class="n">TOP_RIGHT</span>   <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">565171</span><span class="p">,</span><span class="o">-</span><span class="mi">1042703</span><span class="p">)</span>
-<span class="n">SRS_WIDTH</span>   <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="o">-</span><span class="mi">639084</span> <span class="o">-</span> <span class="o">-</span><span class="mi">638825</span><span class="p">)</span> <span class="c1"># tile width in units of crs =&gt; 259 m</span>
-<span class="n">SRS_HEIGHT</span>  <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="o">-</span><span class="mi">1070426</span> <span class="o">-</span> <span class="o">-</span><span class="mi">1070273</span><span class="p">)</span> <span class="c1"># tile height in units of crs =&gt; 153 m</span>
-<span class="n">PX_WIDTH</span>    <span class="o">=</span> <span class="mi">977</span>
-<span class="n">PX_HEIGHT</span>   <span class="o">=</span> <span class="mi">578</span>
-
-<span class="n">FORMAT</span>      <span class="o">=</span> <span class="s1">&#39;image/png&#39;</span>
-<span class="n">LAYERS</span>      <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;KN&#39;</span><span class="p">,</span> <span class="s1">&#39;RST_PK&#39;</span><span class="p">]</span>
-<span class="n">SIZE</span>        <span class="o">=</span> <span class="p">(</span><span class="n">PX_WIDTH</span><span class="p">,</span> <span class="n">PX_HEIGHT</span><span class="p">)</span>
-<span class="n">SRS</span>         <span class="o">=</span> <span class="s1">&#39;EPSG:5514&#39;</span>
-<span class="n">STYLES</span>      <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">]</span>
-<span class="n">TRANSPARENT</span> <span class="o">=</span> <span class="bp">True</span>
-
-<span class="n">DIRECTORY</span> <span class="o">=</span> <span class="s1">&#39;tiles/&#39;</span>
-<span class="n">SLEEP</span>     <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">20</span><span class="p">)</span> <span class="c1"># seconds</span>
-
-<span class="n">dx</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="n">BOTTOM_LEFT</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">TOP_RIGHT</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="c1"># area width in units of crs</span>
-<span class="n">dy</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="n">BOTTOM_LEFT</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">TOP_RIGHT</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="c1"># area height in units of crs</span>
-
-<span class="n">cols</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">dx</span> <span class="o">/</span> <span class="n">SRS_WIDTH</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
-<span class="n">rows</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">dy</span> <span class="o">/</span> <span class="n">SRS_HEIGHT</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
-
-<span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
-
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;world_file.pngw&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">wld_template</span><span class="p">:</span>
-    <span class="n">tmpl</span> <span class="o">=</span> <span class="n">wld_template</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-
-<span class="n">wms</span> <span class="o">=</span> <span class="n">WebMapService</span><span class="p">(</span><span class="s1">&#39;http://services.cuzk.cz/wms/wms.asp&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.1.1&#39;</span><span class="p">)</span>
-
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">rows</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">DIRECTORY</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)):</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">DIRECTORY</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
-
-    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">cols</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">DIRECTORY</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;/kn_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span><span class="p">):</span>
-            <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="k">continue</span>
-
-        <span class="n">bbox</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">i</span> <span class="o">*</span> <span class="n">SRS_WIDTH</span> <span class="o">+</span> <span class="n">BOTTOM_LEFT</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-            <span class="n">j</span> <span class="o">*</span> <span class="n">SRS_HEIGHT</span> <span class="o">+</span> <span class="n">BOTTOM_LEFT</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-            <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">SRS_WIDTH</span> <span class="o">+</span> <span class="n">BOTTOM_LEFT</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-            <span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">SRS_HEIGHT</span> <span class="o">+</span> <span class="n">BOTTOM_LEFT</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="p">)</span>
-
-        <span class="n">img</span> <span class="o">=</span> <span class="n">wms</span><span class="o">.</span><span class="n">getmap</span><span class="p">(</span>
-            <span class="n">layers</span><span class="o">=</span><span class="n">LAYERS</span><span class="p">,</span>
-            <span class="n">styles</span><span class="o">=</span><span class="n">STYLES</span><span class="p">,</span>
-            <span class="n">srs</span><span class="o">=</span><span class="n">SRS</span><span class="p">,</span>
-            <span class="n">bbox</span><span class="o">=</span><span class="n">bbox</span><span class="p">,</span>
-            <span class="n">size</span><span class="o">=</span><span class="n">SIZE</span><span class="p">,</span>
-            <span class="n">format</span><span class="o">=</span><span class="n">FORMAT</span><span class="p">,</span>
-            <span class="n">transparent</span><span class="o">=</span><span class="n">TRANSPARENT</span>
-        <span class="p">)</span>
-
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">DIRECTORY</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;/kn_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">png</span><span class="p">:</span>
-            <span class="n">png</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
-
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">DIRECTORY</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/kn_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.pngw&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">wld_file</span><span class="p">:</span>
-            <span class="n">wld_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">tmpl</span><span class="p">)</span>
-            <span class="n">wld_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="n">SRS_WIDTH</span> <span class="o">+</span> <span class="n">BOTTOM_LEFT</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
-            <span class="n">wld_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">((</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">SRS_HEIGHT</span> <span class="o">+</span> <span class="n">BOTTOM_LEFT</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-
-        <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="k">print</span> <span class="nb">str</span><span class="p">(</span><span class="n">counter</span><span class="p">),</span> <span class="s1">&#39; out of &#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">rows</span> <span class="o">*</span> <span class="n">cols</span><span class="p">)</span>
-        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">SLEEP</span><span class="p">)</span>
-</pre></div>
-
-
-<p>First, always make sure <strong>you are not violating terms of use</strong> defined by service provider. If you are not, here are the necessary&nbsp;steps:</p>
-<ol>
-<li>Define your area of interest with bottom left and top right&nbsp;coordinates.</li>
-<li>Calculate width of single image both in pixels and units of <span class="caps">CRS</span> to get the rightsized image. Note that there may be image size restrictions defined by provider (2048 &times; 2048 px is usually the biggest you can&nbsp;get).</li>
-<li>Define template <a href="https://en.wikipedia.org/wiki/World_file">world file</a> for referencing images. OWSLib doesn&#8217;t provide world files to saved images, these have to be created by you. I recommend to use a template file for creating real world&nbsp;files.</li>
-<li>Be nice! Don&#8217;t overload the service. I use <code>time.sleep()</code> for&nbsp;this.</li>
-<li>Profit.</li>
-</ol>
-<p>The trouble with <span class="caps">WMS</span> is that you can&#8217;t set an arbitrary scale you want to obtain images in (e.g. 1:1 000). It&#8217;s fairly easy to get all values needed to imitate this behavior&nbsp;though.</p>
-<p>Using <a href="http://qgis.org"><span class="caps">QGIS</span></a> you&nbsp;can:</p>
-<ol>
-<li>Get bounding box of area you&#8217;re interested&nbsp;in.</li>
-<li>Save current view as an image (together with the world file!) and use it as a specimen for your own world&nbsp;files.</li>
-<li>Derive image width (<span class="caps">CRS</span>, pixels) from the saved image, thus getting the same zoom level you were using in <span class="caps">QGIS</span>.</li>
-</ol>
-<p>Code given is not bulletproof, it will fail on any network error. However, if you restart it after such a crash, it checks for existing files and starts with the first missing, so you don&#8217;t have to download all the tiles&nbsp;again.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/author/michal-zimmermann11.html">&laquo; Previous page</a>

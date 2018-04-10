@@ -24,6 +24,333 @@
 <h2 class="text-center">Articles tagged with postgresql tag</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2017/postgresql-development-history-revealed-with-postgresql/" rel="bookmark" title="Permalink to PostgreSQL Development History Revealed with PostgreSQL">PostgreSQL Development History Revealed with&nbsp;PostgreSQL</a></h1>
+    <aside><span>Aug 9, 2017</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p>I spend a lot of time reading <a href="https://www.postgresql.org/docs/manuals/">PostgreSQL docs</a>. It occurred to me just a few weeks ago that those versioned manuals are great opportunity to get an insight into PostgreSQL development history. Using PostgreSQL, of&nbsp;course.</p>
+<h2><span class="caps">TOP</span> 5 functions with the most verbose docs in each&nbsp;version</h2>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span>
+    <span class="k">version</span><span class="p">,</span>
+    <span class="n">string_agg</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="s1">&#39; | &#39;</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">letter_count</span> <span class="k">DESC</span><span class="p">)</span>
+<span class="k">FROM</span> <span class="p">(</span>
+    <span class="k">SELECT</span>
+        <span class="k">version</span><span class="p">,</span>
+        <span class="n">func</span><span class="p">,</span>
+        <span class="n">letter_count</span><span class="p">,</span>
+        <span class="n">row_number</span><span class="p">()</span> <span class="n">OVER</span> <span class="p">(</span><span class="n">PARTITION</span> <span class="k">BY</span> <span class="k">version</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">letter_count</span> <span class="k">DESC</span><span class="p">)</span>
+    <span class="k">FROM</span> <span class="n">postgresql_development</span><span class="p">.</span><span class="k">data</span>
+<span class="p">)</span> <span class="n">a</span>
+<span class="k">WHERE</span> <span class="n">row_number</span> <span class="o">&lt;=</span> <span class="mi">10</span>
+<span class="k">GROUP</span> <span class="k">BY</span> <span class="k">version</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="k">version</span> <span class="k">DESC</span>
+</pre></div>
+
+
+<p>Seems like a huge comeback for <code>CREATE TABLE</code>.</p>
+<table>
+<thead>
+<tr>
+<th><span class="caps">VERSION</span></th>
+<th>1st</th>
+<th>2nd</th>
+<th>3rd</th>
+<th>4th</th>
+<th>5th</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10.0</td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">SELECT</span></td>
+</tr>
+<tr>
+<td>9.6</td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">SELECT</span></td>
+</tr>
+<tr>
+<td>9.5</td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">SELECT</span></td>
+</tr>
+<tr>
+<td>9.4</td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">SELECT</span></td>
+</tr>
+<tr>
+<td>9.3</td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">DEFAULT</span> <span class="caps">PRIVILEGES</span></td>
+</tr>
+<tr>
+<td>9.2</td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">DEFAULT</span> <span class="caps">PRIVILEGES</span></td>
+</tr>
+<tr>
+<td>9.1</td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">DEFAULT</span> <span class="caps">PRIVILEGES</span></td>
+</tr>
+<tr>
+<td>9.0</td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">DEFAULT</span> <span class="caps">PRIVILEGES</span></td>
+</tr>
+<tr>
+<td>8.4</td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">SELECT</span></td>
+</tr>
+<tr>
+<td>8.3</td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">COMMENT</span></td>
+</tr>
+<tr>
+<td>8.2</td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">SELECT</span></td>
+</tr>
+<tr>
+<td>8.1</td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">SELECT</span></td>
+</tr>
+<tr>
+<td>8</td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">SELECT</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+</tr>
+<tr>
+<td>7.4</td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">GRANT</span></td>
+<td><span class="caps">SELECT</span></td>
+</tr>
+<tr>
+<td>7.3</td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">SELECT</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">REVOKE</span></td>
+<td><span class="caps">GRANT</span></td>
+</tr>
+<tr>
+<td>7.2</td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">SELECT</span> <span class="caps">INTO</span></td>
+<td><span class="caps">SELECT</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TYPE</span></td>
+</tr>
+<tr>
+<td>7.1</td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">SELECT</span> <span class="caps">INTO</span></td>
+<td><span class="caps">SELECT</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TYPE</span></td>
+<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
+</tr>
+<tr>
+<td>7.0</td>
+<td><span class="caps">SELECT</span></td>
+<td><span class="caps">SELECT</span> <span class="caps">INTO</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TYPE</span></td>
+<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
+<td><span class="caps">COMMENT</span></td>
+</tr>
+</tbody>
+</table>
+<h2>Number of functions available in each&nbsp;version</h2>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span>
+    <span class="k">version</span><span class="p">,</span>
+    <span class="k">count</span><span class="p">(</span><span class="n">func</span><span class="p">),</span>
+    <span class="k">sum</span><span class="p">(</span><span class="n">letter_count</span><span class="p">)</span>
+<span class="k">FROM</span> <span class="n">postgresql_development</span><span class="p">.</span><span class="k">data</span>
+<span class="k">GROUP</span> <span class="k">BY</span> <span class="k">version</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="k">version</span><span class="p">;</span>
+</pre></div>
+
+
+<div class="text-center"><img data-echo="/posts/assets/postgresql-development-history-revealed-with-postgresql/plot1.png"/></div>
+
+<h2>The most verbose docs in each&nbsp;version</h2>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="k">DISTINCT</span> <span class="k">ON</span> <span class="p">(</span><span class="k">version</span><span class="p">)</span>
+    <span class="k">version</span><span class="p">,</span>
+    <span class="n">func</span><span class="p">,</span>
+    <span class="n">letter_count</span>
+<span class="k">FROM</span> <span class="n">postgresql_development</span><span class="p">.</span><span class="k">data</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="k">version</span><span class="p">,</span> <span class="n">letter_count</span> <span class="k">DESC</span><span class="p">;</span>
+</pre></div>
+
+
+<p>Poor <code>REVOKE</code>, the defeated&nbsp;champion.</p>
+<div class="text-center">
+    <table style="margin-left:auto; margin-right: auto">
+    <thead>
+    <tr>
+    <th><span class="caps"><span class="caps">VERSION</span></span></th>
+    <th><span class="caps"><span class="caps">FUNCTION</span></span></th>
+    <th><span class="caps"><span class="caps">LETTER</span></span> <span class="caps"><span class="caps">COUNT</span></span></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td>10</td>
+    <td><span class="caps"><span class="caps">CREATE</span></span> <span class="caps"><span class="caps">TABLE</span></span></td>
+    <td>3142</td>
+    </tr>
+    <tr>
+    <td>9.6</td>
+    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
+    <td>2856</td>
+    </tr>
+    <tr>
+    <td>9.5</td>
+    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
+    <td>2856</td>
+    </tr>
+    <tr>
+    <td>9.4</td>
+    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
+    <td>2856</td>
+    </tr>
+    <tr>
+    <td>9.3</td>
+    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
+    <td>2856</td>
+    </tr>
+    <tr>
+    <td>9.2</td>
+    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
+    <td>2856</td>
+    </tr>
+    <tr>
+    <td>9.1</td>
+    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
+    <td>2508</td>
+    </tr>
+    <tr>
+    <td>9</td>
+    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
+    <td>2502</td>
+    </tr>
+    <tr>
+    <td>8.4</td>
+    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
+    <td>2105</td>
+    </tr>
+    <tr>
+    <td>8.3</td>
+    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
+    <td>1485</td>
+    </tr>
+    <tr>
+    <td>8.2</td>
+    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
+    <td>1527</td>
+    </tr>
+    <tr>
+    <td>8.1</td>
+    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
+    <td>1312</td>
+    </tr>
+    <tr>
+    <td>8</td>
+    <td><span class="caps"><span class="caps">CREATE</span></span> <span class="caps"><span class="caps">TABLE</span></span></td>
+    <td>1251</td>
+    </tr>
+    <tr>
+    <td>7.4</td>
+    <td><span class="caps"><span class="caps">CREATE</span></span> <span class="caps"><span class="caps">TABLE</span></span></td>
+    <td>1075</td>
+    </tr>
+    <tr>
+    <td>7.3</td>
+    <td><span class="caps"><span class="caps">CREATE</span></span> <span class="caps"><span class="caps">TABLE</span></span></td>
+    <td>929</td>
+    </tr>
+    <tr>
+    <td>7.2</td>
+    <td><span class="caps"><span class="caps">CREATE</span></span> <span class="caps"><span class="caps">TABLE</span></span></td>
+    <td>929</td>
+    </tr>
+    <tr>
+    <td>7.1</td>
+    <td><span class="caps"><span class="caps">CREATE</span></span> <span class="caps"><span class="caps">TABLE</span></span></td>
+    <td>871</td>
+    </tr>
+    <tr>
+    <td>7</td>
+    <td><span class="caps"><span class="caps">SELECT</span></span></td>
+    <td>450</td>
+    </tr>
+    </tbody>
+    </table>
+</div>
+
+<h2><span class="caps">CREATE</span> <span class="caps">TABLE</span> docs&nbsp;evolution</h2>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span>
+    <span class="k">version</span><span class="p">,</span>
+    <span class="n">letter_count</span>
+<span class="k">FROM</span> <span class="n">postgresql_development</span><span class="p">.</span><span class="k">data</span>
+<span class="k">WHERE</span> <span class="n">func</span> <span class="o">=</span> <span class="s1">&#39;CREATE TABLE&#39;</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="n">func</span><span class="p">,</span> <span class="k">version</span><span class="p">;</span>
+</pre></div>
+
+
+<p>Something&#8217;s going on in an upcoming 10.0&nbsp;version.</p>
+<div class="text-center"><img data-echo="/posts/assets/postgresql-development-history-revealed-with-postgresql/plot2.png"/></div>
+
+<p>All the data was obtained with the following Python script and processed inside the PostgreSQL database. Plots done with <a href="http://bokeh.pydata.org/en/latest/">Bokeh</a>, though I probably wouldn&#8217;t use it again, the docs site is absurdly sluggish and the info is just all over the&nbsp;place.</p>
+<script src="https://gist.github.com/zimmicz/f69a5ce5d3cf3a220e171553c35e0391.js"></script>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2017/upgrading-postgresql-95-to-postgresql-96-with-postgis/" rel="bookmark" title="Permalink to Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with PostGIS">Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with&nbsp;PostGIS</a></h1>
     <aside><span>Mar 1, 2017</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
@@ -229,52 +556,6 @@ Running this script will delete the old cluster<span class="err">&#39;</span>s d
 
 <span class="c1">-- SELECT how_many(&#39;test&#39;, &#39;t&#39;); -- returns number 2</span>
 </pre></div>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/" rel="bookmark" title="Permalink to Plotting the Czech Cadastre Land Use with d3: Data Load (part III)">Plotting the Czech Cadastre Land Use with d3: Data Load (part <span class="caps">III</span>)</a></h1>
-    <aside><span>Nov 15, 2016</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/d3.html">d3</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/data.html">data</a></span>
-    </aside>
-    <p>This post is the third part of the series summarizing the process of visualizing landuse data with bash, PostgreSQL and d3.js. Read other&nbsp;parts:</p>
-<ol>
-<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part&nbsp;I)</a></li>
-<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></li>
-<li>you&#8217;re reading it&nbsp;now</li>
-</ol>
-<h2><span class="caps">ETL</span>&nbsp;process</h2>
-<p>Before the d3 viz can be crafted, it&#8217;s necessary&nbsp;to:</p>
-<ol>
-<li>extract <span class="caps">CSV</span> data from the URLs provided via the Atom&nbsp;feed</li>
-<li>transform those data into a relational database, do some&nbsp;math</li>
-<li>load data into a d3.js&nbsp;viz</li>
-<li>profit (as&nbsp;usual)</li>
-</ol>
-<h3>Extract</h3>
-<p>See <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)</a>.</p>
-<h3>Transform</h3>
-<p>See <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a>.</p>
-<h2>Load</h2>
-<p>Thanks to the way I transformed the data, the whole load is done with&nbsp;simple</p>
-<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
-
-touch ./data/data.js
-<span class="nb">echo</span> <span class="s2">&quot;let data =&quot;</span> &gt; ./data/data.js
-
-<span class="o">(</span>
-cat <span class="s">&lt;&lt; EOF | psql -qAt --no-psqlrc</span>
-<span class="s">    SELECT</span>
-<span class="s">    array_to_json(array_agg(row_to_json(r)))</span>
-<span class="s">    FROM (</span>
-<span class="s">    SELECT *</span>
-<span class="s">    FROM data</span>
-<span class="s">    ) r</span>
-<span class="s">EOF</span>
-<span class="o">)</span> &gt;&gt; ./data/data.js
-</pre></div>
-
-
-<p>That&#8217;s the whole <span class="caps">ETL</span> process! Next time, I&#8217;ll cover the d3.js&nbsp;viz.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/tag/postgresql.html">&laquo; Previous page</a>

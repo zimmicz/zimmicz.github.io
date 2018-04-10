@@ -24,6 +24,104 @@
 <h2 class="text-center">Articles tagged with linux tag</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-systemd-automation/" rel="bookmark" title="Permalink to PostgreSQL Backup and Recovery Orchestration: systemd Automation">PostgreSQL Backup and Recovery Orchestration: systemd&nbsp;Automation</a></h1>
+    <aside><span>Apr 10, 2018</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p>Posts in this series have described the basic automation of PostgreSQL backup/recovery strategy. The process itself consists of different periodic tasks that shouldn&#8217;t be executed manually. There are essentially two tools dedicated to periodic task running in Linux: <strong>cron</strong> and <strong>systemd</strong>.</p>
+<p>Cron used to be my first choice of automation in Linux, as it&#8217;s very easy to use. On the other hand, it&#8217;s quite messy (running <code>crontab -e</code> under different users to find out which one has the job defined) and a bit difficult to test - many times I ran into a situation when underlying bash script executed just fine, while cron job kept failing for reason&nbsp;unknown.</p>
+<p>My own cron experience together with a few words from a workmate brought me into the arms of systemd, which is a Linux system and service manager. It&#8217;s capable of running periodic tasks just like cron, yet making it more&nbsp;transparent.</p>
+<h2>Important&nbsp;bits</h2>
+<p>Understanding the whole systemd is way out of scope of a poor <span class="caps">GIS</span> guy, yet I managed to tame three important parts of the&nbsp;ecosystem:</p>
+<ul>
+<li>services</li>
+<li>timers</li>
+<li>targets</li>
+</ul>
+<h3>Services</h3>
+<p>Service is a configuration saved inside &#8220;.service&#8221; file specifying what you want systemd to do. Following code shows how you can tell systemd to vacuum your database once in a&nbsp;while.</p>
+<div class="highlight"><pre><span></span><span class="o">[</span>Unit<span class="o">]</span>
+<span class="nv">Description</span><span class="o">=</span>CR vacuumdb
+<span class="nv">OnFailure</span><span class="o">=</span>unit-status-mail@%n.service unit-status-slack@%n.service
+<span class="nv">Wants</span><span class="o">=</span>cr-sunday.timer
+
+<span class="o">[</span>Service<span class="o">]</span>
+<span class="nv">User</span><span class="o">=</span>postgres
+<span class="nv">Group</span><span class="o">=</span>postgres
+<span class="nv">Type</span><span class="o">=</span>simple
+<span class="nv">ExecStart</span><span class="o">=</span>/bin/bash /usr/local/sbin/pgsql-vacuumdb.sh --port %i
+
+<span class="o">[</span>Install<span class="o">]</span>
+<span class="nv">WantedBy</span><span class="o">=</span>cr-sunday.target
+</pre></div>
+
+
+<p>Unit files come with several handy features. First of all, they are orchestrated with <code>systemctl</code>. Second, any service configuration file containing <code>@</code> in its filename might be symlinked/copied and run for different instances. Third, notice <code>OnFailure</code> directive in the code above. If anything goes wrong, systemd might serve as a postman delivering the bad news. I set up both e-mail and Slack notifications and they&#8217;ve been working like a charm ever&nbsp;since.</p>
+<p>On top of that, I find systemd orchestration much easier to test and maintain compared to&nbsp;cron.</p>
+<p>With the above code saved in <code>/lib/systemd/system/pgsql-vacuumdb@.service</code>, you can copy the file to <code>/lib/systemd/system/pgsql-vacuumdb@5432.service</code>, <code>/lib/systemd/system/pgsql-vacuumdb@5432.service</code> etc. If you look at <code>ExecStart</code> part of the service file, you&#8217;ll notice <code>%i</code> being used at the end - a <a href="https://www.freedesktop.org/software/systemd/man/systemd.unit.html">placeholder</a> replaced with the string between <code>@</code> and <code>.service</code> in the&nbsp;filename.</p>
+<p>This systemd service file is no more than a simple wrapper around the following bash code. We run three different database clusters on one machine and this approach makes their maintenance pretty&nbsp;comfortable.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="c1">#</span>
+<span class="c1"># @author: Michal Zimmermann &lt;michal.zimmermann@clevermaps.cz&gt;</span>
+<span class="c1"># Vacuums the whole database cluster running on a given port.</span>
+
+<span class="k">while</span> <span class="o">[[</span> <span class="nv">$#</span> &gt; <span class="m">0</span> <span class="o">]]</span>
+<span class="k">do</span>
+    <span class="nv">key</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>
+
+    <span class="k">case</span> <span class="nv">$key</span> in
+        -p<span class="p">|</span>--port<span class="o">)</span>
+            <span class="nv">PORT</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$2</span><span class="s2">&quot;</span>
+            <span class="nb">shift</span>
+            <span class="p">;;</span>
+        *<span class="o">)</span>
+            <span class="nb">echo</span> <span class="s2">&quot;Usage: `basename </span><span class="nv">$0</span><span class="s2">` --port|-p [port_number]&quot;</span>
+            <span class="nb">exit</span> <span class="m">1</span>
+            <span class="p">;;</span>
+    <span class="k">esac</span>
+    <span class="nb">shift</span>
+<span class="k">done</span>
+
+<span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;</span><span class="nv">$PORT</span><span class="s2">&quot;</span> <span class="o">]]</span>
+<span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;Port not provided!&quot;</span>
+    <span class="nv">$0</span> *
+    <span class="nb">exit</span> <span class="m">2</span>
+<span class="k">fi</span>
+
+/usr/bin/vacuumdb -U postgres -p <span class="nv">$PORT</span> --all --full --analyze
+</pre></div>
+
+
+<p>What you get so far is the possibility to run <code>systemctl start pgsql-vacuumdb@5432</code> instead of calling the underlying bash code manually. Not much, really. That&#8217;s where timers come to the&nbsp;party.</p>
+<h3>Timers</h3>
+<p>Timer files ends with &#8220;.timer&#8221; and are responsible for running services on given time. The code below, coming from <code>/lib/systemd/system/cr-sunday.timer</code> file runs the <code>pgsql-vacuumdb</code> service every Sunday at 3:45&nbsp;am.</p>
+<div class="highlight"><pre><span></span><span class="o">[</span>Unit<span class="o">]</span>
+<span class="nv">Description</span><span class="o">=</span>CR Sunday timer
+
+<span class="o">[</span>Timer<span class="o">]</span>
+<span class="nv">OnCalendar</span><span class="o">=</span>Sun *-*-* <span class="m">03</span>:45
+<span class="nv">Persistent</span><span class="o">=</span>yes
+<span class="nv">Unit</span><span class="o">=</span>cr-sunday.target
+
+<span class="o">[</span>Install<span class="o">]</span>
+<span class="nv">WantedBy</span><span class="o">=</span>multi-user.target
+</pre></div>
+
+
+<h3>Targets</h3>
+<p>Target files end with &#8220;.target&#8221; and are used to group units in general. In our case, the target file for vacuumdb service is as simple as the following&nbsp;code.</p>
+<div class="highlight"><pre><span></span><span class="o">[</span>Unit<span class="o">]</span>
+<span class="nv">Description</span><span class="o">=</span>CR Sunday target
+<span class="nv">StopWhenUnneeded</span><span class="o">=</span>yes
+</pre></div>
+
+
+<p>Targets might be called by other targets. Running <code>systemctl start cr-sunday.target</code> would eventually lead to running all the services wanted by that&nbsp;target.</p>
+<p>As I already mentioned, I find systemd services easy to code and test. If any of them should fail, you&#8217;d find a message in syslog or via <code>systemctl status pgsql-vacuumdb</code>.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-bash-automation/" rel="bookmark" title="Permalink to PostgreSQL Backup and Recovery Orchestration: Bash Automation">PostgreSQL Backup and Recovery Orchestration: Bash&nbsp;Automation</a></h1>
     <aside><span>Mar 2, 2018</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
@@ -399,128 +497,6 @@ sudo -u postgres psql -d spatial_template -c <span class="s2">&quot;CREATE EXTEN
 sudo -u postgres psql -d spatial_template -c <span class="s2">&quot;CREATE EXTENSION postgis_sfcgal;&quot;</span>
 sudo -u postgres psql -d spatial_template -c <span class="s2">&quot;SELECT postgis_full_version();&quot;</span>
 </pre></div>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2015/color-relief-shaded-map-using-open-data-with-open-source-software/" rel="bookmark" title="Permalink to Color Relief Shaded Map Using Open Data with Open Source Software">Color Relief Shaded Map Using Open Data with Open Source&nbsp;Software</a></h1>
-    <aside><span>Oct 25, 2015</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
-    </aside>
-    <p>The Digital Elevation Model over Europe (<span class="caps">EU</span>-<span class="caps">DEM</span>) has been recently released for public usage at <a href="http://land.copernicus.eu/in-situ/eu-dem">Copernicus Land Monitoring Services homepage</a>. Strictly speaking, it is a <strong>digital surface model</strong> coming from weighted average of <span class="caps">SRTM</span> and <span class="caps">ASTER</span> <span class="caps">GDEM</span> with geographic accuracy of 25 m. Data are provided as GeoTIFF files projected in 1 degree by 1 degree tiles (projected to <span class="caps">EPSG</span>:3035), so they correspond to the <span class="caps">SRTM</span> naming&nbsp;convention.</p>
-<p>If you can&#8217;t see the map to choose the data to download, make sure you&#8217;re not using <span class="caps">HTTPS</span> Everywhere or similar browser&nbsp;plugin.</p>
-<p>I chose <strong>Austria</strong> to play with the&nbsp;data.</p>
-<h2>Obtaining the&nbsp;data</h2>
-<p>It&#8217;s so easy I doubt it&#8217;s even worth a word. Get zipped data with <code>wget</code>, extract them to a&nbsp;directory.</p>
-<div class="highlight"><pre><span></span>wget https://cws-download.eea.europa.eu/in-situ/eudem/eu-dem/EUD_CP-DEMS_4500025000-AA.rar -O dem.rar
-unrar dem.rar -d copernicus
-<span class="nb">cd</span> copernicus
-</pre></div>
-
-
-<h2>Hillshade and color&nbsp;relief</h2>
-<p>Use <span class="caps">GDAL</span> to create hillshade with a simple command. No need to use <code>-s</code> flag to convert units, it already comes in meters. Exaggerate heights a bit with <code>-z</code> flag.</p>
-<div class="highlight"><pre><span></span>gdaldem hillshade EUD_CP-DEMS_4500025000-AA.tif hillshade.tif -z <span class="m">3</span>
-</pre></div>
-
-
-<p>And here comes the&nbsp;Alps.</p>
-<p class="text-center"><img title="Hillshade" src="{filename}/assets/color-relief-shaded-map-using-open-data-and-open-source-software/hillshade.png" class="center"></p>
-
-<p>To create a color relief you need a ramp of heights with colors. <a href="http://cartographicperspectives.org/index.php/journal/article/viewFile/20/70">&#8220;The Development and Rationale of Cross-blended Hypsometric Tints&#8221;</a> by T. Patterson and B. Jenny is a great read on <strong>hypsometric tints</strong>. They also give advice on what colors to choose in different environments (see the table at the last page of the article). I settled for warm humid color&nbsp;values.</p>
-<table class="center">
-<thead>
-    <tr>
-        <th>Elevation [m]</th>
-        <th>Red</th>
-        <th>Green</th>
-        <th>Blue</th>
-    </tr>
-</thead>
-<tbody>
-<tr style="background: rgb(220, 220, 220)">
-<td>5000</td>
-<td>220</td>
-<td>220</td>
-<td>220</td>
-</tr>
-<tr style="background: rgb(212, 207, 204)">
-<td>4000</td>
-<td>212</td>
-<td>207</td>
-<td>204</td>
-</tr>
-<tr style="background: rgb(212, 193, 179)">
-<td>3000</td>
-<td>212</td>
-<td>193</td>
-<td>179</td>
-</tr>
-<tr style="background: rgb(212, 184, 163)">
-<td>2000</td>
-<td>212</td>
-<td>184</td>
-<td>163</td>
-</tr>
-<tr style="background: rgb(212, 201, 180)">
-<td>1000</td>
-<td>212</td>
-<td>201</td>
-<td>180</td>
-</tr>
-<tr style="background: rgb(196, 192, 166)">
-<td>600</td>
-<td>169</td>
-<td>192</td>
-<td>166</td>
-</tr>
-<tr style="background: rgb(134, 184, 159)">
-<td>200</td>
-<td>134</td>
-<td>184</td>
-<td>159</td>
-</tr>
-<tr style="background: rgb(120, 172, 149)">
-<td>50</td>
-<td>120</td>
-<td>172</td>
-<td>149</td>
-</tr>
-<tr style="background: rgb(114, 164, 141)">
-<td>0</td>
-<td>114</td>
-<td>164</td>
-<td>141</td>
-</tr>
-</tbody>
-</table>
-
-<p>I created a color relief with another <span class="caps">GDAL</span>&nbsp;command.</p>
-<div class="highlight"><pre><span></span>gdaldem color-relief EUD_CP-DEMS_4500025000-AA.tif ramp_humid.txt color_relief.tif
-</pre></div>
-
-
-<p>And here comes hypsometric&nbsp;tints.</p>
-<p class="text-center"><img title="Color relief" src="{filename}/assets/color-relief-shaded-map-using-open-data-and-open-source-software/color_relief.png" class="center"></p>
-
-<p>Add a bit of compression and some overviews to make it smaller and load&nbsp;faster.</p>
-<div class="highlight"><pre><span></span>gdal_translate -of GTiff -co <span class="nv">TILED</span><span class="o">=</span>YES -co <span class="nv">COMPRESS</span><span class="o">=</span>DEFLATE color_relief.tif color_relief.compress.tif
-gdal_translate -of GTiff -co <span class="nv">TILED</span><span class="o">=</span>YES -co <span class="nv">COMPRESS</span><span class="o">=</span>DEFLATE hillshade.tif hillshade.compress.tif
-rm color_relief.tif
-rm hillshade.tif
-mv color_relief.compress.tif color_relief.tif
-mv hillshade.compress.tif hillshade.tif
-gdaladdo color_relief.tif <span class="m">2</span> <span class="m">4</span> <span class="m">8</span> <span class="m">16</span>
-gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span class="m">8</span> <span class="m">16</span>
-</pre></div>
-
-
-<h2>Map&nbsp;composition</h2>
-<p>I chose Austria for its excessive amount of freely available datasets. What I didn&#8217;t take into consideration was my lack of knowledge when it comes to German (#fail). States come from <a href="http://data.gv.at">data.gv.at</a> and was dissolved from smaller administrative units. State capitals were downloaded from <a href="http://naturalearth.com">naturalearth.com</a>.</p>
-<p class="text-center"><a href="https://www.zimmi.cz/posts/assets/color-relief-shaded-map-using-open-data-and-open-source-software/map.pdf" title="Click for PDF version"><img title="Austria" src="{filename}/assets/color-relief-shaded-map-using-open-data-and-open-source-software/map.png" class="center"></a></p>
-
-<p>I&#8217;d like to add some more thematic layers in the future. And translate the map to&nbsp;English.</p>
-<h2>Few words on <span class="caps">INSPIRE</span>&nbsp;Geoportal</h2>
-<p><a href="http://inspire-geoportal.ec.europa.eu/"><span class="caps">INSPIRE</span> Geoportal</a> should be the first place you go to search for European spatial data (at last <span class="caps">EU</span> thinks so). I used it to find data for this map and it was a very frustrating experience. It was actually more frustrating than using Austrian open data portal in German. Last news are from May 21, 2015, but the whole site looks and feels like deep 90s or early 2000 at&nbsp;least.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/tag/linux2.html">Next page &raquo;</a>

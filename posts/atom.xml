@@ -1,5 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Michal Zimmermann</title><link href="https://www.zimmi.cz/posts/" rel="alternate"></link><link href="https://www.zimmi.cz/posts/atom.xml" rel="self"></link><id>https://www.zimmi.cz/posts/</id><updated>2018-03-02T16:00:00+01:00</updated><entry><title>PostgreSQL Backup and Recovery Orchestration: Bash Automation</title><link href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-bash-automation/" rel="alternate"></link><published>2018-03-02T16:00:00+01:00</published><updated>2018-03-02T16:00:00+01:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2018-03-02:/posts/2018/postgresql-backup-and-recovery-orchestration-bash-automation/</id><summary type="html">&lt;p&gt;There is a bunch of periodic database-related tasks in a life of PostgreSQL administrator. Some should be done daily, others weekly, others can wait for a whole month. Many of them are essential for your database health. Forget to run such a task or screw up the run accidentally, and …&lt;/p&gt;</summary><content type="html">&lt;p&gt;There is a bunch of periodic database-related tasks in a life of PostgreSQL administrator. Some should be done daily, others weekly, others can wait for a whole month. Many of them are essential for your database health. Forget to run such a task or screw up the run accidentally, and you&amp;#8217;ll be snowed under with fixing your&amp;nbsp;database.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Michal Zimmermann</title><link href="https://www.zimmi.cz/posts/" rel="alternate"></link><link href="https://www.zimmi.cz/posts/atom.xml" rel="self"></link><id>https://www.zimmi.cz/posts/</id><updated>2018-04-10T12:00:00+02:00</updated><entry><title>PostgreSQL Backup and Recovery Orchestration: systemd Automation</title><link href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-systemd-automation/" rel="alternate"></link><published>2018-04-10T12:00:00+02:00</published><updated>2018-04-10T12:00:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2018-04-10:/posts/2018/postgresql-backup-and-recovery-orchestration-systemd-automation/</id><summary type="html">&lt;p&gt;Posts in this series have described the basic automation of PostgreSQL backup/recovery strategy. The process itself consists of different periodic tasks that shouldn&amp;#8217;t be executed manually. There are essentially two tools dedicated to periodic task running in Linux: &lt;strong&gt;cron&lt;/strong&gt; and &lt;strong&gt;systemd&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;Cron used to be my first choice …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Posts in this series have described the basic automation of PostgreSQL backup/recovery strategy. The process itself consists of different periodic tasks that shouldn&amp;#8217;t be executed manually. There are essentially two tools dedicated to periodic task running in Linux: &lt;strong&gt;cron&lt;/strong&gt; and &lt;strong&gt;systemd&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;Cron used to be my first choice of automation in Linux, as it&amp;#8217;s very easy to use. On the other hand, it&amp;#8217;s quite messy (running &lt;code&gt;crontab -e&lt;/code&gt; under different users to find out which one has the job defined) and a bit difficult to test - many times I ran into a situation when underlying bash script executed just fine, while cron job kept failing for reason&amp;nbsp;unknown.&lt;/p&gt;
+&lt;p&gt;My own cron experience together with a few words from a workmate brought me into the arms of systemd, which is a Linux system and service manager. It&amp;#8217;s capable of running periodic tasks just like cron, yet making it more&amp;nbsp;transparent.&lt;/p&gt;
+&lt;h2&gt;Important&amp;nbsp;bits&lt;/h2&gt;
+&lt;p&gt;Understanding the whole systemd is way out of scope of a poor &lt;span class="caps"&gt;GIS&lt;/span&gt; guy, yet I managed to tame three important parts of the&amp;nbsp;ecosystem:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;services&lt;/li&gt;
+&lt;li&gt;timers&lt;/li&gt;
+&lt;li&gt;targets&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;Services&lt;/h3&gt;
+&lt;p&gt;Service is a configuration saved inside &amp;#8220;.service&amp;#8221; file specifying what you want systemd to do. Following code shows how you can tell systemd to vacuum your database once in a&amp;nbsp;while.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;Unit&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;span class="nv"&gt;Description&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;CR vacuumdb
+&lt;span class="nv"&gt;OnFailure&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;unit-status-mail@%n.service unit-status-slack@%n.service
+&lt;span class="nv"&gt;Wants&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;cr-sunday.timer
+
+&lt;span class="o"&gt;[&lt;/span&gt;Service&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;span class="nv"&gt;User&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;postgres
+&lt;span class="nv"&gt;Group&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;postgres
+&lt;span class="nv"&gt;Type&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;simple
+&lt;span class="nv"&gt;ExecStart&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/bin/bash /usr/local/sbin/pgsql-vacuumdb.sh --port %i
+
+&lt;span class="o"&gt;[&lt;/span&gt;Install&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;span class="nv"&gt;WantedBy&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;cr-sunday.target
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Unit files come with several handy features. First of all, they are orchestrated with &lt;code&gt;systemctl&lt;/code&gt;. Second, any service configuration file containing &lt;code&gt;@&lt;/code&gt; in its filename might be symlinked/copied and run for different instances. Third, notice &lt;code&gt;OnFailure&lt;/code&gt; directive in the code above. If anything goes wrong, systemd might serve as a postman delivering the bad news. I set up both e-mail and Slack notifications and they&amp;#8217;ve been working like a charm ever&amp;nbsp;since.&lt;/p&gt;
+&lt;p&gt;On top of that, I find systemd orchestration much easier to test and maintain compared to&amp;nbsp;cron.&lt;/p&gt;
+&lt;p&gt;With the above code saved in &lt;code&gt;/lib/systemd/system/pgsql-vacuumdb@.service&lt;/code&gt;, you can copy the file to &lt;code&gt;/lib/systemd/system/pgsql-vacuumdb@5432.service&lt;/code&gt;, &lt;code&gt;/lib/systemd/system/pgsql-vacuumdb@5432.service&lt;/code&gt; etc. If you look at &lt;code&gt;ExecStart&lt;/code&gt; part of the service file, you&amp;#8217;ll notice &lt;code&gt;%i&lt;/code&gt; being used at the end - a &lt;a href="https://www.freedesktop.org/software/systemd/man/systemd.unit.html"&gt;placeholder&lt;/a&gt; replaced with the string between &lt;code&gt;@&lt;/code&gt; and &lt;code&gt;.service&lt;/code&gt; in the&amp;nbsp;filename.&lt;/p&gt;
+&lt;p&gt;This systemd service file is no more than a simple wrapper around the following bash code. We run three different database clusters on one machine and this approach makes their maintenance pretty&amp;nbsp;comfortable.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# @author: Michal Zimmermann &amp;lt;michal.zimmermann@clevermaps.cz&amp;gt;&lt;/span&gt;
+&lt;span class="c1"&gt;# Vacuums the whole database cluster running on a given port.&lt;/span&gt;
+
+&lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; &lt;span class="nv"&gt;$#&lt;/span&gt; &amp;gt; &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;
+&lt;span class="k"&gt;do&lt;/span&gt;
+    &lt;span class="nv"&gt;key&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$1&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+
+    &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="nv"&gt;$key&lt;/span&gt; in
+        -p&lt;span class="p"&gt;|&lt;/span&gt;--port&lt;span class="o"&gt;)&lt;/span&gt;
+            &lt;span class="nv"&gt;PORT&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$2&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+            &lt;span class="nb"&gt;shift&lt;/span&gt;
+            &lt;span class="p"&gt;;;&lt;/span&gt;
+        *&lt;span class="o"&gt;)&lt;/span&gt;
+            &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Usage: `basename &lt;/span&gt;&lt;span class="nv"&gt;$0&lt;/span&gt;&lt;span class="s2"&gt;` --port|-p [port_number]&amp;quot;&lt;/span&gt;
+            &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;
+            &lt;span class="p"&gt;;;&lt;/span&gt;
+    &lt;span class="k"&gt;esac&lt;/span&gt;
+    &lt;span class="nb"&gt;shift&lt;/span&gt;
+&lt;span class="k"&gt;done&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; -z &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$PORT&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;
+&lt;span class="k"&gt;then&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Port not provided!&amp;quot;&lt;/span&gt;
+    &lt;span class="nv"&gt;$0&lt;/span&gt; *
+    &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;
+&lt;span class="k"&gt;fi&lt;/span&gt;
+
+/usr/bin/vacuumdb -U postgres -p &lt;span class="nv"&gt;$PORT&lt;/span&gt; --all --full --analyze
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;What you get so far is the possibility to run &lt;code&gt;systemctl start pgsql-vacuumdb@5432&lt;/code&gt; instead of calling the underlying bash code manually. Not much, really. That&amp;#8217;s where timers come to the&amp;nbsp;party.&lt;/p&gt;
+&lt;h3&gt;Timers&lt;/h3&gt;
+&lt;p&gt;Timer files ends with &amp;#8220;.timer&amp;#8221; and are responsible for running services on given time. The code below, coming from &lt;code&gt;/lib/systemd/system/cr-sunday.timer&lt;/code&gt; file runs the &lt;code&gt;pgsql-vacuumdb&lt;/code&gt; service every Sunday at 3:45&amp;nbsp;am.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;Unit&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;span class="nv"&gt;Description&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;CR Sunday timer
+
+&lt;span class="o"&gt;[&lt;/span&gt;Timer&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;span class="nv"&gt;OnCalendar&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;Sun *-*-* &lt;span class="m"&gt;03&lt;/span&gt;:45
+&lt;span class="nv"&gt;Persistent&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;yes
+&lt;span class="nv"&gt;Unit&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;cr-sunday.target
+
+&lt;span class="o"&gt;[&lt;/span&gt;Install&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;span class="nv"&gt;WantedBy&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;multi-user.target
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;Targets&lt;/h3&gt;
+&lt;p&gt;Target files end with &amp;#8220;.target&amp;#8221; and are used to group units in general. In our case, the target file for vacuumdb service is as simple as the following&amp;nbsp;code.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;Unit&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;span class="nv"&gt;Description&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;CR Sunday target
+&lt;span class="nv"&gt;StopWhenUnneeded&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;yes
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Targets might be called by other targets. Running &lt;code&gt;systemctl start cr-sunday.target&lt;/code&gt; would eventually lead to running all the services wanted by that&amp;nbsp;target.&lt;/p&gt;
+&lt;p&gt;As I already mentioned, I find systemd services easy to code and test. If any of them should fail, you&amp;#8217;d find a message in syslog or via &lt;code&gt;systemctl status pgsql-vacuumdb&lt;/code&gt;.&lt;/p&gt;</content><category term="postgresql"></category><category term="linux"></category></entry><entry><title>PostgreSQL Backup and Recovery Orchestration: Bash Automation</title><link href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-bash-automation/" rel="alternate"></link><published>2018-03-02T16:00:00+01:00</published><updated>2018-03-02T16:00:00+01:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2018-03-02:/posts/2018/postgresql-backup-and-recovery-orchestration-bash-automation/</id><summary type="html">&lt;p&gt;There is a bunch of periodic database-related tasks in a life of PostgreSQL administrator. Some should be done daily, others weekly, others can wait for a whole month. Many of them are essential for your database health. Forget to run such a task or screw up the run accidentally, and …&lt;/p&gt;</summary><content type="html">&lt;p&gt;There is a bunch of periodic database-related tasks in a life of PostgreSQL administrator. Some should be done daily, others weekly, others can wait for a whole month. Many of them are essential for your database health. Forget to run such a task or screw up the run accidentally, and you&amp;#8217;ll be snowed under with fixing your&amp;nbsp;database.&lt;/p&gt;
 &lt;p&gt;Those tasks are easily done with bash, which is the first step to full automation. Following tasks are perfect candidates to be implemented as bash&amp;nbsp;scripts:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;full backups (both creation and&amp;nbsp;removal)&lt;/li&gt;

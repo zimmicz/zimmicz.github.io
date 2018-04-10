@@ -23,6 +23,48 @@
     <main>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2015/clip-raster-with-vector-using-gdal/" rel="bookmark" title="Permalink to Clip Raster With Vector Using GDAL">Clip Raster With Vector Using <span class="caps">GDAL</span></a></h1>
+    <aside><span>Jul 21, 2015</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/gdal.html">gdal</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
+    </aside>
+    <p>Recently I needed to clip several raster files with polygonal layer of municipalities. A solution to this task is pretty straightforward using <a href="http://gdal.org/"><span class="caps">GDAL</span></a> and a bit of Bash and <span class="caps">QGIS</span> thrown&nbsp;in.</p>
+<p>The necessary steps&nbsp;are:</p>
+<ol>
+<li>Put each polygon to a separate file. This can be done easily with <code>Vector - Data Management Tools - Split Vector Layer</code> in <span class="caps">QGIS</span>. The solution below assumes that each shapefile has the same basename as the raster&nbsp;file.</li>
+<li>These polygons are stored in the <code>obce</code> subfolder relative to the folder with&nbsp;rasters.</li>
+<li>An <code>output</code> folder exists that is used for&#8230; output,&nbsp;yes.</li>
+<li>Rasters are saved with output alpha band for nodata (<code>-dstalpha</code> flag).</li>
+<li>The script takes one argument - raster&nbsp;name.</li>
+<li>Profit!</li>
+</ol>
+<div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env bash</span>
+
+<span class="nv">OBEC</span><span class="o">=</span><span class="nv">$1</span>
+<span class="nv">BASE</span><span class="o">=</span><span class="k">$(</span>basename <span class="nv">$OBEC</span> _jpeg.tif<span class="k">)</span>
+<span class="nb">echo</span> <span class="nv">$BASE</span>
+<span class="nv">EXTENT</span><span class="o">=</span><span class="k">$(</span>ogrinfo -so obce/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.shp <span class="nv">$BASE</span> <span class="p">|</span> grep Extent <span class="se">\</span>
+<span class="p">|</span> sed <span class="s1">&#39;s/Extent: //g&#39;</span> <span class="p">|</span> sed <span class="s1">&#39;s/(//g&#39;</span> <span class="p">|</span> sed <span class="s1">&#39;s/)//g&#39;</span> <span class="se">\</span>
+<span class="p">|</span> sed <span class="s1">&#39;s/ - /, /g&#39;</span><span class="k">)</span>
+<span class="nv">EXTENT</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span> <span class="nv">$EXTENT</span> <span class="p">|</span> awk -F <span class="s1">&#39;,&#39;</span> <span class="s1">&#39;{print $1 &quot; &quot; $4 &quot; &quot; $3 &quot; &quot; $2}&#39;</span><span class="k">)</span>
+gdal_translate -projwin <span class="nv">$EXTENT</span> -of GTiff <span class="nv">$OBEC</span> output/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.tif
+gdalwarp -dstalpha -s_srs <span class="s1">&#39;EPSG:5514&#39;</span> -t_srs <span class="s1">&#39;EPSG:5514&#39;</span> <span class="se">\</span>
+    -co <span class="nv">COMPRESS</span><span class="o">=</span>JPEG <span class="se">\</span>
+    -co <span class="nv">TILED</span><span class="o">=</span>YES -<span class="se">\</span>
+    of GTiff <span class="se">\</span>
+    -cutline obce/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.shp <span class="se">\</span>
+    output/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.tif output/<span class="si">${</span><span class="nv">BASE</span><span class="si">}</span>.final.tif
+</pre></div>
+
+
+<p>Note that if <code>gdalwarp</code> doesn&#8217;t recognize an <span class="caps">EPSG</span> code (which is the case for my country national grid), you might pass it as a <span class="caps">PROJ</span>.4&nbsp;string.</p>
+<p>According to the point 5 in the above list, the script needs to be run in a&nbsp;loop:</p>
+<div class="highlight"><pre><span></span><span class="k">for</span> f in *_jpeg.tif<span class="p">;</span>
+    <span class="k">do</span> the_script_above.sh <span class="nv">$f</span>
+<span class="p">;</span><span class="k">done</span>
+</pre></div>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2015/filtering-points-by-distance-in-postgis/" rel="bookmark" title="Permalink to Filtering points by distance in PostGIS">Filtering points by distance in&nbsp;PostGIS</a></h1>
     <aside><span>Jul 21, 2015</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
@@ -337,77 +379,6 @@
 
 
 <p><span class="caps">SMIL</span> with <span class="caps">SVG</span> seems to be interesting option for web map animation, a bit lengthy though. Syncing animations can easily become pain in the ass (<a href="https://stackoverflow.com/questions/29897355/svg-smil-animatemotion-only-triggers-once/">see StackOverflow thread</a>). Never call your function <code>animate</code> - there is namesake function defined in <a href="https://w3c.github.io/web-animations/">Web Animations <span class="caps">API</span></a> that makes animation crash in Chrome. <code>&lt;animateMotion /&gt;</code> is a great tool to animate elements along&nbsp;path.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2015/grass-big-buffers-made-easy/" rel="bookmark" title="Permalink to GRASS: Big Buffers Made Easy"><span class="caps">GRASS</span>: Big Buffers Made&nbsp;Easy</a></h1>
-    <aside><span>Apr 20, 2015</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/grass.html">grass</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
-    </aside>
-    <p>Recently I&#8217;ve written about <a href="/2015/postgis-buffers-intersections-differences-and-collections/">struggling with fairly complex geometries in PostGIS</a>. Lesson learned from the last time was to use more smaller geometries instead of several really huge. You can obtain the small ones from the big by <a href="/2015/postgis-rectangular-grid-creation/">cutting it with a grid</a>.</p>
-<p>A supervisor of a project I&#8217;ve been working on came up with a task that totally buried the previous process in a blink of an eye: <strong>Give me the buffer (diffed with original geometries) that is smoothed on the outer bounds so there are no edges shorter than 10 cm.</strong> I sighed. Then, I cursed. Then, I gave it a try with PostGIS. Achieving this goal involves these&nbsp;steps:</p>
-<ul>
-<li>Dissolve intersecting&nbsp;buffers</li>
-<li>Run some kind of generalization algorithm that is not defined in&nbsp;PostGIS</li>
-<li>Diff original&nbsp;geometries</li>
-<li>Cut buffer with grid so it works <del>faster</del> not so slow for the next&nbsp;steps</li>
-</ul>
-<p>Two of those four are rather problematic with PostGIS: line smoothing and diffing the original geometries (I didn&#8217;t get to the last one, so it might be 3 of 4 as&nbsp;well).</p>
-<h2>Hello, I&#8217;m <span class="caps">GRASS</span></h2>
-<p>I haven&#8217;t used <span class="caps">GRASS</span> for ages and even back then I didn&#8217;t get to know it much, but it saved the day for me this&nbsp;time.</p>
-<div class="highlight"><pre><span></span>grass -text path/to/mapset -c
-
-v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&quot;PG:host=localhost dbname=db user=postgres password=postgres&quot;</span> <span class="nv">output</span><span class="o">=</span>ilot_050 <span class="nv">layer</span><span class="o">=</span>ilot_2015_050 <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
-<span class="c1"># turn the snapping off, I don&#39;t want the input changed in any way, even though it is not topologically valid</span>
-v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&quot;PG:host=localhost dbname=db user=postgres password=postgres&quot;</span> <span class="nv">output</span><span class="o">=</span>lollipops_050 <span class="nv">layer</span><span class="o">=</span>lollipops.lollipops_2015_050_tmp <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
-v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&quot;PG:host=localhost dbname=db user=postgres password=postgres&quot;</span> <span class="nv">output</span><span class="o">=</span>holes_050 <span class="nv">layer</span><span class="o">=</span>phase_3.holes_050 <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
-v.db.addcolumn <span class="nv">map</span><span class="o">=</span>ilot_050 <span class="nv">columns</span><span class="o">=</span><span class="s2">&quot;id_0 int&quot;</span>
-v.db.update <span class="nv">map</span><span class="o">=</span>ilot_050 <span class="nv">column</span><span class="o">=</span>id_0 <span class="nv">value</span><span class="o">=</span><span class="m">1</span>
-
-<span class="c1"># dissolve didn&#39;t work without a column specified, dunno why</span>
-v.dissolve <span class="nv">input</span><span class="o">=</span>ilot_050 <span class="nv">column</span><span class="o">=</span>id_0 <span class="nv">output</span><span class="o">=</span>ilot_050_dissolve --overwrite
-v.buffer <span class="nv">input</span><span class="o">=</span>ilot_050_dissolve <span class="nv">output</span><span class="o">=</span>ilot_050_buffer <span class="nv">distance</span><span class="o">=</span><span class="m">20</span> --overwrite
-
-<span class="c1"># v.out and v.in routine used just because I didn&#39;t get the way attributes work in GRASS, would do it differently next time</span>
-v.out.ogr <span class="nv">input</span><span class="o">=</span>ilot_050_buffer <span class="nv">output</span><span class="o">=</span>ilot_050_buffer <span class="nv">format</span><span class="o">=</span>ESRI_Shapefile --overwrite
-v.in.ogr <span class="nv">input</span><span class="o">=</span>ilot_050_buffer <span class="nv">output</span><span class="o">=</span>ilot_050_buffer <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
-v.overlay <span class="nv">ainput</span><span class="o">=</span>ilot_050_buffer <span class="nv">binput</span><span class="o">=</span>holes_050 <span class="nv">operator</span><span class="o">=</span>or <span class="nv">output</span><span class="o">=</span>combined_050_01 <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
-
-<span class="c1"># tried v.patch to combine the three layers, it gave some strange results in the final overlay</span>
-v.overlay <span class="nv">ainput</span><span class="o">=</span>combined_050_01 <span class="nv">binput</span><span class="o">=</span>lollipops_050 <span class="nv">operator</span><span class="o">=</span>or <span class="nv">output</span><span class="o">=</span>combined_050_02 <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
-v.out.ogr <span class="nv">input</span><span class="o">=</span>combined_050_02 <span class="nv">output</span><span class="o">=</span>combined_050 <span class="nv">format</span><span class="o">=</span>ESRI_Shapefile --overwrite
-v.in.ogr <span class="nv">input</span><span class="o">=</span>combined_050 <span class="nv">output</span><span class="o">=</span>combined_050_in <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
-v.db.addcolumn <span class="nv">map</span><span class="o">=</span>combined_050_in <span class="nv">columns</span><span class="o">=</span><span class="s2">&quot;id_1 int&quot;</span>
-v.db.update <span class="nv">map</span><span class="o">=</span>combined_050_in <span class="nv">column</span><span class="o">=</span>id_1 <span class="nv">value</span><span class="o">=</span><span class="m">1</span>
-v.dissolve <span class="nv">input</span><span class="o">=</span>combined_050_in <span class="nv">column</span><span class="o">=</span>id_1 <span class="nv">output</span><span class="o">=</span>combined_050_dissolve --overwrite
-
-<span class="c1"># get rid of &lt; 10cm edges</span>
-v.generalize <span class="nv">input</span><span class="o">=</span>combined_050_dissolve <span class="nv">output</span><span class="o">=</span>combined_050_gen <span class="nv">method</span><span class="o">=</span>reduction <span class="nv">threshold</span><span class="o">=</span><span class="m">0</span>.1 --overwrite
-v.out.ogr <span class="nv">input</span><span class="o">=</span>combined_050_gen <span class="nv">output</span><span class="o">=</span>combined_050_gen <span class="nv">format</span><span class="o">=</span>ESRI_Shapefile --overwrite
-v.in.ogr <span class="nv">input</span><span class="o">=</span>combined_050_gen <span class="nv">output</span><span class="o">=</span>combined_050_gen <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
-v.overlay <span class="nv">ainput</span><span class="o">=</span>combined_050_gen <span class="nv">binput</span><span class="o">=</span>ilot_050 <span class="nv">operator</span><span class="o">=</span>not <span class="nv">snap</span><span class="o">=</span>1e-05 --overwrite <span class="nv">output</span><span class="o">=</span>ilot_050_diff
-v.out.postgis <span class="nv">input</span><span class="o">=</span>ilot_050_diff <span class="nv">output</span><span class="o">=</span><span class="s2">&quot;PG:dbname=db user=postgres password=postgres&quot;</span> <span class="nv">output_layer</span><span class="o">=</span>onf3.buffer_050_diff <span class="nv">options</span><span class="o">=</span><span class="s2">&quot;GEOMETRY_NAME=wkb_geometry,SRID=2154&quot;</span> --overwrite
-v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&quot;PG:host=localhost dbname=ign user=postgres password=postgres&quot;</span> <span class="nv">output</span><span class="o">=</span>buffer_050 <span class="nv">layer</span><span class="o">=</span>onf3.buffer_050_diff <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
-v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&quot;PG:host=localhost dbname=ign user=postgres password=postgres&quot;</span> <span class="nv">output</span><span class="o">=</span>grid <span class="nv">layer</span><span class="o">=</span>grid <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
-v.db.connect -d <span class="nv">map</span><span class="o">=</span>buffer_050
-
-<span class="c1"># instead of v.out and v.in routine</span>
-db.connect <span class="nv">driver</span><span class="o">=</span>sqlite <span class="nv">database</span><span class="o">=</span><span class="s1">&#39;$GISDBASE/$LOCATION_NAME/$MAPSET/sqlite.db&#39;</span>
-v.db.addtable <span class="nv">map</span><span class="o">=</span>buffer_050
-v.overlay <span class="nv">ainput</span><span class="o">=</span>buffer_050 <span class="nv">binput</span><span class="o">=</span>grid <span class="nv">operator</span><span class="o">=</span>and <span class="nv">output</span><span class="o">=</span>buffer_050_grid <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
-v.out.postgis <span class="nv">input</span><span class="o">=</span>buffer_050_grid <span class="nv">output</span><span class="o">=</span><span class="s2">&quot;PG:dbname=ign user=postgres password=postgres&quot;</span> <span class="nv">output_layer</span><span class="o">=</span>onf3.buffer_050_diff_grid <span class="nv">options</span><span class="o">=</span><span class="s2">&quot;GEOMETRY_NAME=wkb_geometry,SRID=2154&quot;</span> --overwrite
-</pre></div>
-
-
-<p><strong>It is damn fast</strong> compared to PostGIS. It can be automated. It can be parametrized. It is robust. It is&nbsp;great!</p>
-<h2>Lesson&nbsp;learned</h2>
-<ul>
-<li>You cannot smooth lines by deleting edges shorter than <code>n</code> in PostGIS. At least I haven&#8217;t found the way to do so without defining your own procedure. You can with <span class="caps">GRASS</span>.</li>
-<li><span class="caps">GRASS</span> reduction algorithm always keep first and last node untouched. Thus, if they&#8217;re closer than <code>n</code>, they&#8217;ll stay even if you&#8217;d like to have them&nbsp;deleted.</li>
-<li>Getting to grips with <span class="caps">GRASS</span> attribute data is rather hard after using shapefiles all your <span class="caps">GIS</span>&nbsp;life.</li>
-<li>It is great to exploit synergy of different <span class="caps">GIS</span> tools used for what they&#8217;re best&nbsp;at.</li>
-</ul>
-<p>The more I work with big data, the more I get used to not seeing them. That&#8217;s kind of a twist after crafting maps at&nbsp;university.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/index10.html">&laquo; Previous page</a>

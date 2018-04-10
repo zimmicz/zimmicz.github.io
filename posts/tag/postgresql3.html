@@ -24,6 +24,52 @@
 <h2 class="text-center">Articles tagged with postgresql tag</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/" rel="bookmark" title="Permalink to Plotting the Czech Cadastre Land Use with d3: Data Load (part III)">Plotting the Czech Cadastre Land Use with d3: Data Load (part <span class="caps">III</span>)</a></h1>
+    <aside><span>Nov 15, 2016</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/d3.html">d3</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/data.html">data</a></span>
+    </aside>
+    <p>This post is the third part of the series summarizing the process of visualizing landuse data with bash, PostgreSQL and d3.js. Read other&nbsp;parts:</p>
+<ol>
+<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part&nbsp;I)</a></li>
+<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></li>
+<li>you&#8217;re reading it&nbsp;now</li>
+</ol>
+<h2><span class="caps">ETL</span>&nbsp;process</h2>
+<p>Before the d3 viz can be crafted, it&#8217;s necessary&nbsp;to:</p>
+<ol>
+<li>extract <span class="caps">CSV</span> data from the URLs provided via the Atom&nbsp;feed</li>
+<li>transform those data into a relational database, do some&nbsp;math</li>
+<li>load data into a d3.js&nbsp;viz</li>
+<li>profit (as&nbsp;usual)</li>
+</ol>
+<h3>Extract</h3>
+<p>See <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)</a>.</p>
+<h3>Transform</h3>
+<p>See <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a>.</p>
+<h2>Load</h2>
+<p>Thanks to the way I transformed the data, the whole load is done with&nbsp;simple</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+touch ./data/data.js
+<span class="nb">echo</span> <span class="s2">&quot;let data =&quot;</span> &gt; ./data/data.js
+
+<span class="o">(</span>
+cat <span class="s">&lt;&lt; EOF | psql -qAt --no-psqlrc</span>
+<span class="s">    SELECT</span>
+<span class="s">    array_to_json(array_agg(row_to_json(r)))</span>
+<span class="s">    FROM (</span>
+<span class="s">    SELECT *</span>
+<span class="s">    FROM data</span>
+<span class="s">    ) r</span>
+<span class="s">EOF</span>
+<span class="o">)</span> &gt;&gt; ./data/data.js
+</pre></div>
+
+
+<p>That&#8217;s the whole <span class="caps">ETL</span> process! Next time, I&#8217;ll cover the d3.js&nbsp;viz.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii" rel="bookmark" title="Permalink to Plotting the Czech Cadastre Land Use with d3: Data Transformation (part II)">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></h1>
     <aside><span>Nov 14, 2016</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/d3.html">d3</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>    </span>
@@ -360,77 +406,6 @@ rm <span class="nv">$CSVFILE</span> <span class="nv">$CSVUTF8FILE</span>
 
 <div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">ST_PolygonFromCentroid</span><span class="p">(</span><span class="n">ST_SetSRID</span><span class="p">(</span><span class="n">ST_MakePoint</span><span class="p">(</span><span class="mi">13</span><span class="p">.</span><span class="mi">912</span><span class="p">,</span><span class="mi">50</span><span class="p">.</span><span class="mi">633</span><span class="p">),</span><span class="mi">4326</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 </pre></div>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2016/finding-polygons-lying-across-other-polygons-with-postgis/" rel="bookmark" title="Permalink to Finding Polygons Lying across Other Polygons with PostGIS">Finding Polygons Lying across Other Polygons with&nbsp;PostGIS</a></h1>
-    <aside><span>Aug 5, 2016</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p>Doing overlays (<code>ST_Intersection()</code>) in PostGIS based on spatial relationships (<code>ST_Intersects()</code>, <code>ST_Contains()</code>, &hellip;) is so easy it is not something you get particularly excited&nbsp;about.</p>
-<p>Today I faced a bit more interesting task: <strong>given two polygon layers, get me all the polygons from layer A such that they lie across the polygons from layer B and&hellip; a picture worth a thousand words,&nbsp;right?</strong></p>
-<div class="text-center"><img data-echo="/posts/assets/finding-polygons-lying-across-other-polygons-with-postgis/polygons.svg" /></div>
-
-<p>I hope you got the idea, it is fairly&nbsp;simple:</p>
-<ol>
-<li>Intersect A (red, blue) with B&nbsp;(green)</li>
-<li>Subtract the result of previous from layer&nbsp;A</li>
-<li>Combine results from steps 1 and&nbsp;2</li>
-<li>Keep polygon only if its id occurs more than twice (that means it went straight through the layer&nbsp;B)</li>
-<li>Profit!</li>
-</ol>
-<!-- codeblock -->
-
-<div class="highlight"><pre><span></span><span class="k">WITH</span> <span class="n">overlays</span> <span class="k">AS</span> <span class="p">(</span>
-<span class="cm">/* nothing fancy here */</span>
-    <span class="k">SELECT</span>
-        <span class="n">A</span><span class="p">.</span><span class="n">ogc_fid</span> <span class="n">a_id</span><span class="p">,</span>
-        <span class="n">B</span><span class="p">.</span><span class="n">ogc_fid</span> <span class="n">b_id</span><span class="p">,</span>
-        <span class="n">ST_Intersection</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">B</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">geom</span><span class="p">,</span>
-        <span class="n">ST_Area</span><span class="p">(</span><span class="n">ST_Intersection</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">B</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">area_shared</span>
-    <span class="k">FROM</span> <span class="n">A</span>
-    <span class="k">JOIN</span> <span class="n">B</span> <span class="k">ON</span> <span class="p">(</span><span class="n">ST_Intersects</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">B</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span>
-<span class="p">),</span>
-<span class="n">diffs</span> <span class="k">AS</span> <span class="p">(</span>
-<span class="cm">/* note this is a 1:1 relationship in ST_Difference */</span>
-<span class="cm">/* a little hack is needed to prevent PostGIS from returning its usual difference mess */</span>
-    <span class="k">SELECT</span>
-        <span class="n">o</span><span class="p">.</span><span class="n">a_id</span><span class="p">,</span>
-        <span class="n">o</span><span class="p">.</span><span class="n">b_id</span><span class="p">,</span>
-        <span class="p">(</span><span class="n">ST_Dump</span><span class="p">(</span><span class="n">ST_Difference</span><span class="p">(</span><span class="n">ST_Buffer</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="o">-</span><span class="mi">0</span><span class="p">.</span><span class="mi">0001</span><span class="p">),</span> <span class="n">o</span><span class="p">.</span><span class="n">geom</span><span class="p">))).</span><span class="n">geom</span><span class="p">,</span> <span class="c1">-- ugly hack</span>
-        <span class="n">o</span><span class="p">.</span><span class="n">area_shared</span>
-    <span class="k">FROM</span> <span class="n">overlays</span> <span class="n">o</span>
-    <span class="k">JOIN</span> <span class="n">A</span> <span class="k">ON</span> <span class="p">(</span><span class="n">o</span><span class="p">.</span><span class="n">a_id</span> <span class="o">=</span> <span class="n">A</span><span class="p">.</span><span class="n">id</span><span class="p">)</span>
-<span class="p">),</span>
-
-<span class="n">merged</span> <span class="k">AS</span> <span class="p">(</span>
-<span class="cm">/* put those two result sets together */</span>
-    <span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">overlays</span>
-    <span class="k">UNION</span> <span class="k">ALL</span>
-    <span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">diffs</span>
-<span class="p">),</span>
-
-<span class="n">merged_reduced</span> <span class="k">AS</span> <span class="p">(</span>
-<span class="cm">/* get only those A polygons that consist of three parts at least for each intersection with B polygon */</span>
-  <span class="k">SELECT</span>
-    <span class="n">m</span><span class="p">.</span><span class="o">*</span>
-  <span class="k">FROM</span> <span class="n">merged</span> <span class="n">m</span>
-  <span class="k">JOIN</span> <span class="p">(</span>
-    <span class="k">SELECT</span>
-      <span class="n">a_id</span><span class="p">,</span>
-      <span class="n">b_id</span>
-    <span class="k">FROM</span> <span class="n">merged</span>
-    <span class="k">GROUP</span> <span class="k">BY</span> <span class="n">a_id</span><span class="p">,</span> <span class="n">b_id</span>
-    <span class="k">HAVING</span> <span class="k">COUNT</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span>
-  <span class="p">)</span> <span class="n">a</span> <span class="k">ON</span> <span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">a_id</span> <span class="o">=</span> <span class="n">m</span><span class="p">.</span><span class="n">a_id</span> <span class="k">AND</span> <span class="n">a</span><span class="p">.</span><span class="n">b_id</span> <span class="o">=</span> <span class="n">m</span><span class="p">.</span><span class="n">b_id</span><span class="p">)</span>
-<span class="p">)</span>
-<span class="cm">/* do as you wish with the result */</span>
-<span class="k">SELECT</span> <span class="o">*</span>
-<span class="k">FROM</span> <span class="n">merged_reduced</span><span class="p">;</span>
-</pre></div>
-
-
-<p>In my case, centerlines of layer B were also included and their length inside each intersection was used to divide the area of the smallest part with. It was fun,&nbsp;actually.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/tag/postgresql2.html">&laquo; Previous page</a>

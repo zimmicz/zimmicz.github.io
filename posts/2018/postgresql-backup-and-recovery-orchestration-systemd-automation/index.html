@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+          <title>Michal Zimmermann | PostgreSQL Backup and Recovery Orchestration: systemd Automation</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+
+
+
+    <meta name="tags" content="postgresql" />
+    <meta name="tags" content="linux" />
+    <meta property="og:image" content="https://www.zimmi.cz/posts/assets/postgresql-backup-and-recovery-orchestration/postgresql_recovery.jpg" />
+  <meta property="og:title" content="PostgreSQL Backup and Recovery Orchestration: systemd Automation" />
+  <meta property="og:description" content="Posts in this series have described the basic automation of PostgreSQL backup/recovery strategy. The process itself consists of different periodic tasks that shouldn’t be executed manually. There are essentially two tools dedicated to periodic task..." />
+  <meta property="og:url" content="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-systemd-automation/" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?a4089d0f">
+</head>
+<body>
+    <nav role="navigation">
+        <ul>
+            <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+            <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+            <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
+        </ul>
+    </nav>
+    <header>
+        <h1><a href="/posts">Michal Zimmermann<small>Pieces of knowledge from the world of GIS.</small></a></h1>
+    </header>
+    <main>
+<article>
+    <h1><a href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-systemd-automation/" rel="bookmark" title="Permalink to PostgreSQL Backup and Recovery Orchestration: systemd Automation">PostgreSQL Backup and Recovery Orchestration: systemd&nbsp;Automation</a></h1>
+    <aside><span>Apr 10, 2018</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+<p>Posts in this series have described the basic automation of PostgreSQL backup/recovery strategy. The process itself consists of different periodic tasks that shouldn&#8217;t be executed manually. There are essentially two tools dedicated to periodic task running in Linux: <strong>cron</strong> and <strong>systemd</strong>.</p>
+<p>Cron used to be my first choice of automation in Linux, as it&#8217;s very easy to use. On the other hand, it&#8217;s quite messy (running <code>crontab -e</code> under different users to find out which one has the job defined) and a bit difficult to test - many times I ran into a situation when underlying bash script executed just fine, while cron job kept failing for reason&nbsp;unknown.</p>
+<p>My own cron experience together with a few words from a workmate brought me into the arms of systemd, which is a Linux system and service manager. It&#8217;s capable of running periodic tasks just like cron, yet making it more&nbsp;transparent.</p>
+<h2>Important&nbsp;bits</h2>
+<p>Understanding the whole systemd is way out of scope of a poor <span class="caps">GIS</span> guy, yet I managed to tame three important parts of the&nbsp;ecosystem:</p>
+<ul>
+<li>services</li>
+<li>timers</li>
+<li>targets</li>
+</ul>
+<h3>Services</h3>
+<p>Service is a configuration saved inside &#8220;.service&#8221; file specifying what you want systemd to do. Following code shows how you can tell systemd to vacuum your database once in a&nbsp;while.</p>
+<div class="highlight"><pre><span></span><span class="o">[</span>Unit<span class="o">]</span>
+<span class="nv">Description</span><span class="o">=</span>CR vacuumdb
+<span class="nv">OnFailure</span><span class="o">=</span>unit-status-mail@%n.service unit-status-slack@%n.service
+<span class="nv">Wants</span><span class="o">=</span>cr-sunday.timer
+
+<span class="o">[</span>Service<span class="o">]</span>
+<span class="nv">User</span><span class="o">=</span>postgres
+<span class="nv">Group</span><span class="o">=</span>postgres
+<span class="nv">Type</span><span class="o">=</span>simple
+<span class="nv">ExecStart</span><span class="o">=</span>/bin/bash /usr/local/sbin/pgsql-vacuumdb.sh --port %i
+
+<span class="o">[</span>Install<span class="o">]</span>
+<span class="nv">WantedBy</span><span class="o">=</span>cr-sunday.target
+</pre></div>
+
+
+<p>Unit files come with several handy features. First of all, they are orchestrated with <code>systemctl</code>. Second, any service configuration file containing <code>@</code> in its filename might be symlinked/copied and run for different instances. Third, notice <code>OnFailure</code> directive in the code above. If anything goes wrong, systemd might serve as a postman delivering the bad news. I set up both e-mail and Slack notifications and they&#8217;ve been working like a charm ever&nbsp;since.</p>
+<p>On top of that, I find systemd orchestration much easier to test and maintain compared to&nbsp;cron.</p>
+<p>With the above code saved in <code>/lib/systemd/system/pgsql-vacuumdb@.service</code>, you can copy the file to <code>/lib/systemd/system/pgsql-vacuumdb@5432.service</code>, <code>/lib/systemd/system/pgsql-vacuumdb@5432.service</code> etc. If you look at <code>ExecStart</code> part of the service file, you&#8217;ll notice <code>%i</code> being used at the end - a <a href="https://www.freedesktop.org/software/systemd/man/systemd.unit.html">placeholder</a> replaced with the string between <code>@</code> and <code>.service</code> in the&nbsp;filename.</p>
+<p>This systemd service file is no more than a simple wrapper around the following bash code. We run three different database clusters on one machine and this approach makes their maintenance pretty&nbsp;comfortable.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="c1">#</span>
+<span class="c1"># @author: Michal Zimmermann &lt;michal.zimmermann@clevermaps.cz&gt;</span>
+<span class="c1"># Vacuums the whole database cluster running on a given port.</span>
+
+<span class="k">while</span> <span class="o">[[</span> <span class="nv">$#</span> &gt; <span class="m">0</span> <span class="o">]]</span>
+<span class="k">do</span>
+    <span class="nv">key</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>
+
+    <span class="k">case</span> <span class="nv">$key</span> in
+        -p<span class="p">|</span>--port<span class="o">)</span>
+            <span class="nv">PORT</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$2</span><span class="s2">&quot;</span>
+            <span class="nb">shift</span>
+            <span class="p">;;</span>
+        *<span class="o">)</span>
+            <span class="nb">echo</span> <span class="s2">&quot;Usage: `basename </span><span class="nv">$0</span><span class="s2">` --port|-p [port_number]&quot;</span>
+            <span class="nb">exit</span> <span class="m">1</span>
+            <span class="p">;;</span>
+    <span class="k">esac</span>
+    <span class="nb">shift</span>
+<span class="k">done</span>
+
+<span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;</span><span class="nv">$PORT</span><span class="s2">&quot;</span> <span class="o">]]</span>
+<span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;Port not provided!&quot;</span>
+    <span class="nv">$0</span> *
+    <span class="nb">exit</span> <span class="m">2</span>
+<span class="k">fi</span>
+
+/usr/bin/vacuumdb -U postgres -p <span class="nv">$PORT</span> --all --full --analyze
+</pre></div>
+
+
+<p>What you get so far is the possibility to run <code>systemctl start pgsql-vacuumdb@5432</code> instead of calling the underlying bash code manually. Not much, really. That&#8217;s where timers come to the&nbsp;party.</p>
+<h3>Timers</h3>
+<p>Timer files ends with &#8220;.timer&#8221; and are responsible for running services on given time. The code below, coming from <code>/lib/systemd/system/cr-sunday.timer</code> file runs the <code>pgsql-vacuumdb</code> service every Sunday at 3:45&nbsp;am.</p>
+<div class="highlight"><pre><span></span><span class="o">[</span>Unit<span class="o">]</span>
+<span class="nv">Description</span><span class="o">=</span>CR Sunday timer
+
+<span class="o">[</span>Timer<span class="o">]</span>
+<span class="nv">OnCalendar</span><span class="o">=</span>Sun *-*-* <span class="m">03</span>:45
+<span class="nv">Persistent</span><span class="o">=</span>yes
+<span class="nv">Unit</span><span class="o">=</span>cr-sunday.target
+
+<span class="o">[</span>Install<span class="o">]</span>
+<span class="nv">WantedBy</span><span class="o">=</span>multi-user.target
+</pre></div>
+
+
+<h3>Targets</h3>
+<p>Target files end with &#8220;.target&#8221; and are used to group units in general. In our case, the target file for vacuumdb service is as simple as the following&nbsp;code.</p>
+<div class="highlight"><pre><span></span><span class="o">[</span>Unit<span class="o">]</span>
+<span class="nv">Description</span><span class="o">=</span>CR Sunday target
+<span class="nv">StopWhenUnneeded</span><span class="o">=</span>yes
+</pre></div>
+
+
+<p>Targets might be called by other targets. Running <code>systemctl start cr-sunday.target</code> would eventually lead to running all the services wanted by that&nbsp;target.</p>
+<p>As I already mentioned, I find systemd services easy to code and test. If any of them should fail, you&#8217;d find a message in syslog or via <code>systemctl status pgsql-vacuumdb</code>.</p>
+<aside>
+<h3>This post is part 4 of the "PostgreSQL Backup and Recovery Orchestration" series:</h3>
+    <ol class="parts">
+            <li>
+<a href='https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-wal-archiving/'>                PostgreSQL Backup and Recovery Orchestration: <span class="caps">WAL</span>&nbsp;Archiving
+</a>            </li>
+            <li>
+<a href='https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-recovery/'>                PostgreSQL Backup and Recovery Orchestration:&nbsp;Recovery
+</a>            </li>
+            <li>
+<a href='https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-bash-automation/'>                PostgreSQL Backup and Recovery Orchestration: Bash&nbsp;Automation
+</a>            </li>
+            <li>
+                PostgreSQL Backup and Recovery Orchestration: systemd&nbsp;Automation
+            </li>
+    </ol>
+
+<h3>More reading</h3>
+    <ul>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/postgresql-remote-access/">PostgreSQL Remote&nbsp;Access</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-bash-automation/">PostgreSQL Backup and Recovery Orchestration: Bash&nbsp;Automation</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-wal-archiving/">PostgreSQL Backup and Recovery Orchestration: <span class="caps">WAL</span>&nbsp;Archiving</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-recovery/">PostgreSQL Backup and Recovery Orchestration:&nbsp;Recovery</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/">Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span></a></li>
+    </ul>
+<!-- Start of Async Drift Code -->
+<script>
+    !function () {
+        var t;
+        if (t = window.driftt = window.drift = window.driftt || [], !t.init) return t.invoked ? void (window.console && console.error && console.error("Drift snippet included twice.")) : (t.invoked = !0,
+            t.methods = ["identify", "config", "track", "reset", "debug", "show", "ping", "page", "hide", "off", "on"],
+            t.factory = function (e) {
+                return function () {
+                    var n;
+                    return n = Array.prototype.slice.call(arguments), n.unshift(e), t.push(n), t;
+                };
+            }, t.methods.forEach(function (e) {
+                t[e] = t.factory(e);
+            }), t.load = function (t) {
+                var e, n, o, i;
+                e = 3e5, i = Math.ceil(new Date() / e) * e, o = document.createElement("script"),
+                    o.type = "text/javascript", o.async = !0, o.crossorigin = "anonymous", o.src = "https://js.driftt.com/include/" + i + "/" + t + ".js",
+                    n = document.getElementsByTagName("script")[0], n.parentNode.insertBefore(o, n);
+            });
+    }();
+    drift.SNIPPET_VERSION = '0.3.1';
+    drift.load('caacyauy5t6b');
+
+</script>
+<!-- End of Async Drift Code --></aside>
+    </main>
+    <footer>
+        Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
+        Proudly powered by <a href="//getpelican.com/">Pelican</a>,
+        which takes great advantage of <a href="//python.org">Python</a>.
+    </footer>
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-43432739-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments)};
+  gtag('js', new Date());
+
+  gtag('config', 'UA-43432739-2');
+</script>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NW8R37N');</script>
+<!-- End Google Tag Manager -->
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NW8R37N"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<script src="https://www.zimmi.cz/posts/theme/js/echo.min.js"></script>
+<script>
+echo.init({
+  offset: 200,
+  throttle: 250,
+  unload: false
+});
+</script>
+</body>
+</html>

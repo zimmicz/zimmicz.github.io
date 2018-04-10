@@ -23,6 +23,50 @@
     <main>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2014/notify-when-average-of-10-subsequent-numbers-is-bigger-than-given-value/" rel="bookmark" title="Permalink to Notify When Average of 10 Subsequent Numbers Is Bigger Than Given Value">Notify When Average of 10 Subsequent Numbers Is Bigger Than Given&nbsp;Value</a></h1>
+    <aside><span>Sep 21, 2014</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/php.html">php</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+    </aside>
+    <p>I found an <a href="http://stackoverflow.com/questions/25952380/php-find-a-maximum-average-for-10-subsequent-numbers-in-a-list-of-50-random-numb">interesting question</a> at StackOverflow asking for help finding solution to what I have already mentioned in the title, with <span class="caps">PHP</span>. I gave it a try before reading answers and came up with the following&nbsp;code:</p>
+<div class="highlight"><pre><span></span>$avg  = // value we are looking for
+$size = count($numbers);
+
+for ($i = 0; $i &lt; $size; $i += 1) {
+    if ($i + 9 &lt; 51) {
+        $val += $numbers[$i];
+        for ($j = $i + 1; $j &lt; 10 + $i; $j += 1) {
+            $val += $numbers[$j];
+        }
+        if ($val / 10 &gt;= $avg) { // hit
+            // do something
+        }
+        $val = 0;
+    }
+}
+</pre></div>
+
+
+<p>That was the first that I could think of. And it worked. The answer given by Dave Chen was much more elegant than my solution (although I think it does something a bit different, but that&#8217;s not the point&nbsp;here):</p>
+<div class="highlight"><pre><span></span>$number = 10; //numbers in a set
+$max = 0;
+$index = 0;
+
+$size = sizeof($numbers) - $number;
+for ($i = 0; $i &lt; $size; $i++) {
+    $tmp = array_sum(array_slice($numbers, $i, $number)) / $number;
+    if ($tmp &gt; $max) {
+        $max = $tmp;
+        $index = $i;
+    }
+}
+</pre></div>
+
+
+<p>I made a simple benchmark with <a href="http://php.net/manual/en/function.microtime.php"><code>microtime()</code></a> and found out that my solution (ran 100k times) took about ~12.3 seconds while Dave&#8217;s took only ~7.4 seconds to finish. That makes his code almost twice faster than&nbsp;mine.</p>
+<p><strong>Lesson learned: do not stop&nbsp;learning!</strong></p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2014/postgresql-remote-access/" rel="bookmark" title="Permalink to PostgreSQL Remote Access">PostgreSQL Remote&nbsp;Access</a></h1>
     <aside><span>Sep 17, 2014</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
@@ -156,46 +200,6 @@
 <p>Running <code>sudo docker build --tag=piecrust .</code> will result in having docker container ready to run. Just run <code>sudo docker run -it -p 8080:8080 -v /host_piecrust_path/:/container_path piecrust /bin/bash</code> in terminal. While in container terminal, run <code>chef serve -n -p 8080 -a 0.0.0.0</code> and visit <a href="http://localhost:8080">http://localhost:8080</a>. You should see your PieCrust site up and&nbsp;running.</p>
 <p>The last command tells chef to serve your site on port 8080 (which should be free unless you&#8217;re running Tomcat or something like that) and make it listen on every available network interface. If you used 127.0.0.1 instead, you would never reach your site from outside the&nbsp;container.</p>
 <p>See?&nbsp;Easy.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2014/wmts-few-things-i-want-to-remember/" rel="bookmark" title="Permalink to WMTS: Few Things I Want To Remember"><span class="caps">WMTS</span>: Few Things I Want To&nbsp;Remember</a></h1>
-    <aside><span>Sep 10, 2014</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/ogc.html">ogc</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/wmts.html">wmts</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/web-maps.html">web maps</a></span>
-    </aside>
-    <ul>
-<li>Used to serve prepared rectangular tiles; this means you are limited by web server speed rather than map server&nbsp;speed</li>
-<li>Several ways to retrieve tiles are defined: <span class="caps">KVP</span> and <span class="caps">REST</span> are mandatory, <span class="caps">SOAP</span> is&nbsp;optional</li>
-<li>Does not allow layer combination; additional tile matrix would have to be&nbsp;created</li>
-<li>GetCapabilities, GetTile and GetFeatureInfo requests are&nbsp;defined</li>
-<li><strong>tile</strong></li>
-<li>rectangular representation of&nbsp;space</li>
-<li>defined by tile and row&nbsp;indices</li>
-<li><strong>tile&nbsp;matrix</strong></li>
-<li>set of tiles for a given&nbsp;scale</li>
-<li><em>defined with:</em><ul>
-<li>tile size derived from standardized pixel size (0.28 &times; 0.28&nbsp;mm)</li>
-<li>tile width and tile height&nbsp;(px)</li>
-<li>left upper corner&nbsp;coordinates</li>
-<li>matrix width and height as number of&nbsp;tiles</li>
-</ul>
-</li>
-<li><strong>tile matrix&nbsp;set</strong></li>
-<li>set of tile matrices for different&nbsp;scales</li>
-</ul>
-<h3>Total count of tile&nbsp;matrices</h3>
-<p><em><code>nTileMatrices × nTiledStyles × nTiledFormats (if no dimensions are defined)</code></em></p>
-<h3>Total count of tiles in a tile&nbsp;matrix</h3>
-<p><em><code>matrixWidth × matrixHeight</code></em></p>
-<h3>Other&nbsp;equations</h3>
-<ul>
-<li><code>pixelSpan = scaleDenominator × 0.28 10<sup>3</sup> / metersPerUnit(crs);</code></li>
-<li><code>tileSpanX = tileWidth × pixelSpan;</code></li>
-<li><code>tileSpanY = tileHeight × pixelSpan;</code></li>
-<li><code>tileMatrixMaxX = tileMatrixMinX + tileSpanX × matrixWidth;</code></li>
-<li><code>tileMatrixMinY = tileMatrixMaxY - tileSpanY × matrixHeight;</code></li>
-</ul>
-<p><img data-echo="/posts/assets/wmts-few-things-i-want-to-remember/wmts.png" title="WMTS tiling schema" class="img-responsive centered"></p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/index14.html">&laquo; Previous page</a>

@@ -23,6 +23,106 @@
     <main>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2017/upgrading-postgresql-95-to-postgresql-96-with-postgis/" rel="bookmark" title="Permalink to Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with PostGIS">Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with&nbsp;PostGIS</a></h1>
+    <aside><span>Mar 1, 2017</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p>Thanks to <code>pg_upgrade</code> tool the PostgreSQL upgrade on Ubuntu is pretty straightforward. Different PostGIS versions might cause troubles though. This post covers PostgreSQL 9.5, PostGIS 2.2 to PostgreSQL 9.6, PostGIS 2.3&nbsp;migration.</p>
+<p>First of all, install the PostgreSQL 9.6 with PostGIS&nbsp;2.3.</p>
+<div class="highlight"><pre><span></span>apt install postgresql-9.6 postgresql-9.6-postgis-2.3
+</pre></div>
+
+
+<p>Mind that newly installed database cluster runs on port <code>5433</code>.</p>
+<p>If you run <code>pg_upgrade</code> at this stage, it will fail with the following&nbsp;error.</p>
+<div class="highlight"><pre><span></span>could not load library <span class="s2">&quot;</span><span class="nv">$libdir</span><span class="s2">/postgis_topology-2.2&quot;</span>:
+ERROR:  could not access file <span class="s2">&quot;</span><span class="nv">$libdir</span><span class="s2">/postgis_topology-2.2&quot;</span>: No such file or directory
+</pre></div>
+
+
+<p><code>pg_upgrade</code> can&#8217;t run the upgrade because PostGIS versions don&#8217;t match. Install the PostGIS 2.3 for PostgreSQL 9.5 and update extensions in all your&nbsp;databases.</p>
+<div class="highlight"><pre><span></span>apt install postgresql-9.5-postgis-2.3
+
+:::sql
+ALTER EXTENSION postgis UPDATE<span class="p">;</span>
+</pre></div>
+
+
+<p>With both clusters using the same PostGIS version, the upgrade can begin. First, stop them&nbsp;with</p>
+<div class="highlight"><pre><span></span>service postgresql stop
+</pre></div>
+
+
+<p>Then, run the actual <code>pg_upgrade</code> command as <code>postgres</code> user. Make sure the <code>pg_hba.conf</code> file is set to allow local&nbsp;connections.</p>
+<div class="highlight"><pre><span></span>/usr/lib/postgresql/9.6/bin/pg_upgrade <span class="se">\</span>
+-b /usr/lib/postgresql/9.5/bin/ <span class="se">\</span>
+-B /usr/lib/postgresql/9.6/bin/ <span class="se">\</span>
+-d /var/lib/postgresql/9.5/main <span class="se">\</span>
+-D /var/lib/postgresql/9.6/main <span class="se">\</span>
+-o <span class="s1">&#39; -c config_file=/etc/postgresql/9.5/main/postgresql.conf&#39;</span> <span class="se">\</span>
+-O <span class="s1">&#39; -c config_file=/etc/postgresql/9.6/main/postgresql.conf&#39;</span>
+</pre></div>
+
+
+<p>The following result means the upgrade was&nbsp;smooth.</p>
+<div class="highlight"><pre><span></span>Performing Consistency Checks
+-----------------------------
+Checking cluster versions                                   ok
+Checking database user is the install user                  ok
+Checking database connection settings                       ok
+Checking <span class="k">for</span> prepared transactions                          ok
+Checking <span class="k">for</span> reg* system OID user data types                ok
+Checking <span class="k">for</span> contrib/isn with bigint-passing mismatch       ok
+Checking <span class="k">for</span> roles starting with <span class="s1">&#39;pg_&#39;</span>                      ok
+Creating dump of global objects                             ok
+Creating dump of database schemas
+                                                            ok
+Checking <span class="k">for</span> presence of required libraries                 ok
+Checking database user is the install user                  ok
+Checking <span class="k">for</span> prepared transactions                          ok
+
+If pg_upgrade fails after this point, you must re-initdb the
+new cluster before continuing.
+
+Performing Upgrade
+------------------
+Analyzing all rows in the new cluster                       ok
+Freezing all rows on the new cluster                        ok
+Deleting files from new pg_clog                             ok
+Copying old pg_clog to new server                           ok
+Setting next transaction ID and epoch <span class="k">for</span> new cluster       ok
+Deleting files from new pg_multixact/offsets                ok
+Copying old pg_multixact/offsets to new server              ok
+Deleting files from new pg_multixact/members                ok
+Copying old pg_multixact/members to new server              ok
+Setting next multixact ID and offset <span class="k">for</span> new cluster        ok
+Resetting WAL archives                                      ok
+Setting frozenxid and minmxid counters in new cluster       ok
+Restoring global objects in the new cluster                 ok
+Restoring database schemas in the new cluster
+                                                            ok
+Copying user relation files
+                                                            ok
+Setting next OID <span class="k">for</span> new cluster                            ok
+Sync data directory to disk                                 ok
+Creating script to analyze new cluster                      ok
+Creating script to delete old cluster                       ok
+
+Upgrade Complete
+----------------
+Optimizer statistics are not transferred by pg_upgrade so,
+once you start the new server, consider running:
+    ./analyze_new_cluster.sh
+
+Running this script will delete the old cluster<span class="err">&#39;</span>s data files:
+    ./delete_old_cluster.sh
+</pre></div>
+
+
+<p>The old cluster can be removed and the new one switched back to port <code>5432</code>. Run <code>/usr/lib/postgresql/9.6/bin/vacuumdb -p 5433 --all --analyze-in-stages</code> to collect&nbsp;statistics.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2017/executing-dynamic-sql-query-right-away/" rel="bookmark" title="Permalink to Executing dynamic SQL query right away">Executing dynamic <span class="caps">SQL</span> query right&nbsp;away</a></h1>
     <aside><span>Feb 28, 2017</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
@@ -179,52 +279,6 @@
 <p><small>Bottom line: I use localStorage to keep track of the database existence.</small></p>
 <h3>Resume</h3>
 <p>Two pet projects completed in one month definitely means the winter is here! Looking forward to using more&nbsp;vue.js.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/" rel="bookmark" title="Permalink to Plotting the Czech Cadastre Land Use with d3: Data Load (part III)">Plotting the Czech Cadastre Land Use with d3: Data Load (part <span class="caps">III</span>)</a></h1>
-    <aside><span>Nov 15, 2016</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/d3.html">d3</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/data.html">data</a></span>
-    </aside>
-    <p>This post is the third part of the series summarizing the process of visualizing landuse data with bash, PostgreSQL and d3.js. Read other&nbsp;parts:</p>
-<ol>
-<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part&nbsp;I)</a></li>
-<li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></li>
-<li>you&#8217;re reading it&nbsp;now</li>
-</ol>
-<h2><span class="caps">ETL</span>&nbsp;process</h2>
-<p>Before the d3 viz can be crafted, it&#8217;s necessary&nbsp;to:</p>
-<ol>
-<li>extract <span class="caps">CSV</span> data from the URLs provided via the Atom&nbsp;feed</li>
-<li>transform those data into a relational database, do some&nbsp;math</li>
-<li>load data into a d3.js&nbsp;viz</li>
-<li>profit (as&nbsp;usual)</li>
-</ol>
-<h3>Extract</h3>
-<p>See <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)</a>.</p>
-<h3>Transform</h3>
-<p>See <a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a>.</p>
-<h2>Load</h2>
-<p>Thanks to the way I transformed the data, the whole load is done with&nbsp;simple</p>
-<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
-
-touch ./data/data.js
-<span class="nb">echo</span> <span class="s2">&quot;let data =&quot;</span> &gt; ./data/data.js
-
-<span class="o">(</span>
-cat <span class="s">&lt;&lt; EOF | psql -qAt --no-psqlrc</span>
-<span class="s">    SELECT</span>
-<span class="s">    array_to_json(array_agg(row_to_json(r)))</span>
-<span class="s">    FROM (</span>
-<span class="s">    SELECT *</span>
-<span class="s">    FROM data</span>
-<span class="s">    ) r</span>
-<span class="s">EOF</span>
-<span class="o">)</span> &gt;&gt; ./data/data.js
-</pre></div>
-
-
-<p>That&#8217;s the whole <span class="caps">ETL</span> process! Next time, I&#8217;ll cover the d3.js&nbsp;viz.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/index4.html">&laquo; Previous page</a>
