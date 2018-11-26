@@ -6,7 +6,7 @@ Category: SQL
 I've come across the [beautiful GIS StackExchange question](http://gis.stackexchange.com/questions/208797/draw-wind-rose-with-qgis-from-postgis/) recently, asking how to draw a [wind rose](https://en.wikipedia.org/wiki/Wind_rose) within PostGIS.
 
 <div class="text-center">
-<img data-echo="http://i.stack.imgur.com/0xAMU.png">
+<img src="http://i.stack.imgur.com/0xAMU.png">
 </div>
 
 It's pretty easy to accomplish this with a custom PLPGSQL procedure below, that takes line geometry, number of sections and radius of the inner circle as parameters.
@@ -61,7 +61,7 @@ It's pretty easy to accomplish this with a custom PLPGSQL procedure below, that 
 Wind rose created with this function might look like the one below.
 
 <div class="text-center">
-<img data-echo="http://i.stack.imgur.com/4OD0J.png">
+<img src="http://i.stack.imgur.com/4OD0J.png">
 </div>
 
 Run it as follows. The `line` parameter should be a simple straight line made of just two vertices.

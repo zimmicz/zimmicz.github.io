@@ -29,7 +29,7 @@ As far as I know, it's not trivial to do this with the standard Leaflet library.
 
 With this piece of code you get a map key with checkboxes for all the categories, yet they're still kept in the single cluster on the map. Brilliant!
 
-<img data-echo="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/map.png" title="vozejkmap.cz data map" class="img-responsive centered">
+<img src="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/map.png" title="vozejkmap.cz data map" class="img-responsive centered">
 
 ## Using Turf.js for analysis
 
@@ -67,6 +67,6 @@ From what I've tried so far, Turf seems to be incredibly fast and easy to use. I
 
 Turf is blazing fast! I've implemented nearest point for each of the categories and it gets done in a blink of an eye. Some screenshots below. Geolocation implemented as well.
 
-<p><img data-echo="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen1.png" title="vozejkmap.cz data map" class="img-responsive centered"> You can locate the point easily.</p>
-<p><img data-echo="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen2.png" title="vozejkmap.cz data map" class="img-responsive centered"> You can hide the infobox.</p>
-<p><img data-echo="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen3.png" title="vozejkmap.cz data map" class="img-responsive centered">You can jump to any of the nearest places.</p>
+<p><img src="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen1.png" title="vozejkmap.cz data map" class="img-responsive centered"> You can locate the point easily.</p>
+<p><img src="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen2.png" title="vozejkmap.cz data map" class="img-responsive centered"> You can hide the infobox.</p>
+<p><img src="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen3.png" title="vozejkmap.cz data map" class="img-responsive centered">You can jump to any of the nearest places.</p>

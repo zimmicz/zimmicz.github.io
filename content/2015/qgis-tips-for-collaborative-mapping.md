@@ -24,13 +24,13 @@ Using this multiple times for each user-specific layer is a great time saver.
 
 QGIS attribute table has so many settings you probably don't use on daily basis and yet they might be invaluable in such project. All of them are available from layer properties under the Fields tab.
 
-<p class='text-center'><img data-echo="/posts/assets/qgis-tips-for-collaborative-mapping/hidden.png" width=50% class="img-responsive centered"></p>
+<p class='text-center'><img src="/posts/assets/qgis-tips-for-collaborative-mapping/hidden.png" width=50% class="img-responsive centered"></p>
 
 Sadly, our PostGIS layers are very wide in terms of column count. Not all of the columns are to be edited or even seen by operators, so it might be a good idea to hide them by setting their Edit Widget to Hidden. Those that should be seen, but not edited, might be set as not editable by unchecking that option.
 
 Lots of our attributes use enumerations provided by our project partner as CSV files. We use them in QGIS as value maps, so operators don't have to type them manually - we both make their work easier and eliminate mistakes they made.
 
-<p class='text-center'><img data-echo="/posts/assets/qgis-tips-for-collaborative-mapping/valuemap.png" width=50% class="img-responsive centered"></p>
+<p class='text-center'><img src="/posts/assets/qgis-tips-for-collaborative-mapping/valuemap.png" width=50% class="img-responsive centered"></p>
 
 Note QGIS swallows the first row of the given CSV file as if it was a header. Don't forget about this when creating your own enumerations. Once set, operators will see a friendly combo box instead of a hostile blank input in the attribute table.
 

@@ -133,7 +133,7 @@ y = map(time, first, last, 0, 500)
 z = map(lat, 16.59971950210866964, 63.68835804244784526, 0, height)
 </code></pre>
 
-<p><img data-echo="http://www.processing.org/tutorials/p3d/imgs/coordinatesystem.png" title="Processing coordinate system" class="img-rounded pull-left">They define how coordinates inside the cube should be computed. As you see, <code>x</code> is the result of mapping longitudinal extent of our area to the width of cube, the same happens to <code>z</code> and latitude, and to <code>y</code> (but here we map time, not coordinates).</p>
+<p><img src="http://www.processing.org/tutorials/p3d/imgs/coordinatesystem.png" title="Processing coordinate system" class="img-rounded pull-left">They define how coordinates inside the cube should be computed. As you see, <code>x</code> is the result of mapping longitudinal extent of our area to the width of cube, the same happens to <code>z</code> and latitude, and to <code>y</code> (but here we map time, not coordinates).</p>
 
 <p>The bounding box used in those computations is the bounding box of the basemap. Interesting thing about Processing and its 3D environment is how it defines the beginning of the coordinate system. As you can see on the left, it might be slighty different from what you could expect. That&#8217;s what you need to be careful about.</p>
 

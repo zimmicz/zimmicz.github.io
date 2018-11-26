@@ -51,7 +51,7 @@ Category: development
 
 <p>I decided to throw away the tweets with the empty <code>coordinates</code> field, because the accuracy of the value specified in the place field can be generally considered very low and insufficient for my purposes. You still need to account for position inaccuracies of users&#8217; devices though, however that is not something that we can deal with. <em>Let us just assume that geotagged tweets are accurate.</em></p>
 
-<div class="text-center"><img data-echo="/posts/assets/analyzing-twitter-languages-with-streaming-api/cr.png" width="50%" height="50%" title="Geotagged tweets" class="img-rounded"><p><strong>Figure:</strong> Twitter seems not to be very accurate when matching tweets against bounding box.</p></div>
+<div class="text-center"><img src="/posts/assets/analyzing-twitter-languages-with-streaming-api/cr.png" width="50%" height="50%" title="Geotagged tweets" class="img-rounded"><p><strong>Figure:</strong> Twitter seems not to be very accurate when matching tweets against bounding box.</p></div>
 
 <p>Although, as you can see in the picture, they are not. Or they are, but Twitter is not good at telling so. Besides that, none of the countries in the world is shaped like a rectangle and we would need to clip the data anyway. That is where SQLite comes in, because I have been saving incoming tweets right into the database.</p>
 
@@ -75,6 +75,6 @@ Category: development
 
 <p>I am definitely willing to share the <abbr title="Do not expect much, it was my first time with node.js">code</abbr> and the final viz. Meanwhile, you can have a look at the screenshot on picture [*]. I have already implemented nationality switch (legend items are clickable) and I would like to add a day/night switch to see whether there are any differences between the peoples&#8217; behaviour. </p>
 
-<div class="text-center"><img width="60%" height="60%" data-echo="/posts/assets/analyzing-twitter-languages-with-streaming-api/screenshot.png" title="Final geoviz using Leaflet" class="img-rounded"><p><strong>Figure:</strong> Final map screenshot. A legend is used to turn nationalities on and off. You are looking at Prague by the way.</p></div>
+<div class="text-center"><img width="60%" height="60%" src="/posts/assets/analyzing-twitter-languages-with-streaming-api/screenshot.png" title="Final geoviz using Leaflet" class="img-rounded"><p><strong>Figure:</strong> Final map screenshot. A legend is used to turn nationalities on and off. You are looking at Prague by the way.</p></div>
 
 <p>Obviously the most tweets were sent from the most populated places, e.g. Prague, Brno, Ostrava. </p>
