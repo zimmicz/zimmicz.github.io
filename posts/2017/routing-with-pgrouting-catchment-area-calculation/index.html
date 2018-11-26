@@ -15,7 +15,7 @@
   <meta property="og:title" content="Routing with pgRouting: Catchment Area Calculation" />
   <meta property="og:description" content="For a long time I’ve wanted to play with pgRouting and that time has finally come. Among many other routing functions there is one that caught my eye, called pgr_drivingdistance. As the documentation says, it returns the driving distance from a start..." />
   <meta property="og:url" content="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?a4089d0f">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
 </head>
 <body>
     <nav role="navigation">
@@ -93,7 +93,7 @@
 
 
 <p>This function creates the <code>cze.roads_noded_vertices_pgr</code> that contains all the extracted nodes from the&nbsp;network.</p>
-<div class="text-center"><img data-echo="/posts/assets/routing-with-pgrouting-catchment-area-calculation/nodes.png" width="70%" /></div>
+<div class="text-center"><img src="/posts/assets/routing-with-pgrouting-catchment-area-calculation/nodes.png" width="70%" /></div>
 
 <p>As already mentioned, measures other than length can be used as a distance, I chose the time to get to a given node on&nbsp;foot.</p>
 <div class="highlight"><pre><span></span><span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="k">ADD</span> <span class="k">COLUMN</span> <span class="n">cost_minutes</span> <span class="nb">integer</span><span class="p">;</span>
@@ -133,7 +133,7 @@
     <span class="p">);</span>
 
     <span class="c1">-- order by the biggest area so the polygons are not hidden beneath the bigger ones</span>
-    <span class="k">FOR</span> <span class="k">c</span> <span class="k">IN</span> <span class="k">SELECT</span> <span class="n">agg_cost</span> <span class="k">FROM</span> <span class="n">cze</span><span class="p">.</span><span class="n">temp</span> <span class="k">GROUP</span> <span class="k">BY</span> <span class="n">agg_cost</span> <span class="k">HAVING</span> <span class="k">COUNT</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="mi">1</span> <span class="k">DESC</span> <span class="n">LOOP</span>
+    <span class="k">FOR</span> <span class="k">c</span> <span class="k">IN</span> <span class="k">SELECT</span> <span class="n">agg_cost</span> <span class="k">FROM</span> <span class="n">cze</span><span class="p">.</span><span class="n">temp</span> <span class="k">GROUP</span> <span class="k">BY</span> <span class="n">agg_cost</span> <span class="k">HAVING</span> <span class="k">COUNT</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="mi">3</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="mi">1</span> <span class="k">DESC</span> <span class="n">LOOP</span>
         <span class="n">RAISE</span> <span class="n">INFO</span> <span class="s1">&#39;%&#39;</span><span class="p">,</span> <span class="k">c</span><span class="p">;</span>
         <span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">tmp</span> <span class="p">(</span><span class="n">agg_cost</span><span class="p">,</span> <span class="n">geom</span><span class="p">)</span>
         <span class="k">SELECT</span>
@@ -152,7 +152,7 @@
 
 
 <p>Using <code>pgr_pointsAsPolygon</code> renders resulting nodes accessible in 10-minute walk in polygons, but weird looking ones. Not bad, could be better&nbsp;though.</p>
-<div class="text-center"><img data-echo="/assets/routing-with-pgrouting-catchment-area-calculation/area1.png" width="70%" /></div>
+<div class="text-center"><img src="/assets/routing-with-pgrouting-catchment-area-calculation/area1.png" width="70%" /></div>
 
 <p>How about seeing only nodes instead of&nbsp;polygons?</p>
 <div class="highlight"><pre><span></span><span class="k">SELECT</span>
@@ -169,7 +169,7 @@
 
 
 <p>Looks good, could be better&nbsp;though.</p>
-<div class="text-center"><img data-echo="/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png" width="70%" /></div>
+<div class="text-center"><img src="/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png" width="70%" /></div>
 
 <p>How about creating concave hulls from the extracted&nbsp;nodes?</p>
 <div class="highlight"><pre><span></span><span class="k">SELECT</span>
@@ -193,7 +193,7 @@
 
 
 <p>This one looks the best I&nbsp;guess.</p>
-<div class="text-center"><img data-echo="/assets/routing-with-pgrouting-catchment-area-calculation/area2.png" width="70%" /></div>
+<div class="text-center"><img src="/assets/routing-with-pgrouting-catchment-area-calculation/area2.png" width="70%" /></div>
 
 <h2>Remarks</h2>
 <ul>
@@ -207,11 +207,11 @@
 
 <h3>More reading</h3>
     <ul>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/">Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span></a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/">Automated Map Creation With <span class="caps">QGIS</span>, PostGIS, Python, <span class="caps">SVG</span> and&nbsp;ImageMagick</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-count-line-self-intersections/">PostGIS: Count Line&nbsp;Self-Intersections</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-rectangular-grid-creation/">PostGIS: Rectangular Grid&nbsp;Creation</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/dead-simple-random-points-in-polygons-with-postgis/">Dead Simple Random Points in Polygons with&nbsp;PostGIS</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-buffers-intersections-differences-and-collections/">PostGIS: Buffers, Intersections, Differences And&nbsp;Collections</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/postgis-spatial-indexing-with-st_intersects/">PostGIS Spatial Indexing With&nbsp;ST_Intersects</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/postgis-case-study-vozejkmap-open-data-part-i/">PostGIS Case Study: VozejkMap Open Data (Part&nbsp;I)</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-ii/">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">II</span>)</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
 <script>

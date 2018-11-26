@@ -7,7 +7,7 @@
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
         <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
         <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?a4089d0f">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
 </head>
 <body>
     <nav role="navigation">
@@ -31,7 +31,7 @@
     </aside>
     <p>I&#8217;d like to introduce you to my little pet project, which might just as well be awarded <em>the first pet project I&#8217;ve ever completed</em>, called <a href="https://www.zimmi.cz/blind-maps">Blind maps</a>.</p>
 <p>It&#8217;s a very simple, yet useful web application built on top of the great <a href="../../tag/leaflet.html">Leaflet</a> library meant to help you get to know our world a bit better. As the name suggests, the app shows you, well&hellip; a blind map, and you try to fill as many features as you&nbsp;can.</p>
-<div class="text-center"><img data-echo="/posts/assets/introducing-blind-maps-project/map.png" /></div>
+<div class="text-center"><img src="/posts/assets/introducing-blind-maps-project/map.png" /></div>
 
 <p>The app is ready and can be&nbsp;used:</p>
 <ul>
@@ -81,7 +81,7 @@
 
 
 <p>With this piece of code you get a map key with checkboxes for all the categories, yet they&#8217;re still kept in the single cluster on the map.&nbsp;Brilliant!</p>
-<p><img data-echo="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/map.png" title="vozejkmap.cz data map" class="img-responsive centered"></p>
+<p><img src="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/map.png" title="vozejkmap.cz data map" class="img-responsive centered"></p>
 <h2>Using Turf.js for&nbsp;analysis</h2>
 <p>Turf is one of those libraries I get amazed easily with, spending a week trying to find a use case, finally putting it aside with <em>&#8220;I&#8217;ll get back to it later&#8221;</em>. I usually don&#8217;t. This time it&#8217;s&nbsp;different.</p>
 <p>I use Turf to get the nearest neighbor for any marker on click. My first try ended up with the same marker being the result as it was a member of a feature collection passed to <code>turf.nearest()</code> method. After snooping around the docs I found <code>turf.remove()</code> method that can filter GeoJSON based on key-value&nbsp;pair.</p>
@@ -94,8 +94,8 @@
                 <span class="nx">distance</span> <span class="o">=</span> <span class="nx">turf</span><span class="p">.</span><span class="nx">distance</span><span class="p">(</span><span class="nx">layer</span><span class="p">.</span><span class="nx">toGeoJSON</span><span class="p">(),</span> <span class="nx">nearest</span><span class="p">,</span> <span class="s2">&quot;kilometers&quot;</span><span class="p">).</span><span class="nx">toPrecision</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
                 <span class="nx">popup</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">popup</span><span class="p">({</span><span class="nx">offset</span><span class="o">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">35</span><span class="p">]}).</span><span class="nx">setLatLng</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">latlng</span><span class="p">),</span>
                 <span class="nx">content</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">Util</span><span class="p">.</span><span class="nx">template</span><span class="p">(</span>
-                    <span class="s2">&quot;&lt;h1&gt;{title}&lt;/h1&gt;&lt;p&gt;{description}&lt;/p&gt; \</span>
-<span class="s2">                    &lt;p&gt;Nejbližší bod: {nearest} je {distance} km daleko.&lt;/p&gt;&quot;</span><span class="p">,</span> <span class="p">{</span>
+                    <span class="s2">&quot;&amp;lt;h1&amp;gt;{title}&amp;lt;/h1&amp;gt;&amp;lt;p&amp;gt;{description}&amp;lt;/p&amp;gt; \</span>
+<span class="s2">                    &amp;lt;p&amp;gt;Nejbližší bod: {nearest} je {distance} km daleko.&amp;lt;/p&amp;gt;&quot;</span><span class="p">,</span> <span class="p">{</span>
                     <span class="nx">title</span><span class="o">:</span> <span class="nx">feature</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">title</span><span class="p">,</span>
                     <span class="nx">description</span><span class="o">:</span> <span class="nx">feature</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">description</span><span class="p">,</span>
                     <span class="nx">nearest</span><span class="o">:</span> <span class="nx">nearest</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">title</span><span class="p">,</span>
@@ -112,11 +112,11 @@
 <p>From what I&#8217;ve tried so far, Turf seems to be incredibly fast and easy to use. I&#8217;ll try to find the nearest point for any of the categories, that could take Turf some&nbsp;time.</p>
 <h2>Update</h2>
 <p>Turf is blazing fast! I&#8217;ve implemented nearest point for each of the categories and it gets done in a blink of an eye. Some screenshots below. Geolocation implemented as&nbsp;well.</p>
-<p><img data-echo="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen1.png" title="vozejkmap.cz data map" class="img-responsive centered"> You can locate the point&nbsp;easily.</p>
+<p><img src="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen1.png" title="vozejkmap.cz data map" class="img-responsive centered"> You can locate the point&nbsp;easily.</p>
 
-<p><img data-echo="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen2.png" title="vozejkmap.cz data map" class="img-responsive centered"> You can hide the&nbsp;infobox.</p>
+<p><img src="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen2.png" title="vozejkmap.cz data map" class="img-responsive centered"> You can hide the&nbsp;infobox.</p>
 
-<p><img data-echo="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen3.png" title="vozejkmap.cz data map" class="img-responsive centered">You can jump to any of the nearest&nbsp;places.</p>
+<p><img src="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen3.png" title="vozejkmap.cz data map" class="img-responsive centered">You can jump to any of the nearest&nbsp;places.</p>
 </article>
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/animating-svg-maps-with-smil/" rel="bookmark" title="Permalink to Animating SVG Maps With SMIL">Animating <span class="caps">SVG</span> Maps With <span class="caps">SMIL</span></a></h1>
@@ -414,7 +414,7 @@
 <li><code>tileMatrixMaxX = tileMatrixMinX + tileSpanX × matrixWidth;</code></li>
 <li><code>tileMatrixMinY = tileMatrixMaxY - tileSpanY × matrixHeight;</code></li>
 </ul>
-<p><img data-echo="/posts/assets/wmts-few-things-i-want-to-remember/wmts.png" title="WMTS tiling schema" class="img-responsive centered"></p>
+<p><img src="/posts/assets/wmts-few-things-i-want-to-remember/wmts.png" title="WMTS tiling schema" class="img-responsive centered"></p>
 </article>
 <aside id="pagination">
 </aside>    </main>

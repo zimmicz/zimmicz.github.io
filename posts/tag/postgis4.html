@@ -7,7 +7,7 @@
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
         <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
         <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?a4089d0f">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
 </head>
 <body>
     <nav role="navigation">
@@ -310,7 +310,7 @@ ALTER TABLE uni ADD PRIMARY KEY(id);
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
     <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
-    <p><a href="{{ pcposturl(2014, 12, 02, 'postgis-case-study-vozejkmap-open-data-part-i') }}">In the first part of my little case study</a> I downloaded <a href="http://vozejkmap.cz">vozejkmap.cz</a> dataset and imported it into the PostGIS database. Having spatial data safely stored the time comes to get it onto the map. Libraries used&nbsp;are:</p>
+    <p><a href="{{ pcposturl(2014, 12, 02," title="postgis-case-study-vozejkmap-open-data-part-i">In the first part of my little case study</a> }}) I downloaded <a href="http://vozejkmap.cz">vozejkmap.cz</a> dataset and imported it into the PostGIS database. Having spatial data safely stored the time comes to get it onto the map. Libraries used&nbsp;are:</p>
 <ul>
 <li><a href="http://leafletjs.com">Leaflet</a></li>
 <li><a href="https://github.com/lvoogdt/Leaflet.awesome-markers">Leaflet.awesome-markers</a></li>
@@ -363,7 +363,7 @@ FROM vozejkmap AS lg ) AS f
 <h2>Leaflet&nbsp;map</h2>
 <p>Map JavaScript is rather simple with ~30 lines of code (not taking styles into account). Thanks to the great plugins it is easy to show ~7,600 points on the map real&nbsp;quick.</p>
 <p>I didn&#8217;t do much customization apart from styling markers and binding&nbsp;popups.</p>
-<p><img data-echo="/posts/assets/postgis-case-study-vozejkmap-open-data-part-ii/map.png" title="vozejkmap.cz data map" class="img-responsive centered"></p>
+<p><img src="/posts/assets/postgis-case-study-vozejkmap-open-data-part-ii/map.png" title="vozejkmap.cz data map" class="img-responsive centered"></p>
 <h2>What&#8217;s&nbsp;next</h2>
 <ol>
 <li><a href="http://turfjs.org">Turf</a> which means I need to think of what could be fun to do with this&nbsp;data</li>

@@ -7,7 +7,7 @@
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
         <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
         <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?a4089d0f">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
 </head>
 <body>
     <nav role="navigation">
@@ -87,7 +87,7 @@
 
 
 <p>This function creates the <code>cze.roads_noded_vertices_pgr</code> that contains all the extracted nodes from the&nbsp;network.</p>
-<div class="text-center"><img data-echo="/posts/assets/routing-with-pgrouting-catchment-area-calculation/nodes.png" width="70%" /></div>
+<div class="text-center"><img src="/posts/assets/routing-with-pgrouting-catchment-area-calculation/nodes.png" width="70%" /></div>
 
 <p>As already mentioned, measures other than length can be used as a distance, I chose the time to get to a given node on&nbsp;foot.</p>
 <div class="highlight"><pre><span></span><span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="k">ADD</span> <span class="k">COLUMN</span> <span class="n">cost_minutes</span> <span class="nb">integer</span><span class="p">;</span>
@@ -127,7 +127,7 @@
     <span class="p">);</span>
 
     <span class="c1">-- order by the biggest area so the polygons are not hidden beneath the bigger ones</span>
-    <span class="k">FOR</span> <span class="k">c</span> <span class="k">IN</span> <span class="k">SELECT</span> <span class="n">agg_cost</span> <span class="k">FROM</span> <span class="n">cze</span><span class="p">.</span><span class="n">temp</span> <span class="k">GROUP</span> <span class="k">BY</span> <span class="n">agg_cost</span> <span class="k">HAVING</span> <span class="k">COUNT</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="mi">1</span> <span class="k">DESC</span> <span class="n">LOOP</span>
+    <span class="k">FOR</span> <span class="k">c</span> <span class="k">IN</span> <span class="k">SELECT</span> <span class="n">agg_cost</span> <span class="k">FROM</span> <span class="n">cze</span><span class="p">.</span><span class="n">temp</span> <span class="k">GROUP</span> <span class="k">BY</span> <span class="n">agg_cost</span> <span class="k">HAVING</span> <span class="k">COUNT</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="mi">3</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="mi">1</span> <span class="k">DESC</span> <span class="n">LOOP</span>
         <span class="n">RAISE</span> <span class="n">INFO</span> <span class="s1">&#39;%&#39;</span><span class="p">,</span> <span class="k">c</span><span class="p">;</span>
         <span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">tmp</span> <span class="p">(</span><span class="n">agg_cost</span><span class="p">,</span> <span class="n">geom</span><span class="p">)</span>
         <span class="k">SELECT</span>
@@ -146,7 +146,7 @@
 
 
 <p>Using <code>pgr_pointsAsPolygon</code> renders resulting nodes accessible in 10-minute walk in polygons, but weird looking ones. Not bad, could be better&nbsp;though.</p>
-<div class="text-center"><img data-echo="/assets/routing-with-pgrouting-catchment-area-calculation/area1.png" width="70%" /></div>
+<div class="text-center"><img src="/assets/routing-with-pgrouting-catchment-area-calculation/area1.png" width="70%" /></div>
 
 <p>How about seeing only nodes instead of&nbsp;polygons?</p>
 <div class="highlight"><pre><span></span><span class="k">SELECT</span>
@@ -163,7 +163,7 @@
 
 
 <p>Looks good, could be better&nbsp;though.</p>
-<div class="text-center"><img data-echo="/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png" width="70%" /></div>
+<div class="text-center"><img src="/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png" width="70%" /></div>
 
 <p>How about creating concave hulls from the extracted&nbsp;nodes?</p>
 <div class="highlight"><pre><span></span><span class="k">SELECT</span>
@@ -187,7 +187,7 @@
 
 
 <p>This one looks the best I&nbsp;guess.</p>
-<div class="text-center"><img data-echo="/assets/routing-with-pgrouting-catchment-area-calculation/area2.png" width="70%" /></div>
+<div class="text-center"><img src="/assets/routing-with-pgrouting-catchment-area-calculation/area2.png" width="70%" /></div>
 
 <h2>Remarks</h2>
 <ul>

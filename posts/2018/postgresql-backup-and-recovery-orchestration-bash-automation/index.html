@@ -16,7 +16,7 @@
   <meta property="og:title" content="PostgreSQL Backup and Recovery Orchestration: Bash Automation" />
   <meta property="og:description" content="There is a bunch of periodic database-related tasks in a life of PostgreSQL administrator. Some should be done daily, others weekly, others can wait for a whole month. Many of them are essential for your database health. Forget to run such a task or..." />
   <meta property="og:url" content="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-bash-automation/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?a4089d0f">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
 </head>
 <body>
     <nav role="navigation">
@@ -50,7 +50,7 @@
 <p>Full backup creation is just one example of how powerful bash can&nbsp;be.</p>
 <div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
 <span class="c1">#</span>
-<span class="c1"># @author: Michal Zimmermann &lt;michal.zimmermann@clevermaps.cz&gt;</span>
+<span class="c1"># @author: Michal Zimmermann &amp;lt;michal.zimmermann@clevermaps.cz&amp;gt;</span>
 <span class="c1"># Creates base backup.</span>
 
 <span class="nv">CUR_DIR</span><span class="o">=</span><span class="k">$(</span>dirname <span class="s2">&quot;</span><span class="nv">$0</span><span class="s2">&quot;</span><span class="k">)</span>
@@ -86,17 +86,17 @@ pg_basebackup <span class="se">\</span>
     <span class="nb">exit</span> <span class="m">3</span>
 <span class="k">fi</span>
 
-tar -czf <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span>.tar.gz <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span> <span class="o">&amp;&amp;</span> rm -rf <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span>
+tar -czf <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span>.tar.gz <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span> <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> rm -rf <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span>
 </pre></div>
 
 
 <p>As you probably noticed, a <code>pgsql-common.sh</code> file is sourced at the beginning of the script. This script in turn just loads the proper config file that provides variables to other, devops, scripts. As you might need those variables in several of your scripts, it is a good idea to put their load to a separate&nbsp;file.</p>
 <div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
 <span class="c1">#</span>
-<span class="c1"># @author: Michal Zimmermann &lt;michal.zimmermann@clevermaps.cz&gt;</span>
+<span class="c1"># @author: Michal Zimmermann &amp;lt;michal.zimmermann@clevermaps.cz&amp;gt;</span>
 <span class="c1"># Sourced in pgsql-*.sh scripts.</span>
 
-<span class="k">while</span> <span class="o">[[</span> <span class="nv">$#</span> &gt; <span class="m">0</span> <span class="o">]]</span>
+<span class="k">while</span> <span class="o">[[</span> <span class="nv">$#</span> <span class="p">&amp;</span>gt<span class="p">;</span> <span class="m">0</span> <span class="o">]]</span>
 <span class="k">do</span>
     <span class="nv">key</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>
 
@@ -146,10 +146,10 @@ tar -czf <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><sp
 <p>Another, likely the simplest, example is a vacuumdb&nbsp;task:</p>
 <div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
 <span class="c1">#</span>
-<span class="c1"># @author: Michal Zimmermann &lt;michal.zimmermann@clevermaps.cz&gt;</span>
+<span class="c1"># @author: Michal Zimmermann &amp;lt;michal.zimmermann@clevermaps.cz&amp;gt;</span>
 <span class="c1"># Vacuums the whole database cluster running on a given port.</span>
 
-<span class="k">while</span> <span class="o">[[</span> <span class="nv">$#</span> &gt; <span class="m">0</span> <span class="o">]]</span>
+<span class="k">while</span> <span class="o">[[</span> <span class="nv">$#</span> <span class="p">&amp;</span>gt<span class="p">;</span> <span class="m">0</span> <span class="o">]]</span>
 <span class="k">do</span>
     <span class="nv">key</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>
 
@@ -207,11 +207,11 @@ tar -czf <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><sp
 
 <h3>More reading</h3>
     <ul>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/postgresql-remote-access/">PostgreSQL Remote&nbsp;Access</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-recovery/">PostgreSQL Backup and Recovery Orchestration:&nbsp;Recovery</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-systemd-automation/">PostgreSQL Backup and Recovery Orchestration: systemd&nbsp;Automation</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-wal-archiving/">PostgreSQL Backup and Recovery Orchestration: <span class="caps">WAL</span>&nbsp;Archiving</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-recovery/">PostgreSQL Backup and Recovery Orchestration:&nbsp;Recovery</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/">Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span></a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/postgresql-remote-access/">PostgreSQL Remote&nbsp;Access</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
 <script>

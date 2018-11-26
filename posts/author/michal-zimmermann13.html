@@ -7,7 +7,7 @@
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
         <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
         <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?a4089d0f">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
 </head>
 <body>
     <nav role="navigation">
@@ -23,6 +23,185 @@
     <main>
 <h2>Articles by Michal Zimmermann</h2>
 
+<article>
+    <h1><a href="https://www.zimmi.cz/posts/2015/postgis-buffers-intersections-differences-and-collections/" rel="bookmark" title="Permalink to PostGIS: Buffers, Intersections, Differences And Collections">PostGIS: Buffers, Intersections, Differences And&nbsp;Collections</a></h1>
+    <aside><span>Mar 19, 2015</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p>Being part of <a href="http://clevermaps.cz">CleverMaps</a> means doing lot of nasty work with PostGIS. Recently, I&#8217;ve been given a following task that needed to be done for a really big project dealing with agricultural&nbsp;parcels:</p>
+<ul>
+<li>given a polygonal shapefile of agricultural parcels, create 20m wide buffers around all of&nbsp;them,</li>
+<li>extract holes from these&nbsp;parcels,</li>
+<li>clip buffers so they don&#8217;t overlap with other&nbsp;parcels,</li>
+<li>get rid of overlaps between nearby parcels (e.g. dissolve&nbsp;them),</li>
+<li>create output combined from holes and&nbsp;buffers,</li>
+<li>the output must not contain features having more than ~1,000,000&nbsp;vertices</li>
+</ul>
+<p>This process is going to be run ~20&times; on layers with ~40,000-70,000&nbsp;polygons.</p>
+<h2>Input&nbsp;data</h2>
+<ul>
+<li>polygonal layer of agricultural&nbsp;parcels</li>
+<li>rectangular grid (7.5 &times; 7.5 km) for cutting the&nbsp;output</li>
+</ul>
+<h2>First&nbsp;try</h2>
+<p>My initial effort was to union all the buffers and then clip them with a rectangular grid. Long story short: <strong>Don&#8217;t do that. Never. Ever. I mean&nbsp;it.</strong></p>
+<p>It works fine until you end up with one huge multipolygon having like ~2,000,000 vertices. But then you need to split it somehow so you meet the 1,000,000 limit rule (see list above). Spatial index doesn&#8217;t help you much in such cases, so that really huge polygon is being cut by every rectangle it intersects and it takes hours and hours. It&#8217;s just a no&nbsp;go.</p>
+<h2>The other way&nbsp;round</h2>
+<p>Let&#8217;s put it the other way round. First, split buffers by rectangular grid, doing union on each cell&nbsp;separately.</p>
+<h3>Import</h3>
+<p>Using the swiss knife of <span class="caps">GIS</span> to import the&nbsp;data:</p>
+<div class="highlight"><pre><span></span>export SHAPE_ENCODING=&quot;ISO-8859-1&quot;
+ogr2ogr -f PostgreSQL PG:&quot;dbname=db user=postgres&quot; parcels.shp -lco ENCODING=UTF-8 -t_srs &quot;EPSG:2154&quot;
+ogr2ogr -f PostgreSQL PG:&quot;dbname=db user=postgres&quot; grid.shp -lco ENCODING=UTF-8 -t_srs &quot;EPSG:2154&quot;
+</pre></div>
+
+
+<h3>PostGIS&nbsp;processing</h3>
+<p>Recently I stumbled upon a psql <code>\set</code> command. Launching several queries on the same table, it might be useful to define it&#8217;s name with <code>\set table tablename</code>:</p>
+<div class="highlight"><pre><span></span>\set table &#39;parcels&#39;
+-- prepare separate table for holes (inner rings)
+DROP TABLE IF EXISTS holes;
+CREATE TABLE holes (
+id serial,
+ilot_id varchar,
+wkb_geometry geometry(&#39;Polygon&#39;, 2154),
+path integer);
+</pre></div>
+
+
+<p>I found the following query an easy way to get all the rings from geometries having more than one&nbsp;ring:</p>
+<div class="highlight"><pre><span></span>INSERT INTO holes (ilot_id, wkb_geometry, path) (
+SELECT id,
+    (ST_DumpRings(wkb_geometry)).geom::geometry(&#39;Polygon&#39;, 2154) as wkb_geometry,
+    unnest((ST_DumpRings(wkb_geometry)).path) as path
+FROM :table
+WHERE ST_NRings(wkb_geometry) &gt; 1
+);
+</pre></div>
+
+
+<p>Here&#8217;s a little trick. Doing some checks I found out that some of the polygons had two rings without having any inner ring, both of them being the same. I guess this comes from some kind of human error. This query thus deletes all rings with <code>path = 0</code> (exterior rings). At the same time, it deals with that <em>invalid</em> polygons by checking their spatial relationship to&nbsp;parcels.</p>
+<div class="highlight"><pre><span></span>DELETE FROM holes
+    WHERE path = 0
+    OR id IN (
+        SELECT holes.id
+        FROM holes
+        JOIN :table ON
+            ST_Within(
+                ST_Buffer(holes.wkb_geometry,-1),
+                :table.wkb_geometry
+            )
+        AND holes.wkb_geometry &amp;&amp; :table.wkb_geometry
+);
+</pre></div>
+
+
+<p>To my surprise, it is possible that parcel has a hole with another parcel being in that hole. Argh. Find those and get rid of&nbsp;them.</p>
+<div class="highlight"><pre><span></span>DROP TABLE IF EXISTS ints;
+CREATE TABLE ints AS
+    SELECT holes.*
+    FROM holes
+    JOIN :table ON ST_Intersects(holes.wkb_geometry, :table.wkb_geometry)
+    AND ST_Relate(holes.wkb_geometry, :table.wkb_geometry, &#39;2********&#39;);
+DELETE FROM holes
+WHERE id IN (SELECT id FROM ints);
+</pre></div>
+
+
+<p>I still need to get the difference between the hole geometry and the parcel that resides inside it - this difference is the actual hole I&#8217;m looking&nbsp;for.</p>
+<div class="highlight"><pre><span></span>DROP TABLE IF EXISTS diff_ints;
+CREATE TABLE diff_ints AS
+    SELECT
+        ints.id,
+        ST_Difference(
+            ints.wkb_geometry,
+            ST_Collect(:table.wkb_geometry)
+        ) wkb_geometry
+    FROM ints, :table
+    WHERE ST_Within(:table.wkb_geometry, ints.wkb_geometry)
+    GROUP BY ints.wkb_geometry, ints.id;
+</pre></div>
+
+
+<p>And I&#8217;m done with holes. Get back to&nbsp;buffers.</p>
+<div class="highlight"><pre><span></span>DROP TABLE IF EXISTS buffer;
+CREATE TABLE buffer AS
+    SELECT id, ST_Buffer(wkb_geometry, 20) wkb_geometry
+    FROM :table;
+CREATE INDEX buffer_gist_idx ON buffer USING gist(wkb_geometry);
+ALTER TABLE buffer ADD PRIMARY KEY(id);
+VACUUM ANALYZE buffer;
+</pre></div>
+
+
+<p>Combine all the parts&nbsp;together.</p>
+<div class="highlight"><pre><span></span><span class="nt">DROP</span> <span class="nt">TABLE</span> <span class="nt">IF</span> <span class="nt">EXISTS</span> <span class="nt">diff</span><span class="o">;</span>
+<span class="nt">CREATE</span> <span class="nt">TABLE</span> <span class="nt">diff</span> <span class="nt">AS</span>
+    <span class="nt">SELECT</span> <span class="nt">a</span><span class="p">.</span><span class="nc">id</span><span class="o">,</span> <span class="nt">ST_Difference</span><span class="o">(</span><span class="nt">a</span><span class="p">.</span><span class="nc">wkb_geometry</span><span class="o">,</span> <span class="nt">ST_Union</span><span class="o">(</span><span class="nt">ST_MakeValid</span><span class="o">(</span><span class="nt">b</span><span class="p">.</span><span class="nc">wkb_geometry</span><span class="o">)))</span> <span class="nt">as</span> <span class="nt">wkb_geometry</span>
+    <span class="nt">FROM</span> <span class="nt">buffer</span> <span class="nt">a</span><span class="o">,</span> <span class="p">:</span><span class="nd">table</span> <span class="nt">b</span>
+    <span class="nt">WHERE</span> <span class="nt">ST_Intersects</span><span class="o">(</span><span class="nt">a</span><span class="p">.</span><span class="nc">wkb_geometry</span><span class="o">,</span> <span class="nt">b</span><span class="p">.</span><span class="nc">wkb_geometry</span><span class="o">)</span>
+    <span class="nt">GROUP</span> <span class="nt">BY</span> <span class="nt">a</span><span class="p">.</span><span class="nc">id</span><span class="o">,</span> <span class="nt">a</span><span class="p">.</span><span class="nc">wkb_geometry</span>
+    <span class="nt">UNION</span>
+    <span class="nt">SELECT</span> <span class="nt">id</span><span class="p">::</span><span class="nd">varchar</span><span class="o">,</span> <span class="nt">wkb_geometry</span> <span class="nt">FROM</span> <span class="nt">holes</span>
+    <span class="nt">UNION</span>
+    <span class="nt">SELECT</span> <span class="nt">id</span><span class="p">::</span><span class="nd">varchar</span><span class="o">,</span> <span class="nt">wkb_geometry</span> <span class="nt">FROM</span> <span class="nt">diff_ints</span><span class="o">;</span>
+<span class="nt">CREATE</span> <span class="nt">INDEX</span> <span class="nt">diff_gist_idx</span> <span class="nt">ON</span> <span class="nt">diff</span> <span class="nt">USING</span> <span class="nt">gist</span><span class="o">(</span><span class="nt">wkb_geometry</span><span class="o">);</span>
+<span class="nt">VACUUM</span> <span class="nt">ANALYZE</span> <span class="nt">diff</span><span class="o">;</span>
+</pre></div>
+
+
+<p>Collect the geometries in every cell, simplify them a little, snap them to 3 decimal numbers, make them valid and dump them to simple features. This query takes ~300,000 ms which is orders of magnitude faster than my initial&nbsp;attempt.</p>
+<div class="highlight"><pre><span></span>DROP TABLE IF EXISTS uni;
+CREATE TABLE uni AS
+SELECT
+    g.ogc_fid AS grid_id,
+    (ST_Dump(
+        ST_MakeValid(
+            ST_SnapToGrid(
+                ST_SimplifyPreserveTopology(
+                    ST_CollectionExtract(
+                        ST_Buffer(
+                            ST_Collect(
+                                ST_Intersection(a.wkb_geometry, g.wkb_geometry)
+                            )
+                        , 0)
+                    , 3)
+                , 0.1)
+            , 0.001)
+        )
+    )).geom as wkb_geometry
+FROM diff a, grid g
+WHERE ST_Intersects(a.wkb_geometry, g.wkb_geometry)
+GROUP BY g.ogc_fid;
+</pre></div>
+
+
+<p>After running the query it is reasonable to check the results. I&#8217;m only interested in polygonal geometries, <code>ST_GeometryType()</code> would tell me of any other geometry type. Invalid geometries are not&nbsp;allowed.</p>
+<div class="highlight"><pre><span></span>SELECT DISTINCT ST_GeometryType(wkb_geometry) FROM uni;
+SELECT COUNT(1) FROM uni WHERE NOT ST_IsValid(wkb_geometry);
+</pre></div>
+
+
+<p>Add primary key on serial column as a last <span class="caps">SQL</span>&nbsp;step.</p>
+<div class="highlight"><pre><span></span>ALTER TABLE uni ADD COLUMN id serial;
+ALTER TABLE uni ADD PRIMARY KEY(id);
+</pre></div>
+
+
+<h3>Export</h3>
+<p>And spit it out as a&nbsp;shapefile.</p>
+<div class="highlight"><pre><span></span>ogr2ogr -f &quot;ESRI Shapefile&quot; output.shp PG:&quot;dbname=ign user=postgres&quot; uni -s_srs &quot;EPSG:2154&quot; -t_srs &quot;EPSG:2154&quot; -lco ENCODING=UTF-8
+</pre></div>
+
+
+<h2>Lesson&nbsp;learned</h2>
+<ul>
+<li>More of little seems to be faster than less of&nbsp;bigger.</li>
+<li>Never stop learning and trying different&nbsp;approaches.</li>
+<li>Although using <code>CTE</code> might be tempting, creating separate tables for separate steps of the whole process is much more comfortable for&nbsp;debugging.</li>
+</ul>
+</article>
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/wms-download-for-future-offline-use/" rel="bookmark" title="Permalink to WMS Download For Future Offline Use"><span class="caps">WMS</span> Download For Future Offline&nbsp;Use</a></h1>
     <aside><span>Mar 15, 2015</span>
@@ -158,7 +337,7 @@ www.posts.zimmi.cz CNAME posts-zimmi.rhcloud.com
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
     <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
-    <p><a href="{{ pcposturl(2014, 12, 02, 'postgis-case-study-vozejkmap-open-data-part-i') }}">In the first part of my little case study</a> I downloaded <a href="http://vozejkmap.cz">vozejkmap.cz</a> dataset and imported it into the PostGIS database. Having spatial data safely stored the time comes to get it onto the map. Libraries used&nbsp;are:</p>
+    <p><a href="{{ pcposturl(2014, 12, 02," title="postgis-case-study-vozejkmap-open-data-part-i">In the first part of my little case study</a> }}) I downloaded <a href="http://vozejkmap.cz">vozejkmap.cz</a> dataset and imported it into the PostGIS database. Having spatial data safely stored the time comes to get it onto the map. Libraries used&nbsp;are:</p>
 <ul>
 <li><a href="http://leafletjs.com">Leaflet</a></li>
 <li><a href="https://github.com/lvoogdt/Leaflet.awesome-markers">Leaflet.awesome-markers</a></li>
@@ -211,7 +390,7 @@ FROM vozejkmap AS lg ) AS f
 <h2>Leaflet&nbsp;map</h2>
 <p>Map JavaScript is rather simple with ~30 lines of code (not taking styles into account). Thanks to the great plugins it is easy to show ~7,600 points on the map real&nbsp;quick.</p>
 <p>I didn&#8217;t do much customization apart from styling markers and binding&nbsp;popups.</p>
-<p><img data-echo="/posts/assets/postgis-case-study-vozejkmap-open-data-part-ii/map.png" title="vozejkmap.cz data map" class="img-responsive centered"></p>
+<p><img src="/posts/assets/postgis-case-study-vozejkmap-open-data-part-ii/map.png" title="vozejkmap.cz data map" class="img-responsive centered"></p>
 <h2>What&#8217;s&nbsp;next</h2>
 <ol>
 <li><a href="http://turfjs.org">Turf</a> which means I need to think of what could be fun to do with this&nbsp;data</li>
@@ -243,14 +422,6 @@ FROM vozejkmap AS lg ) AS f
 
 
 <p>That&#8217;s what I&#8217;ve come up with. It basically extracts the zoom level from the link, adds number two to its value and writes it back to the&nbsp;string.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2015/leaflet-with-custom-crs-epsg5514/" rel="bookmark" title="Permalink to Leaflet With Custom CRS (EPSG:5514)">Leaflet With Custom <span class="caps">CRS</span> (<span class="caps">EPSG</span>:5514)</a></h1>
-    <aside><span>Jan 15, 2015</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/leaflet.html">leaflet</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
-    </aside>
-    <p>If you ever find yourself in need to use custom projection with Leaflet, feel free to start with this example of <a href="https://github.com/zimmicz/leaflet-custom-crs-jtsk">Czech national coordinate system</a>. All you need is <a href="http://leafletjs.com">Leaflet</a>, <a href="http://proj4js.org/">proj4.js</a> and <a href="https://github.com/kartena/Proj4Leaflet">proj4 for Leaflet plugin</a>. I&#8217;m still not sure how <code>origin</code> coordinates work&nbsp;though.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/author/michal-zimmermann12.html">&laquo; Previous page</a>

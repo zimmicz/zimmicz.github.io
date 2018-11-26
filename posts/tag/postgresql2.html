@@ -7,7 +7,7 @@
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
         <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
         <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?a4089d0f">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
 </head>
 <body>
     <nav role="navigation">
@@ -23,6 +23,51 @@
     <main>
 <h2 class="text-center">Articles tagged with postgresql tag</h2>
 
+<article>
+    <h1><a href="https://www.zimmi.cz/posts/2017/postgresql-dollar-quoting-inside-bash-heredoc/" rel="bookmark" title="Permalink to PostgreSQL Dollar Quoting inside Bash Heredoc">PostgreSQL Dollar Quoting inside Bash&nbsp;Heredoc</a></h1>
+    <aside><span>Sep 22, 2017</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p>Yesterday I spent two very unpleasant hours debugging the weirdest <span class="caps">SQL</span> error I&#8217;ve seen in my life, running the below query (simplified for this&nbsp;post).</p>
+<div class="highlight"><pre><span></span><span class="n">psql</span> <span class="o">-</span><span class="n">qAt</span> <span class="c1">--no-psqlrc &lt;&lt;BACKUP</span>
+<span class="k">DO</span>
+<span class="err">$$</span>
+<span class="k">DECLARE</span> <span class="n">r</span> <span class="n">record</span><span class="p">;</span>
+<span class="k">BEGIN</span>
+  <span class="n">RAISE</span> <span class="n">INFO</span> <span class="s1">&#39;%&#39;</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">;</span>
+<span class="k">END</span>
+<span class="err">$$</span><span class="p">;</span>
+<span class="n">BACKUP</span>
+</pre></div>
+
+
+<p>Running this in your terminal will result in a nasty syntax&nbsp;error.</p>
+<div class="highlight"><pre><span></span>ERROR:  syntax error at or near <span class="s2">&quot;1111&quot;</span>
+LINE <span class="m">2</span>: <span class="m">1111</span>
+        ^
+ERROR:  syntax error at or near <span class="s2">&quot;RAISE&quot;</span>
+LINE <span class="m">2</span>:   RAISE INFO <span class="s1">&#39;%&#39;</span>, <span class="s1">&#39;info&#39;</span><span class="p">;</span>
+          ^
+ERROR:  syntax error at or near <span class="s2">&quot;1111&quot;</span>
+LINE <span class="m">2</span>: <span class="m">1111</span><span class="p">;</span>
+</pre></div>
+
+
+<p>You stare on the screen for a while, absolutely sure that number <code>1111</code> is nowhere close to the data you work with. You try again. Another error. You save the code into a file and try again. It works. What the <em>heck</em>? You try again using the bash heredoc. Another&nbsp;failure.</p>
+<p>The minute you realize <code>$$</code> is being substituted with the <span class="caps">ID</span> of the current process, you feel like the dumbest person on Earth. Yet the happiest one at the same&nbsp;time.</p>
+<p>The solution is&nbsp;trivial.</p>
+<div class="highlight"><pre><span></span><span class="n">psql</span> <span class="o">-</span><span class="n">qAt</span> <span class="c1">--no-psqlrc &lt;&lt;BACKUP</span>
+<span class="k">DO</span>
+<span class="err">\$\$</span>
+<span class="k">DECLARE</span> <span class="n">r</span> <span class="n">record</span><span class="p">;</span>
+<span class="k">BEGIN</span>
+  <span class="n">RAISE</span> <span class="n">INFO</span> <span class="s1">&#39;%&#39;</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">;</span>
+<span class="k">END</span>
+<span class="err">\$\$</span><span class="p">;</span>
+<span class="n">BACKUP</span>
+</pre></div>
+</article>
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2017/postgresql-development-history-revealed-with-postgresql/" rel="bookmark" title="Permalink to PostgreSQL Development History Revealed with PostgreSQL">PostgreSQL Development History Revealed with&nbsp;PostgreSQL</a></h1>
     <aside><span>Aug 9, 2017</span>
@@ -42,7 +87,7 @@
         <span class="n">row_number</span><span class="p">()</span> <span class="n">OVER</span> <span class="p">(</span><span class="n">PARTITION</span> <span class="k">BY</span> <span class="k">version</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">letter_count</span> <span class="k">DESC</span><span class="p">)</span>
     <span class="k">FROM</span> <span class="n">postgresql_development</span><span class="p">.</span><span class="k">data</span>
 <span class="p">)</span> <span class="n">a</span>
-<span class="k">WHERE</span> <span class="n">row_number</span> <span class="o">&lt;=</span> <span class="mi">10</span>
+<span class="k">WHERE</span> <span class="n">row_number</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">=</span> <span class="mi">10</span>
 <span class="k">GROUP</span> <span class="k">BY</span> <span class="k">version</span>
 <span class="k">ORDER</span> <span class="k">BY</span> <span class="k">version</span> <span class="k">DESC</span>
 </pre></div>
@@ -217,7 +262,7 @@
 </pre></div>
 
 
-<div class="text-center"><img data-echo="/posts/assets/postgresql-development-history-revealed-with-postgresql/plot1.png"/></div>
+<div class="text-center"><img src="/posts/assets/postgresql-development-history-revealed-with-postgresql/plot1.png"/></div>
 
 <h2>The most verbose docs in each&nbsp;version</h2>
 <div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="k">DISTINCT</span> <span class="k">ON</span> <span class="p">(</span><span class="k">version</span><span class="p">)</span>
@@ -345,7 +390,7 @@
 
 
 <p>Something&#8217;s going on in an upcoming 10.0&nbsp;version.</p>
-<div class="text-center"><img data-echo="/posts/assets/postgresql-development-history-revealed-with-postgresql/plot2.png"/></div>
+<div class="text-center"><img src="/posts/assets/postgresql-development-history-revealed-with-postgresql/plot2.png"/></div>
 
 <p>All the data was obtained with the following Python script and processed inside the PostgreSQL database. Plots done with <a href="http://bokeh.pydata.org/en/latest/">Bokeh</a>, though I probably wouldn&#8217;t use it again, the docs site is absurdly sluggish and the info is just all over the&nbsp;place.</p>
 <script src="https://gist.github.com/zimmicz/f69a5ce5d3cf3a220e171553c35e0391.js"></script>
@@ -476,7 +521,7 @@ Running this script will delete the old cluster<span class="err">&#39;</span>s d
     </aside>
     <p>Spatial indexes are absolutely crucial part of any spatial database and - as I tend to say quite often - only a fool would try to query spatial data without building spatial indexes&nbsp;beforehand.</p>
 <p>Spatial indexes are based on bounding box comparisons, which are generally very fast. Yet, there are situations when spatial indexes don&#8217;t help much (or they don&#8217;t help as much as they could, if you&nbsp;wish).</p>
-<div class="text-center"><img data-echo="/posts/assets/subdivide-and-conquer-effective-spatial-indexes-in-postgis/index.svg" /></div>
+<div class="text-center"><img src="/posts/assets/subdivide-and-conquer-effective-spatial-indexes-in-postgis/index.svg" /></div>
 
 <p>Bounding box comparisons are effective with lots of small bounding boxes rather then few large ones. Why? See the picture above. The curved line (imagine it&#8217;s a pipeline for example) clearly demonstrates when the spatial index/bounding box comparison might fall short of what you&#8217;d&nbsp;expect.</p>
 <p>Once the bounding box gets really big, it intersects so many other geometries&#8217; bounding boxes that the whole comparison starts to slow&nbsp;down.</p>
@@ -536,25 +581,6 @@ Running this script will delete the old cluster<span class="err">&#39;</span>s d
      <span class="k">FROM</span> <span class="n">pozadovane_parcely</span> <span class="n">pp</span>
      <span class="k">WHERE</span> <span class="n">pp</span><span class="p">.</span><span class="n">par_id</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">idpar</span>
   <span class="p">);</span>
-</pre></div>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2016/counting-substring-occurrences-in-postgresql/" rel="bookmark" title="Permalink to Counting substring occurrences in PostgreSQL">Counting substring occurrences in&nbsp;PostgreSQL</a></h1>
-    <aside><span>Dec 19, 2016</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p>I got to count occurrences of <em>/</em> character today and found out no built-in function exists in PostgreSQL, so here&#8217;s my shot at it. Pretty simple, yet&nbsp;useful.</p>
-<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">OR</span> <span class="k">REPLACE</span> <span class="k">FUNCTION</span> <span class="n">how_many</span><span class="p">(</span><span class="k">IN</span> <span class="nb">text</span><span class="p">,</span> <span class="k">IN</span> <span class="nb">varchar</span><span class="p">,</span> <span class="k">OUT</span> <span class="nb">integer</span><span class="p">)</span>
-<span class="k">RETURNS</span> <span class="nb">integer</span>
-<span class="k">AS</span>
-<span class="err">$</span><span class="n">how_many$</span>
-    <span class="k">SELECT</span> <span class="k">length</span><span class="p">(</span><span class="err">$</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="k">length</span><span class="p">(</span><span class="k">replace</span><span class="p">(</span><span class="err">$</span><span class="mi">1</span><span class="p">,</span> <span class="err">$</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">));</span>
-<span class="err">$</span><span class="n">how_many$</span>
-<span class="k">LANGUAGE</span> <span class="k">SQL</span>
-<span class="k">SECURITY</span> <span class="k">DEFINER</span><span class="p">;</span>
-
-<span class="c1">-- SELECT how_many(&#39;test&#39;, &#39;t&#39;); -- returns number 2</span>
 </pre></div>
 </article>
 <aside id="pagination">

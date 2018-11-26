@@ -15,7 +15,7 @@
   <meta property="og:title" content="Going 3D With Space Time Cube" />
   <meta property="og:description" content="Seeing Anita’s space-time cube back in 2013 was a moment of woooow for me. I’ve been interested in unusual ways of displaying data ever since I started studying GIS and this one was just great. How the hell did she make it?!, I thought back then. And..." />
   <meta property="og:url" content="https://www.zimmi.cz/posts/2014/going-3d-with-space-time-cube/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?a4089d0f">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
 </head>
 <body>
     <nav role="navigation">
@@ -165,7 +165,7 @@ y = map(time, first, last, 0, 500)
 z = map(lat, 16.59971950210866964, 63.68835804244784526, 0, height)
 </code></pre>
 
-<p><img data-echo="http://www.processing.org/tutorials/p3d/imgs/coordinatesystem.png" title="Processing coordinate system" class="img-rounded pull-left">They define how coordinates inside the cube should be computed. As you see, <code>x</code> is the result of mapping longitudinal extent of our area to the width of cube, the same happens to <code>z</code> and latitude, and to <code>y</code> (but here we map time, not&nbsp;coordinates).</p>
+<p><img src="http://www.processing.org/tutorials/p3d/imgs/coordinatesystem.png" title="Processing coordinate system" class="img-rounded pull-left">They define how coordinates inside the cube should be computed. As you see, <code>x</code> is the result of mapping longitudinal extent of our area to the width of cube, the same happens to <code>z</code> and latitude, and to <code>y</code> (but here we map time, not&nbsp;coordinates).</p>
 
 <p>The bounding box used in those computations is the bounding box of the basemap. Interesting thing about Processing and its 3D environment is how it defines the beginning of the coordinate system. As you can see on the left, it might be slighty different from what you could expect. That&#8217;s what you need to be careful&nbsp;about.</p>
 
@@ -176,11 +176,11 @@ z = map(lat, 16.59971950210866964, 63.68835804244784526, 0, height)
 
 <h3>More reading</h3>
     <ul>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/"><span class="caps">QGIS</span> Plugin Development: Using Python&nbsp;Console</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/postgresql-development-history-revealed-with-postgresql/">PostgreSQL Development History Revealed with&nbsp;PostgreSQL</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/">Automated Map Creation With <span class="caps">QGIS</span>, PostGIS, Python, <span class="caps">SVG</span> and&nbsp;ImageMagick</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-creating-gui-with-qt-designer/"><span class="caps">QGIS</span> Plugin Development: Creating <span class="caps">GUI</span> with Qt&nbsp;Designer</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/twitter-rest-api-data-mining-on-openshift-part-ii/">Twitter <span class="caps">REST</span> <span class="caps">API</span> Data Mining on OpenShift (Part <span class="caps">II</span>)</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-testing-your-code/"><span class="caps">QGIS</span> Plugin Development: Testing Your&nbsp;Code</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-attributetransfer-plugin/"><span class="caps">QGIS</span> Plugin Development: AttributeTransfer&nbsp;Plugin</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/postgresql-development-history-revealed-with-postgresql/">PostgreSQL Development History Revealed with&nbsp;PostgreSQL</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
 <script>

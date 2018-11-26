@@ -15,7 +15,7 @@
   <meta property="og:title" content="QGIS Plugin Development: Testing Your Code" />
   <meta property="og:description" content="Good news, everyone! The AttributeTransfer plugin has been approved for QGIS Python Plugins Repository. It’s available via QGIS Manage and Install Plugins menu. Feel free to download! Nevertheless, this post (the last in the series) covers QGIS plugin..." />
   <meta property="og:url" content="https://www.zimmi.cz/posts/2017/qgis-plugin-development-testing-your-code/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?a4089d0f">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
 </head>
 <body>
     <nav role="navigation">
@@ -48,7 +48,7 @@
 <div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="c1"># @Date    : 2017-11-18 18:40:50</span>
-<span class="c1"># @Author  : Michal Zimmermann &lt;zimmicz@gmail.com&gt;</span>
+<span class="c1"># @Author  : Michal Zimmermann &amp;lt;zimmicz@gmail.com&amp;gt;</span>
 
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sip</span>
@@ -78,9 +78,9 @@
 
     <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">source_layer</span> <span class="o">=</span> <span class="n">QgsVectorLayer</span><span class="p">(</span>
-            <span class="s2">&quot;Polygon?crs=epsg:4326&amp;field=id:integer&amp;field=textAttr:string&amp;field=intAttr:integer&amp;field=decAttr:double&amp;field=dateAttr:date&amp;index=yes&quot;</span><span class="p">,</span> <span class="s2">&quot;source layer&quot;</span><span class="p">,</span> <span class="s2">&quot;memory&quot;</span><span class="p">)</span>
+            <span class="s2">&quot;Polygon?crs=epsg:4326&amp;amp;field=id:integer&amp;amp;field=textAttr:string&amp;amp;field=intAttr:integer&amp;amp;field=decAttr:double&amp;amp;field=dateAttr:date&amp;amp;index=yes&quot;</span><span class="p">,</span> <span class="s2">&quot;source layer&quot;</span><span class="p">,</span> <span class="s2">&quot;memory&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">target_layer</span> <span class="o">=</span> <span class="n">QgsVectorLayer</span><span class="p">(</span>
-            <span class="s2">&quot;Linestring?crs=epsg:4326&amp;field=id:integer&amp;index=yes&quot;</span><span class="p">,</span> <span class="s2">&quot;target layer&quot;</span><span class="p">,</span> <span class="s2">&quot;memory&quot;</span><span class="p">)</span>
+            <span class="s2">&quot;Linestring?crs=epsg:4326&amp;amp;field=id:integer&amp;amp;index=yes&quot;</span><span class="p">,</span> <span class="s2">&quot;target layer&quot;</span><span class="p">,</span> <span class="s2">&quot;memory&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">widget</span> <span class="o">=</span> <span class="n">AttributeTransfer</span><span class="p">(</span><span class="n">IFACE</span><span class="p">)</span>
 
         <span class="n">registry</span> <span class="o">=</span> <span class="n">QgsMapLayerRegistry</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span>
@@ -176,11 +176,11 @@
 
 <h3>More reading</h3>
     <ul>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/"><span class="caps">QGIS</span> Plugin Development: Using Python&nbsp;Console</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/">Automated Map Creation With <span class="caps">QGIS</span>, PostGIS, Python, <span class="caps">SVG</span> and&nbsp;ImageMagick</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-creating-gui-with-qt-designer/"><span class="caps">QGIS</span> Plugin Development: Creating <span class="caps">GUI</span> with Qt&nbsp;Designer</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/"><span class="caps">QGIS</span> Plugin Development: Using Python&nbsp;Console</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-attributetransfer-plugin/"><span class="caps">QGIS</span> Plugin Development: AttributeTransfer&nbsp;Plugin</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/"><span class="caps">QGIS</span> Plugin Development: Finding Nearest&nbsp;Neighbors</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/">Automated Map Creation With <span class="caps">QGIS</span>, PostGIS, Python, <span class="caps">SVG</span> and&nbsp;ImageMagick</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
 <script>

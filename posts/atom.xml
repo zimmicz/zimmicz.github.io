@@ -1,5 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Michal Zimmermann</title><link href="https://www.zimmi.cz/posts/" rel="alternate"></link><link href="https://www.zimmi.cz/posts/atom.xml" rel="self"></link><id>https://www.zimmi.cz/posts/</id><updated>2018-04-10T12:00:00+02:00</updated><entry><title>PostgreSQL Backup and Recovery Orchestration: systemd Automation</title><link href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-systemd-automation/" rel="alternate"></link><published>2018-04-10T12:00:00+02:00</published><updated>2018-04-10T12:00:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2018-04-10:/posts/2018/postgresql-backup-and-recovery-orchestration-systemd-automation/</id><summary type="html">&lt;p&gt;Posts in this series have described the basic automation of PostgreSQL backup/recovery strategy. The process itself consists of different periodic tasks that shouldn&amp;#8217;t be executed manually. There are essentially two tools dedicated to periodic task running in Linux: &lt;strong&gt;cron&lt;/strong&gt; and &lt;strong&gt;systemd&lt;/strong&gt;.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Michal Zimmermann</title><link href="https://www.zimmi.cz/posts/" rel="alternate"></link><link href="https://www.zimmi.cz/posts/atom.xml" rel="self"></link><id>https://www.zimmi.cz/posts/</id><updated>2018-11-26T21:00:00+01:00</updated><subtitle>Pieces of knowledge from the world of GIS.</subtitle><entry><title>Implementing Linked List with PostgreSQL Recursive CTE</title><link href="https://www.zimmi.cz/posts/2018/implementing-linked-list-with-postgresql-recursive-cte/" rel="alternate"></link><published>2018-11-26T21:00:00+01:00</published><updated>2018-11-26T21:00:00+01:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2018-11-26:/posts/2018/implementing-linked-list-with-postgresql-recursive-cte/</id><summary type="html">&lt;p&gt;I&amp;#8217;ve been working on a book/storytelling pet project recently. Dealing with book events and keeping them in order was a task that was to be tackled sooner or later. While both frontend and backend of the app could deal with linked and ordered data, database might be just …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I&amp;#8217;ve been working on a book/storytelling pet project recently. Dealing with book events and keeping them in order was a task that was to be tackled sooner or later. While both frontend and backend of the app could deal with linked and ordered data, database might be just about the best place to do&amp;nbsp;so.&lt;/p&gt;
+&lt;h2&gt;What you might need a linked list&amp;nbsp;for&lt;/h2&gt;
+&lt;p&gt;You have a set of chronological events. The set is not complete at the beginning and position of events might be changed (e.g. their neighbouring events might change in&amp;nbsp;time).&lt;/p&gt;
+&lt;h2&gt;Implementation&lt;/h2&gt;
+&lt;p&gt;Linked list is a perfect structure for such a case (see &lt;a href="https://en.wikipedia.org/wiki/Linked_list"&gt;Wikipedia&lt;/a&gt;). You can keep your data in tact using just id and previous/next&amp;nbsp;id.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;CREATE&lt;/span&gt; &lt;span class="k"&gt;TABLE&lt;/span&gt; &lt;span class="k"&gt;public&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;events&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+  &lt;span class="n"&gt;id&lt;/span&gt; &lt;span class="nb"&gt;integer&lt;/span&gt; &lt;span class="k"&gt;generated&lt;/span&gt; &lt;span class="n"&gt;always&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="k"&gt;identity&lt;/span&gt; &lt;span class="k"&gt;primary&lt;/span&gt; &lt;span class="k"&gt;key&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+  &lt;span class="n"&gt;previous_id&lt;/span&gt; &lt;span class="nb"&gt;integer&lt;/span&gt;
+&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="k"&gt;COPY&lt;/span&gt; &lt;span class="k"&gt;public&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;events&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;previous_id&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="k"&gt;stdin&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="mi"&gt;7&lt;/span&gt;   &lt;span class="err"&gt;\&lt;/span&gt;&lt;span class="n"&gt;N&lt;/span&gt;
+&lt;span class="mi"&gt;10&lt;/span&gt;  &lt;span class="mi"&gt;5&lt;/span&gt;
+&lt;span class="mi"&gt;5&lt;/span&gt;   &lt;span class="mi"&gt;1&lt;/span&gt;
+&lt;span class="mi"&gt;1&lt;/span&gt;   &lt;span class="mi"&gt;3&lt;/span&gt;
+&lt;span class="mi"&gt;3&lt;/span&gt;   &lt;span class="mi"&gt;8&lt;/span&gt;
+&lt;span class="mi"&gt;8&lt;/span&gt;   &lt;span class="mi"&gt;9&lt;/span&gt;
+&lt;span class="mi"&gt;9&lt;/span&gt;   &lt;span class="mi"&gt;2&lt;/span&gt;
+&lt;span class="mi"&gt;2&lt;/span&gt;   &lt;span class="mi"&gt;6&lt;/span&gt;
+&lt;span class="mi"&gt;6&lt;/span&gt;   &lt;span class="mi"&gt;4&lt;/span&gt;
+&lt;span class="mi"&gt;4&lt;/span&gt;   &lt;span class="mi"&gt;7&lt;/span&gt;
+&lt;span class="err"&gt;\&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Generating the list of events in the right order is the matter of running one recursive &lt;span class="caps"&gt;CTE&lt;/span&gt;&amp;nbsp;query.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;WITH&lt;/span&gt; &lt;span class="k"&gt;RECURSIVE&lt;/span&gt; &lt;span class="n"&gt;evt&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;AS&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+&lt;span class="k"&gt;SELECT&lt;/span&gt;
+    &lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;previous_id&lt;/span&gt;
+&lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="n"&gt;events&lt;/span&gt;
+&lt;span class="k"&gt;WHERE&lt;/span&gt; &lt;span class="n"&gt;previous_id&lt;/span&gt; &lt;span class="k"&gt;IS&lt;/span&gt; &lt;span class="k"&gt;NULL&lt;/span&gt;
+&lt;span class="k"&gt;UNION&lt;/span&gt;
+&lt;span class="k"&gt;SELECT&lt;/span&gt;
+    &lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;previous_id&lt;/span&gt;
+&lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="n"&gt;events&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt;
+&lt;span class="k"&gt;JOIN&lt;/span&gt; &lt;span class="n"&gt;evt&lt;/span&gt; &lt;span class="k"&gt;ON&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;previous_id&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;evt&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="k"&gt;SELECT&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="n"&gt;evt&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;It gathers the first event (the one having the previous pointer set to &lt;code&gt;NULL&lt;/code&gt;) and iteratively adds the following ones. Note that this version is actually the &lt;em&gt;reverse&lt;/em&gt; implementation of the linked list, pointing to the previous instead of the next event. All it would take to change that, would be finding the event id not present in &lt;code&gt;previous_id&lt;/code&gt; column as the first one instead of &lt;code&gt;WHERE previous_id IS NULL&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;With the data coming properly sorted to the client, all it has to do is rendering the&amp;nbsp;list.&lt;/p&gt;</content><category term="postgresql"></category></entry><entry><title>PostgreSQL Backup and Recovery Orchestration: systemd Automation</title><link href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-systemd-automation/" rel="alternate"></link><published>2018-04-10T12:00:00+02:00</published><updated>2018-04-10T12:00:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2018-04-10:/posts/2018/postgresql-backup-and-recovery-orchestration-systemd-automation/</id><summary type="html">&lt;p&gt;Posts in this series have described the basic automation of PostgreSQL backup/recovery strategy. The process itself consists of different periodic tasks that shouldn&amp;#8217;t be executed manually. There are essentially two tools dedicated to periodic task running in Linux: &lt;strong&gt;cron&lt;/strong&gt; and &lt;strong&gt;systemd&lt;/strong&gt;.&lt;/p&gt;
 &lt;p&gt;Cron used to be my first choice …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Posts in this series have described the basic automation of PostgreSQL backup/recovery strategy. The process itself consists of different periodic tasks that shouldn&amp;#8217;t be executed manually. There are essentially two tools dedicated to periodic task running in Linux: &lt;strong&gt;cron&lt;/strong&gt; and &lt;strong&gt;systemd&lt;/strong&gt;.&lt;/p&gt;
 &lt;p&gt;Cron used to be my first choice of automation in Linux, as it&amp;#8217;s very easy to use. On the other hand, it&amp;#8217;s quite messy (running &lt;code&gt;crontab -e&lt;/code&gt; under different users to find out which one has the job defined) and a bit difficult to test - many times I ran into a situation when underlying bash script executed just fine, while cron job kept failing for reason&amp;nbsp;unknown.&lt;/p&gt;
 &lt;p&gt;My own cron experience together with a few words from a workmate brought me into the arms of systemd, which is a Linux system and service manager. It&amp;#8217;s capable of running periodic tasks just like cron, yet making it more&amp;nbsp;transparent.&lt;/p&gt;
@@ -34,10 +78,10 @@
 &lt;p&gt;This systemd service file is no more than a simple wrapper around the following bash code. We run three different database clusters on one machine and this approach makes their maintenance pretty&amp;nbsp;comfortable.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
 &lt;span class="c1"&gt;#&lt;/span&gt;
-&lt;span class="c1"&gt;# @author: Michal Zimmermann &amp;lt;michal.zimmermann@clevermaps.cz&amp;gt;&lt;/span&gt;
+&lt;span class="c1"&gt;# @author: Michal Zimmermann &amp;amp;lt;michal.zimmermann@clevermaps.cz&amp;amp;gt;&lt;/span&gt;
 &lt;span class="c1"&gt;# Vacuums the whole database cluster running on a given port.&lt;/span&gt;
 
-&lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; &lt;span class="nv"&gt;$#&lt;/span&gt; &amp;gt; &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;
+&lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; &lt;span class="nv"&gt;$#&lt;/span&gt; &lt;span class="p"&gt;&amp;amp;&lt;/span&gt;gt&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;
 &lt;span class="k"&gt;do&lt;/span&gt;
     &lt;span class="nv"&gt;key&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$1&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
 
@@ -104,7 +148,7 @@
 &lt;p&gt;Full backup creation is just one example of how powerful bash can&amp;nbsp;be.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
 &lt;span class="c1"&gt;#&lt;/span&gt;
-&lt;span class="c1"&gt;# @author: Michal Zimmermann &amp;lt;michal.zimmermann@clevermaps.cz&amp;gt;&lt;/span&gt;
+&lt;span class="c1"&gt;# @author: Michal Zimmermann &amp;amp;lt;michal.zimmermann@clevermaps.cz&amp;amp;gt;&lt;/span&gt;
 &lt;span class="c1"&gt;# Creates base backup.&lt;/span&gt;
 
 &lt;span class="nv"&gt;CUR_DIR&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;dirname &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$0&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;
@@ -140,17 +184,17 @@ pg_basebackup &lt;span class="se"&gt;\&lt;/span&gt;
     &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="m"&gt;3&lt;/span&gt;
 &lt;span class="k"&gt;fi&lt;/span&gt;
 
-tar -czf &lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;CR_BASE_BACKUP_DIR&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;/&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;CR_LABEL&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;.tar.gz &lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;CR_BASE_BACKUP_DIR&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;/&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;CR_LABEL&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; rm -rf &lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;CR_BASE_BACKUP_DIR&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;/&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;CR_LABEL&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;
+tar -czf &lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;CR_BASE_BACKUP_DIR&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;/&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;CR_LABEL&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;.tar.gz &lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;CR_BASE_BACKUP_DIR&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;/&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;CR_LABEL&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt; &lt;span class="p"&gt;&amp;amp;&lt;/span&gt;amp&lt;span class="p"&gt;;&amp;amp;&lt;/span&gt;amp&lt;span class="p"&gt;;&lt;/span&gt; rm -rf &lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;CR_BASE_BACKUP_DIR&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;/&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;CR_LABEL&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;As you probably noticed, a &lt;code&gt;pgsql-common.sh&lt;/code&gt; file is sourced at the beginning of the script. This script in turn just loads the proper config file that provides variables to other, devops, scripts. As you might need those variables in several of your scripts, it is a good idea to put their load to a separate&amp;nbsp;file.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
 &lt;span class="c1"&gt;#&lt;/span&gt;
-&lt;span class="c1"&gt;# @author: Michal Zimmermann &amp;lt;michal.zimmermann@clevermaps.cz&amp;gt;&lt;/span&gt;
+&lt;span class="c1"&gt;# @author: Michal Zimmermann &amp;amp;lt;michal.zimmermann@clevermaps.cz&amp;amp;gt;&lt;/span&gt;
 &lt;span class="c1"&gt;# Sourced in pgsql-*.sh scripts.&lt;/span&gt;
 
-&lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; &lt;span class="nv"&gt;$#&lt;/span&gt; &amp;gt; &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;
+&lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; &lt;span class="nv"&gt;$#&lt;/span&gt; &lt;span class="p"&gt;&amp;amp;&lt;/span&gt;gt&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;
 &lt;span class="k"&gt;do&lt;/span&gt;
     &lt;span class="nv"&gt;key&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$1&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
 
@@ -200,10 +244,10 @@ tar -czf &lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;CR_BASE_BA
 &lt;p&gt;Another, likely the simplest, example is a vacuumdb&amp;nbsp;task:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
 &lt;span class="c1"&gt;#&lt;/span&gt;
-&lt;span class="c1"&gt;# @author: Michal Zimmermann &amp;lt;michal.zimmermann@clevermaps.cz&amp;gt;&lt;/span&gt;
+&lt;span class="c1"&gt;# @author: Michal Zimmermann &amp;amp;lt;michal.zimmermann@clevermaps.cz&amp;amp;gt;&lt;/span&gt;
 &lt;span class="c1"&gt;# Vacuums the whole database cluster running on a given port.&lt;/span&gt;
 
-&lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; &lt;span class="nv"&gt;$#&lt;/span&gt; &amp;gt; &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;
+&lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; &lt;span class="nv"&gt;$#&lt;/span&gt; &lt;span class="p"&gt;&amp;amp;&lt;/span&gt;gt&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;
 &lt;span class="k"&gt;do&lt;/span&gt;
     &lt;span class="nv"&gt;key&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$1&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
 
@@ -355,7 +399,7 @@ find &lt;span class="nv"&gt;$CR_WAL_BACKUP_DIR&lt;/span&gt; &lt;span class="se"&
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/usr/bin/env python&lt;/span&gt;
 &lt;span class="c1"&gt;# -*- coding: utf-8 -*-&lt;/span&gt;
 &lt;span class="c1"&gt;# @Date    : 2017-11-18 18:40:50&lt;/span&gt;
-&lt;span class="c1"&gt;# @Author  : Michal Zimmermann &amp;lt;zimmicz@gmail.com&amp;gt;&lt;/span&gt;
+&lt;span class="c1"&gt;# @Author  : Michal Zimmermann &amp;amp;lt;zimmicz@gmail.com&amp;amp;gt;&lt;/span&gt;
 
 &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;os&lt;/span&gt;
 &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;sip&lt;/span&gt;
@@ -385,9 +429,9 @@ find &lt;span class="nv"&gt;$CR_WAL_BACKUP_DIR&lt;/span&gt; &lt;span class="se"&
 
     &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;setUp&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
         &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;source_layer&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;QgsVectorLayer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
-            &lt;span class="s2"&gt;&amp;quot;Polygon?crs=epsg:4326&amp;amp;field=id:integer&amp;amp;field=textAttr:string&amp;amp;field=intAttr:integer&amp;amp;field=decAttr:double&amp;amp;field=dateAttr:date&amp;amp;index=yes&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;source layer&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;memory&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+            &lt;span class="s2"&gt;&amp;quot;Polygon?crs=epsg:4326&amp;amp;amp;field=id:integer&amp;amp;amp;field=textAttr:string&amp;amp;amp;field=intAttr:integer&amp;amp;amp;field=decAttr:double&amp;amp;amp;field=dateAttr:date&amp;amp;amp;index=yes&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;source layer&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;memory&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
         &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;target_layer&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;QgsVectorLayer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
-            &lt;span class="s2"&gt;&amp;quot;Linestring?crs=epsg:4326&amp;amp;field=id:integer&amp;amp;index=yes&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;target layer&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;memory&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+            &lt;span class="s2"&gt;&amp;quot;Linestring?crs=epsg:4326&amp;amp;amp;field=id:integer&amp;amp;amp;index=yes&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;target layer&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;memory&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
         &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;widget&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;AttributeTransfer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;IFACE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 
         &lt;span class="n"&gt;registry&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;QgsMapLayerRegistry&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;instance&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
@@ -458,11 +502,11 @@ find &lt;span class="nv"&gt;$CR_WAL_BACKUP_DIR&lt;/span&gt; &lt;span class="se"&
 &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="vm"&gt;__name__&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;__main__&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
     &lt;span class="n"&gt;unittest&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;main&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;</content><category term="python"></category><category term="QGIS"></category></entry><entry><title>QGIS Plugin Development: AttributeTransfer Plugin</title><link href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-attributetransfer-plugin/" rel="alternate"></link><published>2017-11-23T19:00:00+01:00</published><updated>2017-11-23T19:00:00+01:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-11-23:/posts/2017/qgis-plugin-development-attributetransfer-plugin/</id><summary type="html">&lt;p&gt;This part finally brings &lt;a href="https://github.com/zimmicz/qgis-attribute-transfer-plugin"&gt;the whole source code of the &lt;span class="caps"&gt;QGIS&lt;/span&gt; AttributeTransfer plugin&lt;/a&gt;.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/qgis-plugin-development-attribute-transfer-plugin/qgis.gif"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="/posts/assets/qgis-plugin-development-attribute-transfer-plugin/qgis.gif"/&gt;&lt;/div&gt;
 
 &lt;p&gt;The plugin itself resides in the &lt;a href="https://github.com/zimmicz/qgis-attribute-transfer-plugin/blob/master/attribute_transfer.py"&gt;&lt;code&gt;attribute_transfer.py&lt;/code&gt;&lt;/a&gt; file. When &lt;code&gt;run()&lt;/code&gt; method is invoked, the &lt;span class="caps"&gt;QT&lt;/span&gt; form pops up with combos prefilled with available vector layers that support attribute&amp;nbsp;editing.&lt;/p&gt;
 &lt;p&gt;Source and target layer combos are mutually …&lt;/p&gt;</summary><content type="html">&lt;p&gt;This part finally brings &lt;a href="https://github.com/zimmicz/qgis-attribute-transfer-plugin"&gt;the whole source code of the &lt;span class="caps"&gt;QGIS&lt;/span&gt; AttributeTransfer plugin&lt;/a&gt;.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/qgis-plugin-development-attribute-transfer-plugin/qgis.gif"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="/posts/assets/qgis-plugin-development-attribute-transfer-plugin/qgis.gif"/&gt;&lt;/div&gt;
 
 &lt;p&gt;The plugin itself resides in the &lt;a href="https://github.com/zimmicz/qgis-attribute-transfer-plugin/blob/master/attribute_transfer.py"&gt;&lt;code&gt;attribute_transfer.py&lt;/code&gt;&lt;/a&gt; file. When &lt;code&gt;run()&lt;/code&gt; method is invoked, the &lt;span class="caps"&gt;QT&lt;/span&gt; form pops up with combos prefilled with available vector layers that support attribute&amp;nbsp;editing.&lt;/p&gt;
 &lt;p&gt;Source and target layer combos are mutually exclusive, thus it&amp;#8217;s not possible to transfer the attribute within the same&amp;nbsp;layer.&lt;/p&gt;
@@ -498,7 +542,7 @@ find &lt;span class="nv"&gt;$CR_WAL_BACKUP_DIR&lt;/span&gt; &lt;span class="se"&
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;p&gt;Using the spatial index brings one more issue I&amp;#8217;ve come to realize just after implementing the special comparison workflows for different geometry types. There&amp;#8217;s a chance of finding the nearest feature using the bounding box that&amp;#8217;s actually &lt;em&gt;not&lt;/em&gt; the nearest feature. In that case, I chose to find the most distant vertex of such a feature and use it to construct the rectangle around the target feature. If there are any source features in such a rectangle, it&amp;#8217;s very likely one of them is the &lt;em&gt;real&lt;/em&gt; nearest&amp;nbsp;feature.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/qgis-plugin-development-attribute-transfer-plugin/qgis.png"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="/posts/assets/qgis-plugin-development-attribute-transfer-plugin/qgis.png"/&gt;&lt;/div&gt;
 
 &lt;p&gt;Right now, I&amp;#8217;m working on &lt;a href="https://github.com/zimmicz/qgis-attribute-transfer-plugin/issues/3"&gt;finding the nearest feature even if no bounding box intersection is found&lt;/a&gt;. Meanwhile, &lt;a href="https://github.com/zimmicz/qgis-attribute-transfer-plugin/issues/2"&gt;the plugin is being reviewed&lt;/a&gt; to be featured in &lt;a href="https://plugins.qgis.org"&gt;&lt;span class="caps"&gt;QGIS&lt;/span&gt; Plugins repository&lt;/a&gt;. Fingers&amp;nbsp;crossed.&lt;/p&gt;
 &lt;p&gt;I thought this was going to be the last part of the series. But how could one possibly claim the coding project done without writing &lt;em&gt;tests&lt;/em&gt;? Stay tuned for the next&amp;nbsp;episode.&lt;/p&gt;</content><category term="python"></category><category term="QGIS"></category></entry><entry><title>QGIS Plugin Development: Creating GUI with Qt Designer</title><link href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-creating-gui-with-qt-designer/" rel="alternate"></link><published>2017-11-16T15:00:00+01:00</published><updated>2017-11-16T15:00:00+01:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-11-16:/posts/2017/qgis-plugin-development-creating-gui-with-qt-designer/</id><summary type="html">&lt;p&gt;After fiddling with &lt;a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/"&gt;&lt;span class="caps"&gt;QGIS&lt;/span&gt; Python console&lt;/a&gt; and implementing &lt;a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/"&gt;nearest neighbor analysis&lt;/a&gt;, I&amp;#8217;m going to create a very simple &lt;span class="caps"&gt;GUI&lt;/span&gt; for the plugin at&amp;nbsp;last.&lt;/p&gt;
@@ -506,7 +550,7 @@ find &lt;span class="nv"&gt;$CR_WAL_BACKUP_DIR&lt;/span&gt; &lt;span class="se"&
 &lt;p&gt;While &lt;span class="caps"&gt;QGIS&lt;/span&gt; &lt;span class="caps"&gt;API&lt;/span&gt; docs took me few hours to grasp, the PyQGIS ecosystem knocked my socks off. Here comes the list of tools you should incorporate into your development process as soon as&amp;nbsp;possible.&lt;/p&gt;
 &lt;h2&gt;Plugin&amp;nbsp;Builder&lt;/h2&gt;
 &lt;p&gt;The &lt;a href="https://plugins.qgis.org/plugins/pluginbuilder/"&gt;&lt;span class="caps"&gt;QGIS&lt;/span&gt; Plugin Builder&lt;/a&gt; is a plugin created to create&amp;hellip; well, other plugins. It gets you going in minutes and lets you code instead of setting up things you don&amp;#8217;t want to be setting up. A definite must-have. Note you should put the plugin inside the &lt;span class="caps"&gt;QGIS&lt;/span&gt; plugins folder (defaults to ~/.qgis2/python/plugins) in&amp;nbsp;Linux.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/qgis-plugin-development-creating-gui-with-qt-designer/qgis.gif"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="/posts/assets/qgis-plugin-development-creating-gui-with-qt-designer/qgis.gif"/&gt;&lt;/div&gt;
 
 &lt;p&gt;Remember to run &lt;code&gt;pyrcc4 -o resources.py resources.qrc&lt;/code&gt; inside your plugin folder before you add it to &lt;span class="caps"&gt;QGIS&lt;/span&gt;.&lt;/p&gt;
 &lt;h2&gt;Plugin&amp;nbsp;Reloader&lt;/h2&gt;
@@ -514,15 +558,15 @@ find &lt;span class="nv"&gt;$CR_WAL_BACKUP_DIR&lt;/span&gt; &lt;span class="se"&
 &lt;h2&gt;Qt&amp;nbsp;Designer&lt;/h2&gt;
 &lt;p&gt;&lt;a href="https://www.qt.io/qt-features-libraries-apis-tools-and-ide/"&gt;Qt Designer&lt;/a&gt; comes with &lt;code&gt;qt4-designer&lt;/code&gt; package in Ubuntu. It is tailored to design and build GUIs from Qt components that can be used within &lt;span class="caps"&gt;QGIS&lt;/span&gt;. Its drag&amp;amp;drop interface lets you prototype&amp;nbsp;quickly.&lt;/p&gt;
 &lt;p&gt;Thanks to the Plugin Builder you can load the &lt;code&gt;attribute_transfer_dialog_base.ui&lt;/code&gt; file straight into the Qt Designer and adjust it to your&amp;nbsp;needs.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/qgis-plugin-development-creating-gui-with-qt-designer/qt.gif"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="/posts/assets/qgis-plugin-development-creating-gui-with-qt-designer/qt.gif"/&gt;&lt;/div&gt;
 
 &lt;p&gt;It doesn&amp;#8217;t take much, just one &lt;code&gt;QLineEdit&lt;/code&gt; and a few &lt;code&gt;QComboBox&lt;/code&gt; widgets. Those will be available in the &lt;code&gt;attribute_transfer.py&lt;/code&gt; file as properties of the &lt;code&gt;AttributeTransferDialog&lt;/code&gt; class.&lt;/p&gt;
 &lt;p&gt;The widget name can be customized in the right sidebar and I advise you to do so. I chose the&amp;nbsp;following:&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/qgis-plugin-development-creating-gui-with-qt-designer/qt.png"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="/posts/assets/qgis-plugin-development-creating-gui-with-qt-designer/qt.png"/&gt;&lt;/div&gt;
 
 &lt;p&gt;Once loaded with Plugins -&amp;gt; Manage and Install Plugins -&amp;gt; AttributeTransfer, the plugin is available right from the toolbar or Vector menu. It is missing the business logic completely, but I have this covered in &lt;a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/"&gt;the previous part&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;All that is to be done is to bind those two parts&amp;nbsp;together.&lt;/p&gt;</content><category term="python"></category><category term="QGIS"></category></entry><entry><title>QGIS Plugin Development: Finding Nearest Neighbors</title><link href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/" rel="alternate"></link><published>2017-11-09T15:00:00+01:00</published><updated>2017-11-09T15:00:00+01:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-11-09:/posts/2017/qgis-plugin-development-finding-nearest-neighbors/</id><summary type="html">&lt;p&gt;I described basics of vector layers manipulation in &lt;a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/"&gt;the previous part&lt;/a&gt; of the series. With my goal in mind (fully functional custom plugin capable of writing an attribute value from a source layer to a target layer based on a feature distance), I&amp;#8217;d like to discuss &lt;strong&gt;spatial indexing&lt;/strong&gt; and …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I described basics of vector layers manipulation in &lt;a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/"&gt;the previous part&lt;/a&gt; of the series. With my goal in mind (fully functional custom plugin capable of writing an attribute value from a source layer to a target layer based on a feature distance), I&amp;#8217;d like to discuss &lt;strong&gt;spatial indexing&lt;/strong&gt; and &lt;strong&gt;nearest neighbor analysis&lt;/strong&gt;.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/qgis-plugin-development-finding-nearest-neighbors/qgis.png"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="/posts/assets/qgis-plugin-development-finding-nearest-neighbors/qgis.png"/&gt;&lt;/div&gt;
 
 &lt;p&gt;The picture above illustrates the task that can be solved solely by using &lt;span class="caps"&gt;QGIS&lt;/span&gt; &lt;span class="caps"&gt;API&lt;/span&gt;. Imagine you&amp;#8217;re given a source layer with an attribute filled with values. You&amp;#8217;re given a target layer as well, sadly though, the values in this layer are missing (&lt;em&gt;not so rare in the &lt;span class="caps"&gt;GIS&lt;/span&gt; world, right?&lt;/em&gt;). Yet you know that the missing attribute value of each feature in the target layer can be filled by the value of its nearest neighbor from the source layer. How do you do&amp;nbsp;that?&lt;/p&gt;
 &lt;h2&gt;Generating dummy&amp;nbsp;data&lt;/h2&gt;
@@ -530,8 +574,8 @@ find &lt;span class="nv"&gt;$CR_WAL_BACKUP_DIR&lt;/span&gt; &lt;span class="se"&
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;qgis.core&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;QgsMapLayerRegistry&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;QgsVectorLayer&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;QgsFeature&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;QgsGeometry&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;QgsPoint&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;QgsSpatialIndex&lt;/span&gt;
 &lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;qgis.utils&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;iface&lt;/span&gt;
 
-&lt;span class="n"&gt;source_layer&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;QgsVectorLayer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;point?crs=epsg:4326&amp;amp;field=id:integer&amp;amp;field=value:integer&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Source layer&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;memory&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="n"&gt;target_layer&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;QgsVectorLayer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;point?crs=epsg:4326&amp;amp;field=id:integer&amp;amp;field=value:integer&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Target layer&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;memory&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;source_layer&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;QgsVectorLayer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;point?crs=epsg:4326&amp;amp;amp;field=id:integer&amp;amp;amp;field=value:integer&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Source layer&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;memory&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;target_layer&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;QgsVectorLayer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;point?crs=epsg:4326&amp;amp;amp;field=id:integer&amp;amp;amp;field=value:integer&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Target layer&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;memory&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 
 &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;create_dummy_data&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
 
@@ -717,10 +761,10 @@ find &lt;span class="nv"&gt;$CR_WAL_BACKUP_DIR&lt;/span&gt; &lt;span class="se"&
 
 
 &lt;p&gt;That was a very brief introduction to &lt;span class="caps"&gt;QGIS&lt;/span&gt; &lt;span class="caps"&gt;API&lt;/span&gt;, the next part will walk you through the console more&amp;nbsp;thoroughly.&lt;/p&gt;</content><category term="python"></category><category term="QGIS"></category></entry><entry><title>Serving Mapbox Vector Tiles with PostGIS, Nginx and Python Backend</title><link href="https://www.zimmi.cz/posts/2017/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/" rel="alternate"></link><published>2017-10-23T16:00:00+02:00</published><updated>2017-10-23T16:00:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-10-23:/posts/2017/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/</id><summary type="html">&lt;p&gt;&lt;a href="({filename}../2017/postgis-as-a-mapbox-vector-tiles-generator.md)"&gt;Since version 2.4.0, PostGIS can serve &lt;span class="caps"&gt;MVT&lt;/span&gt;&lt;/a&gt; data directly. &lt;span class="caps"&gt;MVT&lt;/span&gt; returning queries put heavy workload on the database though. On top of that, each of the query has to be run again every time a client demands the data. This leaves us with plenty of room to optimize …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="({filename}../2017/postgis-as-a-mapbox-vector-tiles-generator.md)"&gt;Since version 2.4.0, PostGIS can serve &lt;span class="caps"&gt;MVT&lt;/span&gt;&lt;/a&gt; data directly. &lt;span class="caps"&gt;MVT&lt;/span&gt; returning queries put heavy workload on the database though. On top of that, each of the query has to be run again every time a client demands the data. This leaves us with plenty of room to optimize the&amp;nbsp;process.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/election.gif"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="/posts/assets/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/election.gif"/&gt;&lt;/div&gt;
 
 &lt;p&gt;During the last week, while working on the Czech legislative election data visualization, I&amp;#8217;ve struggled with the server becoming unresponsive far too often due to the issues mentioned&amp;nbsp;above.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/schema.png"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="/posts/assets/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/schema.png"/&gt;&lt;/div&gt;
 
 &lt;p&gt;According to the schema, the first client to come to the&amp;nbsp;server:&lt;/p&gt;
 &lt;ul&gt;
@@ -907,7 +951,7 @@ LINE &lt;span class="m"&gt;2&lt;/span&gt;: &lt;span class="m"&gt;1111&lt;/span&g
         &lt;span class="n"&gt;row_number&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="n"&gt;OVER&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;PARTITION&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="k"&gt;version&lt;/span&gt; &lt;span class="k"&gt;ORDER&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="n"&gt;letter_count&lt;/span&gt; &lt;span class="k"&gt;DESC&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
     &lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="n"&gt;postgresql_development&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="k"&gt;data&lt;/span&gt;
 &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;
-&lt;span class="k"&gt;WHERE&lt;/span&gt; &lt;span class="n"&gt;row_number&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;=&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;
+&lt;span class="k"&gt;WHERE&lt;/span&gt; &lt;span class="n"&gt;row_number&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;lt&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;
 &lt;span class="k"&gt;GROUP&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="k"&gt;version&lt;/span&gt;
 &lt;span class="k"&gt;ORDER&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="k"&gt;version&lt;/span&gt; &lt;span class="k"&gt;DESC&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
@@ -1082,7 +1126,7 @@ LINE &lt;span class="m"&gt;2&lt;/span&gt;: &lt;span class="m"&gt;1111&lt;/span&g
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/postgresql-development-history-revealed-with-postgresql/plot1.png"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="/posts/assets/postgresql-development-history-revealed-with-postgresql/plot1.png"/&gt;&lt;/div&gt;
 
 &lt;h2&gt;The most verbose docs in each&amp;nbsp;version&lt;/h2&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt; &lt;span class="k"&gt;DISTINCT&lt;/span&gt; &lt;span class="k"&gt;ON&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;version&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
@@ -1210,7 +1254,7 @@ LINE &lt;span class="m"&gt;2&lt;/span&gt;: &lt;span class="m"&gt;1111&lt;/span&g
 
 
 &lt;p&gt;Something&amp;#8217;s going on in an upcoming 10.0&amp;nbsp;version.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/postgresql-development-history-revealed-with-postgresql/plot2.png"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="/posts/assets/postgresql-development-history-revealed-with-postgresql/plot2.png"/&gt;&lt;/div&gt;
 
 &lt;p&gt;All the data was obtained with the following Python script and processed inside the PostgreSQL database. Plots done with &lt;a href="http://bokeh.pydata.org/en/latest/"&gt;Bokeh&lt;/a&gt;, though I probably wouldn&amp;#8217;t use it again, the docs site is absurdly sluggish and the info is just all over the&amp;nbsp;place.&lt;/p&gt;
 &lt;script src="https://gist.github.com/zimmicz/f69a5ce5d3cf3a220e171553c35e0391.js"&gt;&lt;/script&gt;</content><category term="postgresql"></category><category term="python"></category></entry><entry><title>PostGIS as a Mapbox Vector Tiles generator</title><link href="https://www.zimmi.cz/posts/2017/postgis-as-a-mapbox-vector-tiles-generator/" rel="alternate"></link><published>2017-08-06T18:00:00+02:00</published><updated>2017-08-06T18:00:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-08-06:/posts/2017/postgis-as-a-mapbox-vector-tiles-generator/</id><summary type="html">&lt;p&gt;&lt;a href="http://postgis.net/2017/08/05/postgis-2.4.0alpha/"&gt;PostGIS 2.4.0&lt;/a&gt; was released recently bringing the possibilities to generate &lt;strong&gt;Mapbox Vector Tiles&lt;/strong&gt; without any third party tools. I got a shot at it with Node.js and docker. Even if it&amp;#8217;s not as straightforward as solely using &lt;a href="https://postgis.net/docs/manual-dev/ST_AsMVT.html"&gt;ST_AsMVT&lt;/a&gt;, it still looks pretty&amp;nbsp;great.&lt;/p&gt;
@@ -1222,7 +1266,7 @@ LINE &lt;span class="m"&gt;2&lt;/span&gt;: &lt;span class="m"&gt;1111&lt;/span&g
 RUN apt update
 RUN apt install -y wget less systemd
 RUN touch /etc/apt/sources.list.d/pgdg.list
-RUN &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;deb http://apt.postgresql.org/pub/repos/apt/ zesty-pgdg main&amp;quot;&lt;/span&gt; &amp;gt; /etc/apt/sources.list.d/pgdg.list
+RUN &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;deb http://apt.postgresql.org/pub/repos/apt/ zesty-pgdg main&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;&amp;amp;&lt;/span&gt;gt&lt;span class="p"&gt;;&lt;/span&gt; /etc/apt/sources.list.d/pgdg.list
 RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc &lt;span class="p"&gt;|&lt;/span&gt; apt-key add -
 RUN apt update
 RUN apt -y install postgresql-9.6 postgresql-server-dev-9.6
@@ -1231,18 +1275,18 @@ USER postgres
 RUN /usr/lib/postgresql/9.6/bin/pg_ctl -D /var/lib/postgresql/9.6/main -l /tmp/logfile start
 
 USER root
-RUN &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;host all  all    0.0.0.0/0  trust&amp;quot;&lt;/span&gt; &amp;gt;&amp;gt; /etc/postgresql/9.6/main/pg_hba.conf &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
-    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;listen_addresses=&amp;#39;*&amp;#39;&amp;quot;&lt;/span&gt; &amp;gt;&amp;gt; /etc/postgresql/9.6/main/postgresql.conf
+RUN &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;host all  all    0.0.0.0/0  trust&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;&amp;amp;&lt;/span&gt;gt&lt;span class="p"&gt;;&amp;amp;&lt;/span&gt;gt&lt;span class="p"&gt;;&lt;/span&gt; /etc/postgresql/9.6/main/pg_hba.conf &lt;span class="p"&gt;&amp;amp;&lt;/span&gt;amp&lt;span class="p"&gt;;&amp;amp;&lt;/span&gt;amp&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;listen_addresses=&amp;#39;*&amp;#39;&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;&amp;amp;&lt;/span&gt;gt&lt;span class="p"&gt;;&amp;amp;&lt;/span&gt;gt&lt;span class="p"&gt;;&lt;/span&gt; /etc/postgresql/9.6/main/postgresql.conf
 
 
 EXPOSE &lt;span class="m"&gt;5432&lt;/span&gt;
 RUN apt install -y netcat build-essential libxml2 libxml2-dev libgeos-3.5.1 libgdal-dev gdal-bin libgdal20 libgeos-dev libprotobuf-c1 libprotobuf-c-dev libprotobuf-dev protobuf-compiler protobuf-c-compiler
 RUN wget http://download.osgeo.org/postgis/source/postgis-2.4.0alpha.tar.gz
 RUN tar -xvzf postgis-2.4.0alpha.tar.gz
-RUN &lt;span class="nb"&gt;cd&lt;/span&gt; postgis-2.4.0alpha &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; ./configure &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; make &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; make install
+RUN &lt;span class="nb"&gt;cd&lt;/span&gt; postgis-2.4.0alpha &lt;span class="p"&gt;&amp;amp;&lt;/span&gt;amp&lt;span class="p"&gt;;&amp;amp;&lt;/span&gt;amp&lt;span class="p"&gt;;&lt;/span&gt; ./configure &lt;span class="p"&gt;&amp;amp;&lt;/span&gt;amp&lt;span class="p"&gt;;&amp;amp;&lt;/span&gt;amp&lt;span class="p"&gt;;&lt;/span&gt; make &lt;span class="p"&gt;&amp;amp;&lt;/span&gt;amp&lt;span class="p"&gt;;&amp;amp;&lt;/span&gt;amp&lt;span class="p"&gt;;&lt;/span&gt; make install
 
 USER postgres
-RUN service postgresql start &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; psql -c &lt;span class="s2"&gt;&amp;quot;CREATE EXTENSION postgis&amp;quot;&lt;/span&gt;
+RUN service postgresql start &lt;span class="p"&gt;&amp;amp;&lt;/span&gt;amp&lt;span class="p"&gt;;&amp;amp;&lt;/span&gt;amp&lt;span class="p"&gt;;&lt;/span&gt; psql -c &lt;span class="s2"&gt;&amp;quot;CREATE EXTENSION postgis&amp;quot;&lt;/span&gt;
 
 USER root
 COPY start.postgis.sh /start.postgis.sh
@@ -1259,7 +1303,7 @@ CMD &lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/start.
 &lt;span class="nv"&gt;CONF&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/etc/postgresql/9.6/main/postgresql.conf&amp;quot;&lt;/span&gt;
 &lt;span class="nv"&gt;POSTGRES&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/usr/lib/postgresql/9.6/bin/postgres&amp;quot;&lt;/span&gt;
 
-su postgres sh -c &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$POSTGRES&lt;/span&gt;&lt;span class="s2"&gt; -D &lt;/span&gt;&lt;span class="nv"&gt;$DATADIR&lt;/span&gt;&lt;span class="s2"&gt; -c config_file=&lt;/span&gt;&lt;span class="nv"&gt;$CONF&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;&amp;amp;&lt;/span&gt;
+su postgres sh -c &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$POSTGRES&lt;/span&gt;&lt;span class="s2"&gt; -D &lt;/span&gt;&lt;span class="nv"&gt;$DATADIR&lt;/span&gt;&lt;span class="s2"&gt; -c config_file=&lt;/span&gt;&lt;span class="nv"&gt;$CONF&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;&amp;amp;&lt;/span&gt;amp&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;span class="k"&gt;until&lt;/span&gt; nc -z localhost &lt;span class="m"&gt;5432&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;span class="k"&gt;do&lt;/span&gt;
     &lt;span class="nb"&gt;echo&lt;/span&gt; ...
@@ -1277,7 +1321,7 @@ su - postgres -c &lt;span class="s2"&gt;&amp;quot;psql -c \&amp;quot;CREATE EXTE
 &lt;p&gt;I got a cadastre area dataset of the Czech Republic for testing, which contains ~ 13,000 polygons. The geometries should come in Web Mercator a.k.a. &lt;span class="caps"&gt;EPSG&lt;/span&gt;:3857 to work with &lt;a href="https://www.mapbox.com/vector-tiles/specification/"&gt;&lt;span class="caps"&gt;MVT&lt;/span&gt;&lt;/a&gt;.&lt;/p&gt;
 &lt;h2&gt;Vector&amp;nbsp;tiles&lt;/h2&gt;
 &lt;p&gt;I got a bit confused by the docs of &lt;a href="https://postgis.net/docs/manual-dev/ST_AsMVT.html"&gt;ST_AsMVT&lt;/a&gt; and &lt;a href="https://postgis.net/docs/manual-dev/ST_AsMVTGeom.html"&gt;ST_AsMVTGeom&lt;/a&gt;. Especially the latter one took me a few hours to get it right. What is essential (I guess) about Mapbox Vector Tiles is that you have to abstract from the real world coordinates and start thinking inside the tile coordinates. What PostGIS does with &lt;code&gt;ST_AsMVTGeom&lt;/code&gt; (and what any other &lt;span class="caps"&gt;MVT&lt;/span&gt; implemenation should do for you) is that it takes real world coordinates and put them inside a&amp;nbsp;tile.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/postgis-as-a-mapbox-vector-tiles-generator/mvt.gif"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="/posts/assets/postgis-as-a-mapbox-vector-tiles-generator/mvt.gif"/&gt;&lt;/div&gt;
 
 &lt;p&gt;To make this work, you need to know every bounding box of every tile on every zoom level in a Web Mercator projection. Or you can use &lt;a href="https://github.com/mapbox/postgis-vt-util/blob/master/src/TileBBox.sql"&gt;TileBBox procedure by Mapbox&lt;/a&gt;, if you&amp;nbsp;wish.&lt;/p&gt;
 &lt;p&gt;The &lt;span class="caps"&gt;SQL&lt;/span&gt; query itself is pretty simple (this comes from an express route I&amp;#8217;ll be discussing&amp;nbsp;shortly).&lt;/p&gt;
@@ -1367,7 +1411,7 @@ RUN apt install -y gdal-bin
 &lt;p&gt;After the GeoTiff is written to hard drive, &lt;a href="https://www.zimmi.cz/posts/2015/how-to-use-queue-with-rsync/"&gt;inotifywait&lt;/a&gt; can be used to generate overviews. And with ease of calling &lt;code&gt;gdal_polygonize.py&lt;/code&gt; on each of GeoTiffs&amp;hellip;vector layer, at you&amp;nbsp;service.&lt;/p&gt;</content><category term="bash"></category><category term="gdal"></category></entry><entry><title>Mapping North America with QGIS: Tips and Tricks</title><link href="https://www.zimmi.cz/posts/2017/mapping-north-america-with-qgis-tips-and-tricks" rel="alternate"></link><published>2017-05-21T15:30:00+02:00</published><updated>2017-05-21T15:30:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-05-21:/posts/2017/mapping-north-america-with-qgis-tips-and-tricks</id><summary type="html">&lt;p&gt;Recently I&amp;#8217;ve bought a book called &lt;em&gt;Maps&lt;/em&gt; by Aleksandra Mizielinska and Daniel Mizielinski to my nephew. The book&amp;#8217;s absolutely wonderful and made me want to try crafting a map with similar looks. I don&amp;#8217;t do maps much at &lt;a href="https://clevermaps.cz"&gt;CleverMaps&lt;/a&gt;, so this was a great opportunity to find …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Recently I&amp;#8217;ve bought a book called &lt;em&gt;Maps&lt;/em&gt; by Aleksandra Mizielinska and Daniel Mizielinski to my nephew. The book&amp;#8217;s absolutely wonderful and made me want to try crafting a map with similar looks. I don&amp;#8217;t do maps much at &lt;a href="https://clevermaps.cz"&gt;CleverMaps&lt;/a&gt;, so this was a great opportunity to find out what new features became available during the last months of &lt;span class="caps"&gt;QGIS&lt;/span&gt;&amp;nbsp;development.&lt;/p&gt;
 &lt;h2&gt;Result&lt;/h2&gt;
 &lt;p&gt;A map of North America in scale of 1:22,000,000 featuring the biggest lakes, rivers, mountain ranges and basic administrative units for the North American countries. I aimed for visually appealing overview map rather than perfectly correct topographic&amp;nbsp;one.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;a href="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/map.png" title="Click for the full size (3 MB)"&gt;&lt;img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/map.min.png"/&gt;&lt;/a&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;a href="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/map.png" title="Click for the full size (3 MB)"&gt;&lt;img src="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/map.min.png"/&gt;&lt;/a&gt;&lt;/div&gt;
 
 &lt;h2&gt;Data&lt;/h2&gt;
 &lt;p&gt;I used my beloved &lt;a href="http://www.naturalearthdata.com"&gt;Natural Earth dataset&lt;/a&gt; for both cultural (boundaries, cities) and physical (rivers, lakes) map features. Different scales came to play for different map layers as they seemed a bit too/few simplified for the given&amp;nbsp;scale.&lt;/p&gt;
@@ -1379,15 +1423,15 @@ RUN apt install -y gdal-bin
 &lt;p&gt;I&amp;#8217;ve used several techniques I find interesting enough to be listed&amp;nbsp;here.&lt;/p&gt;
 &lt;h3&gt;Coastlines&lt;/h3&gt;
 &lt;p&gt;For a long time I&amp;#8217;ve considered coastlines a field for cartographic invention. They can be emphasized by shading or 3D effects. I chose the set of four parallel coastlines subtly disappearing into the sea, hopefully invoking the feeling of waves coming to the&amp;nbsp;shore.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/coastlines.png"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/coastlines.png"/&gt;&lt;/div&gt;
 
 &lt;p&gt;It&amp;#8217;s done by dissolving all the features and buffering them again and&amp;nbsp;again.&lt;/p&gt;
 &lt;h3&gt;Buffered&amp;nbsp;labels&lt;/h3&gt;
 &lt;p&gt;Buffered labels are usually hard to get right, because they fill so much space if the buffer color&amp;#8217;s not corresponding to its surroundings. But choosing the proper color can be a real struggle at&amp;nbsp;times.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/qgis_expressions.png"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/qgis_expressions.png"/&gt;&lt;/div&gt;
 
 &lt;p&gt;On this map, almost all the labels are buffered with the color of its surroundings, which makes them more legible, yet not too expressive. This is possible thanks to &lt;span class="caps"&gt;QGIS&lt;/span&gt; expression based properties that let you define unique styling to different map&amp;nbsp;features.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/buffered_labels.png"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/buffered_labels.png"/&gt;&lt;/div&gt;
 
 &lt;p&gt;Where it isn&amp;#8217;t possible (e.g. Bahamas or Honduras) to choose just one buffer color, the label is not buffered at all (or the semi-transparent white buffer is&amp;nbsp;used).&lt;/p&gt;
 &lt;p&gt;Note the &lt;em&gt;Rocky Mountains&lt;/em&gt; label is split on the borders of the &lt;span class="caps"&gt;U.S.A.&lt;/span&gt; and Canada and its both parts match the background&amp;nbsp;color.&lt;/p&gt;
@@ -1395,17 +1439,17 @@ RUN apt install -y gdal-bin
 &lt;p&gt;Rivers are tapered based on the Natural Earth&amp;#8217;s width attribute value for each river&amp;nbsp;segment.&lt;/p&gt;
 &lt;h3&gt;Labels in separate&amp;nbsp;layers&lt;/h3&gt;
 &lt;p&gt;I&amp;#8217;m used to put labels into separate layers in more complicated map compositions, especially when you need to draw label along path for areal features (such as countries or&amp;nbsp;states).&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/labels.png"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/labels.png"/&gt;&lt;/div&gt;
 
 &lt;p&gt;It becomes a bit harder to keep the features in sync with the labels though. I&amp;#8217;d like to use only one layer for all the map layers in the future, as I feel that&amp;#8217;s the way to go for the best&amp;nbsp;labeling.&lt;/p&gt;
 &lt;h3&gt;Labels wrapped on&amp;nbsp;character&lt;/h3&gt;
 &lt;p&gt;Some labels just can&amp;#8217;t fit the feature they belong to and &lt;span class="caps"&gt;QGIS&lt;/span&gt; lets you deal with this by wrapping labels on a special character, &lt;code&gt;\&lt;/code&gt; in my&amp;nbsp;case.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/wrapped_labels.png"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/wrapped_labels.png"/&gt;&lt;/div&gt;
 
 &lt;h3&gt;Layer blending&amp;nbsp;mode&lt;/h3&gt;
 &lt;p&gt;The mechanics behind layer blending modes are still a mystery to me, but they can add that little extra to a map very easily. Thanks to the Overlay blending mode, &lt;em&gt;the Rocky Mountains&lt;/em&gt; may remain very subtle on different kinds of&amp;nbsp;background.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/blending_mode.png"/&gt;&lt;/div&gt;</content><category term="qgis"></category><category term="visualization"></category></entry><entry><title>Wifileaks Wi-Fi Networks Dataviz</title><link href="https://www.zimmi.cz/posts/2017/wifileaks-wi-fi-networks-dataviz/" rel="alternate"></link><published>2017-05-02T18:30:00+02:00</published><updated>2017-05-02T18:30:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-05-02:/posts/2017/wifileaks-wi-fi-networks-dataviz/</id><summary type="html">&lt;p&gt;&lt;a href="http://www.wifileaks.cz"&gt;Wifileaks&lt;/a&gt; is a project by Jakub Čížek aimed to map the Czech wi-fi networks with Android/iOS app. The data gathered by people using the app &lt;a href="http://download.wifileaks.cz/data/wifileaks_raw_170416.tar.gz"&gt;is available to download&lt;/a&gt; and features ~&amp;nbsp;90,000,000 records, each representing the position of the cellphone when connecting to the network. Just about …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://www.wifileaks.cz"&gt;Wifileaks&lt;/a&gt; is a project by Jakub Čížek aimed to map the Czech wi-fi networks with Android/iOS app. The data gathered by people using the app &lt;a href="http://download.wifileaks.cz/data/wifileaks_raw_170416.tar.gz"&gt;is available to download&lt;/a&gt; and features ~&amp;nbsp;90,000,000 records, each representing the position of the cellphone when connecting to the network. Just about perfect to craft some&amp;nbsp;maps!&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/cr.png"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/blending_mode.png"/&gt;&lt;/div&gt;</content><category term="qgis"></category><category term="visualization"></category></entry><entry><title>Wifileaks Wi-Fi Networks Dataviz</title><link href="https://www.zimmi.cz/posts/2017/wifileaks-wi-fi-networks-dataviz/" rel="alternate"></link><published>2017-05-02T18:30:00+02:00</published><updated>2017-05-02T18:30:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-05-02:/posts/2017/wifileaks-wi-fi-networks-dataviz/</id><summary type="html">&lt;p&gt;&lt;a href="http://www.wifileaks.cz"&gt;Wifileaks&lt;/a&gt; is a project by Jakub Čížek aimed to map the Czech wi-fi networks with Android/iOS app. The data gathered by people using the app &lt;a href="http://download.wifileaks.cz/data/wifileaks_raw_170416.tar.gz"&gt;is available to download&lt;/a&gt; and features ~&amp;nbsp;90,000,000 records, each representing the position of the cellphone when connecting to the network. Just about …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://www.wifileaks.cz"&gt;Wifileaks&lt;/a&gt; is a project by Jakub Čížek aimed to map the Czech wi-fi networks with Android/iOS app. The data gathered by people using the app &lt;a href="http://download.wifileaks.cz/data/wifileaks_raw_170416.tar.gz"&gt;is available to download&lt;/a&gt; and features ~&amp;nbsp;90,000,000 records, each representing the position of the cellphone when connecting to the network. Just about perfect to craft some&amp;nbsp;maps!&lt;/p&gt;
+&lt;div class="text-center"&gt;&lt;img src="/posts/assets/wifileaks-wifi-networks-dataviz/cr.png"/&gt;&lt;/div&gt;
 
 &lt;h2&gt;Using PostgreSQL&amp;nbsp;cstore_fdw&lt;/h2&gt;
 &lt;p&gt;I ran out of disk space immediately after loading the dataset into the PostgreSQL database. After fiddling around I remembered that columnar store should be a bit space-friendlier than the old fashioned relational database. Thus, I installed the &lt;a href="https://github.com/citusdata/cstore_fdw"&gt;cstore_fdw&lt;/a&gt; by Citus Data in just few&amp;nbsp;steps.&lt;/p&gt;
@@ -1420,24 +1464,24 @@ git clone git@github.com:citusdata/cstore_fdw.git
 
 
 &lt;p&gt;This makes &lt;a href="https://www.zimmi.cz/posts/2016/testing-postgresql-ogr-fdw/"&gt;another &lt;span class="caps"&gt;FDW&lt;/span&gt; available&lt;/a&gt; to you inside the PostgreSQL. The actual foreign server has to be created before loading the data into a foreign&amp;nbsp;table.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;cat &lt;span class="s"&gt;&amp;lt;&amp;lt;END | psql -qAt --no-psqlrc&lt;/span&gt;
-&lt;span class="s"&gt;    CREATE SERVER cstore_server FOREIGN DATA WRAPPER cstore_fdw;&lt;/span&gt;
-&lt;span class="s"&gt;    CREATE SCHEMA data_cstore;&lt;/span&gt;
-&lt;span class="s"&gt;    CREATE FOREIGN TABLE data_cstore.wifi (&lt;/span&gt;
-&lt;span class="s"&gt;        id integer,&lt;/span&gt;
-&lt;span class="s"&gt;        mac text,&lt;/span&gt;
-&lt;span class="s"&gt;        ssid text,&lt;/span&gt;
-&lt;span class="s"&gt;        signal_strength numeric,&lt;/span&gt;
-&lt;span class="s"&gt;        security integer,&lt;/span&gt;
-&lt;span class="s"&gt;        lat numeric,&lt;/span&gt;
-&lt;span class="s"&gt;        lon numeric,&lt;/span&gt;
-&lt;span class="s"&gt;        alt numeric,&lt;/span&gt;
-&lt;span class="s"&gt;        unixtime bigint,&lt;/span&gt;
-&lt;span class="s"&gt;        filename text&lt;/span&gt;
-&lt;span class="s"&gt;    )&lt;/span&gt;
-&lt;span class="s"&gt;    SERVER cstore_server&lt;/span&gt;
-&lt;span class="s"&gt;    OPTIONS (compression &amp;#39;pglz&amp;#39;);&lt;/span&gt;
-&lt;span class="s"&gt;END&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;cat &lt;span class="p"&gt;&amp;amp;&lt;/span&gt;lt&lt;span class="p"&gt;;&amp;amp;&lt;/span&gt;lt&lt;span class="p"&gt;;&lt;/span&gt;END &lt;span class="p"&gt;|&lt;/span&gt; psql -qAt --no-psqlrc
+    CREATE SERVER cstore_server FOREIGN DATA WRAPPER cstore_fdw&lt;span class="p"&gt;;&lt;/span&gt;
+    CREATE SCHEMA data_cstore&lt;span class="p"&gt;;&lt;/span&gt;
+    CREATE FOREIGN TABLE data_cstore.wifi &lt;span class="o"&gt;(&lt;/span&gt;
+        id integer,
+        mac text,
+        ssid text,
+        signal_strength numeric,
+        security integer,
+        lat numeric,
+        lon numeric,
+        alt numeric,
+        unixtime bigint,
+        filename text
+    &lt;span class="o"&gt;)&lt;/span&gt;
+    SERVER cstore_server
+    OPTIONS &lt;span class="o"&gt;(&lt;/span&gt;compression &lt;span class="s1"&gt;&amp;#39;pglz&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+END
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -1448,52 +1492,52 @@ git clone git@github.com:citusdata/cstore_fdw.git
 &lt;li&gt;no &lt;code&gt;SERIAL&lt;/code&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;To overcome these shortcomings I used &lt;code&gt;COPY&lt;/code&gt; statement to spit out the slightly modified table and immediately loaded it back&amp;nbsp;in.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;cat &lt;span class="s"&gt;&amp;lt;&amp;lt;END | psql -qAt --no-psqlrc&lt;/span&gt;
-&lt;span class="s"&gt;COPY (&lt;/span&gt;
-&lt;span class="s"&gt;    SELECT&lt;/span&gt;
-&lt;span class="s"&gt;        row_number() OVER (),&lt;/span&gt;
-&lt;span class="s"&gt;        mac,&lt;/span&gt;
-&lt;span class="s"&gt;        ssid,&lt;/span&gt;
-&lt;span class="s"&gt;        signal_strength,&lt;/span&gt;
-&lt;span class="s"&gt;        security,&lt;/span&gt;
-&lt;span class="s"&gt;        split_part(filename, &amp;#39;_&amp;#39;, 2)::integer,&lt;/span&gt;
-&lt;span class="s"&gt;        to_timestamp(unixtime),&lt;/span&gt;
-&lt;span class="s"&gt;        ST_Transform(ST_SetSRID(ST_MakePoint(lon, lat, alt), 4326), 32633)&lt;/span&gt;
-&lt;span class="s"&gt;    FROM data_cstore.wifi&lt;/span&gt;
-&lt;span class="s"&gt;    WHERE lon BETWEEN 0 AND 20&lt;/span&gt;
-&lt;span class="s"&gt;        AND lat BETWEEN 18 AND 84&lt;/span&gt;
-&lt;span class="s"&gt;) TO &amp;#39;/tmp/wifileaks.db&amp;#39; WITH CSV DELIMITER &amp;#39;;&amp;#39;&lt;/span&gt;
-&lt;span class="s"&gt;    DROP SCHEMA IF EXISTS data_cstore CASCADE;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;cat &lt;span class="p"&gt;&amp;amp;&lt;/span&gt;lt&lt;span class="p"&gt;;&amp;amp;&lt;/span&gt;lt&lt;span class="p"&gt;;&lt;/span&gt;END &lt;span class="p"&gt;|&lt;/span&gt; psql -qAt --no-psqlrc
+COPY &lt;span class="o"&gt;(&lt;/span&gt;
+    SELECT
+        row_number&lt;span class="o"&gt;()&lt;/span&gt; OVER &lt;span class="o"&gt;()&lt;/span&gt;,
+        mac,
+        ssid,
+        signal_strength,
+        security,
+        split_part&lt;span class="o"&gt;(&lt;/span&gt;filename, &lt;span class="s1"&gt;&amp;#39;_&amp;#39;&lt;/span&gt;, &lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;::integer,
+        to_timestamp&lt;span class="o"&gt;(&lt;/span&gt;unixtime&lt;span class="o"&gt;)&lt;/span&gt;,
+        ST_Transform&lt;span class="o"&gt;(&lt;/span&gt;ST_SetSRID&lt;span class="o"&gt;(&lt;/span&gt;ST_MakePoint&lt;span class="o"&gt;(&lt;/span&gt;lon, lat, alt&lt;span class="o"&gt;)&lt;/span&gt;, &lt;span class="m"&gt;4326&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;, &lt;span class="m"&gt;32633&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+    FROM data_cstore.wifi
+    WHERE lon BETWEEN &lt;span class="m"&gt;0&lt;/span&gt; AND &lt;span class="m"&gt;20&lt;/span&gt;
+        AND lat BETWEEN &lt;span class="m"&gt;18&lt;/span&gt; AND &lt;span class="m"&gt;84&lt;/span&gt;
+&lt;span class="o"&gt;)&lt;/span&gt; TO &lt;span class="s1"&gt;&amp;#39;/tmp/wifileaks.db&amp;#39;&lt;/span&gt; WITH CSV DELIMITER &lt;span class="s1"&gt;&amp;#39;;&amp;#39;&lt;/span&gt;
+    DROP SCHEMA IF EXISTS data_cstore CASCADE&lt;span class="p"&gt;;&lt;/span&gt;
 
-&lt;span class="s"&gt;DROP SCHEMA data_cstore;&lt;/span&gt;
-&lt;span class="s"&gt;CREATE SCHEMA data_cstore;&lt;/span&gt;
-&lt;span class="s"&gt;CREATE FOREIGN TABLE data_cstore.wifi (&lt;/span&gt;
-&lt;span class="s"&gt;    id integer,&lt;/span&gt;
-&lt;span class="s"&gt;    mac text,&lt;/span&gt;
-&lt;span class="s"&gt;    ssid text,&lt;/span&gt;
-&lt;span class="s"&gt;    signal_strength numeric,&lt;/span&gt;
-&lt;span class="s"&gt;    security integer,&lt;/span&gt;
-&lt;span class="s"&gt;    userid integer,&lt;/span&gt;
-&lt;span class="s"&gt;    unixtime timestamp without time zone,&lt;/span&gt;
-&lt;span class="s"&gt;    geom geometry(POINTZ, 32633)&lt;/span&gt;
-&lt;span class="s"&gt;)&lt;/span&gt;
-&lt;span class="s"&gt;SERVER cstore_server&lt;/span&gt;
-&lt;span class="s"&gt;OPTIONS (compression &amp;#39;pglz&amp;#39;);&lt;/span&gt;
-&lt;span class="s"&gt;END&lt;/span&gt;
+DROP SCHEMA data_cstore&lt;span class="p"&gt;;&lt;/span&gt;
+CREATE SCHEMA data_cstore&lt;span class="p"&gt;;&lt;/span&gt;
+CREATE FOREIGN TABLE data_cstore.wifi &lt;span class="o"&gt;(&lt;/span&gt;
+    id integer,
+    mac text,
+    ssid text,
+    signal_strength numeric,
+    security integer,
+    userid integer,
+    unixtime timestamp without &lt;span class="nb"&gt;time&lt;/span&gt; zone,
+    geom geometry&lt;span class="o"&gt;(&lt;/span&gt;POINTZ, &lt;span class="m"&gt;32633&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;span class="o"&gt;)&lt;/span&gt;
+SERVER cstore_server
+OPTIONS &lt;span class="o"&gt;(&lt;/span&gt;compression &lt;span class="s1"&gt;&amp;#39;pglz&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+END
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;h2&gt;Putting the networks on the&amp;nbsp;map&lt;/h2&gt;
 &lt;table&gt;
     &lt;tr&gt;
-        &lt;td&gt;&lt;a href="/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"&gt;&lt;img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"&gt;&lt;/a&gt;&lt;/td&gt;
-        &lt;td&gt;&lt;a href="/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"&gt;&lt;img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"&gt;&lt;/a&gt;&lt;/td&gt;
-        &lt;td&gt;&lt;a href="/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"&gt;&lt;img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href="/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"&gt;&lt;img src="/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href="/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"&gt;&lt;img src="/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href="/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"&gt;&lt;img src="/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"&gt;&lt;/a&gt;&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
-        &lt;td&gt;&lt;a href="/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"&gt;&lt;img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"&gt;&lt;/a&gt;&lt;/td&gt;
-        &lt;td&gt;&lt;a href="/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"&gt;&lt;img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"&gt;&lt;/a&gt;&lt;/td&gt;
-        &lt;td&gt;&lt;a href="/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"&gt;&lt;img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href="/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"&gt;&lt;img src="/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href="/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"&gt;&lt;img src="/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href="/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"&gt;&lt;img src="/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"&gt;&lt;/a&gt;&lt;/td&gt;
     &lt;/tr&gt;
 &lt;/table&gt;
 
@@ -1528,7 +1572,7 @@ v.in.ogr &lt;span class="nv"&gt;input&lt;/span&gt;&lt;span class="o"&gt;=&lt;/sp
 
 
 &lt;p&gt;I got six different points and the pretty dense road network. Note none of the points is connected to the existing&amp;nbsp;network.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/routing-with-grass-gis-catchment-area-calculation/roads_points.png"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="/posts/assets/routing-with-grass-gis-catchment-area-calculation/roads_points.png"/&gt;&lt;/div&gt;
 
 &lt;p&gt;You have to have routable network to do the actual routing (the worst sentence ever written). To do so,&amp;nbsp;let&amp;#8217;s:&lt;/p&gt;
 &lt;ul&gt;
@@ -1548,7 +1592,7 @@ v.net &lt;span class="nv"&gt;input&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&
 
 
 &lt;p&gt;The algorithm doesn&amp;#8217;t take bridges, tunnels and oneways into account, it&amp;#8217;s capable of doing so&amp;nbsp;though.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/routing-with-grass-gis-catchment-area-calculation/shortest_path.png" width="70%"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="/posts/assets/routing-with-grass-gis-catchment-area-calculation/shortest_path.png" width="70%"/&gt;&lt;/div&gt;
 
 &lt;h2&gt;Distributing the subnets for nearest&amp;nbsp;centers&lt;/h2&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;v.net.alloc &lt;span class="nv"&gt;input&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;network_noded &lt;span class="nv"&gt;output&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;network_alloc &lt;span class="nv"&gt;center_cats&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;-6 &lt;span class="nv"&gt;node_layer&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;
@@ -1556,7 +1600,7 @@ v.net &lt;span class="nv"&gt;input&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&
 
 
 &lt;p&gt;&lt;code&gt;v.net.alloc&lt;/code&gt; module takes the given centers and distributes the network so each of its parts belongs to exactly one center - the nearest one (speaking the distance, time units,&amp;nbsp;&amp;hellip;).&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/routing-with-grass-gis-catchment-area-calculation/subnets.png" width="70%"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="/posts/assets/routing-with-grass-gis-catchment-area-calculation/subnets.png" width="70%"/&gt;&lt;/div&gt;
 
 &lt;h2&gt;Creating catchment&amp;nbsp;areas&lt;/h2&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;v.net.iso &lt;span class="nv"&gt;input&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;network_noded &lt;span class="nv"&gt;output&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;network_iso &lt;span class="nv"&gt;center_cats&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;-6 &lt;span class="nv"&gt;costs&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;1000&lt;/span&gt;,3000,5000
@@ -1564,10 +1608,10 @@ v.net &lt;span class="nv"&gt;input&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&
 
 
 &lt;p&gt;&lt;code&gt;v.net.iso&lt;/code&gt; splits net by cost isolines. Again, the costs might be specified as lengths, time units,&amp;nbsp;&amp;hellip;.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/routing-with-grass-gis-catchment-area-calculation/isolines.png" width="70%"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="/posts/assets/routing-with-grass-gis-catchment-area-calculation/isolines.png" width="70%"/&gt;&lt;/div&gt;
 
 &lt;p&gt;Two different ways lead to the actual catchment area creation. First, you extract nodes from the roads with their values, turn them into the raster grid and either extract contours or polygonize the raster. I find the last step suboptimal and would love to find another way of polygonizing the&amp;nbsp;results.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/routing-with-grass-gis-catchment-area-calculation/catchment_area.gif" width="70%"/&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="/posts/assets/routing-with-grass-gis-catchment-area-calculation/catchment_area.gif" width="70%"/&gt;&lt;/div&gt;
 
 &lt;p&gt;Note when extracting contours the interval has to be set to the reasonable number depending on the nodes&amp;nbsp;values.&lt;/p&gt;
 &lt;h2&gt;Remarks&lt;/h2&gt;
@@ -1634,7 +1678,7 @@ v.net &lt;span class="nv"&gt;input&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&
 
 
 &lt;p&gt;This function creates the &lt;code&gt;cze.roads_noded_vertices_pgr&lt;/code&gt; that contains all the extracted nodes from the&amp;nbsp;network.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/routing-with-pgrouting-catchment-area-calculation/nodes.png" width="70%" /&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="/posts/assets/routing-with-pgrouting-catchment-area-calculation/nodes.png" width="70%" /&gt;&lt;/div&gt;
 
 &lt;p&gt;As already mentioned, measures other than length can be used as a distance, I chose the time to get to a given node on&amp;nbsp;foot.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;ALTER&lt;/span&gt; &lt;span class="k"&gt;TABLE&lt;/span&gt; &lt;span class="n"&gt;cze&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;roads_noded&lt;/span&gt; &lt;span class="k"&gt;ADD&lt;/span&gt; &lt;span class="k"&gt;COLUMN&lt;/span&gt; &lt;span class="n"&gt;cost_minutes&lt;/span&gt; &lt;span class="nb"&gt;integer&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
@@ -1674,7 +1718,7 @@ v.net &lt;span class="nv"&gt;input&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&
     &lt;span class="p"&gt;);&lt;/span&gt;
 
     &lt;span class="c1"&gt;-- order by the biggest area so the polygons are not hidden beneath the bigger ones&lt;/span&gt;
-    &lt;span class="k"&gt;FOR&lt;/span&gt; &lt;span class="k"&gt;c&lt;/span&gt; &lt;span class="k"&gt;IN&lt;/span&gt; &lt;span class="k"&gt;SELECT&lt;/span&gt; &lt;span class="n"&gt;agg_cost&lt;/span&gt; &lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="n"&gt;cze&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;temp&lt;/span&gt; &lt;span class="k"&gt;GROUP&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="n"&gt;agg_cost&lt;/span&gt; &lt;span class="k"&gt;HAVING&lt;/span&gt; &lt;span class="k"&gt;COUNT&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt; &lt;span class="k"&gt;ORDER&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="k"&gt;DESC&lt;/span&gt; &lt;span class="n"&gt;LOOP&lt;/span&gt;
+    &lt;span class="k"&gt;FOR&lt;/span&gt; &lt;span class="k"&gt;c&lt;/span&gt; &lt;span class="k"&gt;IN&lt;/span&gt; &lt;span class="k"&gt;SELECT&lt;/span&gt; &lt;span class="n"&gt;agg_cost&lt;/span&gt; &lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="n"&gt;cze&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;temp&lt;/span&gt; &lt;span class="k"&gt;GROUP&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="n"&gt;agg_cost&lt;/span&gt; &lt;span class="k"&gt;HAVING&lt;/span&gt; &lt;span class="k"&gt;COUNT&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;gt&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt; &lt;span class="k"&gt;ORDER&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="k"&gt;DESC&lt;/span&gt; &lt;span class="n"&gt;LOOP&lt;/span&gt;
         &lt;span class="n"&gt;RAISE&lt;/span&gt; &lt;span class="n"&gt;INFO&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;%&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;c&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
         &lt;span class="k"&gt;INSERT&lt;/span&gt; &lt;span class="k"&gt;INTO&lt;/span&gt; &lt;span class="n"&gt;tmp&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;agg_cost&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;geom&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
         &lt;span class="k"&gt;SELECT&lt;/span&gt;
@@ -1693,7 +1737,7 @@ v.net &lt;span class="nv"&gt;input&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&
 
 
 &lt;p&gt;Using &lt;code&gt;pgr_pointsAsPolygon&lt;/code&gt; renders resulting nodes accessible in 10-minute walk in polygons, but weird looking ones. Not bad, could be better&amp;nbsp;though.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img data-echo="/assets/routing-with-pgrouting-catchment-area-calculation/area1.png" width="70%" /&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="/assets/routing-with-pgrouting-catchment-area-calculation/area1.png" width="70%" /&gt;&lt;/div&gt;
 
 &lt;p&gt;How about seeing only nodes instead of&amp;nbsp;polygons?&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt;
@@ -1710,7 +1754,7 @@ v.net &lt;span class="nv"&gt;input&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&
 
 
 &lt;p&gt;Looks good, could be better&amp;nbsp;though.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img data-echo="/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png" width="70%" /&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png" width="70%" /&gt;&lt;/div&gt;
 
 &lt;p&gt;How about creating concave hulls from the extracted&amp;nbsp;nodes?&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt;
@@ -1734,7 +1778,7 @@ v.net &lt;span class="nv"&gt;input&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&
 
 
 &lt;p&gt;This one looks the best I&amp;nbsp;guess.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img data-echo="/assets/routing-with-pgrouting-catchment-area-calculation/area2.png" width="70%" /&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="/assets/routing-with-pgrouting-catchment-area-calculation/area2.png" width="70%" /&gt;&lt;/div&gt;
 
 &lt;h2&gt;Remarks&lt;/h2&gt;
 &lt;ul&gt;
@@ -1879,7 +1923,7 @@ Running this script will delete the old cluster&lt;span class="err"&gt;&amp;#39;
 &lt;p&gt;Brilliant.&lt;/p&gt;</content><category term="sql"></category><category term="postgresql"></category></entry><entry><title>Subdivide and Conquer: Effective Spatial Indexes in PostGIS</title><link href="https://www.zimmi.cz/posts/2017/subdivide-and-conquer-effective-spatial-indexes-in-postgis/" rel="alternate"></link><published>2017-01-10T21:45:00+01:00</published><updated>2017-01-10T21:45:00+01:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2017-01-10:/posts/2017/subdivide-and-conquer-effective-spatial-indexes-in-postgis/</id><summary type="html">&lt;p&gt;Spatial indexes are absolutely crucial part of any spatial database and - as I tend to say quite often - only a fool would try to query spatial data without building spatial indexes&amp;nbsp;beforehand.&lt;/p&gt;
 &lt;p&gt;Spatial indexes are based on bounding box comparisons, which are generally very fast. Yet, there are situations when …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Spatial indexes are absolutely crucial part of any spatial database and - as I tend to say quite often - only a fool would try to query spatial data without building spatial indexes&amp;nbsp;beforehand.&lt;/p&gt;
 &lt;p&gt;Spatial indexes are based on bounding box comparisons, which are generally very fast. Yet, there are situations when spatial indexes don&amp;#8217;t help much (or they don&amp;#8217;t help as much as they could, if you&amp;nbsp;wish).&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/subdivide-and-conquer-effective-spatial-indexes-in-postgis/index.svg" /&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="/posts/assets/subdivide-and-conquer-effective-spatial-indexes-in-postgis/index.svg" /&gt;&lt;/div&gt;
 
 &lt;p&gt;Bounding box comparisons are effective with lots of small bounding boxes rather then few large ones. Why? See the picture above. The curved line (imagine it&amp;#8217;s a pipeline for example) clearly demonstrates when the spatial index/bounding box comparison might fall short of what you&amp;#8217;d&amp;nbsp;expect.&lt;/p&gt;
 &lt;p&gt;Once the bounding box gets really big, it intersects so many other geometries&amp;#8217; bounding boxes that the whole comparison starts to slow&amp;nbsp;down.&lt;/p&gt;
@@ -1967,7 +2011,7 @@ Running this script will delete the old cluster&lt;span class="err"&gt;&amp;#39;
 &lt;h2&gt;Data&amp;nbsp;vizualization&lt;/h2&gt;
 &lt;p&gt;Those of you who&amp;#8217;ve been following this series know all the data are set and ready to be used. The rest of you, &lt;em&gt;shame on you by the way&lt;/em&gt;, can go through the above posts to catch&amp;nbsp;up.&lt;/p&gt;
 &lt;p&gt;The result is available at &lt;a href="https://www.zimmi.cz/kn-landuse-monitor"&gt;https://www.zimmi.cz/kn-landuse-monitor&lt;/a&gt; and works like the gif&amp;nbsp;below.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/plotting-the-czech-cadastre-land-use-with-d3-part-iv/screen.gif" /&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="/posts/assets/plotting-the-czech-cadastre-land-use-with-d3-part-iv/screen.gif" /&gt;&lt;/div&gt;
 
 &lt;h3&gt;Features&lt;/h3&gt;
 &lt;ul&gt;
@@ -2276,7 +2320,7 @@ rm &lt;span class="nv"&gt;$CSVFILE&lt;/span&gt; &lt;span class="nv"&gt;$CSVUTF8F
 &lt;p&gt;See &lt;a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/"&gt;Plotting the Czech Cadastre Land Use with d3: Data Transformation (part &lt;span class="caps"&gt;III&lt;/span&gt;)&lt;/a&gt;.&lt;/p&gt;</content><category term="javascript"></category><category term="d3"></category><category term="postgresql"></category><category term="svg"></category></entry><entry><title>Introducing Blind Maps Project</title><link href="https://www.zimmi.cz/posts/2016/introducing-blind-maps-project/" rel="alternate"></link><published>2016-11-02T18:30:00+01:00</published><updated>2016-11-02T18:30:00+01:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2016-11-02:/posts/2016/introducing-blind-maps-project/</id><summary type="html">&lt;p&gt;I&amp;#8217;d like to introduce you to my little pet project, which might just as well be awarded &lt;em&gt;the first pet project I&amp;#8217;ve ever completed&lt;/em&gt;, called &lt;a href="https://www.zimmi.cz/blind-maps"&gt;Blind maps&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;It&amp;#8217;s a very simple, yet useful web application built on top of the great &lt;a href="../../tag/leaflet.html"&gt;Leaflet&lt;/a&gt; library meant to help you …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I&amp;#8217;d like to introduce you to my little pet project, which might just as well be awarded &lt;em&gt;the first pet project I&amp;#8217;ve ever completed&lt;/em&gt;, called &lt;a href="https://www.zimmi.cz/blind-maps"&gt;Blind maps&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;It&amp;#8217;s a very simple, yet useful web application built on top of the great &lt;a href="../../tag/leaflet.html"&gt;Leaflet&lt;/a&gt; library meant to help you get to know our world a bit better. As the name suggests, the app shows you, well&amp;hellip; a blind map, and you try to fill as many features as you&amp;nbsp;can.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/introducing-blind-maps-project/map.png" /&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="/posts/assets/introducing-blind-maps-project/map.png" /&gt;&lt;/div&gt;
 
 &lt;p&gt;The app is ready and can be&amp;nbsp;used:&lt;/p&gt;
 &lt;ul&gt;
@@ -2342,7 +2386,7 @@ rm &lt;span class="nv"&gt;$CSVFILE&lt;/span&gt; &lt;span class="nv"&gt;$CSVUTF8F
 
 &lt;p&gt;The result can be piped to other &lt;code&gt;bash&lt;/code&gt; functions, such as &lt;code&gt;less&lt;/code&gt; or &lt;code&gt;more&lt;/code&gt;. I call it &lt;code&gt;ogrinfotable&lt;/code&gt;.&lt;/p&gt;</content><category term="gdal"></category></entry><entry><title>PostGIS Custom Function to Create Wind Rose</title><link href="https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-wind-rose/" rel="alternate"></link><published>2016-09-01T22:00:00+02:00</published><updated>2016-09-01T22:00:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2016-09-01:/posts/2016/postgis-custom-function-to-create-wind-rose/</id><summary type="html">&lt;p&gt;I&amp;#8217;ve come across the &lt;a href="http://gis.stackexchange.com/questions/208797/draw-wind-rose-with-qgis-from-postgis/"&gt;beautiful &lt;span class="caps"&gt;GIS&lt;/span&gt; StackExchange question&lt;/a&gt; recently, asking how to draw a &lt;a href="https://en.wikipedia.org/wiki/Wind_rose"&gt;wind rose&lt;/a&gt; within&amp;nbsp;PostGIS.&lt;/p&gt;
 &lt;div class="text-center"&gt;
-&lt;img data-echo="http://i.stack.imgur.com/0xAMU.png"&gt;
+&lt;img src="http://i.stack.imgur.com/0xAMU.png"&gt;
 &lt;/div&gt;
 
 &lt;p&gt;It&amp;#8217;s pretty easy to accomplish this with a custom &lt;span class="caps"&gt;PLPGSQL&lt;/span&gt; procedure below, that takes line geometry, number of sections and radius of the inner circle as&amp;nbsp;parameters.&lt;/p&gt;
@@ -2350,7 +2394,7 @@ rm &lt;span class="nv"&gt;$CSVFILE&lt;/span&gt; &lt;span class="nv"&gt;$CSVUTF8F
 
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;CREATE&lt;/span&gt; &lt;span class="k"&gt;OR&lt;/span&gt; &lt;span class="k"&gt;REPLACE …&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;I&amp;#8217;ve come across the &lt;a href="http://gis.stackexchange.com/questions/208797/draw-wind-rose-with-qgis-from-postgis/"&gt;beautiful &lt;span class="caps"&gt;GIS&lt;/span&gt; StackExchange question&lt;/a&gt; recently, asking how to draw a &lt;a href="https://en.wikipedia.org/wiki/Wind_rose"&gt;wind rose&lt;/a&gt; within&amp;nbsp;PostGIS.&lt;/p&gt;
 &lt;div class="text-center"&gt;
-&lt;img data-echo="http://i.stack.imgur.com/0xAMU.png"&gt;
+&lt;img src="http://i.stack.imgur.com/0xAMU.png"&gt;
 &lt;/div&gt;
 
 &lt;p&gt;It&amp;#8217;s pretty easy to accomplish this with a custom &lt;span class="caps"&gt;PLPGSQL&lt;/span&gt; procedure below, that takes line geometry, number of sections and radius of the inner circle as&amp;nbsp;parameters.&lt;/p&gt;
@@ -2367,11 +2411,11 @@ rm &lt;span class="nv"&gt;$CSVFILE&lt;/span&gt; &lt;span class="nv"&gt;$CSVUTF8F
 &lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="k"&gt;AS&lt;/span&gt; &lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;ST_WindRose$&lt;/span&gt;
 &lt;span class="k"&gt;BEGIN&lt;/span&gt;
-    &lt;span class="k"&gt;IF&lt;/span&gt; &lt;span class="n"&gt;directions&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt; &lt;span class="k"&gt;THEN&lt;/span&gt;
+    &lt;span class="k"&gt;IF&lt;/span&gt; &lt;span class="n"&gt;directions&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;lt&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;gt&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt; &lt;span class="k"&gt;THEN&lt;/span&gt;
         &lt;span class="n"&gt;RAISE&lt;/span&gt; &lt;span class="k"&gt;EXCEPTION&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;Odd number of directions found, please provide even number of directions instead.&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
     &lt;span class="k"&gt;END&lt;/span&gt; &lt;span class="k"&gt;IF&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 
-&lt;span class="k"&gt;IF&lt;/span&gt; &lt;span class="n"&gt;radius&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;ST_Length&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;THEN&lt;/span&gt;
+&lt;span class="k"&gt;IF&lt;/span&gt; &lt;span class="n"&gt;radius&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;gt&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="n"&gt;ST_Length&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;THEN&lt;/span&gt;
     &lt;span class="n"&gt;RAISE&lt;/span&gt; &lt;span class="k"&gt;EXCEPTION&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;Inner circle radius is bigger than the wind rose diameter, please make it smaller.&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;span class="k"&gt;END&lt;/span&gt; &lt;span class="k"&gt;IF&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 
@@ -2404,7 +2448,7 @@ rm &lt;span class="nv"&gt;$CSVFILE&lt;/span&gt; &lt;span class="nv"&gt;$CSVUTF8F
 
 &lt;p&gt;Wind rose created with this function might look like the one&amp;nbsp;below.&lt;/p&gt;
 &lt;div class="text-center"&gt;
-&lt;img data-echo="http://i.stack.imgur.com/4OD0J.png"&gt;
+&lt;img src="http://i.stack.imgur.com/4OD0J.png"&gt;
 &lt;/div&gt;
 
 &lt;p&gt;Run it as follows. The &lt;code&gt;line&lt;/code&gt; parameter should be a simple straight line made of just two&amp;nbsp;vertices.&lt;/p&gt;
@@ -2443,7 +2487,7 @@ rm &lt;span class="nv"&gt;$CSVFILE&lt;/span&gt; &lt;span class="nv"&gt;$CSVUTF8F
 &lt;/pre&gt;&lt;/div&gt;</content><category term="postgis"></category><category term="postgresql"></category><category term="sql"></category></entry><entry><title>Finding Polygons Lying across Other Polygons with PostGIS</title><link href="https://www.zimmi.cz/posts/2016/finding-polygons-lying-across-other-polygons-with-postgis/" rel="alternate"></link><published>2016-08-05T19:39:00+02:00</published><updated>2016-08-05T19:39:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2016-08-05:/posts/2016/finding-polygons-lying-across-other-polygons-with-postgis/</id><summary type="html">&lt;p&gt;Doing overlays (&lt;code&gt;ST_Intersection()&lt;/code&gt;) in PostGIS based on spatial relationships (&lt;code&gt;ST_Intersects()&lt;/code&gt;, &lt;code&gt;ST_Contains()&lt;/code&gt;, &amp;hellip;) is so easy it is not something you get particularly excited&amp;nbsp;about.&lt;/p&gt;
 &lt;p&gt;Today I faced a bit more interesting task: &lt;strong&gt;given two polygon layers, get me all the polygons from layer A such that they lie across the polygons …&lt;/strong&gt;&lt;/p&gt;</summary><content type="html">&lt;p&gt;Doing overlays (&lt;code&gt;ST_Intersection()&lt;/code&gt;) in PostGIS based on spatial relationships (&lt;code&gt;ST_Intersects()&lt;/code&gt;, &lt;code&gt;ST_Contains()&lt;/code&gt;, &amp;hellip;) is so easy it is not something you get particularly excited&amp;nbsp;about.&lt;/p&gt;
 &lt;p&gt;Today I faced a bit more interesting task: &lt;strong&gt;given two polygon layers, get me all the polygons from layer A such that they lie across the polygons from layer B and&amp;hellip; a picture worth a thousand words,&amp;nbsp;right?&lt;/strong&gt;&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/finding-polygons-lying-across-other-polygons-with-postgis/polygons.svg" /&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="/posts/assets/finding-polygons-lying-across-other-polygons-with-postgis/polygons.svg" /&gt;&lt;/div&gt;
 
 &lt;p&gt;I hope you got the idea, it is fairly&amp;nbsp;simple:&lt;/p&gt;
 &lt;ol&gt;
@@ -2495,7 +2539,7 @@ rm &lt;span class="nv"&gt;$CSVFILE&lt;/span&gt; &lt;span class="nv"&gt;$CSVUTF8F
       &lt;span class="n"&gt;b_id&lt;/span&gt;
     &lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="n"&gt;merged&lt;/span&gt;
     &lt;span class="k"&gt;GROUP&lt;/span&gt; &lt;span class="k"&gt;BY&lt;/span&gt; &lt;span class="n"&gt;a_id&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;b_id&lt;/span&gt;
-    &lt;span class="k"&gt;HAVING&lt;/span&gt; &lt;span class="k"&gt;COUNT&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;
+    &lt;span class="k"&gt;HAVING&lt;/span&gt; &lt;span class="k"&gt;COUNT&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;gt&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;
   &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="k"&gt;ON&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;a_id&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;m&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;a_id&lt;/span&gt; &lt;span class="k"&gt;AND&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;b_id&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;m&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;b_id&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="cm"&gt;/* do as you wish with the result */&lt;/span&gt;
@@ -2748,9 +2792,9 @@ OPTIONS (LAYER &amp;#39;A05_Vodni_nadrze&amp;#39;);
 &lt;li&gt;they&amp;#8217;re&amp;nbsp;crowded&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;My period card expired on March 8 and I decided not to renew it. Why? See the list above. As I don&amp;#8217;t have a car and I work at the far end of the city, I can either ride a bike or run to work. Ask me how it&amp;#8217;s been for the first month? Not bad at&amp;nbsp;all.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;a href="{filename}/assets/a-month-of-commuting-on-my-own/training_calendar.png"&gt;&lt;img data-echo="/posts/assets/a-month-of-commuting-on-my-own/training_calendar_small.png" title="Strava training log" class="img-rounded"&gt;&lt;/a&gt;&lt;p&gt;&lt;strong&gt;Figure:&lt;/strong&gt; March Strava&amp;nbsp;log.&lt;/p&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;a href="{filename}/assets/a-month-of-commuting-on-my-own/training_calendar.png"&gt;&lt;img src="/posts/assets/a-month-of-commuting-on-my-own/training_calendar_small.png" title="Strava training log" class="img-rounded"&gt;&lt;/a&gt;&lt;p&gt;&lt;strong&gt;Figure:&lt;/strong&gt; March Strava&amp;nbsp;log.&lt;/p&gt;&lt;/div&gt;
 
-&lt;div class="text-center"&gt;&lt;a href="{filename}/assets/a-month-of-commuting-on-my-own/training_calendar2.png"&gt;&lt;img data-echo="/posts/assets/a-month-of-commuting-on-my-own/training_calendar_small2.png" title="Strava training log" class="img-rounded"&gt;&lt;/a&gt;&lt;p&gt;&lt;strong&gt;Figure:&lt;/strong&gt; April Strava&amp;nbsp;log.&lt;/p&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;a href="{filename}/assets/a-month-of-commuting-on-my-own/training_calendar2.png"&gt;&lt;img src="/posts/assets/a-month-of-commuting-on-my-own/training_calendar_small2.png" title="Strava training log" class="img-rounded"&gt;&lt;/a&gt;&lt;p&gt;&lt;strong&gt;Figure:&lt;/strong&gt; April Strava&amp;nbsp;log.&lt;/p&gt;&lt;/div&gt;
 
 &lt;h2&gt;What&amp;#8217;s so great about&amp;nbsp;commuting?&lt;/h2&gt;
 &lt;p&gt;Not so long ago &lt;em&gt;I considered commuting a waste of time&lt;/em&gt;. It took me 40-50 minutes to get to work and about the same to get back home. That&amp;#8217;s 1-2 hours not being productive, not doing anything at all actually, just changing&amp;nbsp;places.&lt;/p&gt;
@@ -2932,14 +2976,14 @@ gdaladdo &lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;OUTPUTPATH
 &lt;p&gt;Each day is written to the separate sqlite file with a name like &lt;code&gt;tw_day_D_M_YYYY&lt;/code&gt;. &lt;code&gt;Bash&lt;/code&gt; is used to gzip all the files before downloading them from&amp;nbsp;OpenShift.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
 
-ssh openshift &lt;span class="s"&gt;&amp;lt;&amp;lt; EOF&lt;/span&gt;
-&lt;span class="s"&gt;    cd app-root/data&lt;/span&gt;
-&lt;span class="s"&gt;    tar czf twitter.tar.gz *.db&lt;/span&gt;
-&lt;span class="s"&gt;EOF&lt;/span&gt;
+ssh openshift &lt;span class="p"&gt;&amp;amp;&lt;/span&gt;lt&lt;span class="p"&gt;;&amp;amp;&lt;/span&gt;lt&lt;span class="p"&gt;;&lt;/span&gt; EOF
+    &lt;span class="nb"&gt;cd&lt;/span&gt; app-root/data
+    tar czf twitter.tar.gz *.db
+EOF
 
 scp openshift:/var/lib/openshift/55e487587628e1280b0000a9/app-root/data/twitter.tar.gz ./data
-&lt;span class="nb"&gt;cd&lt;/span&gt; data &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;
-tar -xzf twitter.tar.gz &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt;
+&lt;span class="nb"&gt;cd&lt;/span&gt; data &lt;span class="p"&gt;&amp;amp;&lt;/span&gt;amp&lt;span class="p"&gt;;&amp;amp;&lt;/span&gt;amp&lt;span class="p"&gt;;&lt;/span&gt;
+tar -xzf twitter.tar.gz &lt;span class="p"&gt;&amp;amp;&lt;/span&gt;amp&lt;span class="p"&gt;;&amp;amp;&lt;/span&gt;amp&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;span class="nb"&gt;cd&lt;/span&gt; -
 
 &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Extract done&amp;quot;&lt;/span&gt;
@@ -2958,16 +3002,16 @@ mkdir ./data/csv
     &lt;span class="nv"&gt;DBNAME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;FILENAME&lt;/span&gt;&lt;span class="p"&gt;%%.db&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;
     &lt;span class="nv"&gt;CSVNAME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$DBNAME&lt;/span&gt;.csv
     &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$DBNAME&lt;/span&gt;&lt;span class="s2"&gt; to csv...&amp;quot;&lt;/span&gt;
-    sqlite3 -header -csv &lt;span class="nv"&gt;$db&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;select * from &lt;/span&gt;&lt;span class="nv"&gt;$DBNAME&lt;/span&gt;&lt;span class="s2"&gt;;&amp;quot;&lt;/span&gt; &amp;gt; ./data/csv/&lt;span class="nv"&gt;$CSVNAME&lt;/span&gt;
+    sqlite3 -header -csv &lt;span class="nv"&gt;$db&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;select * from &lt;/span&gt;&lt;span class="nv"&gt;$DBNAME&lt;/span&gt;&lt;span class="s2"&gt;;&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;&amp;amp;&lt;/span&gt;gt&lt;span class="p"&gt;;&lt;/span&gt; ./data/csv/&lt;span class="nv"&gt;$CSVNAME&lt;/span&gt;
 &lt;span class="k"&gt;done&lt;/span&gt;
 
 &lt;span class="nb"&gt;cd&lt;/span&gt; ./data/csv
 touch tweets.csv
-&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;sed -n 1p &lt;span class="k"&gt;$(&lt;/span&gt;ls -d -1 *.csv &lt;span class="p"&gt;|&lt;/span&gt; head -n &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="k"&gt;))&lt;/span&gt; &amp;gt; tweets.csv &lt;span class="c1"&gt;# get column names&lt;/span&gt;
+&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;sed -n 1p &lt;span class="k"&gt;$(&lt;/span&gt;ls -d -1 *.csv &lt;span class="p"&gt;|&lt;/span&gt; head -n &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="k"&gt;))&lt;/span&gt; &lt;span class="p"&gt;&amp;amp;&lt;/span&gt;gt&lt;span class="p"&gt;;&lt;/span&gt; tweets.csv &lt;span class="c1"&gt;# get column names&lt;/span&gt;
 
 &lt;span class="k"&gt;for&lt;/span&gt; csv in tw_*.csv&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
     &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="nv"&gt;$csv&lt;/span&gt;
-    tail -n +2 &lt;span class="nv"&gt;$csv&lt;/span&gt; &amp;gt;&amp;gt; tweets.csv &lt;span class="c1"&gt;# get all lines without the first one&lt;/span&gt;
+    tail -n +2 &lt;span class="nv"&gt;$csv&lt;/span&gt; &lt;span class="p"&gt;&amp;amp;&lt;/span&gt;gt&lt;span class="p"&gt;;&amp;amp;&lt;/span&gt;gt&lt;span class="p"&gt;;&lt;/span&gt; tweets.csv &lt;span class="c1"&gt;# get all lines without the first one&lt;/span&gt;
 &lt;span class="k"&gt;done&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
@@ -2982,15 +3026,15 @@ touch tweets.csv
 &lt;span class="nv"&gt;SCHEMA&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;dizertace
 &lt;span class="nv"&gt;TABLE&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;tweets
 
-psql &lt;span class="nv"&gt;$DATABASE&lt;/span&gt; &lt;span class="s"&gt;&amp;lt;&amp;lt; EOF&lt;/span&gt;
-&lt;span class="s"&gt;    DROP TABLE IF EXISTS $SCHEMA.$TABLE;&lt;/span&gt;
-&lt;span class="s"&gt;    CREATE UNLOGGED TABLE $SCHEMA.$TABLE (id text, author text, author_id text, tweet text, created_at text, lon float, lat float, lang text);&lt;/span&gt;
-&lt;span class="s"&gt;    \copy $SCHEMA.$TABLE FROM &amp;#39;data/csv/tweets.csv&amp;#39; CSV HEADER DELIMITER &amp;#39;,&amp;#39;&lt;/span&gt;
-&lt;span class="s"&gt;    ALTER TABLE $SCHEMA.$TABLE ADD COLUMN wkb_geometry geometry(POINT, 4326);&lt;/span&gt;
-&lt;span class="s"&gt;    UPDATE $SCHEMA.$TABLE SET wkb_geometry = ST_SetSRID(ST_MakePoint(lon, lat), 4326);&lt;/span&gt;
-&lt;span class="s"&gt;    CREATE INDEX ${TABLE}_geom_idx ON $SCHEMA.$TABLE USING gist(wkb_geometry);&lt;/span&gt;
-&lt;span class="s"&gt;    COMMIT;&lt;/span&gt;
-&lt;span class="s"&gt;EOF&lt;/span&gt;
+psql &lt;span class="nv"&gt;$DATABASE&lt;/span&gt; &lt;span class="p"&gt;&amp;amp;&lt;/span&gt;lt&lt;span class="p"&gt;;&amp;amp;&lt;/span&gt;lt&lt;span class="p"&gt;;&lt;/span&gt; EOF
+    DROP TABLE IF EXISTS &lt;span class="nv"&gt;$SCHEMA&lt;/span&gt;.&lt;span class="nv"&gt;$TABLE&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    CREATE UNLOGGED TABLE &lt;span class="nv"&gt;$SCHEMA&lt;/span&gt;.&lt;span class="nv"&gt;$TABLE&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;id text, author text, author_id text, tweet text, created_at text, lon float, lat float, lang text&lt;span class="o"&gt;)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="se"&gt;\c&lt;/span&gt;opy &lt;span class="nv"&gt;$SCHEMA&lt;/span&gt;.&lt;span class="nv"&gt;$TABLE&lt;/span&gt; FROM &lt;span class="s1"&gt;&amp;#39;data/csv/tweets.csv&amp;#39;&lt;/span&gt; CSV HEADER DELIMITER &lt;span class="s1"&gt;&amp;#39;,&amp;#39;&lt;/span&gt;
+    ALTER TABLE &lt;span class="nv"&gt;$SCHEMA&lt;/span&gt;.&lt;span class="nv"&gt;$TABLE&lt;/span&gt; ADD COLUMN wkb_geometry geometry&lt;span class="o"&gt;(&lt;/span&gt;POINT, &lt;span class="m"&gt;4326&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    UPDATE &lt;span class="nv"&gt;$SCHEMA&lt;/span&gt;.&lt;span class="nv"&gt;$TABLE&lt;/span&gt; SET &lt;span class="nv"&gt;wkb_geometry&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; ST_SetSRID&lt;span class="o"&gt;(&lt;/span&gt;ST_MakePoint&lt;span class="o"&gt;(&lt;/span&gt;lon, lat&lt;span class="o"&gt;)&lt;/span&gt;, &lt;span class="m"&gt;4326&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    CREATE INDEX &lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;TABLE&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;_geom_idx ON &lt;span class="nv"&gt;$SCHEMA&lt;/span&gt;.&lt;span class="nv"&gt;$TABLE&lt;/span&gt; USING gist&lt;span class="o"&gt;(&lt;/span&gt;wkb_geometry&lt;span class="o"&gt;)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    COMMIT&lt;span class="p"&gt;;&lt;/span&gt;
+EOF
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -3025,7 +3069,7 @@ psql &lt;span class="nv"&gt;$DATABASE&lt;/span&gt; &lt;span class="s"&gt;&amp;lt
 
 
 &lt;p&gt;With this piece of code you get a map key with checkboxes for all the categories, yet they&amp;#8217;re still kept in the single cluster on the map.&amp;nbsp;Brilliant!&lt;/p&gt;
-&lt;p&gt;&lt;img data-echo="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/map.png" title="vozejkmap.cz data map" class="img-responsive centered"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/map.png" title="vozejkmap.cz data map" class="img-responsive centered"&gt;&lt;/p&gt;
 &lt;h2&gt;Using Turf.js for&amp;nbsp;analysis&lt;/h2&gt;
 &lt;p&gt;Turf is one of those libraries I get amazed easily with, spending a week trying to find a use case, finally putting it aside with &lt;em&gt;&amp;#8220;I&amp;#8217;ll get back to it later&amp;#8221;&lt;/em&gt;. I usually don&amp;#8217;t. This time it&amp;#8217;s&amp;nbsp;different.&lt;/p&gt;
 &lt;p&gt;I use Turf to get the nearest neighbor for any marker on click. My first try ended up with the same marker being the result as it was a member of a feature collection passed to &lt;code&gt;turf.nearest()&lt;/code&gt; method. After snooping around the docs I found &lt;code&gt;turf.remove()&lt;/code&gt; method that can filter GeoJSON based on key-value&amp;nbsp;pair.&lt;/p&gt;
@@ -3038,8 +3082,8 @@ psql &lt;span class="nv"&gt;$DATABASE&lt;/span&gt; &lt;span class="s"&gt;&amp;lt
                 &lt;span class="nx"&gt;distance&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;turf&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;distance&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;layer&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;toGeoJSON&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt; &lt;span class="nx"&gt;nearest&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;kilometers&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nx"&gt;toPrecision&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
                 &lt;span class="nx"&gt;popup&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;L&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;popup&lt;/span&gt;&lt;span class="p"&gt;({&lt;/span&gt;&lt;span class="nx"&gt;offset&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;35&lt;/span&gt;&lt;span class="p"&gt;]}).&lt;/span&gt;&lt;span class="nx"&gt;setLatLng&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;e&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;latlng&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
                 &lt;span class="nx"&gt;content&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;L&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Util&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;template&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
-                    &lt;span class="s2"&gt;&amp;quot;&amp;lt;h1&amp;gt;{title}&amp;lt;/h1&amp;gt;&amp;lt;p&amp;gt;{description}&amp;lt;/p&amp;gt; \&lt;/span&gt;
-&lt;span class="s2"&gt;                    &amp;lt;p&amp;gt;Nejbližší bod: {nearest} je {distance} km daleko.&amp;lt;/p&amp;gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+                    &lt;span class="s2"&gt;&amp;quot;&amp;amp;lt;h1&amp;amp;gt;{title}&amp;amp;lt;/h1&amp;amp;gt;&amp;amp;lt;p&amp;amp;gt;{description}&amp;amp;lt;/p&amp;amp;gt; \&lt;/span&gt;
+&lt;span class="s2"&gt;                    &amp;amp;lt;p&amp;amp;gt;Nejbližší bod: {nearest} je {distance} km daleko.&amp;amp;lt;/p&amp;amp;gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
                     &lt;span class="nx"&gt;title&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nx"&gt;feature&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;properties&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;title&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
                     &lt;span class="nx"&gt;description&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nx"&gt;feature&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;properties&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;description&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
                     &lt;span class="nx"&gt;nearest&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nx"&gt;nearest&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;properties&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;title&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
@@ -3056,11 +3100,11 @@ psql &lt;span class="nv"&gt;$DATABASE&lt;/span&gt; &lt;span class="s"&gt;&amp;lt
 &lt;p&gt;From what I&amp;#8217;ve tried so far, Turf seems to be incredibly fast and easy to use. I&amp;#8217;ll try to find the nearest point for any of the categories, that could take Turf some&amp;nbsp;time.&lt;/p&gt;
 &lt;h2&gt;Update&lt;/h2&gt;
 &lt;p&gt;Turf is blazing fast! I&amp;#8217;ve implemented nearest point for each of the categories and it gets done in a blink of an eye. Some screenshots below. Geolocation implemented as&amp;nbsp;well.&lt;/p&gt;
-&lt;p&gt;&lt;img data-echo="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen1.png" title="vozejkmap.cz data map" class="img-responsive centered"&gt; You can locate the point&amp;nbsp;easily.&lt;/p&gt;
+&lt;p&gt;&lt;img src="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen1.png" title="vozejkmap.cz data map" class="img-responsive centered"&gt; You can locate the point&amp;nbsp;easily.&lt;/p&gt;
 
-&lt;p&gt;&lt;img data-echo="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen2.png" title="vozejkmap.cz data map" class="img-responsive centered"&gt; You can hide the&amp;nbsp;infobox.&lt;/p&gt;
+&lt;p&gt;&lt;img src="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen2.png" title="vozejkmap.cz data map" class="img-responsive centered"&gt; You can hide the&amp;nbsp;infobox.&lt;/p&gt;
 
-&lt;p&gt;&lt;img data-echo="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen3.png" title="vozejkmap.cz data map" class="img-responsive centered"&gt;You can jump to any of the nearest&amp;nbsp;places.&lt;/p&gt;</content><category term="postgresql"></category><category term="postgis"></category><category term="leaflet"></category><category term="javascript"></category></entry><entry><title>Twitter REST API Data Mining on OpenShift (Part I)</title><link href="https://www.zimmi.cz/posts/2015/twitter-rest-api-data-mining-on-openshift-part-i/" rel="alternate"></link><published>2015-11-06T22:00:00+01:00</published><updated>2015-11-06T22:00:00+01:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2015-11-06:/posts/2015/twitter-rest-api-data-mining-on-openshift-part-i/</id><summary type="html">&lt;p&gt;More than a year ago I wrote about &lt;a href="http://www.zimmi.cz/posts/2014/analyzing-twitter-languages-with-streaming-api/"&gt;analyzing Twitter languages with Streaming &lt;span class="caps"&gt;API&lt;/span&gt;&lt;/a&gt;. Back then I kept my laptop running for a week to download data. Not a comfortable way, especially if you decide to get more data. One year uptime doesn&amp;#8217;t sound like anything you want to …&lt;/p&gt;</summary><content type="html">&lt;p&gt;More than a year ago I wrote about &lt;a href="http://www.zimmi.cz/posts/2014/analyzing-twitter-languages-with-streaming-api/"&gt;analyzing Twitter languages with Streaming &lt;span class="caps"&gt;API&lt;/span&gt;&lt;/a&gt;. Back then I kept my laptop running for a week to download data. Not a comfortable way, especially if you decide to get more data. One year uptime doesn&amp;#8217;t sound like anything you want to be part of. &lt;a href="https://www.openshift.com/"&gt;OpenShift&lt;/a&gt; by Red Hat seems to be almost perfect replacement.&amp;nbsp;Almost.&lt;/p&gt;
+&lt;p&gt;&lt;img src="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen3.png" title="vozejkmap.cz data map" class="img-responsive centered"&gt;You can jump to any of the nearest&amp;nbsp;places.&lt;/p&gt;</content><category term="postgresql"></category><category term="postgis"></category><category term="leaflet"></category><category term="javascript"></category></entry><entry><title>Twitter REST API Data Mining on OpenShift (Part I)</title><link href="https://www.zimmi.cz/posts/2015/twitter-rest-api-data-mining-on-openshift-part-i/" rel="alternate"></link><published>2015-11-06T22:00:00+01:00</published><updated>2015-11-06T22:00:00+01:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2015-11-06:/posts/2015/twitter-rest-api-data-mining-on-openshift-part-i/</id><summary type="html">&lt;p&gt;More than a year ago I wrote about &lt;a href="http://www.zimmi.cz/posts/2014/analyzing-twitter-languages-with-streaming-api/"&gt;analyzing Twitter languages with Streaming &lt;span class="caps"&gt;API&lt;/span&gt;&lt;/a&gt;. Back then I kept my laptop running for a week to download data. Not a comfortable way, especially if you decide to get more data. One year uptime doesn&amp;#8217;t sound like anything you want to …&lt;/p&gt;</summary><content type="html">&lt;p&gt;More than a year ago I wrote about &lt;a href="http://www.zimmi.cz/posts/2014/analyzing-twitter-languages-with-streaming-api/"&gt;analyzing Twitter languages with Streaming &lt;span class="caps"&gt;API&lt;/span&gt;&lt;/a&gt;. Back then I kept my laptop running for a week to download data. Not a comfortable way, especially if you decide to get more data. One year uptime doesn&amp;#8217;t sound like anything you want to be part of. &lt;a href="https://www.openshift.com/"&gt;OpenShift&lt;/a&gt; by Red Hat seems to be almost perfect replacement.&amp;nbsp;Almost.&lt;/p&gt;
 &lt;h2&gt;OpenShift&amp;nbsp;setup&lt;/h2&gt;
 &lt;p&gt;I started with Node.js application running on one small gear. Once running, you can easily &lt;code&gt;git push&lt;/code&gt; the code to your OpenShift repo and login via &lt;span class="caps"&gt;SSH&lt;/span&gt;. I quickly found simple copy-pasting my local solution wasn&amp;#8217;t going to work. and fixed it with some minor tweaks. That&amp;#8217;s where the fun&amp;nbsp;begins&amp;#8230;&lt;/p&gt;
 &lt;blockquote&gt;
@@ -3489,7 +3533,7 @@ gdaladdo hillshade.tif &lt;span class="m"&gt;2&lt;/span&gt; &lt;span class="m"&g
 &lt;h3&gt;Atlas generation&amp;nbsp;settings&lt;/h3&gt;
 &lt;p&gt;&lt;strong&gt;Coverage layer&lt;/strong&gt; is presumably the only thing you really need - as the name suggests, it covers your area of interest. One map will be created for each feature in this layer, unless you decide to use some &lt;strong&gt;filtering&lt;/strong&gt; - which I&amp;nbsp;did.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Output filenames&lt;/strong&gt; can be tweaked to your needs, here&amp;#8217;s what such a function might look like. If there is a slash in the land block &lt;span class="caps"&gt;ID&lt;/span&gt; (&lt;span class="caps"&gt;XXXXXXX&lt;/span&gt;/Y), the filename is set to &lt;code&gt;USER-ID_XXXXXXX-00Y_M_00&lt;/code&gt;, &lt;code&gt;USER-ID_XXXXXXX-000_M_00&lt;/code&gt; otherwise.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;CASE&lt;/span&gt; &lt;span class="k"&gt;WHEN&lt;/span&gt; &lt;span class="n"&gt;strpos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;attribute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;atlasfeature&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;kod_pb&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;CASE&lt;/span&gt; &lt;span class="k"&gt;WHEN&lt;/span&gt; &lt;span class="n"&gt;strpos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;attribute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;atlasfeature&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;kod_pb&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;gt&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;
     &lt;span class="k"&gt;THEN&lt;/span&gt;
         &lt;span class="n"&gt;ji&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;_&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt;
         &lt;span class="n"&gt;substr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
@@ -3552,9 +3596,9 @@ gdaladdo hillshade.tif &lt;span class="m"&gt;2&lt;/span&gt; &lt;span class="m"&g
       &lt;span class="n"&gt;ji&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
       &lt;span class="n"&gt;kod_pb&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
       &lt;span class="n"&gt;concat&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
-            &lt;span class="s1"&gt;&amp;#39;&amp;lt;g fill=&amp;quot;none&amp;quot; stroke=&amp;quot;#000000&amp;quot; stroke-opacity=&amp;quot;1&amp;quot; stroke-width=&amp;quot;1&amp;quot;&lt;/span&gt;
+            &lt;span class="s1"&gt;&amp;#39;&amp;amp;lt;g fill=&amp;quot;none&amp;quot; stroke=&amp;quot;#000000&amp;quot; stroke-opacity=&amp;quot;1&amp;quot; stroke-width=&amp;quot;1&amp;quot;&lt;/span&gt;
 &lt;span class="s1"&gt;                  stroke-linecap=&amp;quot;square&amp;quot; stroke-linejoin=&amp;quot;bevel&amp;quot; transform=&amp;quot;matrix(1.18081,0,0,1.18081,270.0,550.0)&amp;quot;&lt;/span&gt;
-&lt;span class="s1"&gt;                  font-family=&amp;quot;Droid Sans&amp;quot; font-size=&amp;quot;35&amp;quot; font-style=&amp;quot;normal&amp;quot;&amp;gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="s1"&gt;                  font-family=&amp;quot;Droid Sans&amp;quot; font-size=&amp;quot;35&amp;quot; font-style=&amp;quot;normal&amp;quot;&amp;amp;gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
             &lt;span class="n"&gt;kultura&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;vymery&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;vymery_hodnoty&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
             &lt;span class="n"&gt;vcs_titul&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;vcs_brk&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;vcs_brs&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;vcs_chmel&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
             &lt;span class="n"&gt;vcs_zvv&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;vcs_zv&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;vcs_ovv&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;vcs_ov&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;vcs_cur&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;vcs_bip&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
@@ -3569,20 +3613,20 @@ gdaladdo hillshade.tif &lt;span class="m"&gt;2&lt;/span&gt; &lt;span class="m"&g
             &lt;span class="n"&gt;dv_aeko_d1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;dv_aeko_d2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;dv_aeko_d3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;dv_aeko_d4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;dv_aeko_d5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
             &lt;span class="n"&gt;dv_aeko_d6&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;dv_aeko_d7&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;dv_aeko_d8&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;dv_aeko_d9&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;dv_aeko_d10&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
             &lt;span class="n"&gt;dv_aeko_e&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;dv_aeko_f&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;ez&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;dzes_text&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;rep&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;obi&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;seop&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;meop&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;pbz&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;dzes7&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-            &lt;span class="s1"&gt;&amp;#39;&amp;lt;/g&amp;gt;&amp;#39;&lt;/span&gt;
+            &lt;span class="s1"&gt;&amp;#39;&amp;amp;lt;/g&amp;amp;gt;&amp;#39;&lt;/span&gt;
       &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;popis&lt;/span&gt;
 &lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="p"&gt;(...);&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;Each column from the previous query is a result of &lt;code&gt;SELECT&lt;/code&gt; similar to the one&amp;nbsp;below.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt; &lt;span class="n"&gt;concat&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&amp;lt;text fill=&amp;quot;#000000&amp;quot; fill-opacity=&amp;quot;1&amp;quot; stroke=&amp;quot;none&amp;quot;&amp;gt;BrK: &amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;dv_brk&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39; ha / &amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="ss"&gt;&amp;quot;MV_BRK&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39; ha;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;kod_dpz&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;&amp;lt;/text&amp;gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;vcs_brk&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt; &lt;span class="n"&gt;concat&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&amp;amp;lt;text fill=&amp;quot;#000000&amp;quot; fill-opacity=&amp;quot;1&amp;quot; stroke=&amp;quot;none&amp;quot;&amp;amp;gt;BrK: &amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;dv_brk&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39; ha / &amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="ss"&gt;&amp;quot;MV_BRK&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39; ha;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;kod_dpz&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;&amp;amp;lt;/text&amp;amp;gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;vcs_brk&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;The &lt;code&gt;transform="matrix(1.18081,0,0,1.18081,270.0,550.0)&lt;/code&gt; part puts the text on the right spot. Great finding about &lt;span class="caps"&gt;SVG&lt;/span&gt; is that it places each &lt;code&gt;&amp;lt;text&amp;gt;&lt;/code&gt; element on the new line, so you don&amp;#8217;t need to deal with calculating the position in your&amp;nbsp;script.&lt;/p&gt;
 &lt;p&gt;Scale adjustment is done with a dirty lambda&amp;nbsp;function.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;content&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;re&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sub&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;gt;(\d{1,3}\.\d{3,5})&amp;lt;/text&amp;gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;lambda&lt;/span&gt; &lt;span class="n"&gt;m&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;gt;    &amp;quot;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;round&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;float&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;m&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;group&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)))))&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;lt;/text&amp;gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;old_map&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;content&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;re&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sub&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;amp;gt;(\d{1,3}\.\d{3,5})&amp;amp;lt;/text&amp;amp;gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;lambda&lt;/span&gt; &lt;span class="n"&gt;m&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;amp;gt;    &amp;quot;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;round&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;float&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;m&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;group&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)))))&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;amp;lt;/text&amp;amp;gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;old_map&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -3690,7 +3734,7 @@ gdalwarp -dstalpha -s_srs &lt;span class="s1"&gt;&amp;#39;EPSG:5514&amp;#39;&lt;
 &lt;h2&gt;&lt;span class="caps"&gt;QGIS&lt;/span&gt; project&amp;nbsp;file&lt;/h2&gt;
 &lt;p&gt;&lt;span class="caps"&gt;QGIS&lt;/span&gt; project, the .qgs file, is a pure &lt;span class="caps"&gt;XML&lt;/span&gt; and, unlike &lt;span class="caps"&gt;ESRI&lt;/span&gt;&amp;#8217;s .mxd, can be edited with any text editor. That&amp;#8217;s great advantage when you need to prepare one project for many different operators. My project has to load some database layers that should be different for different operators that have different database&amp;nbsp;accounts.&lt;/p&gt;
 &lt;p&gt;How do you do that? It&amp;#8217;s enough to create a project using your own credentials and then replace them with &lt;code&gt;USERNAME&lt;/code&gt; and &lt;code&gt;PASSWORD&lt;/code&gt; strings as seen below. What happens when the user loads the&amp;nbsp;project?&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;datasource&amp;gt;&lt;/span&gt;dbname=&amp;#39;database&amp;#39; host=host port=5432 user=&amp;#39;USERNAME&amp;#39; password=&amp;#39;PASSWORD&amp;#39; sslmode=require key=&amp;#39;qgis_id&amp;#39; srid=5514 type=POLYGON table=&amp;quot;schema&amp;quot;.&amp;quot;table&amp;quot; (wkb_geometry) sql=&lt;span class="nt"&gt;&amp;lt;/datasource&amp;gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ni"&gt;&amp;amp;lt;&lt;/span&gt;datasource&lt;span class="ni"&gt;&amp;amp;gt;&lt;/span&gt;dbname=&amp;#39;database&amp;#39; host=host port=5432 user=&amp;#39;USERNAME&amp;#39; password=&amp;#39;PASSWORD&amp;#39; sslmode=require key=&amp;#39;qgis_id&amp;#39; srid=5514 type=POLYGON table=&amp;quot;schema&amp;quot;.&amp;quot;table&amp;quot; (wkb_geometry) sql=&lt;span class="ni"&gt;&amp;amp;lt;&lt;/span&gt;/datasource&lt;span class="ni"&gt;&amp;amp;gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -3698,11 +3742,11 @@ gdalwarp -dstalpha -s_srs &lt;span class="s1"&gt;&amp;#39;EPSG:5514&amp;#39;&lt;
 &lt;p&gt;Using this multiple times for each user-specific layer is a great time&amp;nbsp;saver.&lt;/p&gt;
 &lt;h2&gt;Adjust attribute table to fit your&amp;nbsp;needs&lt;/h2&gt;
 &lt;p&gt;&lt;span class="caps"&gt;QGIS&lt;/span&gt; attribute table has so many settings you probably don&amp;#8217;t use on daily basis and yet they might be invaluable in such project. All of them are available from layer properties under the Fields&amp;nbsp;tab.&lt;/p&gt;
-&lt;p class='text-center'&gt;&lt;img data-echo="/posts/assets/qgis-tips-for-collaborative-mapping/hidden.png" width=50% class="img-responsive centered"&gt;&lt;/p&gt;
+&lt;p class='text-center'&gt;&lt;img src="/posts/assets/qgis-tips-for-collaborative-mapping/hidden.png" width=50% class="img-responsive centered"&gt;&lt;/p&gt;
 
 &lt;p&gt;Sadly, our PostGIS layers are very wide in terms of column count. Not all of the columns are to be edited or even seen by operators, so it might be a good idea to hide them by setting their Edit Widget to Hidden. Those that should be seen, but not edited, might be set as not editable by unchecking that&amp;nbsp;option.&lt;/p&gt;
 &lt;p&gt;Lots of our attributes use enumerations provided by our project partner as &lt;span class="caps"&gt;CSV&lt;/span&gt; files. We use them in &lt;span class="caps"&gt;QGIS&lt;/span&gt; as value maps, so operators don&amp;#8217;t have to type them manually - we both make their work easier and eliminate mistakes they&amp;nbsp;made.&lt;/p&gt;
-&lt;p class='text-center'&gt;&lt;img data-echo="/posts/assets/qgis-tips-for-collaborative-mapping/valuemap.png" width=50% class="img-responsive centered"&gt;&lt;/p&gt;
+&lt;p class='text-center'&gt;&lt;img src="/posts/assets/qgis-tips-for-collaborative-mapping/valuemap.png" width=50% class="img-responsive centered"&gt;&lt;/p&gt;
 
 &lt;p&gt;Note &lt;span class="caps"&gt;QGIS&lt;/span&gt; swallows the first row of the given &lt;span class="caps"&gt;CSV&lt;/span&gt; file as if it was a header. Don&amp;#8217;t forget about this when creating your own enumerations. Once set, operators will see a friendly combo box instead of a hostile blank input in the attribute&amp;nbsp;table.&lt;/p&gt;
 &lt;p&gt;These are just small adjustments that can make a big difference in your &lt;span class="caps"&gt;QGIS&lt;/span&gt;&amp;nbsp;workflow.&lt;/p&gt;</content><category term="qgis"></category></entry><entry><title>SSH GRASS Processing Status Check</title><link href="https://www.zimmi.cz/posts/2015/ssh-grass-processing-status-check/" rel="alternate"></link><published>2015-07-21T07:51:00+02:00</published><updated>2015-07-21T07:51:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2015-07-21:/posts/2015/ssh-grass-processing-status-check/</id><summary type="html">&lt;p&gt;I&amp;#8217;ve been running some &lt;span class="caps"&gt;GRASS&lt;/span&gt;/PostGIS computations on a remote server that were taking hours to finish. Once in a while I checked for their state by issuing &lt;code&gt;tail log_XX.log&lt;/code&gt; from my laptop to see if they were ready yet. It suddenly became pretty annoying to check five …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I&amp;#8217;ve been running some &lt;span class="caps"&gt;GRASS&lt;/span&gt;/PostGIS computations on a remote server that were taking hours to finish. Once in a while I checked for their state by issuing &lt;code&gt;tail log_XX.log&lt;/code&gt; from my laptop to see if they were ready yet. It suddenly became pretty annoying to check five different logs every ten&amp;nbsp;minutes.&lt;/p&gt;
@@ -4053,7 +4097,7 @@ COPY test2 (id, wkb_geometry) FROM stdin;
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;&lt;img data-echo="/posts/assets/postgis-count-line-self-intersections/lines.png" title="Self-intersecting lines" class="img-responsive centered"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="/posts/assets/postgis-count-line-self-intersections/lines.png" title="Self-intersecting lines" class="img-responsive centered"&gt;&lt;/p&gt;
 &lt;p&gt;Note that those geometries are valid while not being simple, thus, &lt;code&gt;ST_IsValidReason()&lt;/code&gt; wouldn&amp;#8217;t help much. What if we compared it to their single counterparts? Those would have had vertices at intersections. Once you know the original number of vertices and the number of simple geometry vertices, it is fairly easy to subtract those&amp;nbsp;two.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;WITH noded AS (
 SELECT id, COUNT(id)
@@ -4473,13 +4517,13 @@ www.posts.zimmi.cz CNAME posts-zimmi.rhcloud.com
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;Just don&amp;#8217;t forget to handle both naked and &lt;code&gt;www&lt;/code&gt; version. When Google reindexes new URLs (http://www.zimmi.cz/posts instead of http://posts.zimmi.cz) subdomain application might be&amp;nbsp;deleted.&lt;/p&gt;</content><category term="openshift"></category></entry><entry><title>PostGIS Case Study: Vozejkmap Open Data (Part II)</title><link href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-ii/" rel="alternate"></link><published>2015-02-21T20:54:00+01:00</published><updated>2015-02-21T20:54:00+01:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2015-02-21:/posts/2015/postgis-case-study-vozejkmap-open-data-part-ii/</id><summary type="html">&lt;p&gt;&lt;a href="{{ pcposturl(2014, 12, 02, 'postgis-case-study-vozejkmap-open-data-part-i') }}"&gt;In the first part of my little case study&lt;/a&gt; I downloaded &lt;a href="http://vozejkmap.cz"&gt;vozejkmap.cz&lt;/a&gt; dataset and imported it into the PostGIS database. Having spatial data safely stored the time comes to get it onto the map. Libraries used&amp;nbsp;are:&lt;/p&gt;
+&lt;p&gt;Just don&amp;#8217;t forget to handle both naked and &lt;code&gt;www&lt;/code&gt; version. When Google reindexes new URLs (http://www.zimmi.cz/posts instead of http://posts.zimmi.cz) subdomain application might be&amp;nbsp;deleted.&lt;/p&gt;</content><category term="openshift"></category></entry><entry><title>PostGIS Case Study: Vozejkmap Open Data (Part II)</title><link href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-ii/" rel="alternate"></link><published>2015-02-21T20:54:00+01:00</published><updated>2015-02-21T20:54:00+01:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2015-02-21:/posts/2015/postgis-case-study-vozejkmap-open-data-part-ii/</id><summary type="html">&lt;p&gt;&lt;a href="{{ pcposturl(2014, 12, 02," title="postgis-case-study-vozejkmap-open-data-part-i"&gt;In the first part of my little case study&lt;/a&gt; }}) I downloaded &lt;a href="http://vozejkmap.cz"&gt;vozejkmap.cz&lt;/a&gt; dataset and imported it into the PostGIS database. Having spatial data safely stored the time comes to get it onto the map. Libraries used&amp;nbsp;are:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href="http://leafletjs.com"&gt;Leaflet&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="https://github.com/lvoogdt/Leaflet.awesome-markers"&gt;Leaflet.awesome-markers&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="https://github.com/Leaflet/Leaflet.markercluster"&gt;Leaflet.markercluster&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;I teach cartography visualization classes this semester …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="{{ pcposturl(2014, 12, 02, 'postgis-case-study-vozejkmap-open-data-part-i') }}"&gt;In the first part of my little case study&lt;/a&gt; I downloaded &lt;a href="http://vozejkmap.cz"&gt;vozejkmap.cz&lt;/a&gt; dataset and imported it into the PostGIS database. Having spatial data safely stored the time comes to get it onto the map. Libraries used&amp;nbsp;are:&lt;/p&gt;
+&lt;p&gt;I teach cartography visualization classes this semester …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="{{ pcposturl(2014, 12, 02," title="postgis-case-study-vozejkmap-open-data-part-i"&gt;In the first part of my little case study&lt;/a&gt; }}) I downloaded &lt;a href="http://vozejkmap.cz"&gt;vozejkmap.cz&lt;/a&gt; dataset and imported it into the PostGIS database. Having spatial data safely stored the time comes to get it onto the map. Libraries used&amp;nbsp;are:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href="http://leafletjs.com"&gt;Leaflet&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="https://github.com/lvoogdt/Leaflet.awesome-markers"&gt;Leaflet.awesome-markers&lt;/a&gt;&lt;/li&gt;
@@ -4532,7 +4576,7 @@ FROM vozejkmap AS lg ) AS f
 &lt;h2&gt;Leaflet&amp;nbsp;map&lt;/h2&gt;
 &lt;p&gt;Map JavaScript is rather simple with ~30 lines of code (not taking styles into account). Thanks to the great plugins it is easy to show ~7,600 points on the map real&amp;nbsp;quick.&lt;/p&gt;
 &lt;p&gt;I didn&amp;#8217;t do much customization apart from styling markers and binding&amp;nbsp;popups.&lt;/p&gt;
-&lt;p&gt;&lt;img data-echo="/posts/assets/postgis-case-study-vozejkmap-open-data-part-ii/map.png" title="vozejkmap.cz data map" class="img-responsive centered"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="/posts/assets/postgis-case-study-vozejkmap-open-data-part-ii/map.png" title="vozejkmap.cz data map" class="img-responsive centered"&gt;&lt;/p&gt;
 &lt;h2&gt;What&amp;#8217;s&amp;nbsp;next&lt;/h2&gt;
 &lt;ol&gt;
 &lt;li&gt;&lt;a href="http://turfjs.org"&gt;Turf&lt;/a&gt; which means I need to think of what could be fun to do with this&amp;nbsp;data&lt;/li&gt;
@@ -4992,7 +5036,7 @@ for ($i = 0; $i &amp;lt; $size; $i++) {
 &lt;li&gt;&lt;code&gt;tileMatrixMaxX = tileMatrixMinX + tileSpanX × matrixWidth;&lt;/code&gt;&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;tileMatrixMinY = tileMatrixMaxY - tileSpanY × matrixHeight;&lt;/code&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;&lt;img data-echo="/posts/assets/wmts-few-things-i-want-to-remember/wmts.png" title="WMTS tiling schema" class="img-responsive centered"&gt;&lt;/p&gt;</content><category term="ogc"></category><category term="wmts"></category></entry><entry><title>Degrees To Decimal With Javascript</title><link href="https://www.zimmi.cz/posts/2014/degrees-to-decimal-with-javascript/" rel="alternate"></link><published>2014-09-09T20:28:00+02:00</published><updated>2014-09-09T20:28:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2014-09-09:/posts/2014/degrees-to-decimal-with-javascript/</id><summary type="html">&lt;p&gt;I have found a nice way to get decimal value from degrees of longitude and latitude&amp;nbsp;recently:&lt;/p&gt;
+&lt;p&gt;&lt;img src="/posts/assets/wmts-few-things-i-want-to-remember/wmts.png" title="WMTS tiling schema" class="img-responsive centered"&gt;&lt;/p&gt;</content><category term="ogc"></category><category term="wmts"></category></entry><entry><title>Degrees To Decimal With Javascript</title><link href="https://www.zimmi.cz/posts/2014/degrees-to-decimal-with-javascript/" rel="alternate"></link><published>2014-09-09T20:28:00+02:00</published><updated>2014-09-09T20:28:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2014-09-09:/posts/2014/degrees-to-decimal-with-javascript/</id><summary type="html">&lt;p&gt;I have found a nice way to get decimal value from degrees of longitude and latitude&amp;nbsp;recently:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="nx"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;coords&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
     &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;decimal&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
         &lt;span class="nx"&gt;output&lt;/span&gt;  &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[],&lt;/span&gt;
@@ -5107,7 +5151,7 @@ for ($i = 0; $i &amp;lt; $size; $i++) {
 
 &lt;p&gt;I decided to throw away the tweets with the empty &lt;code&gt;coordinates&lt;/code&gt; field, because the accuracy of the value specified in the place field can be generally considered very low and insufficient for my purposes. You still need to account for position inaccuracies of users&amp;#8217; devices though, however that is not something that we can deal with. &lt;em&gt;Let us just assume that geotagged tweets are&amp;nbsp;accurate.&lt;/em&gt;&lt;/p&gt;
 
-&lt;div class="text-center"&gt;&lt;img data-echo="/posts/assets/analyzing-twitter-languages-with-streaming-api/cr.png" width="50%" height="50%" title="Geotagged tweets" class="img-rounded"&gt;&lt;p&gt;&lt;strong&gt;Figure:&lt;/strong&gt; Twitter seems not to be very accurate when matching tweets against bounding&amp;nbsp;box.&lt;/p&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="/posts/assets/analyzing-twitter-languages-with-streaming-api/cr.png" width="50%" height="50%" title="Geotagged tweets" class="img-rounded"&gt;&lt;p&gt;&lt;strong&gt;Figure:&lt;/strong&gt; Twitter seems not to be very accurate when matching tweets against bounding&amp;nbsp;box.&lt;/p&gt;&lt;/div&gt;
 
 &lt;p&gt;Although, as you can see in the picture, they are not. Or they are, but Twitter is not good at telling so. Besides that, none of the countries in the world is shaped like a rectangle and we would need to clip the data anyway. That is where SQLite comes in, because I have been saving incoming tweets right into the&amp;nbsp;database.&lt;/p&gt;
 
@@ -5131,7 +5175,7 @@ for ($i = 0; $i &amp;lt; $size; $i++) {
 
 &lt;p&gt;I am definitely willing to share the &lt;abbr title="Do not expect much, it was my first time with node.js"&gt;code&lt;/abbr&gt; and the final viz. Meanwhile, you can have a look at the screenshot on picture [*]. I have already implemented nationality switch (legend items are clickable) and I would like to add a day/night switch to see whether there are any differences between the peoples&amp;#8217;&amp;nbsp;behaviour. &lt;/p&gt;
 
-&lt;div class="text-center"&gt;&lt;img width="60%" height="60%" data-echo="/posts/assets/analyzing-twitter-languages-with-streaming-api/screenshot.png" title="Final geoviz using Leaflet" class="img-rounded"&gt;&lt;p&gt;&lt;strong&gt;Figure:&lt;/strong&gt; Final map screenshot. A legend is used to turn nationalities on and off. You are looking at Prague by the&amp;nbsp;way.&lt;/p&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img width="60%" height="60%" src="/posts/assets/analyzing-twitter-languages-with-streaming-api/screenshot.png" title="Final geoviz using Leaflet" class="img-rounded"&gt;&lt;p&gt;&lt;strong&gt;Figure:&lt;/strong&gt; Final map screenshot. A legend is used to turn nationalities on and off. You are looking at Prague by the&amp;nbsp;way.&lt;/p&gt;&lt;/div&gt;
 
 &lt;p&gt;Obviously the most tweets were sent from the most populated places, e.g. Prague, Brno,&amp;nbsp;Ostrava. &lt;/p&gt;</content><category term="javascript"></category><category term="leaflet"></category><category term="twitter"></category></entry><entry><title>Going 3D With Space Time Cube</title><link href="https://www.zimmi.cz/posts/2014/going-3d-with-space-time-cube/" rel="alternate"></link><published>2014-09-02T17:35:00+02:00</published><updated>2014-09-02T17:35:00+02:00</updated><author><name>Michal Zimmermann</name></author><id>tag:www.zimmi.cz,2014-09-02:/posts/2014/going-3d-with-space-time-cube/</id><summary type="html">&lt;p&gt;Seeing &lt;a href="http://anitagraser.com/2012/08/05/space-time-cubes-exploring-twitter-streams-3/"&gt;Anita&amp;#8217;s space-time cube&lt;/a&gt; back in 2013 was a moment of &lt;em&gt;woooow&lt;/em&gt; for me. I&amp;#8217;ve been interested in unusual ways of displaying data ever since I started studying &lt;span class="caps"&gt;GIS&lt;/span&gt; and this one was just great. &lt;em&gt;How the hell did she make it?!&lt;/em&gt;, I thought back&amp;nbsp;then.&lt;/p&gt;
 
@@ -5265,7 +5309,7 @@ y = map(time, first, last, 0, 500)
 z = map(lat, 16.59971950210866964, 63.68835804244784526, 0, height)
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;&lt;img data-echo="http://www.processing.org/tutorials/p3d/imgs/coordinatesystem.png" title="Processing coordinate system" class="img-rounded pull-left"&gt;They define how coordinates inside the cube should be computed. As you see, &lt;code&gt;x&lt;/code&gt; is the result of mapping longitudinal extent of our area to the width of cube, the same happens to &lt;code&gt;z&lt;/code&gt; and latitude, and to &lt;code&gt;y&lt;/code&gt; (but here we map time, not&amp;nbsp;coordinates).&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://www.processing.org/tutorials/p3d/imgs/coordinatesystem.png" title="Processing coordinate system" class="img-rounded pull-left"&gt;They define how coordinates inside the cube should be computed. As you see, &lt;code&gt;x&lt;/code&gt; is the result of mapping longitudinal extent of our area to the width of cube, the same happens to &lt;code&gt;z&lt;/code&gt; and latitude, and to &lt;code&gt;y&lt;/code&gt; (but here we map time, not&amp;nbsp;coordinates).&lt;/p&gt;
 
 &lt;p&gt;The bounding box used in those computations is the bounding box of the basemap. Interesting thing about Processing and its 3D environment is how it defines the beginning of the coordinate system. As you can see on the left, it might be slighty different from what you could expect. That&amp;#8217;s what you need to be careful&amp;nbsp;about.&lt;/p&gt;
 
@@ -5284,11 +5328,11 @@ z = map(lat, 16.59971950210866964, 63.68835804244784526, 0, height)
 
 &lt;h3&gt;My first&amp;nbsp;control&lt;/h3&gt;
 
-&lt;p&gt;&lt;img data-echo="/posts/assets/leaflet-chmi-radar-control/google_maps.png" title="Google maps layer control" class="left"&gt;Modularity is one of the things I like the most about Leaflet. I was struggling with creating checkboxes used to toggle layers in Google Maps app, it comes ready with Leaflet. Adding a control to the map is easy as piece of cake, you do &lt;a href="http://leafletjs.com/reference.html#icontrol"&gt;&lt;code&gt;L.Control.extend({)}&lt;/code&gt;&lt;/a&gt; and that&amp;#8217;s it (almost). Since the map displays animated radar images showing the precipitation that occurred during last three hours or so I thought it would be great implementing this as a control: a button used to toggle the animation on/off and displaying the time currently shown image was created&amp;nbsp;at.&lt;/p&gt;
+&lt;p&gt;&lt;img src="/posts/assets/leaflet-chmi-radar-control/google_maps.png" title="Google maps layer control" class="left"&gt;Modularity is one of the things I like the most about Leaflet. I was struggling with creating checkboxes used to toggle layers in Google Maps app, it comes ready with Leaflet. Adding a control to the map is easy as piece of cake, you do &lt;a href="http://leafletjs.com/reference.html#icontrol"&gt;&lt;code&gt;L.Control.extend({)}&lt;/code&gt;&lt;/a&gt; and that&amp;#8217;s it (almost). Since the map displays animated radar images showing the precipitation that occurred during last three hours or so I thought it would be great implementing this as a control: a button used to toggle the animation on/off and displaying the time currently shown image was created&amp;nbsp;at.&lt;/p&gt;
 
 &lt;p&gt;The image on the left side displays the old solution using Google Maps. It was using a lot of &lt;span class="caps"&gt;DOM&lt;/span&gt; manipulation, was quite hard to maintain and definitely not eye-candy. When the animation was turned on, another control popped up in the map&amp;#8217;s top left corner displaying the time the image was taken at. The animation toggle (&lt;em&gt;srážkový radar&lt;/em&gt;) was incorporated into the layer control. I decided to take it out and make it a separate feature of the&amp;nbsp;map.&lt;/p&gt;
 
-&lt;p&gt;&lt;img data-echo="/posts/assets/leaflet-chmi-radar-control/control.png" title="Leaflet radar control" class="right"&gt;You can see the result in the image below. The control is a simple button with the radar icon displaying the time when active. It is only useful for the Czech Republic and is highly dependent on the image provider (&lt;abbr title="Czech Hydrometeorogical Institute"&gt;&lt;span class="caps"&gt;CHMI&lt;/span&gt;&lt;/abbr&gt;), which means that if the &lt;span class="caps"&gt;URL&lt;/span&gt; of the images was to be changed, the whole control would&amp;nbsp;break.&lt;/p&gt;
+&lt;p&gt;&lt;img src="/posts/assets/leaflet-chmi-radar-control/control.png" title="Leaflet radar control" class="right"&gt;You can see the result in the image below. The control is a simple button with the radar icon displaying the time when active. It is only useful for the Czech Republic and is highly dependent on the image provider (&lt;abbr title="Czech Hydrometeorogical Institute"&gt;&lt;span class="caps"&gt;CHMI&lt;/span&gt;&lt;/abbr&gt;), which means that if the &lt;span class="caps"&gt;URL&lt;/span&gt; of the images was to be changed, the whole control would&amp;nbsp;break.&lt;/p&gt;
 
 &lt;p&gt;You can&lt;a href="https://www.zimmi.cz/posts/assets/leaflet-chmi-radar-control/radarcontrol.zip"&gt; grab the code if you like&lt;/a&gt;. You add the control to the map as any other&amp;nbsp;control:&lt;/p&gt;
 

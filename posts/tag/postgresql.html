@@ -7,7 +7,7 @@
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
         <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
         <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?a4089d0f">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
 </head>
 <body>
     <nav role="navigation">
@@ -23,6 +23,58 @@
     <main>
 <h2 class="text-center">Articles tagged with postgresql tag</h2>
 
+<article>
+    <h1><a href="https://www.zimmi.cz/posts/2018/implementing-linked-list-with-postgresql-recursive-cte/" rel="bookmark" title="Permalink to Implementing Linked List with PostgreSQL Recursive CTE">Implementing Linked List with PostgreSQL Recursive <span class="caps">CTE</span></a></h1>
+    <aside><span>Nov 26, 2018</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p>I&#8217;ve been working on a book/storytelling pet project recently. Dealing with book events and keeping them in order was a task that was to be tackled sooner or later. While both frontend and backend of the app could deal with linked and ordered data, database might be just about the best place to do&nbsp;so.</p>
+<h2>What you might need a linked list&nbsp;for</h2>
+<p>You have a set of chronological events. The set is not complete at the beginning and position of events might be changed (e.g. their neighbouring events might change in&nbsp;time).</p>
+<h2>Implementation</h2>
+<p>Linked list is a perfect structure for such a case (see <a href="https://en.wikipedia.org/wiki/Linked_list">Wikipedia</a>). You can keep your data in tact using just id and previous/next&nbsp;id.</p>
+<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="k">public</span><span class="p">.</span><span class="n">events</span> <span class="p">(</span>
+  <span class="n">id</span> <span class="nb">integer</span> <span class="k">generated</span> <span class="n">always</span> <span class="k">as</span> <span class="k">identity</span> <span class="k">primary</span> <span class="k">key</span><span class="p">,</span>
+  <span class="n">previous_id</span> <span class="nb">integer</span>
+<span class="p">);</span>
+
+<span class="k">COPY</span> <span class="k">public</span><span class="p">.</span><span class="n">events</span> <span class="p">(</span><span class="n">id</span><span class="p">,</span> <span class="n">previous_id</span><span class="p">)</span> <span class="k">FROM</span> <span class="k">stdin</span><span class="p">;</span>
+<span class="mi">7</span>   <span class="err">\</span><span class="n">N</span>
+<span class="mi">10</span>  <span class="mi">5</span>
+<span class="mi">5</span>   <span class="mi">1</span>
+<span class="mi">1</span>   <span class="mi">3</span>
+<span class="mi">3</span>   <span class="mi">8</span>
+<span class="mi">8</span>   <span class="mi">9</span>
+<span class="mi">9</span>   <span class="mi">2</span>
+<span class="mi">2</span>   <span class="mi">6</span>
+<span class="mi">6</span>   <span class="mi">4</span>
+<span class="mi">4</span>   <span class="mi">7</span>
+<span class="err">\</span><span class="p">.</span>
+</pre></div>
+
+
+<p>Generating the list of events in the right order is the matter of running one recursive <span class="caps">CTE</span>&nbsp;query.</p>
+<div class="highlight"><pre><span></span><span class="k">WITH</span> <span class="k">RECURSIVE</span> <span class="n">evt</span><span class="p">(</span><span class="n">id</span><span class="p">)</span> <span class="k">AS</span> <span class="p">(</span>
+<span class="k">SELECT</span>
+    <span class="n">id</span><span class="p">,</span>
+    <span class="n">previous_id</span>
+<span class="k">FROM</span> <span class="n">events</span>
+<span class="k">WHERE</span> <span class="n">previous_id</span> <span class="k">IS</span> <span class="k">NULL</span>
+<span class="k">UNION</span>
+<span class="k">SELECT</span>
+    <span class="n">e</span><span class="p">.</span><span class="n">id</span><span class="p">,</span>
+    <span class="n">e</span><span class="p">.</span><span class="n">previous_id</span>
+<span class="k">FROM</span> <span class="n">events</span> <span class="n">e</span>
+<span class="k">JOIN</span> <span class="n">evt</span> <span class="k">ON</span> <span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="n">previous_id</span> <span class="o">=</span> <span class="n">evt</span><span class="p">.</span><span class="n">id</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">evt</span><span class="p">;</span>
+</pre></div>
+
+
+<p>It gathers the first event (the one having the previous pointer set to <code>NULL</code>) and iteratively adds the following ones. Note that this version is actually the <em>reverse</em> implementation of the linked list, pointing to the previous instead of the next event. All it would take to change that, would be finding the event id not present in <code>previous_id</code> column as the first one instead of <code>WHERE previous_id IS NULL</code>.</p>
+<p>With the data coming properly sorted to the client, all it has to do is rendering the&nbsp;list.</p>
+</article>
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-systemd-automation/" rel="bookmark" title="Permalink to PostgreSQL Backup and Recovery Orchestration: systemd Automation">PostgreSQL Backup and Recovery Orchestration: systemd&nbsp;Automation</a></h1>
     <aside><span>Apr 10, 2018</span>
@@ -63,10 +115,10 @@
 <p>This systemd service file is no more than a simple wrapper around the following bash code. We run three different database clusters on one machine and this approach makes their maintenance pretty&nbsp;comfortable.</p>
 <div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
 <span class="c1">#</span>
-<span class="c1"># @author: Michal Zimmermann &lt;michal.zimmermann@clevermaps.cz&gt;</span>
+<span class="c1"># @author: Michal Zimmermann &amp;lt;michal.zimmermann@clevermaps.cz&amp;gt;</span>
 <span class="c1"># Vacuums the whole database cluster running on a given port.</span>
 
-<span class="k">while</span> <span class="o">[[</span> <span class="nv">$#</span> &gt; <span class="m">0</span> <span class="o">]]</span>
+<span class="k">while</span> <span class="o">[[</span> <span class="nv">$#</span> <span class="p">&amp;</span>gt<span class="p">;</span> <span class="m">0</span> <span class="o">]]</span>
 <span class="k">do</span>
     <span class="nv">key</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>
 
@@ -141,7 +193,7 @@
 <p>Full backup creation is just one example of how powerful bash can&nbsp;be.</p>
 <div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
 <span class="c1">#</span>
-<span class="c1"># @author: Michal Zimmermann &lt;michal.zimmermann@clevermaps.cz&gt;</span>
+<span class="c1"># @author: Michal Zimmermann &amp;lt;michal.zimmermann@clevermaps.cz&amp;gt;</span>
 <span class="c1"># Creates base backup.</span>
 
 <span class="nv">CUR_DIR</span><span class="o">=</span><span class="k">$(</span>dirname <span class="s2">&quot;</span><span class="nv">$0</span><span class="s2">&quot;</span><span class="k">)</span>
@@ -177,17 +229,17 @@ pg_basebackup <span class="se">\</span>
     <span class="nb">exit</span> <span class="m">3</span>
 <span class="k">fi</span>
 
-tar -czf <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span>.tar.gz <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span> <span class="o">&amp;&amp;</span> rm -rf <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span>
+tar -czf <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span>.tar.gz <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span> <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> rm -rf <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span>
 </pre></div>
 
 
 <p>As you probably noticed, a <code>pgsql-common.sh</code> file is sourced at the beginning of the script. This script in turn just loads the proper config file that provides variables to other, devops, scripts. As you might need those variables in several of your scripts, it is a good idea to put their load to a separate&nbsp;file.</p>
 <div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
 <span class="c1">#</span>
-<span class="c1"># @author: Michal Zimmermann &lt;michal.zimmermann@clevermaps.cz&gt;</span>
+<span class="c1"># @author: Michal Zimmermann &amp;lt;michal.zimmermann@clevermaps.cz&amp;gt;</span>
 <span class="c1"># Sourced in pgsql-*.sh scripts.</span>
 
-<span class="k">while</span> <span class="o">[[</span> <span class="nv">$#</span> &gt; <span class="m">0</span> <span class="o">]]</span>
+<span class="k">while</span> <span class="o">[[</span> <span class="nv">$#</span> <span class="p">&amp;</span>gt<span class="p">;</span> <span class="m">0</span> <span class="o">]]</span>
 <span class="k">do</span>
     <span class="nv">key</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>
 
@@ -237,10 +289,10 @@ tar -czf <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><sp
 <p>Another, likely the simplest, example is a vacuumdb&nbsp;task:</p>
 <div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
 <span class="c1">#</span>
-<span class="c1"># @author: Michal Zimmermann &lt;michal.zimmermann@clevermaps.cz&gt;</span>
+<span class="c1"># @author: Michal Zimmermann &amp;lt;michal.zimmermann@clevermaps.cz&amp;gt;</span>
 <span class="c1"># Vacuums the whole database cluster running on a given port.</span>
 
-<span class="k">while</span> <span class="o">[[</span> <span class="nv">$#</span> &gt; <span class="m">0</span> <span class="o">]]</span>
+<span class="k">while</span> <span class="o">[[</span> <span class="nv">$#</span> <span class="p">&amp;</span>gt<span class="p">;</span> <span class="m">0</span> <span class="o">]]</span>
 <span class="k">do</span>
     <span class="nv">key</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>
 
@@ -392,51 +444,6 @@ find <span class="nv">$CR_WAL_BACKUP_DIR</span> <span class="se">\</span>
 
 
 <p>Functional backups are crucial part of a solid backup/recovery system. They&#8217;re still just one half of that system, though. <strong>If not tested thoroughly</strong>, they&#8217;re even less than that. More on testing backups and recovering from failures next&nbsp;time.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2017/postgresql-dollar-quoting-inside-bash-heredoc/" rel="bookmark" title="Permalink to PostgreSQL Dollar Quoting inside Bash Heredoc">PostgreSQL Dollar Quoting inside Bash&nbsp;Heredoc</a></h1>
-    <aside><span>Sep 22, 2017</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p>Yesterday I spent two very unpleasant hours debugging the weirdest <span class="caps">SQL</span> error I&#8217;ve seen in my life, running the below query (simplified for this&nbsp;post).</p>
-<div class="highlight"><pre><span></span><span class="n">psql</span> <span class="o">-</span><span class="n">qAt</span> <span class="c1">--no-psqlrc &lt;&lt;BACKUP</span>
-<span class="k">DO</span>
-<span class="err">$$</span>
-<span class="k">DECLARE</span> <span class="n">r</span> <span class="n">record</span><span class="p">;</span>
-<span class="k">BEGIN</span>
-  <span class="n">RAISE</span> <span class="n">INFO</span> <span class="s1">&#39;%&#39;</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">;</span>
-<span class="k">END</span>
-<span class="err">$$</span><span class="p">;</span>
-<span class="n">BACKUP</span>
-</pre></div>
-
-
-<p>Running this in your terminal will result in a nasty syntax&nbsp;error.</p>
-<div class="highlight"><pre><span></span>ERROR:  syntax error at or near <span class="s2">&quot;1111&quot;</span>
-LINE <span class="m">2</span>: <span class="m">1111</span>
-        ^
-ERROR:  syntax error at or near <span class="s2">&quot;RAISE&quot;</span>
-LINE <span class="m">2</span>:   RAISE INFO <span class="s1">&#39;%&#39;</span>, <span class="s1">&#39;info&#39;</span><span class="p">;</span>
-          ^
-ERROR:  syntax error at or near <span class="s2">&quot;1111&quot;</span>
-LINE <span class="m">2</span>: <span class="m">1111</span><span class="p">;</span>
-</pre></div>
-
-
-<p>You stare on the screen for a while, absolutely sure that number <code>1111</code> is nowhere close to the data you work with. You try again. Another error. You save the code into a file and try again. It works. What the <em>heck</em>? You try again using the bash heredoc. Another&nbsp;failure.</p>
-<p>The minute you realize <code>$$</code> is being substituted with the <span class="caps">ID</span> of the current process, you feel like the dumbest person on Earth. Yet the happiest one at the same&nbsp;time.</p>
-<p>The solution is&nbsp;trivial.</p>
-<div class="highlight"><pre><span></span><span class="n">psql</span> <span class="o">-</span><span class="n">qAt</span> <span class="c1">--no-psqlrc &lt;&lt;BACKUP</span>
-<span class="k">DO</span>
-<span class="err">\$\$</span>
-<span class="k">DECLARE</span> <span class="n">r</span> <span class="n">record</span><span class="p">;</span>
-<span class="k">BEGIN</span>
-  <span class="n">RAISE</span> <span class="n">INFO</span> <span class="s1">&#39;%&#39;</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">;</span>
-<span class="k">END</span>
-<span class="err">\$\$</span><span class="p">;</span>
-<span class="n">BACKUP</span>
-</pre></div>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/tag/postgresql2.html">Next page &raquo;</a>

@@ -7,7 +7,7 @@
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
         <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
         <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?a4089d0f">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
 </head>
 <body>
     <nav role="navigation">
@@ -23,6 +23,25 @@
     <main>
 <h2 class="text-center">Articles tagged with postgresql tag</h2>
 
+<article>
+    <h1><a href="https://www.zimmi.cz/posts/2016/counting-substring-occurrences-in-postgresql/" rel="bookmark" title="Permalink to Counting substring occurrences in PostgreSQL">Counting substring occurrences in&nbsp;PostgreSQL</a></h1>
+    <aside><span>Dec 19, 2016</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p>I got to count occurrences of <em>/</em> character today and found out no built-in function exists in PostgreSQL, so here&#8217;s my shot at it. Pretty simple, yet&nbsp;useful.</p>
+<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">OR</span> <span class="k">REPLACE</span> <span class="k">FUNCTION</span> <span class="n">how_many</span><span class="p">(</span><span class="k">IN</span> <span class="nb">text</span><span class="p">,</span> <span class="k">IN</span> <span class="nb">varchar</span><span class="p">,</span> <span class="k">OUT</span> <span class="nb">integer</span><span class="p">)</span>
+<span class="k">RETURNS</span> <span class="nb">integer</span>
+<span class="k">AS</span>
+<span class="err">$</span><span class="n">how_many$</span>
+    <span class="k">SELECT</span> <span class="k">length</span><span class="p">(</span><span class="err">$</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="k">length</span><span class="p">(</span><span class="k">replace</span><span class="p">(</span><span class="err">$</span><span class="mi">1</span><span class="p">,</span> <span class="err">$</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">));</span>
+<span class="err">$</span><span class="n">how_many$</span>
+<span class="k">LANGUAGE</span> <span class="k">SQL</span>
+<span class="k">SECURITY</span> <span class="k">DEFINER</span><span class="p">;</span>
+
+<span class="c1">-- SELECT how_many(&#39;test&#39;, &#39;t&#39;); -- returns number 2</span>
+</pre></div>
+</article>
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/" rel="bookmark" title="Permalink to Plotting the Czech Cadastre Land Use with d3: Data Load (part III)">Plotting the Czech Cadastre Land Use with d3: Data Load (part <span class="caps">III</span>)</a></h1>
     <aside><span>Nov 15, 2016</span>
@@ -315,7 +334,7 @@ rm <span class="nv">$CSVFILE</span> <span class="nv">$CSVUTF8FILE</span>
     </aside>
     <p>I&#8217;ve come across the <a href="http://gis.stackexchange.com/questions/208797/draw-wind-rose-with-qgis-from-postgis/">beautiful <span class="caps">GIS</span> StackExchange question</a> recently, asking how to draw a <a href="https://en.wikipedia.org/wiki/Wind_rose">wind rose</a> within&nbsp;PostGIS.</p>
 <div class="text-center">
-<img data-echo="http://i.stack.imgur.com/0xAMU.png">
+<img src="http://i.stack.imgur.com/0xAMU.png">
 </div>
 
 <p>It&#8217;s pretty easy to accomplish this with a custom <span class="caps">PLPGSQL</span> procedure below, that takes line geometry, number of sections and radius of the inner circle as&nbsp;parameters.</p>
@@ -332,11 +351,11 @@ rm <span class="nv">$CSVFILE</span> <span class="nv">$CSVUTF8FILE</span>
 <span class="p">)</span>
 <span class="k">AS</span> <span class="err">$</span><span class="n">ST_WindRose$</span>
 <span class="k">BEGIN</span>
-    <span class="k">IF</span> <span class="n">directions</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">&lt;&gt;</span> <span class="mi">0</span> <span class="k">THEN</span>
+    <span class="k">IF</span> <span class="n">directions</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="mi">0</span> <span class="k">THEN</span>
         <span class="n">RAISE</span> <span class="k">EXCEPTION</span> <span class="s1">&#39;Odd number of directions found, please provide even number of directions instead.&#39;</span><span class="p">;</span>
     <span class="k">END</span> <span class="k">IF</span><span class="p">;</span>
 
-<span class="k">IF</span> <span class="n">radius</span> <span class="o">&gt;</span> <span class="n">ST_Length</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="k">THEN</span>
+<span class="k">IF</span> <span class="n">radius</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">ST_Length</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="k">THEN</span>
     <span class="n">RAISE</span> <span class="k">EXCEPTION</span> <span class="s1">&#39;Inner circle radius is bigger than the wind rose diameter, please make it smaller.&#39;</span><span class="p">;</span>
 <span class="k">END</span> <span class="k">IF</span><span class="p">;</span>
 
@@ -369,42 +388,13 @@ rm <span class="nv">$CSVFILE</span> <span class="nv">$CSVUTF8FILE</span>
 
 <p>Wind rose created with this function might look like the one&nbsp;below.</p>
 <div class="text-center">
-<img data-echo="http://i.stack.imgur.com/4OD0J.png">
+<img src="http://i.stack.imgur.com/4OD0J.png">
 </div>
 
 <p>Run it as follows. The <code>line</code> parameter should be a simple straight line made of just two&nbsp;vertices.</p>
 <!-- codeblock -->
 
 <div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">ST_WindRose</span><span class="p">(</span><span class="n">ST_MakeLine</span><span class="p">(</span><span class="n">ST_MakePoint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">ST_MakePoint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)),</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mi">01</span><span class="p">);</span>
-</pre></div>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-polygon-from-centroid/" rel="bookmark" title="Permalink to PostGIS Custom Function to Create Polygon from Centroid">PostGIS Custom Function to Create Polygon from&nbsp;Centroid</a></h1>
-    <aside><span>Aug 28, 2016</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p>Needed to create a polygon from a point defining its size in both axes, here&#8217;s a little syntax sugar to make life&nbsp;easier.</p>
-<!-- codeblock -->
-
-<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">OR</span> <span class="k">REPLACE</span> <span class="k">FUNCTION</span> <span class="n">ST_PolygonFromCentroid</span><span class="p">(</span><span class="n">centroid</span> <span class="n">geometry</span><span class="p">,</span> <span class="n">xsize</span> <span class="nb">numeric</span><span class="p">,</span> <span class="n">ysize</span> <span class="nb">numeric</span><span class="p">)</span>
-<span class="k">RETURNS</span> <span class="n">geometry</span>
-<span class="k">AS</span> <span class="err">$</span><span class="n">ST_PolygonFromCentroid$</span>
-<span class="k">SELECT</span> <span class="n">ST_MakeEnvelope</span><span class="p">(</span>
-    <span class="n">ST_X</span><span class="p">(</span><span class="n">ST_Translate</span><span class="p">(</span><span class="err">$</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="err">$</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="err">$</span><span class="mi">3</span><span class="p">)),</span>
-    <span class="n">ST_Y</span><span class="p">(</span><span class="n">ST_Translate</span><span class="p">(</span><span class="err">$</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="err">$</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="err">$</span><span class="mi">3</span><span class="p">)),</span>
-    <span class="n">ST_X</span><span class="p">(</span><span class="n">ST_Translate</span><span class="p">(</span><span class="err">$</span><span class="mi">1</span><span class="p">,</span> <span class="err">$</span><span class="mi">2</span><span class="p">,</span> <span class="err">$</span><span class="mi">3</span><span class="p">)),</span>
-    <span class="n">ST_Y</span><span class="p">(</span><span class="n">ST_Translate</span><span class="p">(</span><span class="err">$</span><span class="mi">1</span><span class="p">,</span> <span class="err">$</span><span class="mi">2</span><span class="p">,</span> <span class="err">$</span><span class="mi">3</span><span class="p">))</span>
-<span class="p">);</span>
-<span class="err">$</span><span class="n">ST_PolygonFromCentroid$</span>
-<span class="k">LANGUAGE</span> <span class="k">SQL</span><span class="p">;</span>
-</pre></div>
-
-
-<p>Run it&nbsp;as:</p>
-<!-- codeblock -->
-
-<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">ST_PolygonFromCentroid</span><span class="p">(</span><span class="n">ST_SetSRID</span><span class="p">(</span><span class="n">ST_MakePoint</span><span class="p">(</span><span class="mi">13</span><span class="p">.</span><span class="mi">912</span><span class="p">,</span><span class="mi">50</span><span class="p">.</span><span class="mi">633</span><span class="p">),</span><span class="mi">4326</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 </pre></div>
 </article>
 <aside id="pagination">

@@ -18,7 +18,7 @@
   <meta property="og:title" content="Automated Map Creation With QGIS, PostGIS, Python, SVG and ImageMagick" />
   <meta property="og:description" content="As mentioned in QGIS Tips For Collaborative Mapping we’re in the middle of crop evaluation project at CleverMaps. With the QGIS workflow up and running, I’ve been focused on different QGIS related task: automatic map generation for land blocks that..." />
   <meta property="og:url" content="https://www.zimmi.cz/posts/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?a4089d0f">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
 </head>
 <body>
     <nav role="navigation">
@@ -70,7 +70,7 @@
 <h3>Atlas generation&nbsp;settings</h3>
 <p><strong>Coverage layer</strong> is presumably the only thing you really need - as the name suggests, it covers your area of interest. One map will be created for each feature in this layer, unless you decide to use some <strong>filtering</strong> - which I&nbsp;did.</p>
 <p><strong>Output filenames</strong> can be tweaked to your needs, here&#8217;s what such a function might look like. If there is a slash in the land block <span class="caps">ID</span> (<span class="caps">XXXXXXX</span>/Y), the filename is set to <code>USER-ID_XXXXXXX-00Y_M_00</code>, <code>USER-ID_XXXXXXX-000_M_00</code> otherwise.</p>
-<div class="highlight"><pre><span></span><span class="k">CASE</span> <span class="k">WHEN</span> <span class="n">strpos</span><span class="p">(</span><span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">),</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span>
+<div class="highlight"><pre><span></span><span class="k">CASE</span> <span class="k">WHEN</span> <span class="n">strpos</span><span class="p">(</span><span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">),</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="o">-</span><span class="mi">1</span>
     <span class="k">THEN</span>
         <span class="n">ji</span> <span class="o">||</span> <span class="s1">&#39;_&#39;</span> <span class="o">||</span>
         <span class="n">substr</span><span class="p">(</span>
@@ -133,9 +133,9 @@
       <span class="n">ji</span><span class="p">,</span>
       <span class="n">kod_pb</span><span class="p">,</span>
       <span class="n">concat</span><span class="p">(</span>
-            <span class="s1">&#39;&lt;g fill=&quot;none&quot; stroke=&quot;#000000&quot; stroke-opacity=&quot;1&quot; stroke-width=&quot;1&quot;</span>
+            <span class="s1">&#39;&amp;lt;g fill=&quot;none&quot; stroke=&quot;#000000&quot; stroke-opacity=&quot;1&quot; stroke-width=&quot;1&quot;</span>
 <span class="s1">                  stroke-linecap=&quot;square&quot; stroke-linejoin=&quot;bevel&quot; transform=&quot;matrix(1.18081,0,0,1.18081,270.0,550.0)&quot;</span>
-<span class="s1">                  font-family=&quot;Droid Sans&quot; font-size=&quot;35&quot; font-style=&quot;normal&quot;&gt;&#39;</span><span class="p">,</span>
+<span class="s1">                  font-family=&quot;Droid Sans&quot; font-size=&quot;35&quot; font-style=&quot;normal&quot;&amp;gt;&#39;</span><span class="p">,</span>
             <span class="n">kultura</span><span class="p">,</span> <span class="n">vymery</span><span class="p">,</span> <span class="n">vymery_hodnoty</span><span class="p">,</span>
             <span class="n">vcs_titul</span><span class="p">,</span> <span class="n">vcs_brk</span><span class="p">,</span> <span class="n">vcs_brs</span><span class="p">,</span> <span class="n">vcs_chmel</span><span class="p">,</span>
             <span class="n">vcs_zvv</span><span class="p">,</span> <span class="n">vcs_zv</span><span class="p">,</span> <span class="n">vcs_ovv</span><span class="p">,</span> <span class="n">vcs_ov</span><span class="p">,</span> <span class="n">vcs_cur</span><span class="p">,</span> <span class="n">vcs_bip</span><span class="p">,</span>
@@ -150,20 +150,20 @@
             <span class="n">dv_aeko_d1</span><span class="p">,</span> <span class="n">dv_aeko_d2</span><span class="p">,</span> <span class="n">dv_aeko_d3</span><span class="p">,</span> <span class="n">dv_aeko_d4</span><span class="p">,</span> <span class="n">dv_aeko_d5</span><span class="p">,</span>
             <span class="n">dv_aeko_d6</span><span class="p">,</span> <span class="n">dv_aeko_d7</span><span class="p">,</span> <span class="n">dv_aeko_d8</span><span class="p">,</span> <span class="n">dv_aeko_d9</span><span class="p">,</span> <span class="n">dv_aeko_d10</span><span class="p">,</span>
             <span class="n">dv_aeko_e</span><span class="p">,</span> <span class="n">dv_aeko_f</span><span class="p">,</span> <span class="n">ez</span><span class="p">,</span> <span class="n">dzes_text</span><span class="p">,</span> <span class="n">rep</span><span class="p">,</span> <span class="n">obi</span><span class="p">,</span> <span class="n">seop</span><span class="p">,</span> <span class="n">meop</span><span class="p">,</span> <span class="n">pbz</span><span class="p">,</span> <span class="n">dzes7</span><span class="p">,</span>
-            <span class="s1">&#39;&lt;/g&gt;&#39;</span>
+            <span class="s1">&#39;&amp;lt;/g&amp;gt;&#39;</span>
       <span class="p">)</span> <span class="n">popis</span>
 <span class="k">FROM</span> <span class="p">(...);</span>
 </pre></div>
 
 
 <p>Each column from the previous query is a result of <code>SELECT</code> similar to the one&nbsp;below.</p>
-<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">concat</span><span class="p">(</span><span class="s1">&#39;&lt;text fill=&quot;#000000&quot; fill-opacity=&quot;1&quot; stroke=&quot;none&quot;&gt;BrK: &#39;</span><span class="p">,</span> <span class="n">dv_brk</span><span class="p">,</span> <span class="s1">&#39; ha / &#39;</span><span class="p">,</span> <span class="ss">&quot;MV_BRK&quot;</span><span class="p">,</span> <span class="s1">&#39; ha;&#39;</span><span class="p">,</span> <span class="n">kod_dpz</span><span class="p">,</span> <span class="s1">&#39;&lt;/text&gt;&#39;</span><span class="p">)</span> <span class="n">vcs_brk</span>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">concat</span><span class="p">(</span><span class="s1">&#39;&amp;lt;text fill=&quot;#000000&quot; fill-opacity=&quot;1&quot; stroke=&quot;none&quot;&amp;gt;BrK: &#39;</span><span class="p">,</span> <span class="n">dv_brk</span><span class="p">,</span> <span class="s1">&#39; ha / &#39;</span><span class="p">,</span> <span class="ss">&quot;MV_BRK&quot;</span><span class="p">,</span> <span class="s1">&#39; ha;&#39;</span><span class="p">,</span> <span class="n">kod_dpz</span><span class="p">,</span> <span class="s1">&#39;&amp;lt;/text&amp;gt;&#39;</span><span class="p">)</span> <span class="n">vcs_brk</span>
 </pre></div>
 
 
 <p>The <code>transform="matrix(1.18081,0,0,1.18081,270.0,550.0)</code> part puts the text on the right spot. Great finding about <span class="caps">SVG</span> is that it places each <code>&lt;text&gt;</code> element on the new line, so you don&#8217;t need to deal with calculating the position in your&nbsp;script.</p>
 <p>Scale adjustment is done with a dirty lambda&nbsp;function.</p>
-<div class="highlight"><pre><span></span><span class="n">content</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;&gt;(\d{1,3}\.\d{3,5})&lt;/text&gt;&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">m</span> <span class="p">:</span><span class="s2">&quot;&gt;    &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)))))</span> <span class="o">+</span> <span class="s2">&quot;&lt;/text&gt;&quot;</span><span class="p">,</span> <span class="n">old_map</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+<div class="highlight"><pre><span></span><span class="n">content</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;&amp;gt;(\d{1,3}\.\d{3,5})&amp;lt;/text&amp;gt;&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">m</span> <span class="p">:</span><span class="s2">&quot;&amp;gt;    &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)))))</span> <span class="o">+</span> <span class="s2">&quot;&amp;lt;/text&amp;gt;&quot;</span><span class="p">,</span> <span class="n">old_map</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
 </pre></div>
 
 
@@ -182,9 +182,9 @@
     <ul>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/liftago-open-dataset-infographics/">Liftago Open Dataset&nbsp;Infographics</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-creating-gui-with-qt-designer/"><span class="caps">QGIS</span> Plugin Development: Creating <span class="caps">GUI</span> with Qt&nbsp;Designer</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/"><span class="caps">QGIS</span> Plugin Development: Finding Nearest&nbsp;Neighbors</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/">Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span></a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/color-relief-shaded-map-using-open-data-with-open-source-software/">Color Relief Shaded Map Using Open Data with Open Source&nbsp;Software</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-testing-your-code/"><span class="caps">QGIS</span> Plugin Development: Testing Your&nbsp;Code</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/"><span class="caps">QGIS</span> Plugin Development: Using Python&nbsp;Console</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
 <script>

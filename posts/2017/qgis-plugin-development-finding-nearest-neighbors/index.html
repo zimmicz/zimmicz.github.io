@@ -16,7 +16,7 @@
   <meta property="og:title" content="QGIS Plugin Development: Finding Nearest Neighbors" />
   <meta property="og:description" content="I described basics of vector layers manipulation in the previous part of the series. With my goal in mind (fully functional custom plugin capable of writing an attribute value from a source layer to a target layer based on a feature distance), I’d..." />
   <meta property="og:url" content="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?a4089d0f">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
 </head>
 <body>
     <nav role="navigation">
@@ -37,7 +37,7 @@
     <span><a class="category-url" href="https://www.zimmi.cz/posts/category/qgis.html">QGIS</a></span>
     </aside>
 <p>I described basics of vector layers manipulation in <a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/">the previous part</a> of the series. With my goal in mind (fully functional custom plugin capable of writing an attribute value from a source layer to a target layer based on a feature distance), I&#8217;d like to discuss <strong>spatial indexing</strong> and <strong>nearest neighbor analysis</strong>.</p>
-<div class="text-center"><img data-echo="/posts/assets/qgis-plugin-development-finding-nearest-neighbors/qgis.png"/></div>
+<div class="text-center"><img src="/posts/assets/qgis-plugin-development-finding-nearest-neighbors/qgis.png"/></div>
 
 <p>The picture above illustrates the task that can be solved solely by using <span class="caps">QGIS</span> <span class="caps">API</span>. Imagine you&#8217;re given a source layer with an attribute filled with values. You&#8217;re given a target layer as well, sadly though, the values in this layer are missing (<em>not so rare in the <span class="caps">GIS</span> world, right?</em>). Yet you know that the missing attribute value of each feature in the target layer can be filled by the value of its nearest neighbor from the source layer. How do you do&nbsp;that?</p>
 <h2>Generating dummy&nbsp;data</h2>
@@ -45,8 +45,8 @@
 <div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qgis.core</span> <span class="kn">import</span> <span class="n">QgsMapLayerRegistry</span><span class="p">,</span> <span class="n">QgsVectorLayer</span><span class="p">,</span> <span class="n">QgsFeature</span><span class="p">,</span> <span class="n">QgsGeometry</span><span class="p">,</span> <span class="n">QgsPoint</span><span class="p">,</span> <span class="n">QgsSpatialIndex</span>
 <span class="kn">from</span> <span class="nn">qgis.utils</span> <span class="kn">import</span> <span class="n">iface</span>
 
-<span class="n">source_layer</span> <span class="o">=</span> <span class="n">QgsVectorLayer</span><span class="p">(</span><span class="s2">&quot;point?crs=epsg:4326&amp;field=id:integer&amp;field=value:integer&quot;</span><span class="p">,</span> <span class="s2">&quot;Source layer&quot;</span><span class="p">,</span> <span class="s2">&quot;memory&quot;</span><span class="p">)</span>
-<span class="n">target_layer</span> <span class="o">=</span> <span class="n">QgsVectorLayer</span><span class="p">(</span><span class="s2">&quot;point?crs=epsg:4326&amp;field=id:integer&amp;field=value:integer&quot;</span><span class="p">,</span> <span class="s2">&quot;Target layer&quot;</span><span class="p">,</span> <span class="s2">&quot;memory&quot;</span><span class="p">)</span>
+<span class="n">source_layer</span> <span class="o">=</span> <span class="n">QgsVectorLayer</span><span class="p">(</span><span class="s2">&quot;point?crs=epsg:4326&amp;amp;field=id:integer&amp;amp;field=value:integer&quot;</span><span class="p">,</span> <span class="s2">&quot;Source layer&quot;</span><span class="p">,</span> <span class="s2">&quot;memory&quot;</span><span class="p">)</span>
+<span class="n">target_layer</span> <span class="o">=</span> <span class="n">QgsVectorLayer</span><span class="p">(</span><span class="s2">&quot;point?crs=epsg:4326&amp;amp;field=id:integer&amp;amp;field=value:integer&quot;</span><span class="p">,</span> <span class="s2">&quot;Target layer&quot;</span><span class="p">,</span> <span class="s2">&quot;memory&quot;</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">create_dummy_data</span><span class="p">():</span>
 
@@ -131,11 +131,11 @@
 
 <h3>More reading</h3>
     <ul>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/"><span class="caps">QGIS</span> Plugin Development: Using Python&nbsp;Console</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/">Automated Map Creation With <span class="caps">QGIS</span>, PostGIS, Python, <span class="caps">SVG</span> and&nbsp;ImageMagick</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-creating-gui-with-qt-designer/"><span class="caps">QGIS</span> Plugin Development: Creating <span class="caps">GUI</span> with Qt&nbsp;Designer</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-testing-your-code/"><span class="caps">QGIS</span> Plugin Development: Testing Your&nbsp;Code</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/"><span class="caps">QGIS</span> Plugin Development: Using Python&nbsp;Console</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-attributetransfer-plugin/"><span class="caps">QGIS</span> Plugin Development: AttributeTransfer&nbsp;Plugin</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/">Automated Map Creation With <span class="caps">QGIS</span>, PostGIS, Python, <span class="caps">SVG</span> and&nbsp;ImageMagick</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
 <script>

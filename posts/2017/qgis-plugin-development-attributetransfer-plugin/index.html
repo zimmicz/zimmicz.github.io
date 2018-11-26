@@ -16,7 +16,7 @@
   <meta property="og:title" content="QGIS Plugin Development: AttributeTransfer Plugin" />
   <meta property="og:description" content="This part finally brings the whole source code of the QGIS AttributeTransfer plugin. The plugin itself resides in the attribute_transfer.py file. When run() method is invoked, the QT form pops up with combos prefilled with available vector layers that..." />
   <meta property="og:url" content="https://www.zimmi.cz/posts/2017/qgis-plugin-development-attributetransfer-plugin/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?a4089d0f">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
 </head>
 <body>
     <nav role="navigation">
@@ -37,7 +37,7 @@
     <span><a class="category-url" href="https://www.zimmi.cz/posts/category/qgis.html">QGIS</a></span>
     </aside>
 <p>This part finally brings <a href="https://github.com/zimmicz/qgis-attribute-transfer-plugin">the whole source code of the <span class="caps">QGIS</span> AttributeTransfer plugin</a>.</p>
-<div class="text-center"><img data-echo="/posts/assets/qgis-plugin-development-attribute-transfer-plugin/qgis.gif"/></div>
+<div class="text-center"><img src="/posts/assets/qgis-plugin-development-attribute-transfer-plugin/qgis.gif"/></div>
 
 <p>The plugin itself resides in the <a href="https://github.com/zimmicz/qgis-attribute-transfer-plugin/blob/master/attribute_transfer.py"><code>attribute_transfer.py</code></a> file. When <code>run()</code> method is invoked, the <span class="caps">QT</span> form pops up with combos prefilled with available vector layers that support attribute&nbsp;editing.</p>
 <p>Source and target layer combos are mutually exclusive, thus it&#8217;s not possible to transfer the attribute within the same&nbsp;layer.</p>
@@ -73,7 +73,7 @@
 </tbody>
 </table>
 <p>Using the spatial index brings one more issue I&#8217;ve come to realize just after implementing the special comparison workflows for different geometry types. There&#8217;s a chance of finding the nearest feature using the bounding box that&#8217;s actually <em>not</em> the nearest feature. In that case, I chose to find the most distant vertex of such a feature and use it to construct the rectangle around the target feature. If there are any source features in such a rectangle, it&#8217;s very likely one of them is the <em>real</em> nearest&nbsp;feature.</p>
-<div class="text-center"><img data-echo="/posts/assets/qgis-plugin-development-attribute-transfer-plugin/qgis.png"/></div>
+<div class="text-center"><img src="/posts/assets/qgis-plugin-development-attribute-transfer-plugin/qgis.png"/></div>
 
 <p>Right now, I&#8217;m working on <a href="https://github.com/zimmicz/qgis-attribute-transfer-plugin/issues/3">finding the nearest feature even if no bounding box intersection is found</a>. Meanwhile, <a href="https://github.com/zimmicz/qgis-attribute-transfer-plugin/issues/2">the plugin is being reviewed</a> to be featured in <a href="https://plugins.qgis.org"><span class="caps">QGIS</span> Plugins repository</a>. Fingers&nbsp;crossed.</p>
 <p>I thought this was going to be the last part of the series. But how could one possibly claim the coding project done without writing <em>tests</em>? Stay tuned for the next&nbsp;episode.</p>
@@ -102,11 +102,11 @@
 
 <h3>More reading</h3>
     <ul>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/"><span class="caps">QGIS</span> Plugin Development: Using Python&nbsp;Console</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/">Automated Map Creation With <span class="caps">QGIS</span>, PostGIS, Python, <span class="caps">SVG</span> and&nbsp;ImageMagick</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-creating-gui-with-qt-designer/"><span class="caps">QGIS</span> Plugin Development: Creating <span class="caps">GUI</span> with Qt&nbsp;Designer</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-testing-your-code/"><span class="caps">QGIS</span> Plugin Development: Testing Your&nbsp;Code</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/"><span class="caps">QGIS</span> Plugin Development: Using Python&nbsp;Console</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/"><span class="caps">QGIS</span> Plugin Development: Finding Nearest&nbsp;Neighbors</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/">Automated Map Creation With <span class="caps">QGIS</span>, PostGIS, Python, <span class="caps">SVG</span> and&nbsp;ImageMagick</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
 <script>

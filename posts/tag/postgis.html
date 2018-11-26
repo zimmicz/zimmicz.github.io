@@ -7,7 +7,7 @@
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
         <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
         <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?a4089d0f">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
 </head>
 <body>
     <nav role="navigation">
@@ -30,10 +30,10 @@
     <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p><a href="({filename}../2017/postgis-as-a-mapbox-vector-tiles-generator.md)">Since version 2.4.0, PostGIS can serve <span class="caps">MVT</span></a> data directly. <span class="caps">MVT</span> returning queries put heavy workload on the database though. On top of that, each of the query has to be run again every time a client demands the data. This leaves us with plenty of room to optimize the&nbsp;process.</p>
-<div class="text-center"><img data-echo="/posts/assets/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/election.gif"/></div>
+<div class="text-center"><img src="/posts/assets/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/election.gif"/></div>
 
 <p>During the last week, while working on the Czech legislative election data visualization, I&#8217;ve struggled with the server becoming unresponsive far too often due to the issues mentioned&nbsp;above.</p>
-<div class="text-center"><img data-echo="/posts/assets/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/schema.png"/></div>
+<div class="text-center"><img src="/posts/assets/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/schema.png"/></div>
 
 <p>According to the schema, the first client to come to the&nbsp;server:</p>
 <ul>
@@ -169,7 +169,7 @@
 RUN apt update
 RUN apt install -y wget less systemd
 RUN touch /etc/apt/sources.list.d/pgdg.list
-RUN <span class="nb">echo</span> <span class="s2">&quot;deb http://apt.postgresql.org/pub/repos/apt/ zesty-pgdg main&quot;</span> &gt; /etc/apt/sources.list.d/pgdg.list
+RUN <span class="nb">echo</span> <span class="s2">&quot;deb http://apt.postgresql.org/pub/repos/apt/ zesty-pgdg main&quot;</span> <span class="p">&amp;</span>gt<span class="p">;</span> /etc/apt/sources.list.d/pgdg.list
 RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc <span class="p">|</span> apt-key add -
 RUN apt update
 RUN apt -y install postgresql-9.6 postgresql-server-dev-9.6
@@ -178,18 +178,18 @@ USER postgres
 RUN /usr/lib/postgresql/9.6/bin/pg_ctl -D /var/lib/postgresql/9.6/main -l /tmp/logfile start
 
 USER root
-RUN <span class="nb">echo</span> <span class="s2">&quot;host all  all    0.0.0.0/0  trust&quot;</span> &gt;&gt; /etc/postgresql/9.6/main/pg_hba.conf <span class="o">&amp;&amp;</span> <span class="se">\</span>
-    <span class="nb">echo</span> <span class="s2">&quot;listen_addresses=&#39;*&#39;&quot;</span> &gt;&gt; /etc/postgresql/9.6/main/postgresql.conf
+RUN <span class="nb">echo</span> <span class="s2">&quot;host all  all    0.0.0.0/0  trust&quot;</span> <span class="p">&amp;</span>gt<span class="p">;&amp;</span>gt<span class="p">;</span> /etc/postgresql/9.6/main/pg_hba.conf <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> <span class="se">\</span>
+    <span class="nb">echo</span> <span class="s2">&quot;listen_addresses=&#39;*&#39;&quot;</span> <span class="p">&amp;</span>gt<span class="p">;&amp;</span>gt<span class="p">;</span> /etc/postgresql/9.6/main/postgresql.conf
 
 
 EXPOSE <span class="m">5432</span>
 RUN apt install -y netcat build-essential libxml2 libxml2-dev libgeos-3.5.1 libgdal-dev gdal-bin libgdal20 libgeos-dev libprotobuf-c1 libprotobuf-c-dev libprotobuf-dev protobuf-compiler protobuf-c-compiler
 RUN wget http://download.osgeo.org/postgis/source/postgis-2.4.0alpha.tar.gz
 RUN tar -xvzf postgis-2.4.0alpha.tar.gz
-RUN <span class="nb">cd</span> postgis-2.4.0alpha <span class="o">&amp;&amp;</span> ./configure <span class="o">&amp;&amp;</span> make <span class="o">&amp;&amp;</span> make install
+RUN <span class="nb">cd</span> postgis-2.4.0alpha <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> ./configure <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> make <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> make install
 
 USER postgres
-RUN service postgresql start <span class="o">&amp;&amp;</span> psql -c <span class="s2">&quot;CREATE EXTENSION postgis&quot;</span>
+RUN service postgresql start <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> psql -c <span class="s2">&quot;CREATE EXTENSION postgis&quot;</span>
 
 USER root
 COPY start.postgis.sh /start.postgis.sh
@@ -206,7 +206,7 @@ CMD <span class="o">[</span><span class="s2">&quot;/start.postgis.sh&quot;</span
 <span class="nv">CONF</span><span class="o">=</span><span class="s2">&quot;/etc/postgresql/9.6/main/postgresql.conf&quot;</span>
 <span class="nv">POSTGRES</span><span class="o">=</span><span class="s2">&quot;/usr/lib/postgresql/9.6/bin/postgres&quot;</span>
 
-su postgres sh -c <span class="s2">&quot;</span><span class="nv">$POSTGRES</span><span class="s2"> -D </span><span class="nv">$DATADIR</span><span class="s2"> -c config_file=</span><span class="nv">$CONF</span><span class="s2">&quot;</span> <span class="p">&amp;</span>
+su postgres sh -c <span class="s2">&quot;</span><span class="nv">$POSTGRES</span><span class="s2"> -D </span><span class="nv">$DATADIR</span><span class="s2"> -c config_file=</span><span class="nv">$CONF</span><span class="s2">&quot;</span> <span class="p">&amp;</span>amp<span class="p">;</span>
 <span class="k">until</span> nc -z localhost <span class="m">5432</span><span class="p">;</span>
 <span class="k">do</span>
     <span class="nb">echo</span> ...
@@ -224,7 +224,7 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
 <p>I got a cadastre area dataset of the Czech Republic for testing, which contains ~ 13,000 polygons. The geometries should come in Web Mercator a.k.a. <span class="caps">EPSG</span>:3857 to work with <a href="https://www.mapbox.com/vector-tiles/specification/"><span class="caps">MVT</span></a>.</p>
 <h2>Vector&nbsp;tiles</h2>
 <p>I got a bit confused by the docs of <a href="https://postgis.net/docs/manual-dev/ST_AsMVT.html">ST_AsMVT</a> and <a href="https://postgis.net/docs/manual-dev/ST_AsMVTGeom.html">ST_AsMVTGeom</a>. Especially the latter one took me a few hours to get it right. What is essential (I guess) about Mapbox Vector Tiles is that you have to abstract from the real world coordinates and start thinking inside the tile coordinates. What PostGIS does with <code>ST_AsMVTGeom</code> (and what any other <span class="caps">MVT</span> implemenation should do for you) is that it takes real world coordinates and put them inside a&nbsp;tile.</p>
-<div class="text-center"><img data-echo="/posts/assets/postgis-as-a-mapbox-vector-tiles-generator/mvt.gif"/></div>
+<div class="text-center"><img src="/posts/assets/postgis-as-a-mapbox-vector-tiles-generator/mvt.gif"/></div>
 
 <p>To make this work, you need to know every bounding box of every tile on every zoom level in a Web Mercator projection. Or you can use <a href="https://github.com/mapbox/postgis-vt-util/blob/master/src/TileBBox.sql">TileBBox procedure by Mapbox</a>, if you&nbsp;wish.</p>
 <p>The <span class="caps">SQL</span> query itself is pretty simple (this comes from an express route I&#8217;ll be discussing&nbsp;shortly).</p>
@@ -324,7 +324,7 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
 
 
 <p>This function creates the <code>cze.roads_noded_vertices_pgr</code> that contains all the extracted nodes from the&nbsp;network.</p>
-<div class="text-center"><img data-echo="/posts/assets/routing-with-pgrouting-catchment-area-calculation/nodes.png" width="70%" /></div>
+<div class="text-center"><img src="/posts/assets/routing-with-pgrouting-catchment-area-calculation/nodes.png" width="70%" /></div>
 
 <p>As already mentioned, measures other than length can be used as a distance, I chose the time to get to a given node on&nbsp;foot.</p>
 <div class="highlight"><pre><span></span><span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="k">ADD</span> <span class="k">COLUMN</span> <span class="n">cost_minutes</span> <span class="nb">integer</span><span class="p">;</span>
@@ -364,7 +364,7 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
     <span class="p">);</span>
 
     <span class="c1">-- order by the biggest area so the polygons are not hidden beneath the bigger ones</span>
-    <span class="k">FOR</span> <span class="k">c</span> <span class="k">IN</span> <span class="k">SELECT</span> <span class="n">agg_cost</span> <span class="k">FROM</span> <span class="n">cze</span><span class="p">.</span><span class="n">temp</span> <span class="k">GROUP</span> <span class="k">BY</span> <span class="n">agg_cost</span> <span class="k">HAVING</span> <span class="k">COUNT</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="mi">1</span> <span class="k">DESC</span> <span class="n">LOOP</span>
+    <span class="k">FOR</span> <span class="k">c</span> <span class="k">IN</span> <span class="k">SELECT</span> <span class="n">agg_cost</span> <span class="k">FROM</span> <span class="n">cze</span><span class="p">.</span><span class="n">temp</span> <span class="k">GROUP</span> <span class="k">BY</span> <span class="n">agg_cost</span> <span class="k">HAVING</span> <span class="k">COUNT</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="mi">3</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="mi">1</span> <span class="k">DESC</span> <span class="n">LOOP</span>
         <span class="n">RAISE</span> <span class="n">INFO</span> <span class="s1">&#39;%&#39;</span><span class="p">,</span> <span class="k">c</span><span class="p">;</span>
         <span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">tmp</span> <span class="p">(</span><span class="n">agg_cost</span><span class="p">,</span> <span class="n">geom</span><span class="p">)</span>
         <span class="k">SELECT</span>
@@ -383,7 +383,7 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
 
 
 <p>Using <code>pgr_pointsAsPolygon</code> renders resulting nodes accessible in 10-minute walk in polygons, but weird looking ones. Not bad, could be better&nbsp;though.</p>
-<div class="text-center"><img data-echo="/assets/routing-with-pgrouting-catchment-area-calculation/area1.png" width="70%" /></div>
+<div class="text-center"><img src="/assets/routing-with-pgrouting-catchment-area-calculation/area1.png" width="70%" /></div>
 
 <p>How about seeing only nodes instead of&nbsp;polygons?</p>
 <div class="highlight"><pre><span></span><span class="k">SELECT</span>
@@ -400,7 +400,7 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
 
 
 <p>Looks good, could be better&nbsp;though.</p>
-<div class="text-center"><img data-echo="/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png" width="70%" /></div>
+<div class="text-center"><img src="/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png" width="70%" /></div>
 
 <p>How about creating concave hulls from the extracted&nbsp;nodes?</p>
 <div class="highlight"><pre><span></span><span class="k">SELECT</span>
@@ -424,7 +424,7 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
 
 
 <p>This one looks the best I&nbsp;guess.</p>
-<div class="text-center"><img data-echo="/assets/routing-with-pgrouting-catchment-area-calculation/area2.png" width="70%" /></div>
+<div class="text-center"><img src="/assets/routing-with-pgrouting-catchment-area-calculation/area2.png" width="70%" /></div>
 
 <h2>Remarks</h2>
 <ul>
@@ -443,7 +443,7 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
     </aside>
     <p>Spatial indexes are absolutely crucial part of any spatial database and - as I tend to say quite often - only a fool would try to query spatial data without building spatial indexes&nbsp;beforehand.</p>
 <p>Spatial indexes are based on bounding box comparisons, which are generally very fast. Yet, there are situations when spatial indexes don&#8217;t help much (or they don&#8217;t help as much as they could, if you&nbsp;wish).</p>
-<div class="text-center"><img data-echo="/posts/assets/subdivide-and-conquer-effective-spatial-indexes-in-postgis/index.svg" /></div>
+<div class="text-center"><img src="/posts/assets/subdivide-and-conquer-effective-spatial-indexes-in-postgis/index.svg" /></div>
 
 <p>Bounding box comparisons are effective with lots of small bounding boxes rather then few large ones. Why? See the picture above. The curved line (imagine it&#8217;s a pipeline for example) clearly demonstrates when the spatial index/bounding box comparison might fall short of what you&#8217;d&nbsp;expect.</p>
 <p>Once the bounding box gets really big, it intersects so many other geometries&#8217; bounding boxes that the whole comparison starts to slow&nbsp;down.</p>
@@ -513,7 +513,7 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
     </aside>
     <p>I&#8217;ve come across the <a href="http://gis.stackexchange.com/questions/208797/draw-wind-rose-with-qgis-from-postgis/">beautiful <span class="caps">GIS</span> StackExchange question</a> recently, asking how to draw a <a href="https://en.wikipedia.org/wiki/Wind_rose">wind rose</a> within&nbsp;PostGIS.</p>
 <div class="text-center">
-<img data-echo="http://i.stack.imgur.com/0xAMU.png">
+<img src="http://i.stack.imgur.com/0xAMU.png">
 </div>
 
 <p>It&#8217;s pretty easy to accomplish this with a custom <span class="caps">PLPGSQL</span> procedure below, that takes line geometry, number of sections and radius of the inner circle as&nbsp;parameters.</p>
@@ -530,11 +530,11 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
 <span class="p">)</span>
 <span class="k">AS</span> <span class="err">$</span><span class="n">ST_WindRose$</span>
 <span class="k">BEGIN</span>
-    <span class="k">IF</span> <span class="n">directions</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">&lt;&gt;</span> <span class="mi">0</span> <span class="k">THEN</span>
+    <span class="k">IF</span> <span class="n">directions</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="mi">0</span> <span class="k">THEN</span>
         <span class="n">RAISE</span> <span class="k">EXCEPTION</span> <span class="s1">&#39;Odd number of directions found, please provide even number of directions instead.&#39;</span><span class="p">;</span>
     <span class="k">END</span> <span class="k">IF</span><span class="p">;</span>
 
-<span class="k">IF</span> <span class="n">radius</span> <span class="o">&gt;</span> <span class="n">ST_Length</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="k">THEN</span>
+<span class="k">IF</span> <span class="n">radius</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">ST_Length</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="k">THEN</span>
     <span class="n">RAISE</span> <span class="k">EXCEPTION</span> <span class="s1">&#39;Inner circle radius is bigger than the wind rose diameter, please make it smaller.&#39;</span><span class="p">;</span>
 <span class="k">END</span> <span class="k">IF</span><span class="p">;</span>
 
@@ -567,7 +567,7 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
 
 <p>Wind rose created with this function might look like the one&nbsp;below.</p>
 <div class="text-center">
-<img data-echo="http://i.stack.imgur.com/4OD0J.png">
+<img src="http://i.stack.imgur.com/4OD0J.png">
 </div>
 
 <p>Run it as follows. The <code>line</code> parameter should be a simple straight line made of just two&nbsp;vertices.</p>

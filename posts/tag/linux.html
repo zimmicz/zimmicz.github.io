@@ -7,7 +7,7 @@
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
         <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
         <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?a4089d0f">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
 </head>
 <body>
     <nav role="navigation">
@@ -63,10 +63,10 @@
 <p>This systemd service file is no more than a simple wrapper around the following bash code. We run three different database clusters on one machine and this approach makes their maintenance pretty&nbsp;comfortable.</p>
 <div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
 <span class="c1">#</span>
-<span class="c1"># @author: Michal Zimmermann &lt;michal.zimmermann@clevermaps.cz&gt;</span>
+<span class="c1"># @author: Michal Zimmermann &amp;lt;michal.zimmermann@clevermaps.cz&amp;gt;</span>
 <span class="c1"># Vacuums the whole database cluster running on a given port.</span>
 
-<span class="k">while</span> <span class="o">[[</span> <span class="nv">$#</span> &gt; <span class="m">0</span> <span class="o">]]</span>
+<span class="k">while</span> <span class="o">[[</span> <span class="nv">$#</span> <span class="p">&amp;</span>gt<span class="p">;</span> <span class="m">0</span> <span class="o">]]</span>
 <span class="k">do</span>
     <span class="nv">key</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>
 
@@ -141,7 +141,7 @@
 <p>Full backup creation is just one example of how powerful bash can&nbsp;be.</p>
 <div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
 <span class="c1">#</span>
-<span class="c1"># @author: Michal Zimmermann &lt;michal.zimmermann@clevermaps.cz&gt;</span>
+<span class="c1"># @author: Michal Zimmermann &amp;lt;michal.zimmermann@clevermaps.cz&amp;gt;</span>
 <span class="c1"># Creates base backup.</span>
 
 <span class="nv">CUR_DIR</span><span class="o">=</span><span class="k">$(</span>dirname <span class="s2">&quot;</span><span class="nv">$0</span><span class="s2">&quot;</span><span class="k">)</span>
@@ -177,17 +177,17 @@ pg_basebackup <span class="se">\</span>
     <span class="nb">exit</span> <span class="m">3</span>
 <span class="k">fi</span>
 
-tar -czf <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span>.tar.gz <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span> <span class="o">&amp;&amp;</span> rm -rf <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span>
+tar -czf <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span>.tar.gz <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span> <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> rm -rf <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><span class="si">}</span>/<span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span>
 </pre></div>
 
 
 <p>As you probably noticed, a <code>pgsql-common.sh</code> file is sourced at the beginning of the script. This script in turn just loads the proper config file that provides variables to other, devops, scripts. As you might need those variables in several of your scripts, it is a good idea to put their load to a separate&nbsp;file.</p>
 <div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
 <span class="c1">#</span>
-<span class="c1"># @author: Michal Zimmermann &lt;michal.zimmermann@clevermaps.cz&gt;</span>
+<span class="c1"># @author: Michal Zimmermann &amp;lt;michal.zimmermann@clevermaps.cz&amp;gt;</span>
 <span class="c1"># Sourced in pgsql-*.sh scripts.</span>
 
-<span class="k">while</span> <span class="o">[[</span> <span class="nv">$#</span> &gt; <span class="m">0</span> <span class="o">]]</span>
+<span class="k">while</span> <span class="o">[[</span> <span class="nv">$#</span> <span class="p">&amp;</span>gt<span class="p">;</span> <span class="m">0</span> <span class="o">]]</span>
 <span class="k">do</span>
     <span class="nv">key</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>
 
@@ -237,10 +237,10 @@ tar -czf <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><sp
 <p>Another, likely the simplest, example is a vacuumdb&nbsp;task:</p>
 <div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
 <span class="c1">#</span>
-<span class="c1"># @author: Michal Zimmermann &lt;michal.zimmermann@clevermaps.cz&gt;</span>
+<span class="c1"># @author: Michal Zimmermann &amp;lt;michal.zimmermann@clevermaps.cz&amp;gt;</span>
 <span class="c1"># Vacuums the whole database cluster running on a given port.</span>
 
-<span class="k">while</span> <span class="o">[[</span> <span class="nv">$#</span> &gt; <span class="m">0</span> <span class="o">]]</span>
+<span class="k">while</span> <span class="o">[[</span> <span class="nv">$#</span> <span class="p">&amp;</span>gt<span class="p">;</span> <span class="m">0</span> <span class="o">]]</span>
 <span class="k">do</span>
     <span class="nv">key</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>
 

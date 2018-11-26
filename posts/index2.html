@@ -7,7 +7,7 @@
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
         <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
         <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?a4089d0f">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
 </head>
 <body>
     <nav role="navigation">
@@ -23,13 +23,136 @@
     <main>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-testing-your-code/" rel="bookmark" title="Permalink to QGIS Plugin Development: Testing Your Code"><span class="caps">QGIS</span> Plugin Development: Testing Your&nbsp;Code</a></h1>
+    <aside><span>Nov 30, 2017</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">QGIS</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/qgis.html">QGIS</a></span>
+    </aside>
+    <p>Good news, everyone! The <a href="https://plugins.qgis.org/plugins/AttributeTransfer/">AttributeTransfer</a> plugin has been approved for <a href="https://plugins.qgis.org/plugins/"><span class="caps">QGIS</span> Python Plugins Repository</a>. It&#8217;s available via <span class="caps">QGIS</span> <em>Manage and Install Plugins</em> menu. Feel free to&nbsp;download!</p>
+<p>Nevertheless, this post (the last in the series) covers <span class="caps">QGIS</span> plugin testing rather than my personal feelings about the aforementioned&nbsp;success.</p>
+<h2>Testing means&nbsp;mocking</h2>
+<p>To test a <span class="caps">QGIS</span> plugin you need to simulate the environment it&#8217;s meant to run in. And that environment is obviously <span class="caps">QGIS</span> itself, yet it&#8217;s not feasible to launch <span class="caps">QGIS</span> every time you run a test. Luckily, <a href="https://github.com/zimmicz/qgis-attribute-transfer-plugin/blob/master/tests/utilities.py">there&#8217;s a great <code>QGIS</code> mock</a> that gets you going in no time (it completely slipped my mind where I found that piece of code&nbsp;though).</p>
+<h2>Testing means you need&nbsp;data</h2>
+<p>Every test is run again and again, which means it has to reset the data being used to its default state. This might be a <span class="caps">PIDA</span> if the test changes the data in an unpredictable&nbsp;manner.</p>
+<p>Using <span class="caps">QGIS</span> memory layers <a href="https://github.com/zimmicz/qgis-attribute-transfer-plugin/blob/master/tests/create_dummy_data.py">you can prepare fresh data</a> for each of your tests, effectively putting the whole data manipulation process&nbsp;aside.</p>
+<h2>Writing&nbsp;tests</h2>
+<p>Each of the AttributeTransfer plugin tests inherits from <code>unittest.TestCase</code>, which comes with several methods you might be familiar with from other languages: <code>setUp()</code> is run before for every test method, while <code>tearDown()</code> is run after each of them. Tests are defined as methods whose names start with the word <code>test</code>.</p>
+<p>Each test should call some <code>assertWhatever</code> method that checks whether the test passed or failed. Here&#8217;s an example of such a test covering non-point&nbsp;layers.</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># @Date    : 2017-11-18 18:40:50</span>
+<span class="c1"># @Author  : Michal Zimmermann &amp;lt;zimmicz@gmail.com&amp;gt;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sip</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+<span class="kn">from</span> <span class="nn">qgis.core</span> <span class="kn">import</span> <span class="n">QgsMapLayerRegistry</span><span class="p">,</span> <span class="n">QgsVectorLayer</span><span class="p">,</span> <span class="n">QgsFeature</span><span class="p">,</span> <span class="n">QgsGeometry</span><span class="p">,</span> <span class="n">QgsPoint</span>
+<span class="kn">from</span> <span class="nn">utilities</span> <span class="kn">import</span> <span class="n">get_qgis_app</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;/..&quot;</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">attribute_transfer</span> <span class="kn">import</span> <span class="n">AttributeTransfer</span>
+<span class="kn">from</span> <span class="nn">create_dummy_data</span> <span class="kn">import</span> <span class="n">create_dummy_data_polygon_or_line</span>
+
+<span class="n">sip</span><span class="o">.</span><span class="n">setapi</span><span class="p">(</span><span class="s1">&#39;QtCore&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">sip</span><span class="o">.</span><span class="n">setapi</span><span class="p">(</span><span class="s1">&#39;QString&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">sip</span><span class="o">.</span><span class="n">setapi</span><span class="p">(</span><span class="s1">&#39;QDate&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">sip</span><span class="o">.</span><span class="n">setapi</span><span class="p">(</span><span class="s1">&#39;QDateTime&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">sip</span><span class="o">.</span><span class="n">setapi</span><span class="p">(</span><span class="s1">&#39;QTextStream&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">sip</span><span class="o">.</span><span class="n">setapi</span><span class="p">(</span><span class="s1">&#39;QTime&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">sip</span><span class="o">.</span><span class="n">setapi</span><span class="p">(</span><span class="s1">&#39;QUrl&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">sip</span><span class="o">.</span><span class="n">setapi</span><span class="p">(</span><span class="s1">&#39;QVariant&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="n">QGIS_APP</span> <span class="o">=</span> <span class="n">get_qgis_app</span><span class="p">()</span>
+<span class="n">IFACE</span> <span class="o">=</span> <span class="n">QGIS_APP</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+
+<span class="k">class</span> <span class="nc">AttributeTransferTestPolygonOrLine</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source_layer</span> <span class="o">=</span> <span class="n">QgsVectorLayer</span><span class="p">(</span>
+            <span class="s2">&quot;Polygon?crs=epsg:4326&amp;amp;field=id:integer&amp;amp;field=textAttr:string&amp;amp;field=intAttr:integer&amp;amp;field=decAttr:double&amp;amp;field=dateAttr:date&amp;amp;index=yes&quot;</span><span class="p">,</span> <span class="s2">&quot;source layer&quot;</span><span class="p">,</span> <span class="s2">&quot;memory&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_layer</span> <span class="o">=</span> <span class="n">QgsVectorLayer</span><span class="p">(</span>
+            <span class="s2">&quot;Linestring?crs=epsg:4326&amp;amp;field=id:integer&amp;amp;index=yes&quot;</span><span class="p">,</span> <span class="s2">&quot;target layer&quot;</span><span class="p">,</span> <span class="s2">&quot;memory&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget</span> <span class="o">=</span> <span class="n">AttributeTransfer</span><span class="p">(</span><span class="n">IFACE</span><span class="p">)</span>
+
+        <span class="n">registry</span> <span class="o">=</span> <span class="n">QgsMapLayerRegistry</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span>
+        <span class="n">registry</span><span class="o">.</span><span class="n">removeAllMapLayers</span><span class="p">()</span>
+        <span class="n">registry</span><span class="o">.</span><span class="n">addMapLayers</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">source_layer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_layer</span><span class="p">])</span>
+        <span class="n">create_dummy_data_polygon_or_line</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source_layer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_layer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">initGui</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">vectors</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">source_layer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_layer</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">editable_vectors</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">source_layer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_layer</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">dlg</span><span class="o">.</span><span class="n">sourceLayer</span><span class="o">.</span><span class="n">addItems</span><span class="p">([</span><span class="s2">&quot;source layer&quot;</span><span class="p">,</span> <span class="s2">&quot;target layer&quot;</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">test_text_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ATTRIBUTE_NAME</span> <span class="o">=</span> <span class="s2">&quot;textAttr&quot;</span>
+        <span class="n">ATTRIBUTE_INDEX</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_test_attr</span><span class="p">(</span><span class="n">ATTRIBUTE_NAME</span><span class="p">,</span> <span class="n">ATTRIBUTE_INDEX</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_int_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ATTRIBUTE_NAME</span> <span class="o">=</span> <span class="s2">&quot;intAttr&quot;</span>
+        <span class="n">ATTRIBUTE_INDEX</span> <span class="o">=</span> <span class="mi">2</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_test_attr</span><span class="p">(</span><span class="n">ATTRIBUTE_NAME</span><span class="p">,</span> <span class="n">ATTRIBUTE_INDEX</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_dec_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ATTRIBUTE_NAME</span> <span class="o">=</span> <span class="s2">&quot;decAttr&quot;</span>
+        <span class="n">ATTRIBUTE_INDEX</span> <span class="o">=</span> <span class="mi">3</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_test_attr</span><span class="p">(</span><span class="n">ATTRIBUTE_NAME</span><span class="p">,</span> <span class="n">ATTRIBUTE_INDEX</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_date_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ATTRIBUTE_NAME</span> <span class="o">=</span> <span class="s2">&quot;dateAttr&quot;</span>
+        <span class="n">ATTRIBUTE_INDEX</span> <span class="o">=</span> <span class="mi">4</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_test_attr</span><span class="p">(</span><span class="n">ATTRIBUTE_NAME</span><span class="p">,</span> <span class="n">ATTRIBUTE_INDEX</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_existing_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ATTRIBUTE_NAME</span> <span class="o">=</span> <span class="s2">&quot;id&quot;</span>
+        <span class="n">ATTRIBUTE_INDEX</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">dlg</span><span class="o">.</span><span class="n">sourceAttribute</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="n">ATTRIBUTE_INDEX</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">dlg</span><span class="o">.</span><span class="n">targetAttribute</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">ATTRIBUTE_NAME</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">dlg</span><span class="o">.</span><span class="n">sourceAttribute</span><span class="o">.</span><span class="n">currentText</span><span class="p">(),</span> <span class="n">ATTRIBUTE_NAME</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">transfer</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">_test_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">,</span> <span class="n">attr_index</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">dlg</span><span class="o">.</span><span class="n">sourceAttribute</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="n">attr_index</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">dlg</span><span class="o">.</span><span class="n">targetAttribute</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">attr_name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">dlg</span><span class="o">.</span><span class="n">sourceAttribute</span><span class="o">.</span><span class="n">currentText</span><span class="p">(),</span> <span class="n">attr_name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">transfer</span><span class="p">()</span>
+
+        <span class="n">target_fields</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">()</span>
+                         <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_layer</span><span class="o">.</span><span class="n">dataProvider</span><span class="p">()</span><span class="o">.</span><span class="n">fields</span><span class="p">()]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="n">attr_name</span><span class="p">,</span> <span class="n">target_fields</span><span class="p">)</span>
+
+        <span class="n">source_features</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">source_layer</span><span class="o">.</span><span class="n">getFeatures</span><span class="p">()]</span>
+        <span class="n">target_features</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_layer</span><span class="o">.</span><span class="n">getFeatures</span><span class="p">()]</span>
+
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">source_features</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">attribute</span><span class="p">(</span><span class="n">attr_name</span><span class="p">),</span> <span class="n">target_features</span><span class="p">[</span>
+                             <span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">attribute</span><span class="p">(</span><span class="n">attr_name</span><span class="p">))</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-attributetransfer-plugin/" rel="bookmark" title="Permalink to QGIS Plugin Development: AttributeTransfer Plugin"><span class="caps">QGIS</span> Plugin Development: AttributeTransfer&nbsp;Plugin</a></h1>
     <aside><span>Nov 23, 2017</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">QGIS</a>    </span>
     <span><a class="category-url" href="https://www.zimmi.cz/posts/category/qgis.html">QGIS</a></span>
     </aside>
     <p>This part finally brings <a href="https://github.com/zimmicz/qgis-attribute-transfer-plugin">the whole source code of the <span class="caps">QGIS</span> AttributeTransfer plugin</a>.</p>
-<div class="text-center"><img data-echo="/posts/assets/qgis-plugin-development-attribute-transfer-plugin/qgis.gif"/></div>
+<div class="text-center"><img src="/posts/assets/qgis-plugin-development-attribute-transfer-plugin/qgis.gif"/></div>
 
 <p>The plugin itself resides in the <a href="https://github.com/zimmicz/qgis-attribute-transfer-plugin/blob/master/attribute_transfer.py"><code>attribute_transfer.py</code></a> file. When <code>run()</code> method is invoked, the <span class="caps">QT</span> form pops up with combos prefilled with available vector layers that support attribute&nbsp;editing.</p>
 <p>Source and target layer combos are mutually exclusive, thus it&#8217;s not possible to transfer the attribute within the same&nbsp;layer.</p>
@@ -65,7 +188,7 @@
 </tbody>
 </table>
 <p>Using the spatial index brings one more issue I&#8217;ve come to realize just after implementing the special comparison workflows for different geometry types. There&#8217;s a chance of finding the nearest feature using the bounding box that&#8217;s actually <em>not</em> the nearest feature. In that case, I chose to find the most distant vertex of such a feature and use it to construct the rectangle around the target feature. If there are any source features in such a rectangle, it&#8217;s very likely one of them is the <em>real</em> nearest&nbsp;feature.</p>
-<div class="text-center"><img data-echo="/posts/assets/qgis-plugin-development-attribute-transfer-plugin/qgis.png"/></div>
+<div class="text-center"><img src="/posts/assets/qgis-plugin-development-attribute-transfer-plugin/qgis.png"/></div>
 
 <p>Right now, I&#8217;m working on <a href="https://github.com/zimmicz/qgis-attribute-transfer-plugin/issues/3">finding the nearest feature even if no bounding box intersection is found</a>. Meanwhile, <a href="https://github.com/zimmicz/qgis-attribute-transfer-plugin/issues/2">the plugin is being reviewed</a> to be featured in <a href="https://plugins.qgis.org"><span class="caps">QGIS</span> Plugins repository</a>. Fingers&nbsp;crossed.</p>
 <p>I thought this was going to be the last part of the series. But how could one possibly claim the coding project done without writing <em>tests</em>? Stay tuned for the next&nbsp;episode.</p>
@@ -80,7 +203,7 @@
 <p>While <span class="caps">QGIS</span> <span class="caps">API</span> docs took me few hours to grasp, the PyQGIS ecosystem knocked my socks off. Here comes the list of tools you should incorporate into your development process as soon as&nbsp;possible.</p>
 <h2>Plugin&nbsp;Builder</h2>
 <p>The <a href="https://plugins.qgis.org/plugins/pluginbuilder/"><span class="caps">QGIS</span> Plugin Builder</a> is a plugin created to create&hellip; well, other plugins. It gets you going in minutes and lets you code instead of setting up things you don&#8217;t want to be setting up. A definite must-have. Note you should put the plugin inside the <span class="caps">QGIS</span> plugins folder (defaults to ~/.qgis2/python/plugins) in&nbsp;Linux.</p>
-<div class="text-center"><img data-echo="/posts/assets/qgis-plugin-development-creating-gui-with-qt-designer/qgis.gif"/></div>
+<div class="text-center"><img src="/posts/assets/qgis-plugin-development-creating-gui-with-qt-designer/qgis.gif"/></div>
 
 <p>Remember to run <code>pyrcc4 -o resources.py resources.qrc</code> inside your plugin folder before you add it to <span class="caps">QGIS</span>.</p>
 <h2>Plugin&nbsp;Reloader</h2>
@@ -88,11 +211,11 @@
 <h2>Qt&nbsp;Designer</h2>
 <p><a href="https://www.qt.io/qt-features-libraries-apis-tools-and-ide/">Qt Designer</a> comes with <code>qt4-designer</code> package in Ubuntu. It is tailored to design and build GUIs from Qt components that can be used within <span class="caps">QGIS</span>. Its drag&amp;drop interface lets you prototype&nbsp;quickly.</p>
 <p>Thanks to the Plugin Builder you can load the <code>attribute_transfer_dialog_base.ui</code> file straight into the Qt Designer and adjust it to your&nbsp;needs.</p>
-<div class="text-center"><img data-echo="/posts/assets/qgis-plugin-development-creating-gui-with-qt-designer/qt.gif"/></div>
+<div class="text-center"><img src="/posts/assets/qgis-plugin-development-creating-gui-with-qt-designer/qt.gif"/></div>
 
 <p>It doesn&#8217;t take much, just one <code>QLineEdit</code> and a few <code>QComboBox</code> widgets. Those will be available in the <code>attribute_transfer.py</code> file as properties of the <code>AttributeTransferDialog</code> class.</p>
 <p>The widget name can be customized in the right sidebar and I advise you to do so. I chose the&nbsp;following:</p>
-<div class="text-center"><img data-echo="/posts/assets/qgis-plugin-development-creating-gui-with-qt-designer/qt.png"/></div>
+<div class="text-center"><img src="/posts/assets/qgis-plugin-development-creating-gui-with-qt-designer/qt.png"/></div>
 
 <p>Once loaded with Plugins -&gt; Manage and Install Plugins -&gt; AttributeTransfer, the plugin is available right from the toolbar or Vector menu. It is missing the business logic completely, but I have this covered in <a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/">the previous part</a>.</p>
 <p>All that is to be done is to bind those two parts&nbsp;together.</p>
@@ -104,7 +227,7 @@
     <span><a class="category-url" href="https://www.zimmi.cz/posts/category/qgis.html">QGIS</a></span>
     </aside>
     <p>I described basics of vector layers manipulation in <a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/">the previous part</a> of the series. With my goal in mind (fully functional custom plugin capable of writing an attribute value from a source layer to a target layer based on a feature distance), I&#8217;d like to discuss <strong>spatial indexing</strong> and <strong>nearest neighbor analysis</strong>.</p>
-<div class="text-center"><img data-echo="/posts/assets/qgis-plugin-development-finding-nearest-neighbors/qgis.png"/></div>
+<div class="text-center"><img src="/posts/assets/qgis-plugin-development-finding-nearest-neighbors/qgis.png"/></div>
 
 <p>The picture above illustrates the task that can be solved solely by using <span class="caps">QGIS</span> <span class="caps">API</span>. Imagine you&#8217;re given a source layer with an attribute filled with values. You&#8217;re given a target layer as well, sadly though, the values in this layer are missing (<em>not so rare in the <span class="caps">GIS</span> world, right?</em>). Yet you know that the missing attribute value of each feature in the target layer can be filled by the value of its nearest neighbor from the source layer. How do you do&nbsp;that?</p>
 <h2>Generating dummy&nbsp;data</h2>
@@ -112,8 +235,8 @@
 <div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qgis.core</span> <span class="kn">import</span> <span class="n">QgsMapLayerRegistry</span><span class="p">,</span> <span class="n">QgsVectorLayer</span><span class="p">,</span> <span class="n">QgsFeature</span><span class="p">,</span> <span class="n">QgsGeometry</span><span class="p">,</span> <span class="n">QgsPoint</span><span class="p">,</span> <span class="n">QgsSpatialIndex</span>
 <span class="kn">from</span> <span class="nn">qgis.utils</span> <span class="kn">import</span> <span class="n">iface</span>
 
-<span class="n">source_layer</span> <span class="o">=</span> <span class="n">QgsVectorLayer</span><span class="p">(</span><span class="s2">&quot;point?crs=epsg:4326&amp;field=id:integer&amp;field=value:integer&quot;</span><span class="p">,</span> <span class="s2">&quot;Source layer&quot;</span><span class="p">,</span> <span class="s2">&quot;memory&quot;</span><span class="p">)</span>
-<span class="n">target_layer</span> <span class="o">=</span> <span class="n">QgsVectorLayer</span><span class="p">(</span><span class="s2">&quot;point?crs=epsg:4326&amp;field=id:integer&amp;field=value:integer&quot;</span><span class="p">,</span> <span class="s2">&quot;Target layer&quot;</span><span class="p">,</span> <span class="s2">&quot;memory&quot;</span><span class="p">)</span>
+<span class="n">source_layer</span> <span class="o">=</span> <span class="n">QgsVectorLayer</span><span class="p">(</span><span class="s2">&quot;point?crs=epsg:4326&amp;amp;field=id:integer&amp;amp;field=value:integer&quot;</span><span class="p">,</span> <span class="s2">&quot;Source layer&quot;</span><span class="p">,</span> <span class="s2">&quot;memory&quot;</span><span class="p">)</span>
+<span class="n">target_layer</span> <span class="o">=</span> <span class="n">QgsVectorLayer</span><span class="p">(</span><span class="s2">&quot;point?crs=epsg:4326&amp;amp;field=id:integer&amp;amp;field=value:integer&quot;</span><span class="p">,</span> <span class="s2">&quot;Target layer&quot;</span><span class="p">,</span> <span class="s2">&quot;memory&quot;</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">create_dummy_data</span><span class="p">():</span>
 
@@ -284,37 +407,6 @@
 
 
 <p>Those were just few examples of what can be done with <span class="caps">QGIS</span> <span class="caps">API</span> and Python console. Next time, I&#8217;d like to focus on spatial joins inside <span class="caps">QGIS</span> - another step to the final&nbsp;plugin.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-getting-started/" rel="bookmark" title="Permalink to QGIS Plugin Development: Getting Started"><span class="caps">QGIS</span> Plugin Development: Getting&nbsp;Started</a></h1>
-    <aside><span>Oct 26, 2017</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">QGIS</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/qgis.html">QGIS</a></span>
-    </aside>
-    <p><span class="caps">QGIS</span> 2.1x is a brilliant tool for Python-based automation in form of custom scripts or even plugins. The first steps towards writing the custom code might be a bit difficult, as you need to grasp quite complex Python <span class="caps">API</span>. The <em><span class="caps">QGIS</span> Plugin Development</em> series (see the list of other parts at the end of this article) targets pitfalls and traps I&#8217;ve met while learning to use it&nbsp;myself.</p>
-<p>The outcome of the series is going to be <strong>a fully functional custom plugin</strong> capable of writing attribute values from a source layer nearest neighbour to a target layer based on their spatial&nbsp;proximity.</p>
-<p>In this part, I&#8217;ll mention the basics a.k.a. what is good to know before you&nbsp;start.</p>
-<h2>Documentation</h2>
-<p>Different <span class="caps">QGIS</span> versions come with different Python <span class="caps">API</span>. The documentation is to be found at <a href="http://qgis.org">https://qgis.org</a>, the latest being <a href="http://qgis.org/api/2.18/">version 2.18</a>. Note that if you come directly to <a href="http://qgis.org/api/">http://qgis.org/api/</a>, you&#8217;ll see the current master&nbsp;docs.</p>
-<p>Alternatively, you can <code>apt install qgis-api-doc</code> on your Ubuntu-based system and run <code>python -m SimpleHTTPServer [port]</code> inside <code>/usr/share/qgis/doc/api</code>. You&#8217;ll find the documentation at <a href="http://localhost:8000">http://localhost:8000</a> (if you don&#8217;t provide port number) and it will be available even when you&#8217;re&nbsp;offline.</p>
-<h2>Basic <span class="caps">API</span> objects&nbsp;structure</h2>
-<p>Before launching <span class="caps">QGIS</span>, take a look at what&#8217;s available inside <span class="caps">API</span>:</p>
-<ul>
-<li><strong>qgis.core</strong> package brings all the basic objects like QgsMapLayer, QgsDataSourceURI, QgsFeature&nbsp;etc</li>
-<li><strong>qgis.gui</strong> package brings <span class="caps">GUI</span> elements that can be used within <span class="caps">QGIS</span> like QgsMessageBar or QgsInterface (very important <span class="caps">API</span> element, exposed to all custom&nbsp;plugins)</li>
-<li><strong>qgis.analysis</strong>, <strong>qgis.networkanalysis</strong>, <strong>qgis.server</strong>, and <strong>qgis.testing</strong> packages that won&#8217;t be covered in the&nbsp;series</li>
-<li><strong>qgis.utils</strong> module that comes with <code>iface</code> exposed (very handy within <span class="caps">QGIS</span> Python&nbsp;console)</li>
-</ul>
-<h2><span class="caps">QGIS</span> Python&nbsp;Console</h2>
-<p>Using Python console is the easiest way to automate your <span class="caps">QGIS</span> workflow. It can be accessed via pressing <code>Ctrl + Alt + P</code> or navigating to <code>Plugins -&gt; Python Console</code>. Note the above mentioned <code>iface</code> from <strong>qgis.utils</strong> module is exposed by default within the console, letting you interact with <span class="caps">QGIS</span> <span class="caps">GUI</span>. Try out the following&nbsp;examples.</p>
-<div class="highlight"><pre><span></span><span class="n">iface</span><span class="o">.</span><span class="n">mapCanvas</span><span class="p">()</span><span class="o">.</span><span class="n">scale</span><span class="p">()</span> <span class="c1"># returns the current map scale</span>
-<span class="n">iface</span><span class="o">.</span><span class="n">mapCanvas</span><span class="p">()</span><span class="o">.</span><span class="n">zoomScale</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="c1"># zoom to scale of 1:100</span>
-<span class="n">iface</span><span class="o">.</span><span class="n">activeLayer</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="p">()</span> <span class="c1"># get the active layer name</span>
-<span class="n">iface</span><span class="o">.</span><span class="n">activeLayer</span><span class="p">()</span><span class="o">.</span><span class="n">startEditing</span><span class="p">()</span> <span class="c1"># toggle editting</span>
-</pre></div>
-
-
-<p>That was a very brief introduction to <span class="caps">QGIS</span> <span class="caps">API</span>, the next part will walk you through the console more&nbsp;thoroughly.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/index.html">&laquo; Previous page</a>

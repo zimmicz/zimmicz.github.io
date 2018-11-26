@@ -16,7 +16,7 @@
   <meta property="og:title" content="Wifileaks Wi-Fi Networks Dataviz" />
   <meta property="og:description" content="Wifileaks is a project by Jakub Čížek aimed to map the Czech wi-fi networks with Android/iOS app. The data gathered by people using the app is available to download and features ~ 90,000,000 records, each representing the position of the cellphone..." />
   <meta property="og:url" content="https://www.zimmi.cz/posts/2017/wifileaks-wi-fi-networks-dataviz/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?a4089d0f">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
 </head>
 <body>
     <nav role="navigation">
@@ -37,7 +37,7 @@
     <span><a class="category-url" href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
     </aside>
 <p><a href="http://www.wifileaks.cz">Wifileaks</a> is a project by Jakub Čížek aimed to map the Czech wi-fi networks with Android/iOS app. The data gathered by people using the app <a href="http://download.wifileaks.cz/data/wifileaks_raw_170416.tar.gz">is available to download</a> and features ~&nbsp;90,000,000 records, each representing the position of the cellphone when connecting to the network. Just about perfect to craft some&nbsp;maps!</p>
-<div class="text-center"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/cr.png"/></div>
+<div class="text-center"><img src="/posts/assets/wifileaks-wifi-networks-dataviz/cr.png"/></div>
 
 <h2>Using PostgreSQL&nbsp;cstore_fdw</h2>
 <p>I ran out of disk space immediately after loading the dataset into the PostgreSQL database. After fiddling around I remembered that columnar store should be a bit space-friendlier than the old fashioned relational database. Thus, I installed the <a href="https://github.com/citusdata/cstore_fdw">cstore_fdw</a> by Citus Data in just few&nbsp;steps.</p>
@@ -52,24 +52,24 @@ git clone git@github.com:citusdata/cstore_fdw.git
 
 
 <p>This makes <a href="https://www.zimmi.cz/posts/2016/testing-postgresql-ogr-fdw/">another <span class="caps">FDW</span> available</a> to you inside the PostgreSQL. The actual foreign server has to be created before loading the data into a foreign&nbsp;table.</p>
-<div class="highlight"><pre><span></span>cat <span class="s">&lt;&lt;END | psql -qAt --no-psqlrc</span>
-<span class="s">    CREATE SERVER cstore_server FOREIGN DATA WRAPPER cstore_fdw;</span>
-<span class="s">    CREATE SCHEMA data_cstore;</span>
-<span class="s">    CREATE FOREIGN TABLE data_cstore.wifi (</span>
-<span class="s">        id integer,</span>
-<span class="s">        mac text,</span>
-<span class="s">        ssid text,</span>
-<span class="s">        signal_strength numeric,</span>
-<span class="s">        security integer,</span>
-<span class="s">        lat numeric,</span>
-<span class="s">        lon numeric,</span>
-<span class="s">        alt numeric,</span>
-<span class="s">        unixtime bigint,</span>
-<span class="s">        filename text</span>
-<span class="s">    )</span>
-<span class="s">    SERVER cstore_server</span>
-<span class="s">    OPTIONS (compression &#39;pglz&#39;);</span>
-<span class="s">END</span>
+<div class="highlight"><pre><span></span>cat <span class="p">&amp;</span>lt<span class="p">;&amp;</span>lt<span class="p">;</span>END <span class="p">|</span> psql -qAt --no-psqlrc
+    CREATE SERVER cstore_server FOREIGN DATA WRAPPER cstore_fdw<span class="p">;</span>
+    CREATE SCHEMA data_cstore<span class="p">;</span>
+    CREATE FOREIGN TABLE data_cstore.wifi <span class="o">(</span>
+        id integer,
+        mac text,
+        ssid text,
+        signal_strength numeric,
+        security integer,
+        lat numeric,
+        lon numeric,
+        alt numeric,
+        unixtime bigint,
+        filename text
+    <span class="o">)</span>
+    SERVER cstore_server
+    OPTIONS <span class="o">(</span>compression <span class="s1">&#39;pglz&#39;</span><span class="o">)</span><span class="p">;</span>
+END
 </pre></div>
 
 
@@ -80,52 +80,52 @@ git clone git@github.com:citusdata/cstore_fdw.git
 <li>no <code>SERIAL</code></li>
 </ul>
 <p>To overcome these shortcomings I used <code>COPY</code> statement to spit out the slightly modified table and immediately loaded it back&nbsp;in.</p>
-<div class="highlight"><pre><span></span>cat <span class="s">&lt;&lt;END | psql -qAt --no-psqlrc</span>
-<span class="s">COPY (</span>
-<span class="s">    SELECT</span>
-<span class="s">        row_number() OVER (),</span>
-<span class="s">        mac,</span>
-<span class="s">        ssid,</span>
-<span class="s">        signal_strength,</span>
-<span class="s">        security,</span>
-<span class="s">        split_part(filename, &#39;_&#39;, 2)::integer,</span>
-<span class="s">        to_timestamp(unixtime),</span>
-<span class="s">        ST_Transform(ST_SetSRID(ST_MakePoint(lon, lat, alt), 4326), 32633)</span>
-<span class="s">    FROM data_cstore.wifi</span>
-<span class="s">    WHERE lon BETWEEN 0 AND 20</span>
-<span class="s">        AND lat BETWEEN 18 AND 84</span>
-<span class="s">) TO &#39;/tmp/wifileaks.db&#39; WITH CSV DELIMITER &#39;;&#39;</span>
-<span class="s">    DROP SCHEMA IF EXISTS data_cstore CASCADE;</span>
+<div class="highlight"><pre><span></span>cat <span class="p">&amp;</span>lt<span class="p">;&amp;</span>lt<span class="p">;</span>END <span class="p">|</span> psql -qAt --no-psqlrc
+COPY <span class="o">(</span>
+    SELECT
+        row_number<span class="o">()</span> OVER <span class="o">()</span>,
+        mac,
+        ssid,
+        signal_strength,
+        security,
+        split_part<span class="o">(</span>filename, <span class="s1">&#39;_&#39;</span>, <span class="m">2</span><span class="o">)</span>::integer,
+        to_timestamp<span class="o">(</span>unixtime<span class="o">)</span>,
+        ST_Transform<span class="o">(</span>ST_SetSRID<span class="o">(</span>ST_MakePoint<span class="o">(</span>lon, lat, alt<span class="o">)</span>, <span class="m">4326</span><span class="o">)</span>, <span class="m">32633</span><span class="o">)</span>
+    FROM data_cstore.wifi
+    WHERE lon BETWEEN <span class="m">0</span> AND <span class="m">20</span>
+        AND lat BETWEEN <span class="m">18</span> AND <span class="m">84</span>
+<span class="o">)</span> TO <span class="s1">&#39;/tmp/wifileaks.db&#39;</span> WITH CSV DELIMITER <span class="s1">&#39;;&#39;</span>
+    DROP SCHEMA IF EXISTS data_cstore CASCADE<span class="p">;</span>
 
-<span class="s">DROP SCHEMA data_cstore;</span>
-<span class="s">CREATE SCHEMA data_cstore;</span>
-<span class="s">CREATE FOREIGN TABLE data_cstore.wifi (</span>
-<span class="s">    id integer,</span>
-<span class="s">    mac text,</span>
-<span class="s">    ssid text,</span>
-<span class="s">    signal_strength numeric,</span>
-<span class="s">    security integer,</span>
-<span class="s">    userid integer,</span>
-<span class="s">    unixtime timestamp without time zone,</span>
-<span class="s">    geom geometry(POINTZ, 32633)</span>
-<span class="s">)</span>
-<span class="s">SERVER cstore_server</span>
-<span class="s">OPTIONS (compression &#39;pglz&#39;);</span>
-<span class="s">END</span>
+DROP SCHEMA data_cstore<span class="p">;</span>
+CREATE SCHEMA data_cstore<span class="p">;</span>
+CREATE FOREIGN TABLE data_cstore.wifi <span class="o">(</span>
+    id integer,
+    mac text,
+    ssid text,
+    signal_strength numeric,
+    security integer,
+    userid integer,
+    unixtime timestamp without <span class="nb">time</span> zone,
+    geom geometry<span class="o">(</span>POINTZ, <span class="m">32633</span><span class="o">)</span>
+<span class="o">)</span>
+SERVER cstore_server
+OPTIONS <span class="o">(</span>compression <span class="s1">&#39;pglz&#39;</span><span class="o">)</span><span class="p">;</span>
+END
 </pre></div>
 
 
 <h2>Putting the networks on the&nbsp;map</h2>
 <table>
     <tr>
-        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"></a></td>
-        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"></a></td>
-        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"></a></td>
+        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"><img src="/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"></a></td>
+        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"><img src="/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"></a></td>
+        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"><img src="/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"></a></td>
     </tr>
     <tr>
-        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"></a></td>
-        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"></a></td>
-        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"></a></td>
+        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"><img src="/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"></a></td>
+        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"><img src="/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"></a></td>
+        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"><img src="/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"></a></td>
     </tr>
 </table>
 
@@ -149,10 +149,10 @@ git clone git@github.com:citusdata/cstore_fdw.git
 <h3>More reading</h3>
     <ul>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/mapping-north-america-with-qgis-tips-and-tricks">Mapping North America with <span class="caps">QGIS</span>: Tips and&nbsp;Tricks</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/"><span class="caps">QGIS</span> Plugin Development: Using Python&nbsp;Console</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/">Automated Map Creation With <span class="caps">QGIS</span>, PostGIS, Python, <span class="caps">SVG</span> and&nbsp;ImageMagick</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-creating-gui-with-qt-designer/"><span class="caps">QGIS</span> Plugin Development: Creating <span class="caps">GUI</span> with Qt&nbsp;Designer</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-testing-your-code/"><span class="caps">QGIS</span> Plugin Development: Testing Your&nbsp;Code</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-attributetransfer-plugin/"><span class="caps">QGIS</span> Plugin Development: AttributeTransfer&nbsp;Plugin</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/color-relief-shaded-map-using-open-data-with-open-source-software/">Color Relief Shaded Map Using Open Data with Open Source&nbsp;Software</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
 <script>

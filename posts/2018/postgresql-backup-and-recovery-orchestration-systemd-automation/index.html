@@ -16,7 +16,7 @@
   <meta property="og:title" content="PostgreSQL Backup and Recovery Orchestration: systemd Automation" />
   <meta property="og:description" content="Posts in this series have described the basic automation of PostgreSQL backup/recovery strategy. The process itself consists of different periodic tasks that shouldn’t be executed manually. There are essentially two tools dedicated to periodic task..." />
   <meta property="og:url" content="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-systemd-automation/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?a4089d0f">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
 </head>
 <body>
     <nav role="navigation">
@@ -70,10 +70,10 @@
 <p>This systemd service file is no more than a simple wrapper around the following bash code. We run three different database clusters on one machine and this approach makes their maintenance pretty&nbsp;comfortable.</p>
 <div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
 <span class="c1">#</span>
-<span class="c1"># @author: Michal Zimmermann &lt;michal.zimmermann@clevermaps.cz&gt;</span>
+<span class="c1"># @author: Michal Zimmermann &amp;lt;michal.zimmermann@clevermaps.cz&amp;gt;</span>
 <span class="c1"># Vacuums the whole database cluster running on a given port.</span>
 
-<span class="k">while</span> <span class="o">[[</span> <span class="nv">$#</span> &gt; <span class="m">0</span> <span class="o">]]</span>
+<span class="k">while</span> <span class="o">[[</span> <span class="nv">$#</span> <span class="p">&amp;</span>gt<span class="p">;</span> <span class="m">0</span> <span class="o">]]</span>
 <span class="k">do</span>
     <span class="nv">key</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>
 
@@ -146,11 +146,11 @@
 
 <h3>More reading</h3>
     <ul>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/postgresql-remote-access/">PostgreSQL Remote&nbsp;Access</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-recovery/">PostgreSQL Backup and Recovery Orchestration:&nbsp;Recovery</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-bash-automation/">PostgreSQL Backup and Recovery Orchestration: Bash&nbsp;Automation</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-wal-archiving/">PostgreSQL Backup and Recovery Orchestration: <span class="caps">WAL</span>&nbsp;Archiving</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-recovery/">PostgreSQL Backup and Recovery Orchestration:&nbsp;Recovery</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/">Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span></a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/postgresql-remote-access/">PostgreSQL Remote&nbsp;Access</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
 <script>

@@ -7,7 +7,7 @@
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
         <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
         <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?a4089d0f">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
 </head>
 <body>
     <nav role="navigation">
@@ -187,7 +187,7 @@
 
 <p>I decided to throw away the tweets with the empty <code>coordinates</code> field, because the accuracy of the value specified in the place field can be generally considered very low and insufficient for my purposes. You still need to account for position inaccuracies of users&#8217; devices though, however that is not something that we can deal with. <em>Let us just assume that geotagged tweets are&nbsp;accurate.</em></p>
 
-<div class="text-center"><img data-echo="/posts/assets/analyzing-twitter-languages-with-streaming-api/cr.png" width="50%" height="50%" title="Geotagged tweets" class="img-rounded"><p><strong>Figure:</strong> Twitter seems not to be very accurate when matching tweets against bounding&nbsp;box.</p></div>
+<div class="text-center"><img src="/posts/assets/analyzing-twitter-languages-with-streaming-api/cr.png" width="50%" height="50%" title="Geotagged tweets" class="img-rounded"><p><strong>Figure:</strong> Twitter seems not to be very accurate when matching tweets against bounding&nbsp;box.</p></div>
 
 <p>Although, as you can see in the picture, they are not. Or they are, but Twitter is not good at telling so. Besides that, none of the countries in the world is shaped like a rectangle and we would need to clip the data anyway. That is where SQLite comes in, because I have been saving incoming tweets right into the&nbsp;database.</p>
 
@@ -211,7 +211,7 @@
 
 <p>I am definitely willing to share the <abbr title="Do not expect much, it was my first time with node.js">code</abbr> and the final viz. Meanwhile, you can have a look at the screenshot on picture [*]. I have already implemented nationality switch (legend items are clickable) and I would like to add a day/night switch to see whether there are any differences between the peoples&#8217;&nbsp;behaviour. </p>
 
-<div class="text-center"><img width="60%" height="60%" data-echo="/posts/assets/analyzing-twitter-languages-with-streaming-api/screenshot.png" title="Final geoviz using Leaflet" class="img-rounded"><p><strong>Figure:</strong> Final map screenshot. A legend is used to turn nationalities on and off. You are looking at Prague by the&nbsp;way.</p></div>
+<div class="text-center"><img width="60%" height="60%" src="/posts/assets/analyzing-twitter-languages-with-streaming-api/screenshot.png" title="Final geoviz using Leaflet" class="img-rounded"><p><strong>Figure:</strong> Final map screenshot. A legend is used to turn nationalities on and off. You are looking at Prague by the&nbsp;way.</p></div>
 
 <p>Obviously the most tweets were sent from the most populated places, e.g. Prague, Brno,&nbsp;Ostrava. </p>
 </article>
@@ -351,7 +351,7 @@ y = map(time, first, last, 0, 500)
 z = map(lat, 16.59971950210866964, 63.68835804244784526, 0, height)
 </code></pre>
 
-<p><img data-echo="http://www.processing.org/tutorials/p3d/imgs/coordinatesystem.png" title="Processing coordinate system" class="img-rounded pull-left">They define how coordinates inside the cube should be computed. As you see, <code>x</code> is the result of mapping longitudinal extent of our area to the width of cube, the same happens to <code>z</code> and latitude, and to <code>y</code> (but here we map time, not&nbsp;coordinates).</p>
+<p><img src="http://www.processing.org/tutorials/p3d/imgs/coordinatesystem.png" title="Processing coordinate system" class="img-rounded pull-left">They define how coordinates inside the cube should be computed. As you see, <code>x</code> is the result of mapping longitudinal extent of our area to the width of cube, the same happens to <code>z</code> and latitude, and to <code>y</code> (but here we map time, not&nbsp;coordinates).</p>
 
 <p>The bounding box used in those computations is the bounding box of the basemap. Interesting thing about Processing and its 3D environment is how it defines the beginning of the coordinate system. As you can see on the left, it might be slighty different from what you could expect. That&#8217;s what you need to be careful&nbsp;about.</p>
 

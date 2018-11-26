@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+          <title>Michal Zimmermann | Implementing Linked List with PostgreSQL Recursive CTE</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+
+
+
+    <meta name="tags" content="postgresql" />
+  <meta property="og:title" content="Implementing Linked List with PostgreSQL Recursive CTE" />
+  <meta property="og:description" content="I’ve been working on a book/storytelling pet project recently. Dealing with book events and keeping them in order was a task that was to be tackled sooner or later. While both frontend and backend of the app could deal with linked and ordered data,..." />
+  <meta property="og:url" content="https://www.zimmi.cz/posts/2018/implementing-linked-list-with-postgresql-recursive-cte/" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
+</head>
+<body>
+    <nav role="navigation">
+        <ul>
+            <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+            <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+            <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
+        </ul>
+    </nav>
+    <header>
+        <h1><a href="/posts">Michal Zimmermann<small>Pieces of knowledge from the world of GIS.</small></a></h1>
+    </header>
+    <main>
+<article>
+    <h1><a href="https://www.zimmi.cz/posts/2018/implementing-linked-list-with-postgresql-recursive-cte/" rel="bookmark" title="Permalink to Implementing Linked List with PostgreSQL Recursive CTE">Implementing Linked List with PostgreSQL Recursive <span class="caps">CTE</span></a></h1>
+    <aside><span>Nov 26, 2018</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+<p>I&#8217;ve been working on a book/storytelling pet project recently. Dealing with book events and keeping them in order was a task that was to be tackled sooner or later. While both frontend and backend of the app could deal with linked and ordered data, database might be just about the best place to do&nbsp;so.</p>
+<h2>What you might need a linked list&nbsp;for</h2>
+<p>You have a set of chronological events. The set is not complete at the beginning and position of events might be changed (e.g. their neighbouring events might change in&nbsp;time).</p>
+<h2>Implementation</h2>
+<p>Linked list is a perfect structure for such a case (see <a href="https://en.wikipedia.org/wiki/Linked_list">Wikipedia</a>). You can keep your data in tact using just id and previous/next&nbsp;id.</p>
+<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="k">public</span><span class="p">.</span><span class="n">events</span> <span class="p">(</span>
+  <span class="n">id</span> <span class="nb">integer</span> <span class="k">generated</span> <span class="n">always</span> <span class="k">as</span> <span class="k">identity</span> <span class="k">primary</span> <span class="k">key</span><span class="p">,</span>
+  <span class="n">previous_id</span> <span class="nb">integer</span>
+<span class="p">);</span>
+
+<span class="k">COPY</span> <span class="k">public</span><span class="p">.</span><span class="n">events</span> <span class="p">(</span><span class="n">id</span><span class="p">,</span> <span class="n">previous_id</span><span class="p">)</span> <span class="k">FROM</span> <span class="k">stdin</span><span class="p">;</span>
+<span class="mi">7</span>   <span class="err">\</span><span class="n">N</span>
+<span class="mi">10</span>  <span class="mi">5</span>
+<span class="mi">5</span>   <span class="mi">1</span>
+<span class="mi">1</span>   <span class="mi">3</span>
+<span class="mi">3</span>   <span class="mi">8</span>
+<span class="mi">8</span>   <span class="mi">9</span>
+<span class="mi">9</span>   <span class="mi">2</span>
+<span class="mi">2</span>   <span class="mi">6</span>
+<span class="mi">6</span>   <span class="mi">4</span>
+<span class="mi">4</span>   <span class="mi">7</span>
+<span class="err">\</span><span class="p">.</span>
+</pre></div>
+
+
+<p>Generating the list of events in the right order is the matter of running one recursive <span class="caps">CTE</span>&nbsp;query.</p>
+<div class="highlight"><pre><span></span><span class="k">WITH</span> <span class="k">RECURSIVE</span> <span class="n">evt</span><span class="p">(</span><span class="n">id</span><span class="p">)</span> <span class="k">AS</span> <span class="p">(</span>
+<span class="k">SELECT</span>
+    <span class="n">id</span><span class="p">,</span>
+    <span class="n">previous_id</span>
+<span class="k">FROM</span> <span class="n">events</span>
+<span class="k">WHERE</span> <span class="n">previous_id</span> <span class="k">IS</span> <span class="k">NULL</span>
+<span class="k">UNION</span>
+<span class="k">SELECT</span>
+    <span class="n">e</span><span class="p">.</span><span class="n">id</span><span class="p">,</span>
+    <span class="n">e</span><span class="p">.</span><span class="n">previous_id</span>
+<span class="k">FROM</span> <span class="n">events</span> <span class="n">e</span>
+<span class="k">JOIN</span> <span class="n">evt</span> <span class="k">ON</span> <span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="n">previous_id</span> <span class="o">=</span> <span class="n">evt</span><span class="p">.</span><span class="n">id</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">evt</span><span class="p">;</span>
+</pre></div>
+
+
+<p>It gathers the first event (the one having the previous pointer set to <code>NULL</code>) and iteratively adds the following ones. Note that this version is actually the <em>reverse</em> implementation of the linked list, pointing to the previous instead of the next event. All it would take to change that, would be finding the event id not present in <code>previous_id</code> column as the first one instead of <code>WHERE previous_id IS NULL</code>.</p>
+<p>With the data coming properly sorted to the client, all it has to do is rendering the&nbsp;list.</p>
+<aside>
+
+<h3>More reading</h3>
+    <ul>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/postgis-case-study-vozejkmap-open-data-part-i/">PostGIS Case Study: VozejkMap Open Data (Part&nbsp;I)</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-recovery/">PostgreSQL Backup and Recovery Orchestration:&nbsp;Recovery</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-bash-automation/">PostgreSQL Backup and Recovery Orchestration: Bash&nbsp;Automation</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/dead-simple-random-points-in-polygons-with-postgis/">Dead Simple Random Points in Polygons with&nbsp;PostGIS</a></li>
+    </ul>
+<!-- Start of Async Drift Code -->
+<script>
+    !function () {
+        var t;
+        if (t = window.driftt = window.drift = window.driftt || [], !t.init) return t.invoked ? void (window.console && console.error && console.error("Drift snippet included twice.")) : (t.invoked = !0,
+            t.methods = ["identify", "config", "track", "reset", "debug", "show", "ping", "page", "hide", "off", "on"],
+            t.factory = function (e) {
+                return function () {
+                    var n;
+                    return n = Array.prototype.slice.call(arguments), n.unshift(e), t.push(n), t;
+                };
+            }, t.methods.forEach(function (e) {
+                t[e] = t.factory(e);
+            }), t.load = function (t) {
+                var e, n, o, i;
+                e = 3e5, i = Math.ceil(new Date() / e) * e, o = document.createElement("script"),
+                    o.type = "text/javascript", o.async = !0, o.crossorigin = "anonymous", o.src = "https://js.driftt.com/include/" + i + "/" + t + ".js",
+                    n = document.getElementsByTagName("script")[0], n.parentNode.insertBefore(o, n);
+            });
+    }();
+    drift.SNIPPET_VERSION = '0.3.1';
+    drift.load('caacyauy5t6b');
+
+</script>
+<!-- End of Async Drift Code --></aside>
+    </main>
+    <footer>
+        Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
+        Proudly powered by <a href="//getpelican.com/">Pelican</a>,
+        which takes great advantage of <a href="//python.org">Python</a>.
+    </footer>
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-43432739-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments)};
+  gtag('js', new Date());
+
+  gtag('config', 'UA-43432739-2');
+</script>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NW8R37N');</script>
+<!-- End Google Tag Manager -->
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NW8R37N"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<script src="https://www.zimmi.cz/posts/theme/js/echo.min.js"></script>
+<script>
+echo.init({
+  offset: 200,
+  throttle: 250,
+  unload: false
+});
+</script>
+</body>
+</html>

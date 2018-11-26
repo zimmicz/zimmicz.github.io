@@ -17,7 +17,7 @@
   <meta property="og:title" content="PostGIS as a Mapbox Vector Tiles generator" />
   <meta property="og:description" content="PostGIS 2.4.0 was released recently bringing the possibilities to generate Mapbox Vector Tiles without any third party tools. I got a shot at it with Node.js and docker. Even if it’s not as straightforward as solely using ST_AsMVT, it still looks..." />
   <meta property="og:url" content="https://www.zimmi.cz/posts/2017/postgis-as-a-mapbox-vector-tiles-generator/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?a4089d0f">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
 </head>
 <body>
     <nav role="navigation">
@@ -44,7 +44,7 @@
 RUN apt update
 RUN apt install -y wget less systemd
 RUN touch /etc/apt/sources.list.d/pgdg.list
-RUN <span class="nb">echo</span> <span class="s2">&quot;deb http://apt.postgresql.org/pub/repos/apt/ zesty-pgdg main&quot;</span> &gt; /etc/apt/sources.list.d/pgdg.list
+RUN <span class="nb">echo</span> <span class="s2">&quot;deb http://apt.postgresql.org/pub/repos/apt/ zesty-pgdg main&quot;</span> <span class="p">&amp;</span>gt<span class="p">;</span> /etc/apt/sources.list.d/pgdg.list
 RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc <span class="p">|</span> apt-key add -
 RUN apt update
 RUN apt -y install postgresql-9.6 postgresql-server-dev-9.6
@@ -53,18 +53,18 @@ USER postgres
 RUN /usr/lib/postgresql/9.6/bin/pg_ctl -D /var/lib/postgresql/9.6/main -l /tmp/logfile start
 
 USER root
-RUN <span class="nb">echo</span> <span class="s2">&quot;host all  all    0.0.0.0/0  trust&quot;</span> &gt;&gt; /etc/postgresql/9.6/main/pg_hba.conf <span class="o">&amp;&amp;</span> <span class="se">\</span>
-    <span class="nb">echo</span> <span class="s2">&quot;listen_addresses=&#39;*&#39;&quot;</span> &gt;&gt; /etc/postgresql/9.6/main/postgresql.conf
+RUN <span class="nb">echo</span> <span class="s2">&quot;host all  all    0.0.0.0/0  trust&quot;</span> <span class="p">&amp;</span>gt<span class="p">;&amp;</span>gt<span class="p">;</span> /etc/postgresql/9.6/main/pg_hba.conf <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> <span class="se">\</span>
+    <span class="nb">echo</span> <span class="s2">&quot;listen_addresses=&#39;*&#39;&quot;</span> <span class="p">&amp;</span>gt<span class="p">;&amp;</span>gt<span class="p">;</span> /etc/postgresql/9.6/main/postgresql.conf
 
 
 EXPOSE <span class="m">5432</span>
 RUN apt install -y netcat build-essential libxml2 libxml2-dev libgeos-3.5.1 libgdal-dev gdal-bin libgdal20 libgeos-dev libprotobuf-c1 libprotobuf-c-dev libprotobuf-dev protobuf-compiler protobuf-c-compiler
 RUN wget http://download.osgeo.org/postgis/source/postgis-2.4.0alpha.tar.gz
 RUN tar -xvzf postgis-2.4.0alpha.tar.gz
-RUN <span class="nb">cd</span> postgis-2.4.0alpha <span class="o">&amp;&amp;</span> ./configure <span class="o">&amp;&amp;</span> make <span class="o">&amp;&amp;</span> make install
+RUN <span class="nb">cd</span> postgis-2.4.0alpha <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> ./configure <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> make <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> make install
 
 USER postgres
-RUN service postgresql start <span class="o">&amp;&amp;</span> psql -c <span class="s2">&quot;CREATE EXTENSION postgis&quot;</span>
+RUN service postgresql start <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> psql -c <span class="s2">&quot;CREATE EXTENSION postgis&quot;</span>
 
 USER root
 COPY start.postgis.sh /start.postgis.sh
@@ -81,7 +81,7 @@ CMD <span class="o">[</span><span class="s2">&quot;/start.postgis.sh&quot;</span
 <span class="nv">CONF</span><span class="o">=</span><span class="s2">&quot;/etc/postgresql/9.6/main/postgresql.conf&quot;</span>
 <span class="nv">POSTGRES</span><span class="o">=</span><span class="s2">&quot;/usr/lib/postgresql/9.6/bin/postgres&quot;</span>
 
-su postgres sh -c <span class="s2">&quot;</span><span class="nv">$POSTGRES</span><span class="s2"> -D </span><span class="nv">$DATADIR</span><span class="s2"> -c config_file=</span><span class="nv">$CONF</span><span class="s2">&quot;</span> <span class="p">&amp;</span>
+su postgres sh -c <span class="s2">&quot;</span><span class="nv">$POSTGRES</span><span class="s2"> -D </span><span class="nv">$DATADIR</span><span class="s2"> -c config_file=</span><span class="nv">$CONF</span><span class="s2">&quot;</span> <span class="p">&amp;</span>amp<span class="p">;</span>
 <span class="k">until</span> nc -z localhost <span class="m">5432</span><span class="p">;</span>
 <span class="k">do</span>
     <span class="nb">echo</span> ...
@@ -99,7 +99,7 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
 <p>I got a cadastre area dataset of the Czech Republic for testing, which contains ~ 13,000 polygons. The geometries should come in Web Mercator a.k.a. <span class="caps">EPSG</span>:3857 to work with <a href="https://www.mapbox.com/vector-tiles/specification/"><span class="caps">MVT</span></a>.</p>
 <h2>Vector&nbsp;tiles</h2>
 <p>I got a bit confused by the docs of <a href="https://postgis.net/docs/manual-dev/ST_AsMVT.html">ST_AsMVT</a> and <a href="https://postgis.net/docs/manual-dev/ST_AsMVTGeom.html">ST_AsMVTGeom</a>. Especially the latter one took me a few hours to get it right. What is essential (I guess) about Mapbox Vector Tiles is that you have to abstract from the real world coordinates and start thinking inside the tile coordinates. What PostGIS does with <code>ST_AsMVTGeom</code> (and what any other <span class="caps">MVT</span> implemenation should do for you) is that it takes real world coordinates and put them inside a&nbsp;tile.</p>
-<div class="text-center"><img data-echo="/posts/assets/postgis-as-a-mapbox-vector-tiles-generator/mvt.gif"/></div>
+<div class="text-center"><img src="/posts/assets/postgis-as-a-mapbox-vector-tiles-generator/mvt.gif"/></div>
 
 <p>To make this work, you need to know every bounding box of every tile on every zoom level in a Web Mercator projection. Or you can use <a href="https://github.com/mapbox/postgis-vt-util/blob/master/src/TileBBox.sql">TileBBox procedure by Mapbox</a>, if you&nbsp;wish.</p>
 <p>The <span class="caps">SQL</span> query itself is pretty simple (this comes from an express route I&#8217;ll be discussing&nbsp;shortly).</p>
@@ -139,10 +139,10 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
 <h3>More reading</h3>
     <ul>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-iii/">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">III</span>)</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/filtering-points-by-distance-in-postgis/">Filtering points by distance in&nbsp;PostGIS</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/postgis-case-study-vozejkmap-open-data-part-i/">PostGIS Case Study: VozejkMap Open Data (Part&nbsp;I)</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/">Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span></a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/">Routing with pgRouting: Catchment Area&nbsp;Calculation</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/postgis-spatial-indexing-with-st_intersects/">PostGIS Spatial Indexing With&nbsp;ST_Intersects</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/degrees-to-decimal-with-javascript-reworked/">Degrees To Decimal With Javascript&nbsp;Reworked</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
 <script>

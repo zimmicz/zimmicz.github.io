@@ -16,7 +16,7 @@
   <meta property="og:title" content="Twitter REST API Data Mining on OpenShift (Part II)" />
   <meta property="og:description" content="Last time I described the setup of my OpenShift Twitter crawler and let it running and downloading data. It’s been more than two months since I started and I got interesting amount of data. I also made a simple ETL process to load it into my local..." />
   <meta property="og:url" content="https://www.zimmi.cz/posts/2015/twitter-rest-api-data-mining-on-openshift-part-ii/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?a4089d0f">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
 </head>
 <body>
     <nav role="navigation">
@@ -41,14 +41,14 @@
 <p>Each day is written to the separate sqlite file with a name like <code>tw_day_D_M_YYYY</code>. <code>Bash</code> is used to gzip all the files before downloading them from&nbsp;OpenShift.</p>
 <div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
 
-ssh openshift <span class="s">&lt;&lt; EOF</span>
-<span class="s">    cd app-root/data</span>
-<span class="s">    tar czf twitter.tar.gz *.db</span>
-<span class="s">EOF</span>
+ssh openshift <span class="p">&amp;</span>lt<span class="p">;&amp;</span>lt<span class="p">;</span> EOF
+    <span class="nb">cd</span> app-root/data
+    tar czf twitter.tar.gz *.db
+EOF
 
 scp openshift:/var/lib/openshift/55e487587628e1280b0000a9/app-root/data/twitter.tar.gz ./data
-<span class="nb">cd</span> data <span class="o">&amp;&amp;</span>
-tar -xzf twitter.tar.gz <span class="o">&amp;&amp;</span>
+<span class="nb">cd</span> data <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span>
+tar -xzf twitter.tar.gz <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span>
 <span class="nb">cd</span> -
 
 <span class="nb">echo</span> <span class="s2">&quot;Extract done&quot;</span>
@@ -67,16 +67,16 @@ mkdir ./data/csv
     <span class="nv">DBNAME</span><span class="o">=</span><span class="si">${</span><span class="nv">FILENAME</span><span class="p">%%.db</span><span class="si">}</span>
     <span class="nv">CSVNAME</span><span class="o">=</span><span class="nv">$DBNAME</span>.csv
     <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$DBNAME</span><span class="s2"> to csv...&quot;</span>
-    sqlite3 -header -csv <span class="nv">$db</span> <span class="s2">&quot;select * from </span><span class="nv">$DBNAME</span><span class="s2">;&quot;</span> &gt; ./data/csv/<span class="nv">$CSVNAME</span>
+    sqlite3 -header -csv <span class="nv">$db</span> <span class="s2">&quot;select * from </span><span class="nv">$DBNAME</span><span class="s2">;&quot;</span> <span class="p">&amp;</span>gt<span class="p">;</span> ./data/csv/<span class="nv">$CSVNAME</span>
 <span class="k">done</span>
 
 <span class="nb">cd</span> ./data/csv
 touch tweets.csv
-<span class="nb">echo</span> <span class="k">$(</span>sed -n 1p <span class="k">$(</span>ls -d -1 *.csv <span class="p">|</span> head -n <span class="m">1</span><span class="k">))</span> &gt; tweets.csv <span class="c1"># get column names</span>
+<span class="nb">echo</span> <span class="k">$(</span>sed -n 1p <span class="k">$(</span>ls -d -1 *.csv <span class="p">|</span> head -n <span class="m">1</span><span class="k">))</span> <span class="p">&amp;</span>gt<span class="p">;</span> tweets.csv <span class="c1"># get column names</span>
 
 <span class="k">for</span> csv in tw_*.csv<span class="p">;</span> <span class="k">do</span>
     <span class="nb">echo</span> <span class="nv">$csv</span>
-    tail -n +2 <span class="nv">$csv</span> &gt;&gt; tweets.csv <span class="c1"># get all lines without the first one</span>
+    tail -n +2 <span class="nv">$csv</span> <span class="p">&amp;</span>gt<span class="p">;&amp;</span>gt<span class="p">;</span> tweets.csv <span class="c1"># get all lines without the first one</span>
 <span class="k">done</span>
 </pre></div>
 
@@ -91,15 +91,15 @@ touch tweets.csv
 <span class="nv">SCHEMA</span><span class="o">=</span>dizertace
 <span class="nv">TABLE</span><span class="o">=</span>tweets
 
-psql <span class="nv">$DATABASE</span> <span class="s">&lt;&lt; EOF</span>
-<span class="s">    DROP TABLE IF EXISTS $SCHEMA.$TABLE;</span>
-<span class="s">    CREATE UNLOGGED TABLE $SCHEMA.$TABLE (id text, author text, author_id text, tweet text, created_at text, lon float, lat float, lang text);</span>
-<span class="s">    \copy $SCHEMA.$TABLE FROM &#39;data/csv/tweets.csv&#39; CSV HEADER DELIMITER &#39;,&#39;</span>
-<span class="s">    ALTER TABLE $SCHEMA.$TABLE ADD COLUMN wkb_geometry geometry(POINT, 4326);</span>
-<span class="s">    UPDATE $SCHEMA.$TABLE SET wkb_geometry = ST_SetSRID(ST_MakePoint(lon, lat), 4326);</span>
-<span class="s">    CREATE INDEX ${TABLE}_geom_idx ON $SCHEMA.$TABLE USING gist(wkb_geometry);</span>
-<span class="s">    COMMIT;</span>
-<span class="s">EOF</span>
+psql <span class="nv">$DATABASE</span> <span class="p">&amp;</span>lt<span class="p">;&amp;</span>lt<span class="p">;</span> EOF
+    DROP TABLE IF EXISTS <span class="nv">$SCHEMA</span>.<span class="nv">$TABLE</span><span class="p">;</span>
+    CREATE UNLOGGED TABLE <span class="nv">$SCHEMA</span>.<span class="nv">$TABLE</span> <span class="o">(</span>id text, author text, author_id text, tweet text, created_at text, lon float, lat float, lang text<span class="o">)</span><span class="p">;</span>
+    <span class="se">\c</span>opy <span class="nv">$SCHEMA</span>.<span class="nv">$TABLE</span> FROM <span class="s1">&#39;data/csv/tweets.csv&#39;</span> CSV HEADER DELIMITER <span class="s1">&#39;,&#39;</span>
+    ALTER TABLE <span class="nv">$SCHEMA</span>.<span class="nv">$TABLE</span> ADD COLUMN wkb_geometry geometry<span class="o">(</span>POINT, <span class="m">4326</span><span class="o">)</span><span class="p">;</span>
+    UPDATE <span class="nv">$SCHEMA</span>.<span class="nv">$TABLE</span> SET <span class="nv">wkb_geometry</span> <span class="o">=</span> ST_SetSRID<span class="o">(</span>ST_MakePoint<span class="o">(</span>lon, lat<span class="o">)</span>, <span class="m">4326</span><span class="o">)</span><span class="p">;</span>
+    CREATE INDEX <span class="si">${</span><span class="nv">TABLE</span><span class="si">}</span>_geom_idx ON <span class="nv">$SCHEMA</span>.<span class="nv">$TABLE</span> USING gist<span class="o">(</span>wkb_geometry<span class="o">)</span><span class="p">;</span>
+    COMMIT<span class="p">;</span>
+EOF
 </pre></div>
 
 
@@ -116,9 +116,9 @@ psql <span class="nv">$DATABASE</span> <span class="s">&lt;&lt; EOF</span>
     <ul>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/twitter-rest-api-data-mining-on-openshift-part-i/">Twitter <span class="caps">REST</span> <span class="caps">API</span> Data Mining on OpenShift (Part&nbsp;I)</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/analyzing-twitter-languages-with-streaming-api/">Analyzing Twitter Languages With Streaming <span class="caps">API</span></a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/leaflet-chmi-radar-control/">Leaflet <span class="caps">CHMI</span> Radar&nbsp;Control</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/hosting-website-on-openshift/">Hosting Website On&nbsp;Openshift</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/do-you-really-need-gulp-or-grunt-or-bower-or-what/">Do You Really Need Gulp? Or Grunt? Or Bower? Or&nbsp;What?</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part&nbsp;I)</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/">Plotting the Czech Cadastre Land Use with d3: Data Load (part <span class="caps">III</span>)</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
 <script>

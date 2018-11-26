@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+        <title>Michal Zimmermann | tag: postgresql</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
+</head>
+<body>
+    <nav role="navigation">
+        <ul>
+            <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+            <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+            <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
+        </ul>
+    </nav>
+    <header>
+        <h1><a href="/posts">Michal Zimmermann<small>Pieces of knowledge from the world of GIS.</small></a></h1>
+    </header>
+    <main>
+<h2 class="text-center">Articles tagged with postgresql tag</h2>
+
+<article>
+    <h1><a href="https://www.zimmi.cz/posts/2014/postgresql-remote-access/" rel="bookmark" title="Permalink to PostgreSQL Remote Access">PostgreSQL Remote&nbsp;Access</a></h1>
+    <aside><span>Sep 17, 2014</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+    </aside>
+    <p>PostgreSQL is set to listen only to connections coming from localhost by default. I guess that&#8217;s fine as far as you don&#8217;t need access to the database from anywhere else (like your work network). If you do, you need to log via <span class="caps">SSH</span> or use some online database management tool (go for <a href="http://adminer.org">Adminer</a> and forget about anything called php[pg|my]admin). Or you can set it up to access connections from other&nbsp;locations.</p>
+<p>You need&nbsp;to:</p>
+<ol>
+<li>set <code>listen_addresses</code> to <code>*</code> in your postgres.conf. That does not mean anyone can connect to your database, that means that the server will listen to connections coming from any available <span class="caps">IP</span>&nbsp;interface.</li>
+<li>insert new entry into pg_hba.conf looking like this: <code>host database user xxx.xxx.xxx.xxx md5</code>. Now we&#8217;re saying we only want connections coming from <span class="caps">IP</span> <code>xxx.xxx.xxx.xxx</code> accepted.</li>
+<li>
+<p>Add rule allowing the database server access to iptables. Number 5 says it will be the fifth rule in the order. It must come before the final <span class="caps">REJECT</span> <span class="caps">ALL</span> rule if&nbsp;present.</p>
+<p><code>iptables -I INPUT 5 -p tcp --dport 5432 -s xxx.xxx.xxx.xxx -j ACCEPT</code>
+4. Just to be sure noone else is able to connect, reject all on port&nbsp;5432.</p>
+<p><code>iptables -I INPUT 6 -p tcp --dport 5432 -j REJECT</code></p>
+</li>
+</ol>
+<p>You&#8217;re set to remotely connect to your database&nbsp;server.</p>
+</article>
+<aside id="pagination">
+            <a href="https://www.zimmi.cz/posts/tag/postgresql6.html">&laquo; Previous page</a>
+</aside>    </main>
+    <footer>
+        Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
+        Proudly powered by <a href="//getpelican.com/">Pelican</a>,
+        which takes great advantage of <a href="//python.org">Python</a>.
+    </footer>
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-43432739-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments)};
+  gtag('js', new Date());
+
+  gtag('config', 'UA-43432739-2');
+</script>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NW8R37N');</script>
+<!-- End Google Tag Manager -->
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NW8R37N"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<script src="https://www.zimmi.cz/posts/theme/js/echo.min.js"></script>
+<script>
+echo.init({
+  offset: 200,
+  throttle: 250,
+  unload: false
+});
+</script>
+</body>
+</html>

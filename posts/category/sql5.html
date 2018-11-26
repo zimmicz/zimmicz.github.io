@@ -7,7 +7,7 @@
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
         <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
         <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?a4089d0f">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
 </head>
 <body>
     <nav role="navigation">
@@ -23,6 +23,81 @@
     <main>
 <h2 class="text-center">Articles in the SQL category</h2>
 
+<article>
+    <h1><a href="https://www.zimmi.cz/posts/2016/looking-for-the-next-row-with-postgresql/" rel="bookmark" title="Permalink to Looking for the Next Row with PostgreSQL">Looking for the Next Row with&nbsp;PostgreSQL</a></h1>
+    <aside><span>Jan 23, 2016</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <h2>Using <span class="caps">JOIN</span>&nbsp;clause</h2>
+<p>All my <span class="caps">GIS</span> life I&#8217;ve been using a simple <code>JOIN</code> clause to find a row with an <code>id = previous_id + 1</code>. In other words, imagine a simple table with no&nbsp;indices:</p>
+<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">test</span> <span class="p">(</span><span class="n">id</span> <span class="nb">integer</span><span class="p">);</span>
+<span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">test</span> <span class="k">SELECT</span> <span class="n">i</span> <span class="k">FROM</span> <span class="n">generate_series</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">10000000</span><span class="p">)</span> <span class="n">i</span><span class="p">;</span>
+</pre></div>
+
+
+<p>Let&#8217;s retrieve next row for each row in that&nbsp;table:</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">a</span><span class="p">.</span><span class="n">id</span><span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">id</span>
+<span class="k">FROM</span> <span class="n">test</span> <span class="n">a</span>
+<span class="k">LEFT</span> <span class="k">JOIN</span> <span class="n">test</span> <span class="n">b</span> <span class="k">ON</span> <span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">id</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">=</span> <span class="n">b</span><span class="p">.</span><span class="n">id</span><span class="p">);</span> <span class="c1">-- note the LEFT JOIN is needed to get the last row as well</span>
+</pre></div>
+
+
+<p>Execution plan looks like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="n">Hash</span> <span class="k">Join</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">311087</span><span class="p">.</span><span class="mi">17</span><span class="p">..</span><span class="mi">953199</span><span class="p">.</span><span class="mi">41</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10088363</span> <span class="n">width</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">25440</span><span class="p">.</span><span class="mi">770</span><span class="p">..</span><span class="mi">79591</span><span class="p">.</span><span class="mi">869</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000000</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+   <span class="n">Hash</span> <span class="n">Cond</span><span class="p">:</span> <span class="p">((</span><span class="n">a</span><span class="p">.</span><span class="n">id</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">b</span><span class="p">.</span><span class="n">id</span><span class="p">)</span>
+   <span class="o">-&gt;</span>  <span class="n">Seq</span> <span class="n">Scan</span> <span class="k">on</span> <span class="n">test</span> <span class="n">a</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">00</span><span class="p">..</span><span class="mi">145574</span><span class="p">.</span><span class="mi">63</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10088363</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">588</span><span class="p">..</span><span class="mi">10801</span><span class="p">.</span><span class="mi">584</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+   <span class="o">-&gt;</span>  <span class="n">Hash</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">145574</span><span class="p">.</span><span class="mi">63</span><span class="p">..</span><span class="mi">145574</span><span class="p">.</span><span class="mi">63</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10088363</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">25415</span><span class="p">.</span><span class="mi">282</span><span class="p">..</span><span class="mi">25415</span><span class="p">.</span><span class="mi">282</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+         <span class="n">Buckets</span><span class="p">:</span> <span class="mi">16384</span>  <span class="n">Batches</span><span class="p">:</span> <span class="mi">128</span>  <span class="n">Memory</span> <span class="k">Usage</span><span class="p">:</span> <span class="mi">2778</span><span class="n">kB</span>
+         <span class="o">-&gt;</span>  <span class="n">Seq</span> <span class="n">Scan</span> <span class="k">on</span> <span class="n">test</span> <span class="n">b</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">00</span><span class="p">..</span><span class="mi">145574</span><span class="p">.</span><span class="mi">63</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10088363</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">422</span><span class="p">..</span><span class="mi">11356</span><span class="p">.</span><span class="mi">108</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+ <span class="n">Planning</span> <span class="n">time</span><span class="p">:</span> <span class="mi">0</span><span class="p">.</span><span class="mi">155</span> <span class="n">ms</span>
+ <span class="n">Execution</span> <span class="n">time</span><span class="p">:</span> <span class="mi">90134</span><span class="p">.</span><span class="mi">248</span> <span class="n">ms</span>
+</pre></div>
+
+
+<p>If we add an index with <code>CREATE INDEX ON test (id)</code>, the plan&nbsp;changes:</p>
+<div class="highlight"><pre><span></span><span class="n">Merge</span> <span class="k">Join</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">87</span><span class="p">..</span><span class="mi">669369</span><span class="p">.</span><span class="mi">85</span> <span class="k">rows</span><span class="o">=</span><span class="mi">9999844</span> <span class="n">width</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">035</span><span class="p">..</span><span class="mi">56219</span><span class="p">.</span><span class="mi">294</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+   <span class="n">Merge</span> <span class="n">Cond</span><span class="p">:</span> <span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">b</span><span class="p">.</span><span class="n">id</span><span class="p">)</span>
+   <span class="o">-&gt;</span>  <span class="k">Index</span> <span class="k">Only</span> <span class="n">Scan</span> <span class="k">using</span> <span class="n">test_id_idx</span> <span class="k">on</span> <span class="n">test</span> <span class="n">a</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">43</span><span class="p">..</span><span class="mi">259686</span><span class="p">.</span><span class="mi">10</span> <span class="k">rows</span><span class="o">=</span><span class="mi">9999844</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">015</span><span class="p">..</span><span class="mi">11101</span><span class="p">.</span><span class="mi">937</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+         <span class="n">Heap</span> <span class="n">Fetches</span><span class="p">:</span> <span class="mi">0</span>
+   <span class="o">-&gt;</span>  <span class="k">Index</span> <span class="k">Only</span> <span class="n">Scan</span> <span class="k">using</span> <span class="n">test_id_idx</span> <span class="k">on</span> <span class="n">test</span> <span class="n">b</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">43</span><span class="p">..</span><span class="mi">259686</span><span class="p">.</span><span class="mi">10</span> <span class="k">rows</span><span class="o">=</span><span class="mi">9999844</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">012</span><span class="p">..</span><span class="mi">11827</span><span class="p">.</span><span class="mi">895</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+         <span class="n">Heap</span> <span class="n">Fetches</span><span class="p">:</span> <span class="mi">0</span>
+ <span class="n">Planning</span> <span class="n">time</span><span class="p">:</span> <span class="mi">0</span><span class="p">.</span><span class="mi">244</span> <span class="n">ms</span>
+ <span class="n">Execution</span> <span class="n">time</span><span class="p">:</span> <span class="mi">65973</span><span class="p">.</span><span class="mi">421</span> <span class="n">ms</span>
+</pre></div>
+
+
+<p>Not&nbsp;bad.</p>
+<h2>Using window&nbsp;function</h2>
+<p><a href="http://www.postgresql.org/docs/9.4/static/functions-window.html">Window functions</a> are real fun. They&#8217;re great if you&#8217;re doing counts, sums or ranks by groups. And, to my surprise, they&#8217;re great in finding next rows as&nbsp;well.</p>
+<p>With the same <code>test</code> table, we retrieve next row for each row with the following&nbsp;query:</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">id</span><span class="p">,</span> <span class="n">lead</span><span class="p">(</span><span class="n">id</span><span class="p">)</span> <span class="n">OVER</span> <span class="p">(</span><span class="k">ORDER</span> <span class="k">BY</span> <span class="n">id</span><span class="p">)</span>
+<span class="k">FROM</span> <span class="n">test</span><span class="p">.</span><span class="n">test</span><span class="p">;</span>
+</pre></div>
+
+
+<p>How does that score without an index? Better than the <code>JOIN</code> clause.</p>
+<div class="highlight"><pre><span></span><span class="n">WindowAgg</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">1581246</span><span class="p">.</span><span class="mi">90</span><span class="p">..</span><span class="mi">1756294</span><span class="p">.</span><span class="mi">50</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10002720</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">28785</span><span class="p">.</span><span class="mi">388</span><span class="p">..</span><span class="mi">63819</span><span class="p">.</span><span class="mi">071</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+   <span class="o">-&gt;</span>  <span class="n">Sort</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">1581246</span><span class="p">.</span><span class="mi">90</span><span class="p">..</span><span class="mi">1606253</span><span class="p">.</span><span class="mi">70</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10002720</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">28785</span><span class="p">.</span><span class="mi">354</span><span class="p">..</span><span class="mi">40117</span><span class="p">.</span><span class="mi">899</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+         <span class="n">Sort</span> <span class="k">Key</span><span class="p">:</span> <span class="n">id</span>
+         <span class="n">Sort</span> <span class="k">Method</span><span class="p">:</span> <span class="k">external</span> <span class="n">merge</span>  <span class="n">Disk</span><span class="p">:</span> <span class="mi">136848</span><span class="n">kB</span>
+         <span class="o">-&gt;</span>  <span class="n">Seq</span> <span class="n">Scan</span> <span class="k">on</span> <span class="n">test</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">00</span><span class="p">..</span><span class="mi">144718</span><span class="p">.</span><span class="mi">20</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10002720</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">020</span><span class="p">..</span><span class="mi">10797</span><span class="p">.</span><span class="mi">961</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+ <span class="n">Planning</span> <span class="n">time</span><span class="p">:</span> <span class="mi">0</span><span class="p">.</span><span class="mi">242</span> <span class="n">ms</span>
+ <span class="n">Execution</span> <span class="n">time</span><span class="p">:</span> <span class="mi">73391</span><span class="p">.</span><span class="mi">024</span> <span class="n">ms</span>
+</pre></div>
+
+
+<p>And it works even better if indexed. It&#8217;s actually ~1,5&times; faster than the <code>JOIN</code> way.</p>
+<div class="highlight"><pre><span></span><span class="n">WindowAgg</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">43</span><span class="p">..</span><span class="mi">409770</span><span class="p">.</span><span class="mi">03</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10002720</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">087</span><span class="p">..</span><span class="mi">35647</span><span class="p">.</span><span class="mi">815</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+   <span class="o">-&gt;</span>  <span class="k">Index</span> <span class="k">Only</span> <span class="n">Scan</span> <span class="k">using</span> <span class="n">test_id_idx</span> <span class="k">on</span> <span class="n">test</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">43</span><span class="p">..</span><span class="mi">259729</span><span class="p">.</span><span class="mi">23</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10002720</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="p">(</span><span class="n">actual</span> <span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">.</span><span class="mi">059</span><span class="p">..</span><span class="mi">11310</span><span class="p">.</span><span class="mi">879</span> <span class="k">rows</span><span class="o">=</span><span class="mi">10000001</span> <span class="n">loops</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+         <span class="n">Heap</span> <span class="n">Fetches</span><span class="p">:</span> <span class="mi">0</span>
+ <span class="n">Planning</span> <span class="n">time</span><span class="p">:</span> <span class="mi">0</span><span class="p">.</span><span class="mi">247</span> <span class="n">ms</span>
+ <span class="n">Execution</span> <span class="n">time</span><span class="p">:</span> <span class="mi">45388</span><span class="p">.</span><span class="mi">202</span> <span class="n">ms</span>
+</pre></div>
+
+
+<p>It reads well and the purpose of such a query is pretty&nbsp;obvious.</p>
+</article>
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/filtering-points-by-distance-in-postgis/" rel="bookmark" title="Permalink to Filtering points by distance in PostGIS">Filtering points by distance in&nbsp;PostGIS</a></h1>
     <aside><span>Jul 21, 2015</span>
@@ -160,7 +235,7 @@ COPY test2 (id, wkb_geometry) FROM stdin;
 </pre></div>
 
 
-<p><img data-echo="/posts/assets/postgis-count-line-self-intersections/lines.png" title="Self-intersecting lines" class="img-responsive centered"></p>
+<p><img src="/posts/assets/postgis-count-line-self-intersections/lines.png" title="Self-intersecting lines" class="img-responsive centered"></p>
 <p>Note that those geometries are valid while not being simple, thus, <code>ST_IsValidReason()</code> wouldn&#8217;t help much. What if we compared it to their single counterparts? Those would have had vertices at intersections. Once you know the original number of vertices and the number of simple geometry vertices, it is fairly easy to subtract those&nbsp;two.</p>
 <div class="highlight"><pre><span></span>WITH noded AS (
 SELECT id, COUNT(id)
@@ -299,185 +374,6 @@ FROM cm_grid(-675593.69, -1057711.19, -672254.69, -1054849.19, 333.47, 333.47);
 <li>each cell is indexed with <code>row</code> and <code>col</code> number</li>
 </ul>
 <p>The messy <code>CASE</code> statement makes sure both <code>row</code> and <code>col</code> are of the same length. I used <code>array_to_string</code> for better readability. It might not be the fastest way, didn&#8217;t do any&nbsp;benchmarks.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2015/postgis-buffers-intersections-differences-and-collections/" rel="bookmark" title="Permalink to PostGIS: Buffers, Intersections, Differences And Collections">PostGIS: Buffers, Intersections, Differences And&nbsp;Collections</a></h1>
-    <aside><span>Mar 19, 2015</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p>Being part of <a href="http://clevermaps.cz">CleverMaps</a> means doing lot of nasty work with PostGIS. Recently, I&#8217;ve been given a following task that needed to be done for a really big project dealing with agricultural&nbsp;parcels:</p>
-<ul>
-<li>given a polygonal shapefile of agricultural parcels, create 20m wide buffers around all of&nbsp;them,</li>
-<li>extract holes from these&nbsp;parcels,</li>
-<li>clip buffers so they don&#8217;t overlap with other&nbsp;parcels,</li>
-<li>get rid of overlaps between nearby parcels (e.g. dissolve&nbsp;them),</li>
-<li>create output combined from holes and&nbsp;buffers,</li>
-<li>the output must not contain features having more than ~1,000,000&nbsp;vertices</li>
-</ul>
-<p>This process is going to be run ~20&times; on layers with ~40,000-70,000&nbsp;polygons.</p>
-<h2>Input&nbsp;data</h2>
-<ul>
-<li>polygonal layer of agricultural&nbsp;parcels</li>
-<li>rectangular grid (7.5 &times; 7.5 km) for cutting the&nbsp;output</li>
-</ul>
-<h2>First&nbsp;try</h2>
-<p>My initial effort was to union all the buffers and then clip them with a rectangular grid. Long story short: <strong>Don&#8217;t do that. Never. Ever. I mean&nbsp;it.</strong></p>
-<p>It works fine until you end up with one huge multipolygon having like ~2,000,000 vertices. But then you need to split it somehow so you meet the 1,000,000 limit rule (see list above). Spatial index doesn&#8217;t help you much in such cases, so that really huge polygon is being cut by every rectangle it intersects and it takes hours and hours. It&#8217;s just a no&nbsp;go.</p>
-<h2>The other way&nbsp;round</h2>
-<p>Let&#8217;s put it the other way round. First, split buffers by rectangular grid, doing union on each cell&nbsp;separately.</p>
-<h3>Import</h3>
-<p>Using the swiss knife of <span class="caps">GIS</span> to import the&nbsp;data:</p>
-<div class="highlight"><pre><span></span>export SHAPE_ENCODING=&quot;ISO-8859-1&quot;
-ogr2ogr -f PostgreSQL PG:&quot;dbname=db user=postgres&quot; parcels.shp -lco ENCODING=UTF-8 -t_srs &quot;EPSG:2154&quot;
-ogr2ogr -f PostgreSQL PG:&quot;dbname=db user=postgres&quot; grid.shp -lco ENCODING=UTF-8 -t_srs &quot;EPSG:2154&quot;
-</pre></div>
-
-
-<h3>PostGIS&nbsp;processing</h3>
-<p>Recently I stumbled upon a psql <code>\set</code> command. Launching several queries on the same table, it might be useful to define it&#8217;s name with <code>\set table tablename</code>:</p>
-<div class="highlight"><pre><span></span>\set table &#39;parcels&#39;
--- prepare separate table for holes (inner rings)
-DROP TABLE IF EXISTS holes;
-CREATE TABLE holes (
-id serial,
-ilot_id varchar,
-wkb_geometry geometry(&#39;Polygon&#39;, 2154),
-path integer);
-</pre></div>
-
-
-<p>I found the following query an easy way to get all the rings from geometries having more than one&nbsp;ring:</p>
-<div class="highlight"><pre><span></span>INSERT INTO holes (ilot_id, wkb_geometry, path) (
-SELECT id,
-    (ST_DumpRings(wkb_geometry)).geom::geometry(&#39;Polygon&#39;, 2154) as wkb_geometry,
-    unnest((ST_DumpRings(wkb_geometry)).path) as path
-FROM :table
-WHERE ST_NRings(wkb_geometry) &gt; 1
-);
-</pre></div>
-
-
-<p>Here&#8217;s a little trick. Doing some checks I found out that some of the polygons had two rings without having any inner ring, both of them being the same. I guess this comes from some kind of human error. This query thus deletes all rings with <code>path = 0</code> (exterior rings). At the same time, it deals with that <em>invalid</em> polygons by checking their spatial relationship to&nbsp;parcels.</p>
-<div class="highlight"><pre><span></span>DELETE FROM holes
-    WHERE path = 0
-    OR id IN (
-        SELECT holes.id
-        FROM holes
-        JOIN :table ON
-            ST_Within(
-                ST_Buffer(holes.wkb_geometry,-1),
-                :table.wkb_geometry
-            )
-        AND holes.wkb_geometry &amp;&amp; :table.wkb_geometry
-);
-</pre></div>
-
-
-<p>To my surprise, it is possible that parcel has a hole with another parcel being in that hole. Argh. Find those and get rid of&nbsp;them.</p>
-<div class="highlight"><pre><span></span>DROP TABLE IF EXISTS ints;
-CREATE TABLE ints AS
-    SELECT holes.*
-    FROM holes
-    JOIN :table ON ST_Intersects(holes.wkb_geometry, :table.wkb_geometry)
-    AND ST_Relate(holes.wkb_geometry, :table.wkb_geometry, &#39;2********&#39;);
-DELETE FROM holes
-WHERE id IN (SELECT id FROM ints);
-</pre></div>
-
-
-<p>I still need to get the difference between the hole geometry and the parcel that resides inside it - this difference is the actual hole I&#8217;m looking&nbsp;for.</p>
-<div class="highlight"><pre><span></span>DROP TABLE IF EXISTS diff_ints;
-CREATE TABLE diff_ints AS
-    SELECT
-        ints.id,
-        ST_Difference(
-            ints.wkb_geometry,
-            ST_Collect(:table.wkb_geometry)
-        ) wkb_geometry
-    FROM ints, :table
-    WHERE ST_Within(:table.wkb_geometry, ints.wkb_geometry)
-    GROUP BY ints.wkb_geometry, ints.id;
-</pre></div>
-
-
-<p>And I&#8217;m done with holes. Get back to&nbsp;buffers.</p>
-<div class="highlight"><pre><span></span>DROP TABLE IF EXISTS buffer;
-CREATE TABLE buffer AS
-    SELECT id, ST_Buffer(wkb_geometry, 20) wkb_geometry
-    FROM :table;
-CREATE INDEX buffer_gist_idx ON buffer USING gist(wkb_geometry);
-ALTER TABLE buffer ADD PRIMARY KEY(id);
-VACUUM ANALYZE buffer;
-</pre></div>
-
-
-<p>Combine all the parts&nbsp;together.</p>
-<div class="highlight"><pre><span></span><span class="nt">DROP</span> <span class="nt">TABLE</span> <span class="nt">IF</span> <span class="nt">EXISTS</span> <span class="nt">diff</span><span class="o">;</span>
-<span class="nt">CREATE</span> <span class="nt">TABLE</span> <span class="nt">diff</span> <span class="nt">AS</span>
-    <span class="nt">SELECT</span> <span class="nt">a</span><span class="p">.</span><span class="nc">id</span><span class="o">,</span> <span class="nt">ST_Difference</span><span class="o">(</span><span class="nt">a</span><span class="p">.</span><span class="nc">wkb_geometry</span><span class="o">,</span> <span class="nt">ST_Union</span><span class="o">(</span><span class="nt">ST_MakeValid</span><span class="o">(</span><span class="nt">b</span><span class="p">.</span><span class="nc">wkb_geometry</span><span class="o">)))</span> <span class="nt">as</span> <span class="nt">wkb_geometry</span>
-    <span class="nt">FROM</span> <span class="nt">buffer</span> <span class="nt">a</span><span class="o">,</span> <span class="p">:</span><span class="nd">table</span> <span class="nt">b</span>
-    <span class="nt">WHERE</span> <span class="nt">ST_Intersects</span><span class="o">(</span><span class="nt">a</span><span class="p">.</span><span class="nc">wkb_geometry</span><span class="o">,</span> <span class="nt">b</span><span class="p">.</span><span class="nc">wkb_geometry</span><span class="o">)</span>
-    <span class="nt">GROUP</span> <span class="nt">BY</span> <span class="nt">a</span><span class="p">.</span><span class="nc">id</span><span class="o">,</span> <span class="nt">a</span><span class="p">.</span><span class="nc">wkb_geometry</span>
-    <span class="nt">UNION</span>
-    <span class="nt">SELECT</span> <span class="nt">id</span><span class="p">::</span><span class="nd">varchar</span><span class="o">,</span> <span class="nt">wkb_geometry</span> <span class="nt">FROM</span> <span class="nt">holes</span>
-    <span class="nt">UNION</span>
-    <span class="nt">SELECT</span> <span class="nt">id</span><span class="p">::</span><span class="nd">varchar</span><span class="o">,</span> <span class="nt">wkb_geometry</span> <span class="nt">FROM</span> <span class="nt">diff_ints</span><span class="o">;</span>
-<span class="nt">CREATE</span> <span class="nt">INDEX</span> <span class="nt">diff_gist_idx</span> <span class="nt">ON</span> <span class="nt">diff</span> <span class="nt">USING</span> <span class="nt">gist</span><span class="o">(</span><span class="nt">wkb_geometry</span><span class="o">);</span>
-<span class="nt">VACUUM</span> <span class="nt">ANALYZE</span> <span class="nt">diff</span><span class="o">;</span>
-</pre></div>
-
-
-<p>Collect the geometries in every cell, simplify them a little, snap them to 3 decimal numbers, make them valid and dump them to simple features. This query takes ~300,000 ms which is orders of magnitude faster than my initial&nbsp;attempt.</p>
-<div class="highlight"><pre><span></span>DROP TABLE IF EXISTS uni;
-CREATE TABLE uni AS
-SELECT
-    g.ogc_fid AS grid_id,
-    (ST_Dump(
-        ST_MakeValid(
-            ST_SnapToGrid(
-                ST_SimplifyPreserveTopology(
-                    ST_CollectionExtract(
-                        ST_Buffer(
-                            ST_Collect(
-                                ST_Intersection(a.wkb_geometry, g.wkb_geometry)
-                            )
-                        , 0)
-                    , 3)
-                , 0.1)
-            , 0.001)
-        )
-    )).geom as wkb_geometry
-FROM diff a, grid g
-WHERE ST_Intersects(a.wkb_geometry, g.wkb_geometry)
-GROUP BY g.ogc_fid;
-</pre></div>
-
-
-<p>After running the query it is reasonable to check the results. I&#8217;m only interested in polygonal geometries, <code>ST_GeometryType()</code> would tell me of any other geometry type. Invalid geometries are not&nbsp;allowed.</p>
-<div class="highlight"><pre><span></span>SELECT DISTINCT ST_GeometryType(wkb_geometry) FROM uni;
-SELECT COUNT(1) FROM uni WHERE NOT ST_IsValid(wkb_geometry);
-</pre></div>
-
-
-<p>Add primary key on serial column as a last <span class="caps">SQL</span>&nbsp;step.</p>
-<div class="highlight"><pre><span></span>ALTER TABLE uni ADD COLUMN id serial;
-ALTER TABLE uni ADD PRIMARY KEY(id);
-</pre></div>
-
-
-<h3>Export</h3>
-<p>And spit it out as a&nbsp;shapefile.</p>
-<div class="highlight"><pre><span></span>ogr2ogr -f &quot;ESRI Shapefile&quot; output.shp PG:&quot;dbname=ign user=postgres&quot; uni -s_srs &quot;EPSG:2154&quot; -t_srs &quot;EPSG:2154&quot; -lco ENCODING=UTF-8
-</pre></div>
-
-
-<h2>Lesson&nbsp;learned</h2>
-<ul>
-<li>More of little seems to be faster than less of&nbsp;bigger.</li>
-<li>Never stop learning and trying different&nbsp;approaches.</li>
-<li>Although using <code>CTE</code> might be tempting, creating separate tables for separate steps of the whole process is much more comfortable for&nbsp;debugging.</li>
-</ul>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/category/sql4.html">&laquo; Previous page</a>

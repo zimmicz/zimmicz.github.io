@@ -7,7 +7,7 @@
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
         <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
         <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?a4089d0f">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
 </head>
 <body>
     <nav role="navigation">
@@ -63,7 +63,7 @@
     <p>Recently I&#8217;ve bought a book called <em>Maps</em> by Aleksandra Mizielinska and Daniel Mizielinski to my nephew. The book&#8217;s absolutely wonderful and made me want to try crafting a map with similar looks. I don&#8217;t do maps much at <a href="https://clevermaps.cz">CleverMaps</a>, so this was a great opportunity to find out what new features became available during the last months of <span class="caps">QGIS</span>&nbsp;development.</p>
 <h2>Result</h2>
 <p>A map of North America in scale of 1:22,000,000 featuring the biggest lakes, rivers, mountain ranges and basic administrative units for the North American countries. I aimed for visually appealing overview map rather than perfectly correct topographic&nbsp;one.</p>
-<div class="text-center"><a href="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/map.png" title="Click for the full size (3 MB)"><img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/map.min.png"/></a></div>
+<div class="text-center"><a href="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/map.png" title="Click for the full size (3 MB)"><img src="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/map.min.png"/></a></div>
 
 <h2>Data</h2>
 <p>I used my beloved <a href="http://www.naturalearthdata.com">Natural Earth dataset</a> for both cultural (boundaries, cities) and physical (rivers, lakes) map features. Different scales came to play for different map layers as they seemed a bit too/few simplified for the given&nbsp;scale.</p>
@@ -75,15 +75,15 @@
 <p>I&#8217;ve used several techniques I find interesting enough to be listed&nbsp;here.</p>
 <h3>Coastlines</h3>
 <p>For a long time I&#8217;ve considered coastlines a field for cartographic invention. They can be emphasized by shading or 3D effects. I chose the set of four parallel coastlines subtly disappearing into the sea, hopefully invoking the feeling of waves coming to the&nbsp;shore.</p>
-<div class="text-center"><img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/coastlines.png"/></div>
+<div class="text-center"><img src="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/coastlines.png"/></div>
 
 <p>It&#8217;s done by dissolving all the features and buffering them again and&nbsp;again.</p>
 <h3>Buffered&nbsp;labels</h3>
 <p>Buffered labels are usually hard to get right, because they fill so much space if the buffer color&#8217;s not corresponding to its surroundings. But choosing the proper color can be a real struggle at&nbsp;times.</p>
-<div class="text-center"><img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/qgis_expressions.png"/></div>
+<div class="text-center"><img src="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/qgis_expressions.png"/></div>
 
 <p>On this map, almost all the labels are buffered with the color of its surroundings, which makes them more legible, yet not too expressive. This is possible thanks to <span class="caps">QGIS</span> expression based properties that let you define unique styling to different map&nbsp;features.</p>
-<div class="text-center"><img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/buffered_labels.png"/></div>
+<div class="text-center"><img src="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/buffered_labels.png"/></div>
 
 <p>Where it isn&#8217;t possible (e.g. Bahamas or Honduras) to choose just one buffer color, the label is not buffered at all (or the semi-transparent white buffer is&nbsp;used).</p>
 <p>Note the <em>Rocky Mountains</em> label is split on the borders of the <span class="caps">U.S.A.</span> and Canada and its both parts match the background&nbsp;color.</p>
@@ -91,16 +91,16 @@
 <p>Rivers are tapered based on the Natural Earth&#8217;s width attribute value for each river&nbsp;segment.</p>
 <h3>Labels in separate&nbsp;layers</h3>
 <p>I&#8217;m used to put labels into separate layers in more complicated map compositions, especially when you need to draw label along path for areal features (such as countries or&nbsp;states).</p>
-<div class="text-center"><img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/labels.png"/></div>
+<div class="text-center"><img src="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/labels.png"/></div>
 
 <p>It becomes a bit harder to keep the features in sync with the labels though. I&#8217;d like to use only one layer for all the map layers in the future, as I feel that&#8217;s the way to go for the best&nbsp;labeling.</p>
 <h3>Labels wrapped on&nbsp;character</h3>
 <p>Some labels just can&#8217;t fit the feature they belong to and <span class="caps">QGIS</span> lets you deal with this by wrapping labels on a special character, <code>\</code> in my&nbsp;case.</p>
-<div class="text-center"><img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/wrapped_labels.png"/></div>
+<div class="text-center"><img src="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/wrapped_labels.png"/></div>
 
 <h3>Layer blending&nbsp;mode</h3>
 <p>The mechanics behind layer blending modes are still a mystery to me, but they can add that little extra to a map very easily. Thanks to the Overlay blending mode, <em>the Rocky Mountains</em> may remain very subtle on different kinds of&nbsp;background.</p>
-<div class="text-center"><img data-echo="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/blending_mode.png"/></div>
+<div class="text-center"><img src="/posts/assets/mapping-north-america-with-qgis-tips-and-tricks/blending_mode.png"/></div>
 </article>
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2017/wifileaks-wi-fi-networks-dataviz/" rel="bookmark" title="Permalink to Wifileaks Wi-Fi Networks Dataviz">Wifileaks Wi-Fi Networks&nbsp;Dataviz</a></h1>
@@ -109,7 +109,7 @@
     <span><a class="category-url" href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
     </aside>
     <p><a href="http://www.wifileaks.cz">Wifileaks</a> is a project by Jakub Čížek aimed to map the Czech wi-fi networks with Android/iOS app. The data gathered by people using the app <a href="http://download.wifileaks.cz/data/wifileaks_raw_170416.tar.gz">is available to download</a> and features ~&nbsp;90,000,000 records, each representing the position of the cellphone when connecting to the network. Just about perfect to craft some&nbsp;maps!</p>
-<div class="text-center"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/cr.png"/></div>
+<div class="text-center"><img src="/posts/assets/wifileaks-wifi-networks-dataviz/cr.png"/></div>
 
 <h2>Using PostgreSQL&nbsp;cstore_fdw</h2>
 <p>I ran out of disk space immediately after loading the dataset into the PostgreSQL database. After fiddling around I remembered that columnar store should be a bit space-friendlier than the old fashioned relational database. Thus, I installed the <a href="https://github.com/citusdata/cstore_fdw">cstore_fdw</a> by Citus Data in just few&nbsp;steps.</p>
@@ -124,24 +124,24 @@ git clone git@github.com:citusdata/cstore_fdw.git
 
 
 <p>This makes <a href="https://www.zimmi.cz/posts/2016/testing-postgresql-ogr-fdw/">another <span class="caps">FDW</span> available</a> to you inside the PostgreSQL. The actual foreign server has to be created before loading the data into a foreign&nbsp;table.</p>
-<div class="highlight"><pre><span></span>cat <span class="s">&lt;&lt;END | psql -qAt --no-psqlrc</span>
-<span class="s">    CREATE SERVER cstore_server FOREIGN DATA WRAPPER cstore_fdw;</span>
-<span class="s">    CREATE SCHEMA data_cstore;</span>
-<span class="s">    CREATE FOREIGN TABLE data_cstore.wifi (</span>
-<span class="s">        id integer,</span>
-<span class="s">        mac text,</span>
-<span class="s">        ssid text,</span>
-<span class="s">        signal_strength numeric,</span>
-<span class="s">        security integer,</span>
-<span class="s">        lat numeric,</span>
-<span class="s">        lon numeric,</span>
-<span class="s">        alt numeric,</span>
-<span class="s">        unixtime bigint,</span>
-<span class="s">        filename text</span>
-<span class="s">    )</span>
-<span class="s">    SERVER cstore_server</span>
-<span class="s">    OPTIONS (compression &#39;pglz&#39;);</span>
-<span class="s">END</span>
+<div class="highlight"><pre><span></span>cat <span class="p">&amp;</span>lt<span class="p">;&amp;</span>lt<span class="p">;</span>END <span class="p">|</span> psql -qAt --no-psqlrc
+    CREATE SERVER cstore_server FOREIGN DATA WRAPPER cstore_fdw<span class="p">;</span>
+    CREATE SCHEMA data_cstore<span class="p">;</span>
+    CREATE FOREIGN TABLE data_cstore.wifi <span class="o">(</span>
+        id integer,
+        mac text,
+        ssid text,
+        signal_strength numeric,
+        security integer,
+        lat numeric,
+        lon numeric,
+        alt numeric,
+        unixtime bigint,
+        filename text
+    <span class="o">)</span>
+    SERVER cstore_server
+    OPTIONS <span class="o">(</span>compression <span class="s1">&#39;pglz&#39;</span><span class="o">)</span><span class="p">;</span>
+END
 </pre></div>
 
 
@@ -152,52 +152,52 @@ git clone git@github.com:citusdata/cstore_fdw.git
 <li>no <code>SERIAL</code></li>
 </ul>
 <p>To overcome these shortcomings I used <code>COPY</code> statement to spit out the slightly modified table and immediately loaded it back&nbsp;in.</p>
-<div class="highlight"><pre><span></span>cat <span class="s">&lt;&lt;END | psql -qAt --no-psqlrc</span>
-<span class="s">COPY (</span>
-<span class="s">    SELECT</span>
-<span class="s">        row_number() OVER (),</span>
-<span class="s">        mac,</span>
-<span class="s">        ssid,</span>
-<span class="s">        signal_strength,</span>
-<span class="s">        security,</span>
-<span class="s">        split_part(filename, &#39;_&#39;, 2)::integer,</span>
-<span class="s">        to_timestamp(unixtime),</span>
-<span class="s">        ST_Transform(ST_SetSRID(ST_MakePoint(lon, lat, alt), 4326), 32633)</span>
-<span class="s">    FROM data_cstore.wifi</span>
-<span class="s">    WHERE lon BETWEEN 0 AND 20</span>
-<span class="s">        AND lat BETWEEN 18 AND 84</span>
-<span class="s">) TO &#39;/tmp/wifileaks.db&#39; WITH CSV DELIMITER &#39;;&#39;</span>
-<span class="s">    DROP SCHEMA IF EXISTS data_cstore CASCADE;</span>
+<div class="highlight"><pre><span></span>cat <span class="p">&amp;</span>lt<span class="p">;&amp;</span>lt<span class="p">;</span>END <span class="p">|</span> psql -qAt --no-psqlrc
+COPY <span class="o">(</span>
+    SELECT
+        row_number<span class="o">()</span> OVER <span class="o">()</span>,
+        mac,
+        ssid,
+        signal_strength,
+        security,
+        split_part<span class="o">(</span>filename, <span class="s1">&#39;_&#39;</span>, <span class="m">2</span><span class="o">)</span>::integer,
+        to_timestamp<span class="o">(</span>unixtime<span class="o">)</span>,
+        ST_Transform<span class="o">(</span>ST_SetSRID<span class="o">(</span>ST_MakePoint<span class="o">(</span>lon, lat, alt<span class="o">)</span>, <span class="m">4326</span><span class="o">)</span>, <span class="m">32633</span><span class="o">)</span>
+    FROM data_cstore.wifi
+    WHERE lon BETWEEN <span class="m">0</span> AND <span class="m">20</span>
+        AND lat BETWEEN <span class="m">18</span> AND <span class="m">84</span>
+<span class="o">)</span> TO <span class="s1">&#39;/tmp/wifileaks.db&#39;</span> WITH CSV DELIMITER <span class="s1">&#39;;&#39;</span>
+    DROP SCHEMA IF EXISTS data_cstore CASCADE<span class="p">;</span>
 
-<span class="s">DROP SCHEMA data_cstore;</span>
-<span class="s">CREATE SCHEMA data_cstore;</span>
-<span class="s">CREATE FOREIGN TABLE data_cstore.wifi (</span>
-<span class="s">    id integer,</span>
-<span class="s">    mac text,</span>
-<span class="s">    ssid text,</span>
-<span class="s">    signal_strength numeric,</span>
-<span class="s">    security integer,</span>
-<span class="s">    userid integer,</span>
-<span class="s">    unixtime timestamp without time zone,</span>
-<span class="s">    geom geometry(POINTZ, 32633)</span>
-<span class="s">)</span>
-<span class="s">SERVER cstore_server</span>
-<span class="s">OPTIONS (compression &#39;pglz&#39;);</span>
-<span class="s">END</span>
+DROP SCHEMA data_cstore<span class="p">;</span>
+CREATE SCHEMA data_cstore<span class="p">;</span>
+CREATE FOREIGN TABLE data_cstore.wifi <span class="o">(</span>
+    id integer,
+    mac text,
+    ssid text,
+    signal_strength numeric,
+    security integer,
+    userid integer,
+    unixtime timestamp without <span class="nb">time</span> zone,
+    geom geometry<span class="o">(</span>POINTZ, <span class="m">32633</span><span class="o">)</span>
+<span class="o">)</span>
+SERVER cstore_server
+OPTIONS <span class="o">(</span>compression <span class="s1">&#39;pglz&#39;</span><span class="o">)</span><span class="p">;</span>
+END
 </pre></div>
 
 
 <h2>Putting the networks on the&nbsp;map</h2>
 <table>
     <tr>
-        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"></a></td>
-        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"></a></td>
-        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"></a></td>
+        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"><img src="/posts/assets/wifileaks-wifi-networks-dataviz/brno.png"></a></td>
+        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"><img src="/posts/assets/wifileaks-wifi-networks-dataviz/praha.png"></a></td>
+        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"><img src="/posts/assets/wifileaks-wifi-networks-dataviz/olomouc.png"></a></td>
     </tr>
     <tr>
-        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"></a></td>
-        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"></a></td>
-        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"><img data-echo="/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"></a></td>
+        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"><img src="/posts/assets/wifileaks-wifi-networks-dataviz/plzen.png"></a></td>
+        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"><img src="/posts/assets/wifileaks-wifi-networks-dataviz/ostrava.png"></a></td>
+        <td><a href="/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"><img src="/posts/assets/wifileaks-wifi-networks-dataviz/hradec_kralove.png"></a></td>
     </tr>
 </table>
 
@@ -377,7 +377,7 @@ gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span c
 <h3>Atlas generation&nbsp;settings</h3>
 <p><strong>Coverage layer</strong> is presumably the only thing you really need - as the name suggests, it covers your area of interest. One map will be created for each feature in this layer, unless you decide to use some <strong>filtering</strong> - which I&nbsp;did.</p>
 <p><strong>Output filenames</strong> can be tweaked to your needs, here&#8217;s what such a function might look like. If there is a slash in the land block <span class="caps">ID</span> (<span class="caps">XXXXXXX</span>/Y), the filename is set to <code>USER-ID_XXXXXXX-00Y_M_00</code>, <code>USER-ID_XXXXXXX-000_M_00</code> otherwise.</p>
-<div class="highlight"><pre><span></span><span class="k">CASE</span> <span class="k">WHEN</span> <span class="n">strpos</span><span class="p">(</span><span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">),</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span>
+<div class="highlight"><pre><span></span><span class="k">CASE</span> <span class="k">WHEN</span> <span class="n">strpos</span><span class="p">(</span><span class="n">attribute</span><span class="p">(</span><span class="err">$</span><span class="n">atlasfeature</span><span class="p">,</span> <span class="s1">&#39;kod_pb&#39;</span><span class="p">),</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="o">-</span><span class="mi">1</span>
     <span class="k">THEN</span>
         <span class="n">ji</span> <span class="o">||</span> <span class="s1">&#39;_&#39;</span> <span class="o">||</span>
         <span class="n">substr</span><span class="p">(</span>
@@ -440,9 +440,9 @@ gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span c
       <span class="n">ji</span><span class="p">,</span>
       <span class="n">kod_pb</span><span class="p">,</span>
       <span class="n">concat</span><span class="p">(</span>
-            <span class="s1">&#39;&lt;g fill=&quot;none&quot; stroke=&quot;#000000&quot; stroke-opacity=&quot;1&quot; stroke-width=&quot;1&quot;</span>
+            <span class="s1">&#39;&amp;lt;g fill=&quot;none&quot; stroke=&quot;#000000&quot; stroke-opacity=&quot;1&quot; stroke-width=&quot;1&quot;</span>
 <span class="s1">                  stroke-linecap=&quot;square&quot; stroke-linejoin=&quot;bevel&quot; transform=&quot;matrix(1.18081,0,0,1.18081,270.0,550.0)&quot;</span>
-<span class="s1">                  font-family=&quot;Droid Sans&quot; font-size=&quot;35&quot; font-style=&quot;normal&quot;&gt;&#39;</span><span class="p">,</span>
+<span class="s1">                  font-family=&quot;Droid Sans&quot; font-size=&quot;35&quot; font-style=&quot;normal&quot;&amp;gt;&#39;</span><span class="p">,</span>
             <span class="n">kultura</span><span class="p">,</span> <span class="n">vymery</span><span class="p">,</span> <span class="n">vymery_hodnoty</span><span class="p">,</span>
             <span class="n">vcs_titul</span><span class="p">,</span> <span class="n">vcs_brk</span><span class="p">,</span> <span class="n">vcs_brs</span><span class="p">,</span> <span class="n">vcs_chmel</span><span class="p">,</span>
             <span class="n">vcs_zvv</span><span class="p">,</span> <span class="n">vcs_zv</span><span class="p">,</span> <span class="n">vcs_ovv</span><span class="p">,</span> <span class="n">vcs_ov</span><span class="p">,</span> <span class="n">vcs_cur</span><span class="p">,</span> <span class="n">vcs_bip</span><span class="p">,</span>
@@ -457,20 +457,20 @@ gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span c
             <span class="n">dv_aeko_d1</span><span class="p">,</span> <span class="n">dv_aeko_d2</span><span class="p">,</span> <span class="n">dv_aeko_d3</span><span class="p">,</span> <span class="n">dv_aeko_d4</span><span class="p">,</span> <span class="n">dv_aeko_d5</span><span class="p">,</span>
             <span class="n">dv_aeko_d6</span><span class="p">,</span> <span class="n">dv_aeko_d7</span><span class="p">,</span> <span class="n">dv_aeko_d8</span><span class="p">,</span> <span class="n">dv_aeko_d9</span><span class="p">,</span> <span class="n">dv_aeko_d10</span><span class="p">,</span>
             <span class="n">dv_aeko_e</span><span class="p">,</span> <span class="n">dv_aeko_f</span><span class="p">,</span> <span class="n">ez</span><span class="p">,</span> <span class="n">dzes_text</span><span class="p">,</span> <span class="n">rep</span><span class="p">,</span> <span class="n">obi</span><span class="p">,</span> <span class="n">seop</span><span class="p">,</span> <span class="n">meop</span><span class="p">,</span> <span class="n">pbz</span><span class="p">,</span> <span class="n">dzes7</span><span class="p">,</span>
-            <span class="s1">&#39;&lt;/g&gt;&#39;</span>
+            <span class="s1">&#39;&amp;lt;/g&amp;gt;&#39;</span>
       <span class="p">)</span> <span class="n">popis</span>
 <span class="k">FROM</span> <span class="p">(...);</span>
 </pre></div>
 
 
 <p>Each column from the previous query is a result of <code>SELECT</code> similar to the one&nbsp;below.</p>
-<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">concat</span><span class="p">(</span><span class="s1">&#39;&lt;text fill=&quot;#000000&quot; fill-opacity=&quot;1&quot; stroke=&quot;none&quot;&gt;BrK: &#39;</span><span class="p">,</span> <span class="n">dv_brk</span><span class="p">,</span> <span class="s1">&#39; ha / &#39;</span><span class="p">,</span> <span class="ss">&quot;MV_BRK&quot;</span><span class="p">,</span> <span class="s1">&#39; ha;&#39;</span><span class="p">,</span> <span class="n">kod_dpz</span><span class="p">,</span> <span class="s1">&#39;&lt;/text&gt;&#39;</span><span class="p">)</span> <span class="n">vcs_brk</span>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">concat</span><span class="p">(</span><span class="s1">&#39;&amp;lt;text fill=&quot;#000000&quot; fill-opacity=&quot;1&quot; stroke=&quot;none&quot;&amp;gt;BrK: &#39;</span><span class="p">,</span> <span class="n">dv_brk</span><span class="p">,</span> <span class="s1">&#39; ha / &#39;</span><span class="p">,</span> <span class="ss">&quot;MV_BRK&quot;</span><span class="p">,</span> <span class="s1">&#39; ha;&#39;</span><span class="p">,</span> <span class="n">kod_dpz</span><span class="p">,</span> <span class="s1">&#39;&amp;lt;/text&amp;gt;&#39;</span><span class="p">)</span> <span class="n">vcs_brk</span>
 </pre></div>
 
 
 <p>The <code>transform="matrix(1.18081,0,0,1.18081,270.0,550.0)</code> part puts the text on the right spot. Great finding about <span class="caps">SVG</span> is that it places each <code>&lt;text&gt;</code> element on the new line, so you don&#8217;t need to deal with calculating the position in your&nbsp;script.</p>
 <p>Scale adjustment is done with a dirty lambda&nbsp;function.</p>
-<div class="highlight"><pre><span></span><span class="n">content</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;&gt;(\d{1,3}\.\d{3,5})&lt;/text&gt;&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">m</span> <span class="p">:</span><span class="s2">&quot;&gt;    &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)))))</span> <span class="o">+</span> <span class="s2">&quot;&lt;/text&gt;&quot;</span><span class="p">,</span> <span class="n">old_map</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+<div class="highlight"><pre><span></span><span class="n">content</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;&amp;gt;(\d{1,3}\.\d{3,5})&amp;lt;/text&amp;gt;&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">m</span> <span class="p">:</span><span class="s2">&quot;&amp;gt;    &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)))))</span> <span class="o">+</span> <span class="s2">&quot;&amp;lt;/text&amp;gt;&quot;</span><span class="p">,</span> <span class="n">old_map</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
 </pre></div>
 
 

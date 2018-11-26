@@ -16,7 +16,7 @@
   <meta property="og:title" content="QGIS Plugin Development: Creating GUI with Qt Designer" />
   <meta property="og:description" content="After fiddling with QGIS Python console and implementing nearest neighbor analysis, I’m going to create a very simple GUI for the plugin at last. While QGIS API docs took me few hours to grasp, the PyQGIS ecosystem knocked my socks off. Here comes the..." />
   <meta property="og:url" content="https://www.zimmi.cz/posts/2017/qgis-plugin-development-creating-gui-with-qt-designer/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?a4089d0f">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
 </head>
 <body>
     <nav role="navigation">
@@ -40,7 +40,7 @@
 <p>While <span class="caps">QGIS</span> <span class="caps">API</span> docs took me few hours to grasp, the PyQGIS ecosystem knocked my socks off. Here comes the list of tools you should incorporate into your development process as soon as&nbsp;possible.</p>
 <h2>Plugin&nbsp;Builder</h2>
 <p>The <a href="https://plugins.qgis.org/plugins/pluginbuilder/"><span class="caps">QGIS</span> Plugin Builder</a> is a plugin created to create&hellip; well, other plugins. It gets you going in minutes and lets you code instead of setting up things you don&#8217;t want to be setting up. A definite must-have. Note you should put the plugin inside the <span class="caps">QGIS</span> plugins folder (defaults to ~/.qgis2/python/plugins) in&nbsp;Linux.</p>
-<div class="text-center"><img data-echo="/posts/assets/qgis-plugin-development-creating-gui-with-qt-designer/qgis.gif"/></div>
+<div class="text-center"><img src="/posts/assets/qgis-plugin-development-creating-gui-with-qt-designer/qgis.gif"/></div>
 
 <p>Remember to run <code>pyrcc4 -o resources.py resources.qrc</code> inside your plugin folder before you add it to <span class="caps">QGIS</span>.</p>
 <h2>Plugin&nbsp;Reloader</h2>
@@ -48,11 +48,11 @@
 <h2>Qt&nbsp;Designer</h2>
 <p><a href="https://www.qt.io/qt-features-libraries-apis-tools-and-ide/">Qt Designer</a> comes with <code>qt4-designer</code> package in Ubuntu. It is tailored to design and build GUIs from Qt components that can be used within <span class="caps">QGIS</span>. Its drag&amp;drop interface lets you prototype&nbsp;quickly.</p>
 <p>Thanks to the Plugin Builder you can load the <code>attribute_transfer_dialog_base.ui</code> file straight into the Qt Designer and adjust it to your&nbsp;needs.</p>
-<div class="text-center"><img data-echo="/posts/assets/qgis-plugin-development-creating-gui-with-qt-designer/qt.gif"/></div>
+<div class="text-center"><img src="/posts/assets/qgis-plugin-development-creating-gui-with-qt-designer/qt.gif"/></div>
 
 <p>It doesn&#8217;t take much, just one <code>QLineEdit</code> and a few <code>QComboBox</code> widgets. Those will be available in the <code>attribute_transfer.py</code> file as properties of the <code>AttributeTransferDialog</code> class.</p>
 <p>The widget name can be customized in the right sidebar and I advise you to do so. I chose the&nbsp;following:</p>
-<div class="text-center"><img data-echo="/posts/assets/qgis-plugin-development-creating-gui-with-qt-designer/qt.png"/></div>
+<div class="text-center"><img src="/posts/assets/qgis-plugin-development-creating-gui-with-qt-designer/qt.png"/></div>
 
 <p>Once loaded with Plugins -&gt; Manage and Install Plugins -&gt; AttributeTransfer, the plugin is available right from the toolbar or Vector menu. It is missing the business logic completely, but I have this covered in <a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/">the previous part</a>.</p>
 <p>All that is to be done is to bind those two parts&nbsp;together.</p>
@@ -81,11 +81,11 @@
 
 <h3>More reading</h3>
     <ul>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/"><span class="caps">QGIS</span> Plugin Development: Using Python&nbsp;Console</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/">Automated Map Creation With <span class="caps">QGIS</span>, PostGIS, Python, <span class="caps">SVG</span> and&nbsp;ImageMagick</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-testing-your-code/"><span class="caps">QGIS</span> Plugin Development: Testing Your&nbsp;Code</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/"><span class="caps">QGIS</span> Plugin Development: Using Python&nbsp;Console</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-attributetransfer-plugin/"><span class="caps">QGIS</span> Plugin Development: AttributeTransfer&nbsp;Plugin</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/"><span class="caps">QGIS</span> Plugin Development: Finding Nearest&nbsp;Neighbors</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/">Automated Map Creation With <span class="caps">QGIS</span>, PostGIS, Python, <span class="caps">SVG</span> and&nbsp;ImageMagick</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
 <script>
