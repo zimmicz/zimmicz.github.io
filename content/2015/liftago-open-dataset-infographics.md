@@ -7,4 +7,4 @@ Category: data
 
 Have a look at my infographics created with PostGIS, Inkscape, Python and pygal.
 
-<p class="text-center"><a href="{filename}/assets/liftago-open-dataset-infographics/liftago.pdf"><img title="Liftago infographics" src="{filename}/assets/liftago-open-dataset-infographics/liftago.png" class="img-responsive centered"></a></p>
+<p class="text-center"><a href="{static}/assets/liftago-open-dataset-infographics/liftago.pdf"><img title="Liftago infographics" src="{static}/assets/liftago-open-dataset-infographics/liftago.png" class="img-responsive centered"></a></p>

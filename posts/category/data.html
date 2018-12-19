@@ -138,18 +138,18 @@ find -type f -not -path <span class="s1">&#39;./PVP_fvu_p_Bechovice_SHP*&#39;</s
 <div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
 
 touch ./data/data.js
-<span class="nb">echo</span> <span class="s2">&quot;let data =&quot;</span> &gt; ./data/data.js
+<span class="nb">echo</span> <span class="s2">&quot;let data =&quot;</span> <span class="p">&amp;</span>gt<span class="p">;</span> ./data/data.js
 
 <span class="o">(</span>
-cat <span class="s">&lt;&lt; EOF | psql -qAt --no-psqlrc</span>
-<span class="s">    SELECT</span>
-<span class="s">    array_to_json(array_agg(row_to_json(r)))</span>
-<span class="s">    FROM (</span>
-<span class="s">    SELECT *</span>
-<span class="s">    FROM data</span>
-<span class="s">    ) r</span>
-<span class="s">EOF</span>
-<span class="o">)</span> &gt;&gt; ./data/data.js
+cat <span class="p">&amp;</span>lt<span class="p">;&amp;</span>lt<span class="p">;</span> EOF <span class="p">|</span> psql -qAt --no-psqlrc
+    SELECT
+    array_to_json<span class="o">(</span>array_agg<span class="o">(</span>row_to_json<span class="o">(</span>r<span class="o">)))</span>
+    FROM <span class="o">(</span>
+    SELECT *
+    FROM data
+    <span class="o">)</span> r
+EOF
+<span class="o">)</span> <span class="p">&amp;</span>gt<span class="p">;&amp;</span>gt<span class="p">;</span> ./data/data.js
 </pre></div>
 
 
@@ -277,7 +277,7 @@ psql -qAt --no-psqlrc -f transform.sql <span class="p">|</span> psql -qAt --no-p
 <span class="p">)</span> <span class="n">a</span>
 <span class="p">)</span>
 <span class="c1">-- create data table with the correct values order for each statistical column</span>
-<span class="c1">-- note that the whole process would crash if d1.ku_kod would be NULL -&gt; @todo fix me</span>
+<span class="c1">-- note that the whole process would crash if d1.ku_kod would be NULL -&amp;gt; @todo fix me</span>
 <span class="k">SELECT</span> <span class="s1">&#39;DROP TABLE IF EXISTS data;</span>
 <span class="s1">    CREATE TABLE data AS</span>
 <span class="s1">    SELECT d1.ku_kod, d1.ku_nazev,&#39;</span>
@@ -373,11 +373,11 @@ wget -q <span class="nv">$URL</span> -O <span class="nv">$CSVFILE</span>
 <span class="k">fi</span>
 
 <span class="nb">echo</span> <span class="s2">&quot;converting to utf-8&quot;</span>
-iconv -f WINDOWS-1250 -t UTF-8 <span class="nv">$CSVFILE</span> -o <span class="nv">$CSVUTF8FILE</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
+iconv -f WINDOWS-1250 -t UTF-8 <span class="nv">$CSVFILE</span> -o <span class="nv">$CSVUTF8FILE</span> <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> <span class="se">\</span>
 <span class="nb">echo</span> <span class="s2">&quot;modifying </span><span class="si">${</span><span class="nv">FILE</span><span class="si">}</span><span class="s2">&quot;</span>
-sed -i <span class="s1">&#39;s/^M$//&#39;</span> <span class="nv">$CSVUTF8FILE</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
-sed -i <span class="s1">&#39;s/\r$//&#39;</span> <span class="nv">$CSVUTF8FILE</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
-sed -i <span class="s1">&#39;s/;*$//g&#39;</span> <span class="nv">$CSVUTF8FILE</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
+sed -i <span class="s1">&#39;s/^M$//&#39;</span> <span class="nv">$CSVUTF8FILE</span> <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> <span class="se">\</span>
+sed -i <span class="s1">&#39;s/\r$//&#39;</span> <span class="nv">$CSVUTF8FILE</span> <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> <span class="se">\</span>
+sed -i <span class="s1">&#39;s/;*$//g&#39;</span> <span class="nv">$CSVUTF8FILE</span> <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> <span class="se">\</span>
 sed -i <span class="s1">&#39;1d&#39;</span> <span class="nv">$CSVUTF8FILE</span>
 
 <span class="nb">echo</span> <span class="s2">&quot;importing to database&quot;</span>

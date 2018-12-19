@@ -27,7 +27,7 @@ Use GDAL to create hillshade with a simple command. No need to use `-s` flag to 
 
 And here comes the Alps.
 
-<p class="text-center"><img title="Hillshade" src="{filename}/assets/color-relief-shaded-map-using-open-data-and-open-source-software/hillshade.png" class="center"></p>
+<p class="text-center"><img title="Hillshade" src="{static}/assets/color-relief-shaded-map-using-open-data-and-open-source-software/hillshade.png" class="center"></p>
 
 To create a color relief you need a ramp of heights with colors. ["The Development and Rationale of Cross-blended Hypsometric Tints"](http://cartographicperspectives.org/index.php/journal/article/viewFile/20/70) by T. Patterson and B. Jenny is a great read on **hypsometric tints**. They also give advice on what colors to choose in different environments (see the table at the last page of the article). I settled for warm humid color values.
 
@@ -105,7 +105,7 @@ I created a color relief with another GDAL command.
 
 And here comes hypsometric tints.
 
-<p class="text-center"><img title="Color relief" src="{filename}/assets/color-relief-shaded-map-using-open-data-and-open-source-software/color_relief.png" class="center"></p>
+<p class="text-center"><img title="Color relief" src="{static}/assets/color-relief-shaded-map-using-open-data-and-open-source-software/color_relief.png" class="center"></p>
 
 Add a bit of compression and some overviews to make it smaller and load faster.
 
@@ -123,7 +123,7 @@ Add a bit of compression and some overviews to make it smaller and load faster.
 
 I chose Austria for its excessive amount of freely available datasets. What I didn't take into consideration was my lack of knowledge when it comes to German (#fail). States come from [data.gv.at](http://data.gv.at) and was dissolved from smaller administrative units. State capitals were downloaded from [naturalearth.com](http://naturalearth.com).
 
-<p class="text-center"><a href="{filename}/assets/color-relief-shaded-map-using-open-data-and-open-source-software/map.pdf" title="Click for PDF version"><img title="Austria" src="{filename}/assets/color-relief-shaded-map-using-open-data-and-open-source-software/map.png" class="center"></a></p>
+<p class="text-center"><a href="{static}/assets/color-relief-shaded-map-using-open-data-and-open-source-software/map.pdf" title="Click for PDF version"><img title="Austria" src="{static}/assets/color-relief-shaded-map-using-open-data-and-open-source-software/map.png" class="center"></a></p>
 
 I'd like to add some more thematic layers in the future. And translate the map to English.
 

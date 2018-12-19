@@ -16,7 +16,7 @@ I've been in love with Leaflet ever since v0.4 was released. Well-documented, cl
 
 <p><img src="/posts/assets/leaflet-chmi-radar-control/control.png" title="Leaflet radar control" class="right">You can see the result in the image below. The control is a simple button with the radar icon displaying the time when active. It is only useful for the Czech Republic and is highly dependent on the image provider (<abbr title="Czech Hydrometeorogical Institute">CHMI</abbr>), which means that if the URL of the images was to be changed, the whole control would break.</p>
 
-<p>You can<a href="{filename}/assets/leaflet-chmi-radar-control/radarcontrol.zip"> grab the code if you like</a>. You add the control to the map as any other control:</p>
+<p>You can<a href="{static}/assets/leaflet-chmi-radar-control/radarcontrol.zip"> grab the code if you like</a>. You add the control to the map as any other control:</p>
 
     :::javascript
     var radar = new L.Control.Radar();

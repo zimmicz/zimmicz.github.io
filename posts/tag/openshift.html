@@ -98,11 +98,11 @@ EOF
 
 <h2>First&nbsp;statistics</h2>
 <p>Some interesting charts and numbers&nbsp;follow.</p>
-<p class="text-center"><img title="Top 100 Twitter users in the Czech Republic" src="{filename}/assets/twitter-rest-api-data-mining-on-openshift-part-ii/authors.png" class="img-responsive centered"></p>
+<p class="text-center"><img title="Top 100 Twitter users in the Czech Republic" src="https://www.zimmi.cz/posts/assets/twitter-rest-api-data-mining-on-openshift-part-ii/authors.png" class="img-responsive centered"></p>
 
-<p class="text-center"><img title="When people tweet in the Czech Republic" src="{filename}/assets/twitter-rest-api-data-mining-on-openshift-part-ii/hours.png" class="img-responsive centered"></p>
+<p class="text-center"><img title="When people tweet in the Czech Republic" src="https://www.zimmi.cz/posts/assets/twitter-rest-api-data-mining-on-openshift-part-ii/hours.png" class="img-responsive centered"></p>
 
-<p class="text-center"><img title="Languages on Twitter in the Czech Republic" src="{filename}/assets/twitter-rest-api-data-mining-on-openshift-part-ii/languages.png" class="img-responsive centered"></p>
+<p class="text-center"><img title="Languages on Twitter in the Czech Republic" src="https://www.zimmi.cz/posts/assets/twitter-rest-api-data-mining-on-openshift-part-ii/languages.png" class="img-responsive centered"></p>
 </article>
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/twitter-rest-api-data-mining-on-openshift-part-i/" rel="bookmark" title="Permalink to Twitter REST API Data Mining on OpenShift (Part I)">Twitter <span class="caps">REST</span> <span class="caps">API</span> Data Mining on OpenShift (Part&nbsp;I)</a></h1>
@@ -123,13 +123,13 @@ EOF
 
 
 <p>Then create <code>.openshift/cron/{hourly,daily,weekly,monthly}</code> folder in the git repository and put your script running a simple curl command into one of&nbsp;those.</p>
-<div class="highlight"><pre><span></span>curl http://social-zimmi.rhcloud.com &gt; /dev/null
+<div class="highlight"><pre><span></span>curl http://social-zimmi.rhcloud.com <span class="p">&amp;</span>gt<span class="p">;</span> /dev/null
 </pre></div>
 
 
 <p>Another problem was just around the corner. Once in a while, the app stopped writing data to the database without saying a word. What helped was restarting it - the only automatic way to do so being a <code>git push</code> command. Sadly, I haven&#8217;t found a way to restart the app from within itself; it probably can&#8217;t be&nbsp;done.</p>
 <p>When you <code>git push</code>, the gear stops, builds, deploys and restarts the app. By using hot deployment you can minimize the downtime. Just put the <code>hot_deploy</code> file into <code>.openshift/markers</code> folder.</p>
-<div class="highlight"><pre><span></span>git commit --allow-empty -m <span class="s2">&quot;Restart gear&quot;</span> <span class="o">&amp;&amp;</span> git push
+<div class="highlight"><pre><span></span>git commit --allow-empty -m <span class="s2">&quot;Restart gear&quot;</span> <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> git push
 </pre></div>
 
 
@@ -140,24 +140,24 @@ EOF
 <span class="nb">cd</span> ~/.anacron
 mkdir cron.daily cron.weekly cron.monthly spool etc
 
-cat <span class="s">&lt;&lt;EOT &gt; ~/.anacron/etc/anacrontab</span>
+cat <span class="p">&amp;</span>lt<span class="p">;&amp;</span>lt<span class="p">;</span>EOT <span class="p">&amp;</span>gt<span class="p">;</span> ~/.anacron/etc/anacrontab
 
-<span class="s">SHELL=/bin/sh</span>
-<span class="s">PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/$HOME/bin</span>
-<span class="s">HOME=$HOME</span>
-<span class="s">LOGNAME=$USER</span>
+<span class="nv">SHELL</span><span class="o">=</span>/bin/sh
+<span class="nv">PATH</span><span class="o">=</span>/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/<span class="nv">$HOME</span>/bin
+<span class="nv">HOME</span><span class="o">=</span><span class="nv">$HOME</span>
+<span class="nv">LOGNAME</span><span class="o">=</span><span class="nv">$USER</span>
 
-<span class="s">1 5  daily-cron nice run-parts --report $HOME/.anacron/cron.daily</span>
-<span class="s">7 10 weekly-cron nice run-parts --report $HOME/.anacron/cron.weekly</span>
-<span class="s">@monthly 15 monthly-cron nice run-parts --report $HOME/.anacron/cron.monthly</span>
+<span class="m">1</span> <span class="m">5</span>  daily-cron nice run-parts --report <span class="nv">$HOME</span>/.anacron/cron.daily
+<span class="m">7</span> <span class="m">10</span> weekly-cron nice run-parts --report <span class="nv">$HOME</span>/.anacron/cron.weekly
+@monthly <span class="m">15</span> monthly-cron nice run-parts --report <span class="nv">$HOME</span>/.anacron/cron.monthly
 
-<span class="s">EOT</span>
+EOT
 
-cat <span class="s">&lt;&lt;EOT &gt;&gt; ~/.zprofile # I use zsh shell</span>
-<span class="s">rm -f $HOME/.anacron/anacron.log</span>
-<span class="s">/usr/sbin/anacron -t /home/zimmi/.anacron/etc/anacrontab -S /home/zimmi/.anacron/spool &amp;&gt; /home/zimmi/.anacron/anacron.log</span>
+cat <span class="p">&amp;</span>lt<span class="p">;&amp;</span>lt<span class="p">;</span>EOT <span class="p">&amp;</span>gt<span class="p">;&amp;</span>gt<span class="p">;</span> ~/.zprofile <span class="c1"># I use zsh shell</span>
+rm -f <span class="nv">$HOME</span>/.anacron/anacron.log
+/usr/sbin/anacron -t /home/zimmi/.anacron/etc/anacrontab -S /home/zimmi/.anacron/spool <span class="p">&amp;</span>amp<span class="p">;&amp;</span>gt<span class="p">;</span> /home/zimmi/.anacron/anacron.log
 
-<span class="s">EOT</span>
+EOT
 </pre></div>
 
 
@@ -167,16 +167,16 @@ cat <span class="s">&lt;&lt;EOT &gt;&gt; ~/.zprofile # I use zsh shell</span>
 
 <span class="nv">workdir</span><span class="o">=</span><span class="s1">&#39;/home/zimmi/documents/zimmi/dizertace/social&#39;</span>
 <span class="nv">logfile</span><span class="o">=</span><span class="nv">$workdir</span>/restart-gear.log
-date &gt; <span class="nv">$logfile</span>
+date <span class="p">&amp;</span>gt<span class="p">;</span> <span class="nv">$logfile</span>
 
 <span class="o">{</span> 
 <span class="nv">HOME</span><span class="o">=</span>/home/zimmi
-<span class="nb">cd</span> <span class="nv">$workdir</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
-git merge origin/master <span class="o">&amp;&amp;</span> <span class="se">\</span>
-git commit --allow-empty -m <span class="s2">&quot;Restart gear&quot;</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
-git push <span class="o">&amp;&amp;</span> <span class="se">\</span>
+<span class="nb">cd</span> <span class="nv">$workdir</span> <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> <span class="se">\</span>
+git merge origin/master <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> <span class="se">\</span>
+git commit --allow-empty -m <span class="s2">&quot;Restart gear&quot;</span> <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> <span class="se">\</span>
+git push <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> <span class="se">\</span>
 <span class="nb">echo</span> <span class="s2">&quot;Success&quot;</span> <span class="p">;</span> 
-<span class="o">}</span> &gt;&gt; <span class="nv">$logfile</span> <span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span>
+<span class="o">}</span> <span class="p">&amp;</span>gt<span class="p">;&amp;</span>gt<span class="p">;</span> <span class="nv">$logfile</span> <span class="m">2</span><span class="p">&amp;</span>gt<span class="p">;&amp;</span>amp<span class="p">;</span><span class="m">1</span>
 </pre></div>
 
 

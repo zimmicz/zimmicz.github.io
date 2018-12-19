@@ -38,13 +38,13 @@
 <div class="highlight"><pre><span></span>$avg  = // value we are looking for
 $size = count($numbers);
 
-for ($i = 0; $i &lt; $size; $i += 1) {
-    if ($i + 9 &lt; 51) {
+for ($i = 0; $i &amp;lt; $size; $i += 1) {
+    if ($i + 9 &amp;lt; 51) {
         $val += $numbers[$i];
-        for ($j = $i + 1; $j &lt; 10 + $i; $j += 1) {
+        for ($j = $i + 1; $j &amp;lt; 10 + $i; $j += 1) {
             $val += $numbers[$j];
         }
-        if ($val / 10 &gt;= $avg) { // hit
+        if ($val / 10 &amp;gt;= $avg) { // hit
             // do something
         }
         $val = 0;
@@ -59,9 +59,9 @@ $max = 0;
 $index = 0;
 
 $size = sizeof($numbers) - $number;
-for ($i = 0; $i &lt; $size; $i++) {
+for ($i = 0; $i &amp;lt; $size; $i++) {
     $tmp = array_sum(array_slice($numbers, $i, $number)) / $number;
-    if ($tmp &gt; $max) {
+    if ($tmp &amp;gt; $max) {
         $max = $tmp;
         $index = $i;
     }

@@ -3,7 +3,7 @@ Date: 2015-02-21 20:54
 Tags: postgresql, postgis
 Category: SQL
 
-[In the first part of my little case study]({{ pcposturl(2014, 12, 02, 'postgis-case-study-vozejkmap-open-data-part-i') }}) I downloaded [vozejkmap.cz](http://vozejkmap.cz) dataset and imported it into the PostGIS database. Having spatial data safely stored the time comes to get it onto the map. Libraries used are:
+[In the first part of my little case study]({filename}../2014/postgis-case-study-vozejkmap-open-data-part-i.md) I downloaded [vozejkmap.cz](http://vozejkmap.cz) dataset and imported it into the PostGIS database. Having spatial data safely stored the time comes to get it onto the map. Libraries used are:
 
 - [Leaflet](http://leafletjs.com)
 - [Leaflet.awesome-markers](https://github.com/lvoogdt/Leaflet.awesome-markers)

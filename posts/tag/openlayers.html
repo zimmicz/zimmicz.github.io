@@ -57,7 +57,7 @@
                 <span class="nx">callback</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">contents</span><span class="p">);</span> <span class="c1">// response contents is where the token is stored</span>
         <span class="p">}</span>
     <span class="p">};</span>
-    <span class="nx">req</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="s2">&quot;http://server.address/arcgis/tokens/?request=getToken&amp;username=username&amp;password=password&amp;expiration=60&quot;</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+    <span class="nx">req</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="s2">&quot;http://server.address/arcgis/tokens/?request=getToken&amp;amp;username=username&amp;amp;password=password&amp;amp;expiration=60&quot;</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
     <span class="nx">req</span><span class="p">.</span><span class="nx">send</span><span class="p">()</span>
 <span class="p">}</span>
 </pre></div>

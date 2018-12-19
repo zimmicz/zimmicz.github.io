@@ -24,6 +24,72 @@
 <h2 class="text-center">Articles in the SQL category</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-wal-archiving/" rel="bookmark" title="Permalink to PostgreSQL Backup and Recovery Orchestration: WAL Archiving">PostgreSQL Backup and Recovery Orchestration: <span class="caps">WAL</span>&nbsp;Archiving</a></h1>
+    <aside><span>Feb 12, 2018</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p>Just a very few of my day-to-day work tasks can be accomplished without PostgreSQL. For years I&#8217;ve been a (power) user of this wonderful relational database, knowing almost nothing about how its internals really work. Faced with the need to build a backup and recovery strategy, I&#8217;ve recently read up <em>a lot</em> on this&nbsp;topic.</p>
+<p>As I don&#8217;t find it very odd for a <span class="caps">GIS</span> person to be given such an extraordinary task (nobody wants to lose the priceless spatial data, right?), I hope this series might shed light on how to prepare and manage the backup/recovery process to those, who are up to such a task. I won&#8217;t be discussing backup strategies based on <code>pg_backup</code> tool, as those don&#8217;t offer neither continuous archivation, nor point-in-time-recovery (<span class="caps">PITR</span>) - those two features disqualifies it as <a href="https://www.clevermaps.cz">CleverMaps</a> production backup&nbsp;strategy.</p>
+<p><strong>That leaves us with taking periodic base backups combined with continuous <span class="caps">WAL</span> archivation, as described&nbsp;below.</strong></p>
+<h2>Taking base&nbsp;backups</h2>
+<p>Archived <span class="caps">WAL</span> segments are worthless without a base backup they can be run on. It&#8217;s crucial to have consistent, periodic base backups to keep your data&nbsp;safe.</p>
+<p><a href="https://www.postgresql.org/docs/current/static/app-pgbasebackup.html"><code>pg_basebackup</code></a> takes base backup of PostgreSQL cluster. Nothing fancy. Gzipping the output folder once the backup is done is definitely a good&nbsp;idea.</p>
+<div class="highlight"><pre><span></span>pg_basebackup <span class="se">\</span>
+    --pgdata<span class="o">=</span>/mnt/backup/base/backup_number <span class="se">\</span>
+    --format<span class="o">=</span>plain <span class="se">\</span>
+    --write-recovery-conf <span class="se">\</span>
+    --xlog-method<span class="o">=</span>stream <span class="se">\</span>
+    --label<span class="o">=</span><span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span> <span class="se">\</span>
+    --checkpoint<span class="o">=</span>fast <span class="se">\</span>
+    --progress <span class="se">\</span>
+    --verbose
+</pre></div>
+
+
+<p>In our current environment, we take a base backup of each of our clusters once a&nbsp;week.</p>
+<h2><span class="caps">WAL</span> archiving&nbsp;configuration</h2>
+<p>To properly set <span class="caps">WAL</span> archiving, several <code>postgresql.conf</code> settings has to be&nbsp;adjusted:</p>
+<ul>
+<li><code>wal_level = replica</code></li>
+<li><code>archive_mode = on</code></li>
+<li><code>archive_command = test ! -f /backup/wal/%f &amp;&amp; cp %p /backup/wal/%f</code></li>
+</ul>
+<p>Setting <code>wal_level</code> to <code>replica</code> writes enough information for <span class="caps">WAL</span> archiving. Turning on <code>archive_mode</code> will run <code>archive_command</code> each time a <span class="caps">WAL</span> segment is completed. <code>archive_command</code> might be anything from simple <code>cp</code> to <code>rsync</code> or <code>aws s3 cp</code> commands. It is absolutely critical that the command returns <strong>non-zero exit code</strong> in case of failure (including when a file with the same name already exists in your backup&nbsp;folder).</p>
+<p>That&#8217;s it, after reloading PostgreSQL service, new <span class="caps">WAL</span> files should be copied to <code>/backup/wal</code> directory. The PostgreSQL process user (<code>postgres</code> usually) has to be able to write to the&nbsp;location.</p>
+<h3>Pitfalls</h3>
+<ul>
+<li>If <code>archive_command</code> fails, <span class="caps">WAL</span> segment remains on your database drive. If it keeps failing long enough, you&#8217;ll run out of space and the database will&nbsp;crash.</li>
+<li>If the backup location fills up, the above-mentioned happens as&nbsp;well.</li>
+<li>If you lose or corrupt any of the archived <span class="caps">WAL</span> segments, you won&#8217;t be able to pass through. That&#8217;s why you want to be sure that your <code>archive_command</code> actually does what you think it&nbsp;does.</li>
+</ul>
+<h3>Tips</h3>
+<p>It might be a real <span class="caps">PITA</span> (fiddling around <span class="caps">WAL</span> segments included) to start a crashed database cluster with no space left. Keeping a dummy file in your <code>pg_xlog</code> location might save you a lot of trouble. Create one with following command. If you run out of space, remove this file and you get 300 <span class="caps">MB</span> for free. Don&#8217;t forget to recreate it after you start the&nbsp;cluster.</p>
+<div class="highlight"><pre><span></span>dd <span class="k">if</span><span class="o">=</span>/dev/zero <span class="nv">of</span><span class="o">=</span>/path_to_your_database_cluster/pg_xlog/DO_NOT_MOVE_THIS_FILE <span class="nv">bs</span><span class="o">=</span>1MB <span class="nv">count</span><span class="o">=</span><span class="m">300</span>
+</pre></div>
+
+
+<p>There&#8217;s no need to keep archived <span class="caps">WAL</span> segments forever. They&#8217;re only needed until you take another base backup. Again, deleting <span class="caps">WAL</span> segments manually (or using <code>find ! -newer previous_base_backup.tar.gz</code>) might lead to accidental corruption of your backups. It&#8217;s much safer to use <a href="https://www.postgresql.org/docs/9.6/static/pgarchivecleanup.html"><code>pg_archivecleanup</code></a> pointed to your <span class="caps">WAL</span> backup folder, referencing the last <strong>sucessful</strong> full backup. Below is the script we use to keep our <span class="caps">WAL</span> backup folder of reasonable size, keeping the last three full&nbsp;backups.</p>
+<div class="highlight"><pre><span></span><span class="c1"># Find base_backup files not older than 3 weeks</span>
+<span class="c1"># Sort by date</span>
+<span class="c1"># Use the oldest one as a reference</span>
+<span class="nv">OLDEST_BASE_BACKUP</span><span class="o">=</span><span class="k">$(</span>basename <span class="k">$(</span>find <span class="si">${</span><span class="nv">CR_WAL_BACKUP_DIR</span><span class="si">}</span>/u/p/ -type f -iname <span class="s2">&quot;*.backup&quot;</span> -mtime -21 -print0 <span class="p">|</span> <span class="se">\</span>
+xargs -0 ls -t <span class="p">|</span> <span class="se">\</span>
+tail -n <span class="m">1</span><span class="k">))</span>
+
+<span class="c1"># Find all subfolders</span>
+<span class="c1"># Except the u/p backup subfolder</span>
+<span class="c1"># Execute pg_archivecleanup for each of the subfolders</span>
+find <span class="nv">$CR_WAL_BACKUP_DIR</span> <span class="se">\</span>
+    -type d <span class="se">\</span>
+    -not -path <span class="s2">&quot;</span><span class="si">${</span><span class="nv">CR_WAL_BACKUP_DIR</span><span class="si">}</span><span class="s2">u*&quot;</span> <span class="se">\</span>
+    -exec pg_archivecleanup -d <span class="o">{}</span> <span class="nv">$OLDEST_BASE_BACKUP</span> <span class="se">\;</span>
+</pre></div>
+
+
+<p>Functional backups are crucial part of a solid backup/recovery system. They&#8217;re still just one half of that system, though. <strong>If not tested thoroughly</strong>, they&#8217;re even less than that. More on testing backups and recovering from failures next&nbsp;time.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2017/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/" rel="bookmark" title="Permalink to Serving Mapbox Vector Tiles with PostGIS, Nginx and Python Backend">Serving Mapbox Vector Tiles with PostGIS, Nginx and Python&nbsp;Backend</a></h1>
     <aside><span>Oct 23, 2017</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>    </span>
@@ -163,7 +229,7 @@
     <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p>Yesterday I spent two very unpleasant hours debugging the weirdest <span class="caps">SQL</span> error I&#8217;ve seen in my life, running the below query (simplified for this&nbsp;post).</p>
-<div class="highlight"><pre><span></span><span class="n">psql</span> <span class="o">-</span><span class="n">qAt</span> <span class="c1">--no-psqlrc &lt;&lt;BACKUP</span>
+<div class="highlight"><pre><span></span><span class="n">psql</span> <span class="o">-</span><span class="n">qAt</span> <span class="c1">--no-psqlrc &amp;lt;&amp;lt;BACKUP</span>
 <span class="k">DO</span>
 <span class="err">$$</span>
 <span class="k">DECLARE</span> <span class="n">r</span> <span class="n">record</span><span class="p">;</span>
@@ -190,7 +256,7 @@ LINE <span class="m">2</span>: <span class="m">1111</span><span class="p">;</spa
 <p>You stare on the screen for a while, absolutely sure that number <code>1111</code> is nowhere close to the data you work with. You try again. Another error. You save the code into a file and try again. It works. What the <em>heck</em>? You try again using the bash heredoc. Another&nbsp;failure.</p>
 <p>The minute you realize <code>$$</code> is being substituted with the <span class="caps">ID</span> of the current process, you feel like the dumbest person on Earth. Yet the happiest one at the same&nbsp;time.</p>
 <p>The solution is&nbsp;trivial.</p>
-<div class="highlight"><pre><span></span><span class="n">psql</span> <span class="o">-</span><span class="n">qAt</span> <span class="c1">--no-psqlrc &lt;&lt;BACKUP</span>
+<div class="highlight"><pre><span></span><span class="n">psql</span> <span class="o">-</span><span class="n">qAt</span> <span class="c1">--no-psqlrc &amp;lt;&amp;lt;BACKUP</span>
 <span class="k">DO</span>
 <span class="err">\$\$</span>
 <span class="k">DECLARE</span> <span class="n">r</span> <span class="n">record</span><span class="p">;</span>
@@ -631,181 +697,6 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
 
 
 <p>The <a href="https://gist.github.com/zimmicz/9e78d9888ab73abc7e87553b77999bc8">server <span class="caps">MVP</span> is available</a> as a GitHub&nbsp;gist.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/" rel="bookmark" title="Permalink to Routing with pgRouting: Catchment Area Calculation">Routing with pgRouting: Catchment Area&nbsp;Calculation</a></h1>
-    <aside><span>Apr 14, 2017</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/pgrouting.html">pgrouting</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p>For a long time I&#8217;ve wanted to play with <a href="http://pgrouting.org/">pgRouting</a> and that time has finally come. Among many other routing functions there is one that caught my eye, called <code>pgr_drivingdistance</code>. As the documentation says, it <em>returns the driving distance from a start node</em> using Dijkstra algorithm. The aforementioned distance doesn&#8217;t need to be defined in Euclidean space (the real distance between two points), it might be calculated in units of time, slopeness etc. How to get it&nbsp;going?</p>
-<h2>Data</h2>
-<p><span class="caps">OSM</span> will do as it always does. There is a tool called <code>osm2pgrouting</code> to help you load the data, the pure <span class="caps">GDAL</span> seems to be a better way to me though. Importing the downloaded data is&nbsp;trivial.</p>
-<div class="highlight"><pre><span></span>ogr2ogr -f <span class="s2">&quot;PostgreSQL&quot;</span> PG:<span class="s2">&quot;dbname=pgrouting active_schema=cze&quot;</span> <span class="se">\</span>
-    -s_srs EPSG:4326 <span class="se">\</span>
-    -t_srs EPSG:5514 <span class="se">\</span>
-    roads.shp <span class="se">\</span>
-    -nln roads <span class="se">\</span>
-    -lco <span class="nv">GEOMETRY_NAME</span><span class="o">=</span>the_geom <span class="se">\</span>
-    -lco <span class="nv">FID</span><span class="o">=</span>id <span class="se">\</span>
-    -gt <span class="m">65000</span> <span class="se">\</span>
-    -nlt PROMOTE_TO_MULTI <span class="se">\</span>
-    -clipsrc <span class="m">16</span>.538 <span class="m">49</span>.147 <span class="m">16</span>.699 <span class="m">49</span>.240
-</pre></div>
-
-
-<p>To route the network, it has to be properly noded. Although pgRouting comes with built-in <code>pgr_nodenetwork</code>, it didn&#8217;t seem to work very well. To node the network, use PostGIS <code>ST_Node</code>. <strong>Note this doesn&#8217;t consider bridges and&nbsp;tunnels.</strong></p>
-<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="k">AS</span>
-<span class="k">SELECT</span>
-    <span class="p">(</span><span class="n">ST_Dump</span><span class="p">(</span><span class="n">geom</span><span class="p">)).</span><span class="n">geom</span> <span class="n">the_geom</span>
-<span class="k">FROM</span> <span class="p">(</span>
-    <span class="k">SELECT</span>
-        <span class="n">ST_Node</span><span class="p">(</span><span class="n">geom</span><span class="p">)</span> <span class="n">geom</span>
-    <span class="k">FROM</span> <span class="p">(</span>
-        <span class="k">SELECT</span> <span class="n">ST_Union</span><span class="p">(</span><span class="n">the_geom</span><span class="p">)</span> <span class="n">geom</span>
-        <span class="k">FROM</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads</span>
-    <span class="p">)</span> <span class="n">a</span>
-<span class="p">)</span> <span class="n">b</span><span class="p">;</span>
-</pre></div>
-
-
-<p>After noding the network, all the information about speed limits and oneways is lost. If needed, it can be brought back with&nbsp;following:</p>
-<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">INDEX</span> <span class="k">ON</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="k">USING</span> <span class="n">gist</span><span class="p">(</span><span class="n">the_geom</span><span class="p">);</span>
-<span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="k">ADD</span> <span class="k">COLUMN</span> <span class="n">id</span> <span class="nb">SERIAL</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">;</span>
-<span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="k">ADD</span> <span class="k">COLUMN</span> <span class="n">maxspeed</span> <span class="nb">integer</span><span class="p">;</span>
-
-<span class="k">UPDATE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span>
-<span class="k">SET</span> <span class="n">maxspeed</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">maxspeed</span>
-<span class="k">FROM</span> <span class="p">(</span>
-    <span class="k">SELECT</span> <span class="k">DISTINCT</span> <span class="k">ON</span> <span class="p">(</span><span class="n">rn</span><span class="p">.</span><span class="n">id</span><span class="p">)</span>
-        <span class="n">rn</span><span class="p">.</span><span class="n">id</span><span class="p">,</span>
-        <span class="n">r</span><span class="p">.</span><span class="n">maxspeed</span>
-    <span class="k">FROM</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="n">rn</span>
-    <span class="k">JOIN</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads</span> <span class="n">r</span> <span class="k">ON</span> <span class="p">(</span><span class="n">ST_Intersects</span><span class="p">(</span><span class="n">rn</span><span class="p">.</span><span class="n">the_geom</span><span class="p">,</span> <span class="n">r</span><span class="p">.</span><span class="n">the_geom</span><span class="p">))</span>
-    <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">rn</span><span class="p">.</span><span class="n">id</span><span class="p">,</span> <span class="n">ST_Length</span><span class="p">(</span><span class="n">ST_Intersection</span><span class="p">(</span><span class="n">rn</span><span class="p">.</span><span class="n">the_geom</span><span class="p">,</span> <span class="n">r</span><span class="p">.</span><span class="n">the_geom</span><span class="p">))</span> <span class="k">DESC</span>
-<span class="p">)</span> <span class="n">a</span>
-<span class="k">WHERE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">id</span><span class="p">;</span>
-</pre></div>
-
-
-<p>With everything set, the topology can be&nbsp;built.</p>
-<div class="highlight"><pre><span></span><span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="k">ADD</span> <span class="k">COLUMN</span> <span class="k">source</span> <span class="nb">integer</span><span class="p">;</span>
-<span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="k">ADD</span> <span class="k">COLUMN</span> <span class="n">target</span> <span class="nb">integer</span><span class="p">;</span>
-<span class="k">SELECT</span> <span class="n">pgr_createTopology</span><span class="p">(</span><span class="s1">&#39;cze.roads_noded&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-</pre></div>
-
-
-<p>This function creates the <code>cze.roads_noded_vertices_pgr</code> that contains all the extracted nodes from the&nbsp;network.</p>
-<div class="text-center"><img src="/posts/assets/routing-with-pgrouting-catchment-area-calculation/nodes.png" width="70%" /></div>
-
-<p>As already mentioned, measures other than length can be used as a distance, I chose the time to get to a given node on&nbsp;foot.</p>
-<div class="highlight"><pre><span></span><span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span> <span class="k">ADD</span> <span class="k">COLUMN</span> <span class="n">cost_minutes</span> <span class="nb">integer</span><span class="p">;</span>
-<span class="k">UPDATE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span>
-<span class="k">SET</span> <span class="n">cost_minutes</span> <span class="o">=</span> <span class="p">(</span><span class="n">ST_Length</span><span class="p">(</span><span class="n">the_geom</span><span class="p">)</span> <span class="o">/</span> <span class="mi">83</span><span class="p">.</span><span class="mi">0</span><span class="p">)::</span><span class="nb">integer</span><span class="p">;</span> <span class="c1">-- it takes average person one minute to walk 83 meters</span>
-
-<span class="k">UPDATE</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded</span>
-<span class="k">SET</span> <span class="n">cost_minutes</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="k">WHERE</span> <span class="n">cost_minutes</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</pre></div>
-
-
-<h2>Routing</h2>
-<p>Now the interesting part. All the routing functions are built on what&#8217;s called <a href="http://docs.pgrouting.org/2.4/en/pgRouting-concepts.html#inner-queries"><em>inner queries</em></a> that are expected to return a certain data structure with no geometry included. As I want to see the results in <span class="caps">QGIS</span> immediately, I had to use a simple anonymous <span class="caps">PL</span>/pgSQL block that writes polygonal catchment areas to a table (consider it a proof of concept, not the final&nbsp;solution).</p>
-<div class="highlight"><pre><span></span><span class="k">DROP</span> <span class="k">TABLE</span> <span class="k">IF</span> <span class="k">EXISTS</span> <span class="n">cze</span><span class="p">.</span><span class="n">temp</span><span class="p">;</span>
-<span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">cze</span><span class="p">.</span><span class="n">temp</span> <span class="k">AS</span>
-<span class="k">SELECT</span> <span class="o">*</span>
-<span class="k">FROM</span> <span class="n">cze</span><span class="p">.</span><span class="n">roads_noded_vertices_pgr</span> <span class="n">ver</span>
-<span class="k">JOIN</span> <span class="p">(</span>
-    <span class="k">SELECT</span> <span class="o">*</span>
-    <span class="k">FROM</span> <span class="n">pgr_drivingDistance</span><span class="p">(</span>
-        <span class="s1">&#39;SELECT id, source, target, cost_minutes as cost, cost_minutes as reverse_cost FROM cze.roads_noded&#39;</span><span class="p">,</span>
-        <span class="mi">6686</span><span class="p">,</span>
-        <span class="mi">10</span><span class="p">,</span>
-        <span class="k">true</span>
-    <span class="p">)</span>
-<span class="p">)</span><span class="n">dist</span> <span class="k">ON</span> <span class="n">ver</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">dist</span><span class="p">.</span><span class="n">node</span><span class="p">;</span>
-
-<span class="k">DO</span> <span class="err">$$</span>
-<span class="k">DECLARE</span>
-    <span class="k">c</span> <span class="nb">integer</span><span class="p">;</span>
-<span class="k">BEGIN</span>
-    <span class="k">DROP</span> <span class="k">TABLE</span> <span class="k">IF</span> <span class="k">EXISTS</span> <span class="n">tmp</span><span class="p">;</span>
-    <span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">tmp</span> <span class="p">(</span>
-        <span class="n">agg_cost</span> <span class="nb">integer</span><span class="p">,</span>
-        <span class="n">geom</span> <span class="n">geometry</span><span class="p">(</span><span class="n">MULTIPOLYGON</span><span class="p">,</span> <span class="mi">5514</span><span class="p">)</span>
-    <span class="p">);</span>
-
-    <span class="c1">-- order by the biggest area so the polygons are not hidden beneath the bigger ones</span>
-    <span class="k">FOR</span> <span class="k">c</span> <span class="k">IN</span> <span class="k">SELECT</span> <span class="n">agg_cost</span> <span class="k">FROM</span> <span class="n">cze</span><span class="p">.</span><span class="n">temp</span> <span class="k">GROUP</span> <span class="k">BY</span> <span class="n">agg_cost</span> <span class="k">HAVING</span> <span class="k">COUNT</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="mi">3</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="mi">1</span> <span class="k">DESC</span> <span class="n">LOOP</span>
-        <span class="n">RAISE</span> <span class="n">INFO</span> <span class="s1">&#39;%&#39;</span><span class="p">,</span> <span class="k">c</span><span class="p">;</span>
-        <span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">tmp</span> <span class="p">(</span><span class="n">agg_cost</span><span class="p">,</span> <span class="n">geom</span><span class="p">)</span>
-        <span class="k">SELECT</span>
-            <span class="k">c</span><span class="p">,</span>
-            <span class="n">ST_Multi</span><span class="p">(</span><span class="n">ST_SetSRID</span><span class="p">(</span><span class="n">pgr_pointsAsPolygon</span><span class="p">(</span>
-                <span class="s1">&#39;SELECT</span>
-<span class="s1">                        temp.id::integer,</span>
-<span class="s1">                        ST_X(temp.the_geom)::float AS x,</span>
-<span class="s1">                        ST_Y(temp.the_geom)::float AS y</span>
-<span class="s1">                FROM cze.temp</span>
-<span class="s1">                WHERE agg_cost = &#39;</span> <span class="o">||</span> <span class="k">c</span>
-            <span class="p">),</span> <span class="mi">5514</span><span class="p">));</span>
-    <span class="k">END</span> <span class="n">LOOP</span><span class="p">;</span>
-<span class="k">END</span><span class="err">$$</span><span class="p">;</span>
-</pre></div>
-
-
-<p>Using <code>pgr_pointsAsPolygon</code> renders resulting nodes accessible in 10-minute walk in polygons, but weird looking ones. Not bad, could be better&nbsp;though.</p>
-<div class="text-center"><img src="/assets/routing-with-pgrouting-catchment-area-calculation/area1.png" width="70%" /></div>
-
-<p>How about seeing only nodes instead of&nbsp;polygons?</p>
-<div class="highlight"><pre><span></span><span class="k">SELECT</span>
-    <span class="n">agg_cost</span><span class="p">,</span>
-    <span class="n">ST_PointN</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
-<span class="k">FROM</span> <span class="p">(</span>
-    <span class="k">SELECT</span>
-        <span class="n">agg_cost</span><span class="p">,</span>
-        <span class="n">ST_ExteriorRing</span><span class="p">((</span><span class="n">ST_Dump</span><span class="p">(</span><span class="n">geom</span><span class="p">)).</span><span class="n">geom</span><span class="p">)</span> <span class="n">geom</span><span class="p">,</span>
-        <span class="n">generate_series</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">ST_NumPoints</span><span class="p">(</span><span class="n">ST_ExteriorRing</span><span class="p">((</span><span class="n">ST_Dump</span><span class="p">(</span><span class="n">geom</span><span class="p">)).</span><span class="n">geom</span><span class="p">)))</span> <span class="n">i</span>
-    <span class="k">FROM</span> <span class="n">tmp</span>
-<span class="p">)</span> <span class="n">a</span><span class="p">;</span>
-</pre></div>
-
-
-<p>Looks good, could be better&nbsp;though.</p>
-<div class="text-center"><img src="/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png" width="70%" /></div>
-
-<p>How about creating concave hulls from the extracted&nbsp;nodes?</p>
-<div class="highlight"><pre><span></span><span class="k">SELECT</span>
-    <span class="n">agg_cost</span><span class="p">,</span>
-    <span class="n">ST_ConcaveHull</span><span class="p">(</span><span class="n">ST_Union</span><span class="p">(</span><span class="n">geom</span><span class="p">))</span> <span class="n">geom</span>
-<span class="k">FROM</span> <span class="p">(</span>
-    <span class="k">SELECT</span>
-        <span class="n">agg_cost</span><span class="p">,</span>
-        <span class="n">ST_PointN</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="n">geom</span>
-    <span class="k">FROM</span> <span class="p">(</span>
-        <span class="k">SELECT</span>
-            <span class="n">agg_cost</span><span class="p">,</span>
-            <span class="n">ST_ExteriorRing</span><span class="p">((</span><span class="n">ST_Dump</span><span class="p">(</span><span class="n">geom</span><span class="p">)).</span><span class="n">geom</span><span class="p">)</span> <span class="n">geom</span><span class="p">,</span>
-            <span class="n">generate_series</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">ST_NumPoints</span><span class="p">(</span><span class="n">ST_ExteriorRing</span><span class="p">((</span><span class="n">ST_Dump</span><span class="p">(</span><span class="n">geom</span><span class="p">)).</span><span class="n">geom</span><span class="p">)))</span> <span class="n">i</span>
-        <span class="k">FROM</span> <span class="n">tmp</span>
-    <span class="p">)</span> <span class="n">a</span>
-<span class="p">)</span> <span class="n">b</span>
-<span class="k">GROUP</span> <span class="k">BY</span> <span class="n">agg_cost</span>
-<span class="k">ORDER</span> <span class="k">BY</span> <span class="n">agg_cost</span> <span class="k">DESC</span><span class="p">;</span>
-</pre></div>
-
-
-<p>This one looks the best I&nbsp;guess.</p>
-<div class="text-center"><img src="/assets/routing-with-pgrouting-catchment-area-calculation/area2.png" width="70%" /></div>
-
-<h2>Remarks</h2>
-<ul>
-<li>The documentation doesn&#8217;t help&nbsp;much.</li>
-<li>I&#8217;d expect existing functions to return different data structures to be easy-to-use,&nbsp;actually.</li>
-<li><code>LATERAL</code> might be really handy with those inner queries, have to give it a shot in the&nbsp;future.</li>
-<li>Pedestrians usually don&#8217;t follow the road&nbsp;network.</li>
-<li>Bridges and tunnels might be an&nbsp;issue.</li>
-</ul>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/category/sql.html">&laquo; Previous page</a>

@@ -26,8 +26,8 @@ TYPOGRIFY = True
 ARTICLE_URL = '{date:%Y}/{slug}/'
 ARTICLE_SAVE_AS = '{date:%Y}/{slug}/index.html'
 GOOGLE_ANALYTICS = True
-PLUGIN_PATHS = ['content/pelican-plugins']
-PLUGINS = ['neighbors', 'assets', 'pelican-image-optimizer', 'related_posts', 'series']
+PLUGIN_PATHS = ['pelican-plugins']
+PLUGINS = ['neighbors', 'assets', 'related_posts', 'series']
 
 CACHE_CONTENT = True
 LOAD_CONTENT_CACHE = True

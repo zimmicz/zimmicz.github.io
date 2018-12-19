@@ -60,18 +60,18 @@
 <div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
 
 touch ./data/data.js
-<span class="nb">echo</span> <span class="s2">&quot;let data =&quot;</span> &gt; ./data/data.js
+<span class="nb">echo</span> <span class="s2">&quot;let data =&quot;</span> <span class="p">&amp;</span>gt<span class="p">;</span> ./data/data.js
 
 <span class="o">(</span>
-cat <span class="s">&lt;&lt; EOF | psql -qAt --no-psqlrc</span>
-<span class="s">    SELECT</span>
-<span class="s">    array_to_json(array_agg(row_to_json(r)))</span>
-<span class="s">    FROM (</span>
-<span class="s">    SELECT *</span>
-<span class="s">    FROM data</span>
-<span class="s">    ) r</span>
-<span class="s">EOF</span>
-<span class="o">)</span> &gt;&gt; ./data/data.js
+cat <span class="p">&amp;</span>lt<span class="p">;&amp;</span>lt<span class="p">;</span> EOF <span class="p">|</span> psql -qAt --no-psqlrc
+    SELECT
+    array_to_json<span class="o">(</span>array_agg<span class="o">(</span>row_to_json<span class="o">(</span>r<span class="o">)))</span>
+    FROM <span class="o">(</span>
+    SELECT *
+    FROM data
+    <span class="o">)</span> r
+EOF
+<span class="o">)</span> <span class="p">&amp;</span>gt<span class="p">;&amp;</span>gt<span class="p">;</span> ./data/data.js
 </pre></div>
 
 
@@ -80,11 +80,11 @@ cat <span class="s">&lt;&lt; EOF | psql -qAt --no-psqlrc</span>
 
 <h3>More reading</h3>
     <ul>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part&nbsp;I)</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/plotting-the-czech-cadastre-land-use-with-d3-data-viz-part-iv/">Plotting the Czech Cadastre Land Use with d3: Data Viz (part <span class="caps">IV</span>)</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-iii/">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">III</span>)</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/postgis-case-study-vozejkmap-open-data-part-i/">PostGIS Case Study: VozejkMap Open Data (Part&nbsp;I)</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/liftago-open-dataset-infographics/">Liftago Open Dataset&nbsp;Infographics</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
 <script>

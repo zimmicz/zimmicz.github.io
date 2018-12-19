@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+          <title>Michal Zimmermann | CentOS PostGIS Upgrade Hell… Yet Again</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+
+
+
+    <meta name="tags" content="postgresql" />
+    <meta name="tags" content="postgis" />
+  <meta property="og:title" content="CentOS PostGIS Upgrade Hell… Yet Again" />
+  <meta property="og:description" content="PostGIS upgrades used to be a nightmare. Broken dependencies, version mismatches, you name it. Upgrading PostgreSQL 10 with PostGIS 2.4 to PostgreSQL 11 on CentOS has been my mission impossible for two days. And it doesn’t seem to come to an end...." />
+  <meta property="og:url" content="https://www.zimmi.cz/posts/2018/centos-postgis-upgrade-hell-yet-again" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
+</head>
+<body>
+    <nav role="navigation">
+        <ul>
+            <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+            <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+            <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
+        </ul>
+    </nav>
+    <header>
+        <h1><a href="/posts">Michal Zimmermann<small>Pieces of knowledge from the world of GIS.</small></a></h1>
+    </header>
+    <main>
+<article>
+    <h1><a href="https://www.zimmi.cz/posts/2018/centos-postgis-upgrade-hell-yet-again" rel="bookmark" title="Permalink to CentOS PostGIS Upgrade Hell… Yet Again">CentOS PostGIS Upgrade Hell&#8230; Yet&nbsp;Again</a></h1>
+    <aside><span>Dec 19, 2018</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+<p><a href="https://www.zimmi.cz/posts/2017/upgrading-postgresql-95-to-postgresql-96-with-postgis/">PostGIS upgrades used to be a nightmare</a>. Broken dependencies, version mismatches, you name it. Upgrading PostgreSQL 10 with PostGIS 2.4 to PostgreSQL 11 on CentOS has been my mission impossible for two days. And it doesn&#8217;t seem to come to an&nbsp;end.</p>
+<h2>What?&nbsp;Why?</h2>
+<p>We&#8217;re running fairly large spatially enabled PostgreSQL 10 database cluster. To keep up with pretty fast development, I was hoping to <code>pg_upgrade</code> it to PostgreSQL&nbsp;11.</p>
+<h2>Tried and&nbsp;failed</h2>
+<p>I&#8217;ve been trying different upgrade strategies with PostgreSQL 11 already running to no avail. Here comes the&nbsp;list.</p>
+<h3>Install PostGIS 2.4 to PostgreSQL 11 and&nbsp;pg_upgrade</h3>
+<div class="highlight"><pre><span></span>yum install postgis24_11
+systemctl stop postgresql-11
+
+su postgres
+/usr/pgsql-11/bin/pg_upgrade <span class="se">\</span>
+  --check <span class="se">\</span>
+  -b /usr/pgsql-10/bin/ -B /usr/pgsql-11/bin/ <span class="se">\</span>
+  -d /var/lib/pgsql/10/data -D /var/lib/pgsql/11/data <span class="se">\</span>
+  --link <span class="se">\</span>
+  -U root <span class="se">\</span>
+  -o <span class="s1">&#39; -c config_file=/var/lib/pgsql/10/data/postgresql.conf&#39;</span> -O <span class="s1">&#39; -c config_file=/var/lib/pgsql/11/data/postgresql.conf&#39;</span>
+</pre></div>
+
+
+<p>This results&nbsp;in:</p>
+<blockquote>
+<p>Your installation references loadable libraries that are missing from the
+new installation.  You can add these libraries to the new installation,
+or remove the functions using them from the old installation.  A list of
+problem libraries is in the file:&nbsp;loadable_libraries.txt</p>
+</blockquote>
+<p><code>loadable_libraries.txt</code> says the&nbsp;following:</p>
+<div class="highlight"><pre><span></span>could not load library <span class="s2">&quot;</span><span class="nv">$libdir</span><span class="s2">/postgis-2.4&quot;</span>: ERROR:  could not load library <span class="s2">&quot;/usr/pgsql-11/lib/postgis-2.4.so&quot;</span>: /usr/pgsql-11/lib/postgis-2.4.so: undefined symbol: geod_polygon_init
+</pre></div>
+
+
+<p>Duckduckgoing I found the related <a href="https://www.postgresql.org/message-id/15450-a3638dc978caa94d@postgresql.org">PostgreSQL mailing list thread</a>.</p>
+<h3>Build and install PostGIS 2.4 from source to PostgreSQL 11 and&nbsp;pg_upgrade</h3>
+<p>The bug report says there&#8217;s something wrong with <code>proj4</code> version, so I chose <code>proj49</code> and <code>geos37</code>.</p>
+<div class="highlight"><pre><span></span>yum install proj49 proj49-devel
+wget https://download.osgeo.org/postgis/source/postgis-2.4.6.tar.gz
+tar -xzvf postgis-2.4.6.tar.gz
+<span class="nb">cd</span> postgis-2.4.6
+
+./configure <span class="se">\</span>
+  --with-pgconfig<span class="o">=</span>/usr/pgsql-11/bin/pg_config <span class="se">\</span>
+  --with-geosconfig<span class="o">=</span>/usr/geos37/bin/geos-config <span class="se">\</span>
+  --with-projdir<span class="o">=</span>/usr/proj49/
+
+make <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> make install
+</pre></div>
+
+
+<p><code>CREATE EXTENSION postgis</code> fails with <code>could not load library "/usr/pgsql-11/lib/postgis-2.4.so": /usr/pgsql-11/lib/postgis-2.4.so: undefined symbol: geod_polygon_init</code>. Oh&nbsp;my.</p>
+<h3>Install PostGIS 2.5 to PostgreSQL 10 and&nbsp;pg_upgrade</h3>
+<p>Running out of ideas, I tried to install PostGIS 2.5 to our PostgreSQL 10 cluster and&nbsp;pg_upgrade.</p>
+<div class="highlight"><pre><span></span>yum install postgis25_10
+</pre></div>
+
+
+<p>The resulting error appeared almost&nbsp;instantly:</p>
+<div class="highlight"><pre><span></span>Transaction check error:
+file /usr/pgsql-10/bin/shp2pgsql-gui from install of postgis25_10-2.5.1-1.rhel7.x86_64 conflicts with file from package postgis24_10-2.4.5-1.rhel7.x86_64
+file /usr/pgsql-10/lib/liblwgeom.so from install of postgis25_10-2.5.1-1.rhel7.x86_64 conflicts with file from package postgis24_10-2.4.5-1.rhel7.x86_64
+file /usr/pgsql-10/lib/postgis-2.4.so from install of postgis25_10-2.5.1-1.rhel7.x86_64 conflicts with file from package postgis24_10-2.4.5-1.rhel7.x86_64
+file /usr/pgsql-10/share/extension/address_standardizer.control from install of postgis25_10-2.5.1-1.rhel7.x86_64 conflicts with file from package postgis24_10-2.4.5-1.rhel7.x86_64
+file /usr/pgsql-10/share/extension/address_standardizer.sql from install of postgis25_10-2.5.1-1.rhel7.x86_64 conflicts with file from package postgis24_10-2.4.5-1.rhel7.x86_64
+file /usr/pgsql-10/share/extension/address_standardizer_data_us.control from install of postgis25_10-2.5.1-1.rhel7.x86_64 conflicts with file from package postgis24_10-2.4.5-1.rhel7.x86_64
+file /usr/pgsql-10/share/extension/address_standardizer_data_us.sql from install of postgis25_10-2.5.1-1.rhel7.x86_64 conflicts with file from package postgis24_10-2.4.5-1.rhel7.x86_64
+file /usr/pgsql-10/share/extension/postgis.control from install of postgis25_10-2.5.1-1.rhel7.x86_64 conflicts with file from package postgis24_10-2.4.5-1.rhel7.x86_64
+file /usr/pgsql-10/share/extension/postgis_sfcgal.control from install of postgis25_10-2.5.1-1.rhel7.x86_64 conflicts with file from package postgis24_10-2.4.5-1.rhel7.x86_64
+file /usr/pgsql-10/share/extension/postgis_tiger_geocoder.control from install of postgis25_10-2.5.1-1.rhel7.x86_64 conflicts with file from package postgis24_10-2.4.5-1.rhel7.x86_64
+file /usr/pgsql-10/share/extension/postgis_topology.control from install of postgis25_10-2.5.1-1.rhel7.x86_64 conflicts with file from package postgis24_10-2.4.5-1.rhel7.x86_64
+</pre></div>
+
+
+<p>What&nbsp;the&hellip;</p>
+<h3>Build and install PostGIS 2.5 from source to PostgreSQL 10 and&nbsp;pg_upgrade</h3>
+<div class="highlight"><pre><span></span>wget https://download.osgeo.org/postgis/source/postgis-2.5.1.tar.gz
+tar -xzvf postgis-2.5.1.tar.gz
+<span class="nb">cd</span> postgis-2.5.1
+
+./configure <span class="se">\</span>
+  --with-pgconfig<span class="o">=</span>/usr/pgsql-10/bin/pg_config <span class="se">\</span>
+  --with-geosconfig<span class="o">=</span>/usr/geos37/bin/geos-config
+
+make <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> make install
+</pre></div>
+
+
+<p><code>CREATE EXTENSION postgis</code> fails with <code>ERROR:  could not load library "/usr/pgsql-10/lib/postgis-2.5.so": /usr/pgsql-10/lib/postgis-2.5.so: undefined symbol: GEOSFrechetDistanceDensify</code>. Again?&nbsp;Really?</p>
+<p><code>GEOSFrechetDistanceDensify</code> was added in <span class="caps">GEOS</span> 3.7 (linked in <code>./configure</code>), yet <code>ldd /usr/pgsql-10/lib/postgis-2.5.so</code> says:</p>
+<div class="highlight"><pre><span></span>linux-vdso.so.1 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span>  <span class="o">(</span>0x00007ffd4c5fa000<span class="o">)</span>
+libgeos_c.so.1 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /usr/geos36/lib64/libgeos_c.so.1 <span class="o">(</span>0x00007f68ddf5a000<span class="o">)</span>
+libproj.so.0 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /lib64/libproj.so.0 <span class="o">(</span>0x00007f68ddd07000<span class="o">)</span>
+libjson-c.so.2 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /lib64/libjson-c.so.2 <span class="o">(</span>0x00007f68ddafc000<span class="o">)</span>
+libxml2.so.2 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /lib64/libxml2.so.2 <span class="o">(</span>0x00007f68dd792000<span class="o">)</span>
+libm.so.6 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /lib64/libm.so.6 <span class="o">(</span>0x00007f68dd48f000<span class="o">)</span>
+libSFCGAL.so.1 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /lib64/libSFCGAL.so.1 <span class="o">(</span>0x00007f68dc9c0000<span class="o">)</span>
+libc.so.6 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /lib64/libc.so.6 <span class="o">(</span>0x00007f68dc5f3000<span class="o">)</span>
+libgeos-3.6.3.so <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /usr/geos36/lib64/libgeos-3.6.3.so <span class="o">(</span>0x00007f68dc244000<span class="o">)</span>
+libstdc++.so.6 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /lib64/libstdc++.so.6 <span class="o">(</span>0x00007f68dbf3d000<span class="o">)</span>
+libgcc_s.so.1 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /lib64/libgcc_s.so.1 <span class="o">(</span>0x00007f68dbd27000<span class="o">)</span>
+libdl.so.2 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /lib64/libdl.so.2 <span class="o">(</span>0x00007f68dbb22000<span class="o">)</span>
+libz.so.1 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /lib64/libz.so.1 <span class="o">(</span>0x00007f68db90c000<span class="o">)</span>
+liblzma.so.5 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /lib64/liblzma.so.5 <span class="o">(</span>0x00007f68db6e6000<span class="o">)</span>
+/lib64/ld-linux-x86-64.so.2 <span class="o">(</span>0x000055960f119000<span class="o">)</span>
+libCGAL.so.11 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /usr/lib64/libCGAL.so.11 <span class="o">(</span>0x00007f68db4bd000<span class="o">)</span>
+libCGAL_Core.so.11 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /usr/lib64/libCGAL_Core.so.11 <span class="o">(</span>0x00007f68db284000<span class="o">)</span>
+libmpfr.so.4 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /usr/lib64/libmpfr.so.4 <span class="o">(</span>0x00007f68db029000<span class="o">)</span>
+libgmp.so.10 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /usr/lib64/libgmp.so.10 <span class="o">(</span>0x00007f68dadb0000<span class="o">)</span>
+libboost_date_time-mt.so.1.53.0 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /usr/lib64/libboost_date_time-mt.so.1.53.0 <span class="o">(</span>0x00007f68dab9f000<span class="o">)</span>
+libboost_thread-mt.so.1.53.0 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /usr/lib64/libboost_thread-mt.so.1.53.0 <span class="o">(</span>0x00007f68da988000<span class="o">)</span>
+libboost_system-mt.so.1.53.0 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /usr/lib64/libboost_system-mt.so.1.53.0 <span class="o">(</span>0x00007f68da783000<span class="o">)</span>
+libboost_serialization-mt.so.1.53.0 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /usr/lib64/libboost_serialization-mt.so.1.53.0 <span class="o">(</span>0x00007f68da517000<span class="o">)</span>
+libpthread.so.0 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /lib64/libpthread.so.0 <span class="o">(</span>0x00007f68da2fa000<span class="o">)</span>
+librt.so.1 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /usr/lib64/librt.so.1 <span class="o">(</span>0x00007f68da0f2000<span class="o">)</span>
+</pre></div>
+
+
+<p>I&#8217;m nearly desperate after spending two days trying to break through. I have ~ 300 <span class="caps">GB</span> of PostgreSQL data to migrate to the current version and there seems to be no possible way to do it in&nbsp;CentOS.</p>
+<p>One more thing to note: using <code>yum install postgis25_11</code> and <code>CREATE EXTENSION postgis</code> in v11 database fails with the exact same error like the one above. I really enjoy working with PostgreSQL and PostGIS, yet there&#8217;s hardly something I fear more than trying to upgrade those two things&nbsp;together.</p>
+<aside>
+
+<h3>More reading</h3>
+    <ul>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-buffers-intersections-differences-and-collections/">PostGIS: Buffers, Intersections, Differences And&nbsp;Collections</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/finding-polygons-lying-across-other-polygons-with-postgis/">Finding Polygons Lying across Other Polygons with&nbsp;PostGIS</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-iii/">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">III</span>)</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/">Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span></a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-polygon-from-centroid/">PostGIS Custom Function to Create Polygon from&nbsp;Centroid</a></li>
+    </ul>
+<!-- Start of Async Drift Code -->
+<script>
+    !function () {
+        var t;
+        if (t = window.driftt = window.drift = window.driftt || [], !t.init) return t.invoked ? void (window.console && console.error && console.error("Drift snippet included twice.")) : (t.invoked = !0,
+            t.methods = ["identify", "config", "track", "reset", "debug", "show", "ping", "page", "hide", "off", "on"],
+            t.factory = function (e) {
+                return function () {
+                    var n;
+                    return n = Array.prototype.slice.call(arguments), n.unshift(e), t.push(n), t;
+                };
+            }, t.methods.forEach(function (e) {
+                t[e] = t.factory(e);
+            }), t.load = function (t) {
+                var e, n, o, i;
+                e = 3e5, i = Math.ceil(new Date() / e) * e, o = document.createElement("script"),
+                    o.type = "text/javascript", o.async = !0, o.crossorigin = "anonymous", o.src = "https://js.driftt.com/include/" + i + "/" + t + ".js",
+                    n = document.getElementsByTagName("script")[0], n.parentNode.insertBefore(o, n);
+            });
+    }();
+    drift.SNIPPET_VERSION = '0.3.1';
+    drift.load('caacyauy5t6b');
+
+</script>
+<!-- End of Async Drift Code --></aside>
+    </main>
+    <footer>
+        Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
+        Proudly powered by <a href="//getpelican.com/">Pelican</a>,
+        which takes great advantage of <a href="//python.org">Python</a>.
+    </footer>
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-43432739-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments)};
+  gtag('js', new Date());
+
+  gtag('config', 'UA-43432739-2');
+</script>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NW8R37N');</script>
+<!-- End Google Tag Manager -->
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NW8R37N"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<script src="https://www.zimmi.cz/posts/theme/js/echo.min.js"></script>
+<script>
+echo.init({
+  offset: 200,
+  throttle: 250,
+  unload: false
+});
+</script>
+</body>
+</html>

@@ -24,88 +24,145 @@
 <h2 class="text-center">Articles tagged with postgis tag</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2015/postgis-count-line-self-intersections/" rel="bookmark" title="Permalink to PostGIS: Count Line Self-Intersections">PostGIS: Count Line&nbsp;Self-Intersections</a></h1>
+    <aside><span>Mar 30, 2015</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p><a href="https://gis.stackexchange.com/questions/107927/counting-self-intersections-of-linestring-using-postgis/140674#140674">Is there a way of using PostgreSQL + PostGIS for finding the number of self intersections in a linestring?</a> was a question that made me think of this problem. I came up with a solution that takes just a few lines of&nbsp;code.</p>
+<p>Assume the following&nbsp;geometries:</p>
+<div class="highlight"><pre><span></span>CREATE TABLE test2 (
+    id integer NOT NULL,
+    wkb_geometry geometry(LineString,5514)
+);
+COPY test2 (id, wkb_geometry) FROM stdin;
+1   01020000208A15000004000000CCDC7845E339EEBFF2003B4A8A08E1BFE4154DAB7C31DCBF24C2042773E3E53F2287BA2CC591E43F604749BFE3B2E2BF2AE9770A11B8F0BF9C91435D56C0C63F
+2   01020000208A1500000600000050212BF9E63EC03F1FA046FD69F1EA3F504D44212915EA3F74A99EDF44E3F33F2CE2805DFAB1F33F805D24B1B189DC3F9834DE5938C1F53FB56F1FBF8AAFEC3F24D0C85B4666EA3FF311B0D8D75BE93F306EAA073894D23FA841B27E3404F33F
+\.
+</pre></div>
+
+
+<p><img src="/posts/assets/postgis-count-line-self-intersections/lines.png" title="Self-intersecting lines" class="img-responsive centered"></p>
+<p>Note that those geometries are valid while not being simple, thus, <code>ST_IsValidReason()</code> wouldn&#8217;t help much. What if we compared it to their single counterparts? Those would have had vertices at intersections. Once you know the original number of vertices and the number of simple geometry vertices, it is fairly easy to subtract those&nbsp;two.</p>
+<div class="highlight"><pre><span></span>WITH noded AS (
+SELECT id, COUNT(id)
+FROM (
+    SELECT DISTINCT (ST_DumpPoints(ST_Node(wkb_geometry))).geom, id
+    FROM test
+) tmp  group by id
+),
+test AS (
+    SELECT id, COUNT(id)
+        FROM (
+            SELECT DISTINCT (ST_DumpPoints(wkb_geometry)).geom, id
+            FROM test
+        ) tmp  group by id
+)
+
+SELECT noded.id, noded.count - test.count cnt FROM noded JOIN test USING (id);
+</pre></div>
+
+
+<p>This query gives you geometry id and the difference in number of vertices between the original and simple geometry. Note the <code>DISTINCT</code> in the <code>noded</code> <span class="caps">CTE</span> - with <code>ST_Node()</code> you get <code>one vertex x number of intersecting lines</code> for each intersection. <code>DISTINCT</code> gives you just one of&nbsp;them.</p>
+<p>The query result on my <code>test</code> table:
+<table>
+    <tr>
+        <th>id</th>
+        <th>cnt</th>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>2</td>
+    </tr>
+</table></p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2015/postgis-rectangular-grid-creation/" rel="bookmark" title="Permalink to PostGIS: Rectangular Grid Creation">PostGIS: Rectangular Grid&nbsp;Creation</a></h1>
     <aside><span>Mar 24, 2015</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
     <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p>Creating a rectangular grid to cover a given extent with same sized cells is one of the basic <span class="caps">GIS</span> tasks I&#8217;ve had to solve several times so far. I used <span class="caps">QGIS</span> or some Python to give me a bunch of <code>INSERT</code> statements to run in PostGIS database, now I&#8217;ve come with a final solution at&nbsp;last.</p>
-<div class="highlight"><pre><span></span>CREATE OR REPLACE FUNCTION cm_grid(
-    blx float8, -- bottom left x coordinate
-    bly float8, -- bottom left y coordinate
-    trx float8, -- top right x coordinate
-    try float8, -- top right y coordinate
-    xsize float8, -- cell width
-    ysize float8, -- cell height
-    srid integer DEFAULT 5514,
-    OUT col varchar,
-    OUT &quot;row&quot; varchar,
-    OUT geom geometry
-) RETURNS SETOF record AS
-$$
-DECLARE
-    width float8; -- total area width
-    height float8; -- total area height
-    cols integer;
-    rows integer;
-BEGIN
-    width  := @($1 - $3); -- absolute value
-    height := @($2 - $4); -- absolute value
-    cols   := ceil(width / xsize);
-    rows   := ceil(height / ysize);
-    RETURN QUERY
-        SELECT
-            cast(
-                lpad((i)::varchar,
-                CASE WHEN
-                    char_length(rows::varchar) &gt; char_length(cols::varchar)
-                        THEN  char_length(rows::varchar)
-                        ELSE char_length(cols::varchar)
-                END,
-                &#39;0&#39;)
-                AS varchar
-            ) AS row,
-            cast(
-                lpad((j)::varchar,
-                CASE WHEN
-                    char_length(rows::varchar) &gt; char_length(cols::varchar)
-                        THEN  char_length(rows::varchar)
-                        ELSE char_length(cols::varchar)
-                END,
-                &#39;0&#39;) AS varchar
-            ) AS col,
-            ST_SetSRID(
-                ST_GeomFromText(
-                    &#39;POLYGON((&#39; ||
-                        array_to_string(
-                            ARRAY[i * xsize + blx, j * ysize + bly],
-                            &#39; &#39;
-                        ) || &#39;,&#39; ||
-                        array_to_string(
-                            ARRAY[i * xsize + blx, (j+1) * ysize + bly],
-                            &#39; &#39;
-                        ) || &#39;,&#39; ||
-                        array_to_string(
-                            ARRAY[(i+1) * xsize + blx, (j+1) * ysize + bly],
-                            &#39; &#39;
-                        ) || &#39;,&#39; ||
-                        array_to_string(
-                            ARRAY[(i+1) * xsize + blx, j * ysize + bly],
-                            &#39; &#39;
-                        ) || &#39;,&#39; ||
-                        array_to_string(
-                            ARRAY[i * xsize + blx, j * ysize + bly],
-                            &#39; &#39;
-                        ) || &#39;
-                    ))&#39;
-                )
-            , srid) AS geom
-        FROM
-            generate_series(0, cols) AS i,
-            generate_series(0, rows) AS j;
-END;
-$$
-LANGUAGE plpgsql;
+<div class="highlight"><pre><span></span><span class="nt">CREATE</span> <span class="nt">OR</span> <span class="nt">REPLACE</span> <span class="nt">FUNCTION</span> <span class="nt">cm_grid</span><span class="o">(</span>
+    <span class="nt">blx</span> <span class="nt">float8</span><span class="o">,</span> <span class="nt">--</span> <span class="nt">bottom</span> <span class="nt">left</span> <span class="nt">x</span> <span class="nt">coordinate</span>
+    <span class="nt">bly</span> <span class="nt">float8</span><span class="o">,</span> <span class="nt">--</span> <span class="nt">bottom</span> <span class="nt">left</span> <span class="nt">y</span> <span class="nt">coordinate</span>
+    <span class="nt">trx</span> <span class="nt">float8</span><span class="o">,</span> <span class="nt">--</span> <span class="nt">top</span> <span class="nt">right</span> <span class="nt">x</span> <span class="nt">coordinate</span>
+    <span class="nt">try</span> <span class="nt">float8</span><span class="o">,</span> <span class="nt">--</span> <span class="nt">top</span> <span class="nt">right</span> <span class="nt">y</span> <span class="nt">coordinate</span>
+    <span class="nt">xsize</span> <span class="nt">float8</span><span class="o">,</span> <span class="nt">--</span> <span class="nt">cell</span> <span class="nt">width</span>
+    <span class="nt">ysize</span> <span class="nt">float8</span><span class="o">,</span> <span class="nt">--</span> <span class="nt">cell</span> <span class="nt">height</span>
+    <span class="nt">srid</span> <span class="nt">integer</span> <span class="nt">DEFAULT</span> <span class="nt">5514</span><span class="o">,</span>
+    <span class="nt">OUT</span> <span class="nt">col</span> <span class="nt">varchar</span><span class="o">,</span>
+    <span class="nt">OUT</span> <span class="s2">&quot;row&quot;</span> <span class="nt">varchar</span><span class="o">,</span>
+    <span class="nt">OUT</span> <span class="nt">geom</span> <span class="nt">geometry</span>
+<span class="o">)</span> <span class="nt">RETURNS</span> <span class="nt">SETOF</span> <span class="nt">record</span> <span class="nt">AS</span>
+<span class="o">$$</span>
+<span class="nt">DECLARE</span>
+    <span class="nt">width</span> <span class="nt">float8</span><span class="o">;</span> <span class="nt">--</span> <span class="nt">total</span> <span class="nt">area</span> <span class="nt">width</span>
+    <span class="nt">height</span> <span class="nt">float8</span><span class="o">;</span> <span class="nt">--</span> <span class="nt">total</span> <span class="nt">area</span> <span class="nt">height</span>
+    <span class="nt">cols</span> <span class="nt">integer</span><span class="o">;</span>
+    <span class="nt">rows</span> <span class="nt">integer</span><span class="o">;</span>
+<span class="nt">BEGIN</span>
+    <span class="nt">width</span>  <span class="o">:=</span> <span class="o">@($</span><span class="nt">1</span> <span class="nt">-</span> <span class="o">$</span><span class="nt">3</span><span class="o">);</span> <span class="nt">--</span> <span class="nt">absolute</span> <span class="nt">value</span>
+    <span class="nt">height</span> <span class="o">:=</span> <span class="o">@($</span><span class="nt">2</span> <span class="nt">-</span> <span class="o">$</span><span class="nt">4</span><span class="o">);</span> <span class="nt">--</span> <span class="nt">absolute</span> <span class="nt">value</span>
+    <span class="nt">cols</span>   <span class="o">:=</span> <span class="nt">ceil</span><span class="o">(</span><span class="nt">width</span> <span class="o">/</span> <span class="nt">xsize</span><span class="o">);</span>
+    <span class="nt">rows</span>   <span class="o">:=</span> <span class="nt">ceil</span><span class="o">(</span><span class="nt">height</span> <span class="o">/</span> <span class="nt">ysize</span><span class="o">);</span>
+    <span class="nt">RETURN</span> <span class="nt">QUERY</span>
+        <span class="nt">SELECT</span>
+            <span class="nt">cast</span><span class="o">(</span>
+                <span class="nt">lpad</span><span class="o">((</span><span class="nt">i</span><span class="o">)</span><span class="p">::</span><span class="nd">varchar</span><span class="o">,</span>
+                <span class="nt">CASE</span> <span class="nt">WHEN</span>
+                    <span class="nt">char_length</span><span class="o">(</span><span class="nt">rows</span><span class="p">::</span><span class="nd">varchar</span><span class="o">)</span> <span class="o">&amp;</span><span class="nt">gt</span><span class="o">;</span> <span class="nt">char_length</span><span class="o">(</span><span class="nt">cols</span><span class="p">::</span><span class="nd">varchar</span><span class="o">)</span>
+                        <span class="nt">THEN</span>  <span class="nt">char_length</span><span class="o">(</span><span class="nt">rows</span><span class="p">::</span><span class="nd">varchar</span><span class="o">)</span>
+                        <span class="nt">ELSE</span> <span class="nt">char_length</span><span class="o">(</span><span class="nt">cols</span><span class="p">::</span><span class="nd">varchar</span><span class="o">)</span>
+                <span class="nt">END</span><span class="o">,</span>
+                <span class="s1">&#39;0&#39;</span><span class="o">)</span>
+                <span class="nt">AS</span> <span class="nt">varchar</span>
+            <span class="o">)</span> <span class="nt">AS</span> <span class="nt">row</span><span class="o">,</span>
+            <span class="nt">cast</span><span class="o">(</span>
+                <span class="nt">lpad</span><span class="o">((</span><span class="nt">j</span><span class="o">)</span><span class="p">::</span><span class="nd">varchar</span><span class="o">,</span>
+                <span class="nt">CASE</span> <span class="nt">WHEN</span>
+                    <span class="nt">char_length</span><span class="o">(</span><span class="nt">rows</span><span class="p">::</span><span class="nd">varchar</span><span class="o">)</span> <span class="o">&amp;</span><span class="nt">gt</span><span class="o">;</span> <span class="nt">char_length</span><span class="o">(</span><span class="nt">cols</span><span class="p">::</span><span class="nd">varchar</span><span class="o">)</span>
+                        <span class="nt">THEN</span>  <span class="nt">char_length</span><span class="o">(</span><span class="nt">rows</span><span class="p">::</span><span class="nd">varchar</span><span class="o">)</span>
+                        <span class="nt">ELSE</span> <span class="nt">char_length</span><span class="o">(</span><span class="nt">cols</span><span class="p">::</span><span class="nd">varchar</span><span class="o">)</span>
+                <span class="nt">END</span><span class="o">,</span>
+                <span class="s1">&#39;0&#39;</span><span class="o">)</span> <span class="nt">AS</span> <span class="nt">varchar</span>
+            <span class="o">)</span> <span class="nt">AS</span> <span class="nt">col</span><span class="o">,</span>
+            <span class="nt">ST_SetSRID</span><span class="o">(</span>
+                <span class="nt">ST_GeomFromText</span><span class="o">(</span>
+                    <span class="s1">&#39;POLYGON((&#39;</span> <span class="o">||</span>
+                        <span class="nt">array_to_string</span><span class="o">(</span>
+                            <span class="nt">ARRAY</span><span class="cp">[</span><span class="nx">i</span> <span class="o">*</span> <span class="nx">xsize</span> <span class="o">+</span> <span class="nx">blx</span><span class="p">,</span> <span class="nx">j</span> <span class="o">*</span> <span class="nx">ysize</span> <span class="o">+</span> <span class="nx">bly</span><span class="cp">]</span><span class="o">,</span>
+                            <span class="s1">&#39; &#39;</span>
+                        <span class="o">)</span> <span class="o">||</span> <span class="s1">&#39;,&#39;</span> <span class="o">||</span>
+                        <span class="nt">array_to_string</span><span class="o">(</span>
+                            <span class="nt">ARRAY</span><span class="cp">[</span><span class="nx">i</span> <span class="o">*</span> <span class="nx">xsize</span> <span class="o">+</span> <span class="nx">blx</span><span class="p">,</span> <span class="p">(</span><span class="nx">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="nx">ysize</span> <span class="o">+</span> <span class="nx">bly</span><span class="cp">]</span><span class="o">,</span>
+                            <span class="s1">&#39; &#39;</span>
+                        <span class="o">)</span> <span class="o">||</span> <span class="s1">&#39;,&#39;</span> <span class="o">||</span>
+                        <span class="nt">array_to_string</span><span class="o">(</span>
+                            <span class="nt">ARRAY</span><span class="cp">[</span><span class="p">(</span><span class="nx">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="nx">xsize</span> <span class="o">+</span> <span class="nx">blx</span><span class="p">,</span> <span class="p">(</span><span class="nx">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="nx">ysize</span> <span class="o">+</span> <span class="nx">bly</span><span class="cp">]</span><span class="o">,</span>
+                            <span class="s1">&#39; &#39;</span>
+                        <span class="o">)</span> <span class="o">||</span> <span class="s1">&#39;,&#39;</span> <span class="o">||</span>
+                        <span class="nt">array_to_string</span><span class="o">(</span>
+                            <span class="nt">ARRAY</span><span class="cp">[</span><span class="p">(</span><span class="nx">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="nx">xsize</span> <span class="o">+</span> <span class="nx">blx</span><span class="p">,</span> <span class="nx">j</span> <span class="o">*</span> <span class="nx">ysize</span> <span class="o">+</span> <span class="nx">bly</span><span class="cp">]</span><span class="o">,</span>
+                            <span class="s1">&#39; &#39;</span>
+                        <span class="o">)</span> <span class="o">||</span> <span class="s1">&#39;,&#39;</span> <span class="o">||</span>
+                        <span class="nt">array_to_string</span><span class="o">(</span>
+                            <span class="nt">ARRAY</span><span class="cp">[</span><span class="nx">i</span> <span class="o">*</span> <span class="nx">xsize</span> <span class="o">+</span> <span class="nx">blx</span><span class="p">,</span> <span class="nx">j</span> <span class="o">*</span> <span class="nx">ysize</span> <span class="o">+</span> <span class="nx">bly</span><span class="cp">]</span><span class="o">,</span>
+                            <span class="s1">&#39; &#39;</span>
+                        <span class="o">)</span> <span class="o">||</span> <span class="s1">&#39;</span>
+<span class="s1">                    ))&#39;</span>
+                <span class="o">)</span>
+            <span class="o">,</span> <span class="nt">srid</span><span class="o">)</span> <span class="nt">AS</span> <span class="nt">geom</span>
+        <span class="nt">FROM</span>
+            <span class="nt">generate_series</span><span class="o">(</span><span class="nt">0</span><span class="o">,</span> <span class="nt">cols</span><span class="o">)</span> <span class="nt">AS</span> <span class="nt">i</span><span class="o">,</span>
+            <span class="nt">generate_series</span><span class="o">(</span><span class="nt">0</span><span class="o">,</span> <span class="nt">rows</span><span class="o">)</span> <span class="nt">AS</span> <span class="nt">j</span><span class="o">;</span>
+<span class="nt">END</span><span class="o">;</span>
+<span class="o">$$</span>
+<span class="nt">LANGUAGE</span> <span class="nt">plpgsql</span><span class="o">;</span>
 </pre></div>
 
 
@@ -178,7 +235,7 @@ SELECT id,
     (ST_DumpRings(wkb_geometry)).geom::geometry(&#39;Polygon&#39;, 2154) as wkb_geometry,
     unnest((ST_DumpRings(wkb_geometry)).path) as path
 FROM :table
-WHERE ST_NRings(wkb_geometry) &gt; 1
+WHERE ST_NRings(wkb_geometry) &amp;gt; 1
 );
 </pre></div>
 
@@ -194,7 +251,7 @@ WHERE ST_NRings(wkb_geometry) &gt; 1
                 ST_Buffer(holes.wkb_geometry,-1),
                 :table.wkb_geometry
             )
-        AND holes.wkb_geometry &amp;&amp; :table.wkb_geometry
+        AND holes.wkb_geometry &amp;amp;&amp;amp; :table.wkb_geometry
 );
 </pre></div>
 
@@ -310,7 +367,7 @@ ALTER TABLE uni ADD PRIMARY KEY(id);
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
     <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
-    <p><a href="{{ pcposturl(2014, 12, 02," title="postgis-case-study-vozejkmap-open-data-part-i">In the first part of my little case study</a> }}) I downloaded <a href="http://vozejkmap.cz">vozejkmap.cz</a> dataset and imported it into the PostGIS database. Having spatial data safely stored the time comes to get it onto the map. Libraries used&nbsp;are:</p>
+    <p><a href="https://www.zimmi.cz/posts/2014/postgis-case-study-vozejkmap-open-data-part-i/">In the first part of my little case study</a> I downloaded <a href="http://vozejkmap.cz">vozejkmap.cz</a> dataset and imported it into the PostGIS database. Having spatial data safely stored the time comes to get it onto the map. Libraries used&nbsp;are:</p>
 <ul>
 <li><a href="http://leafletjs.com">Leaflet</a></li>
 <li><a href="https://github.com/lvoogdt/Leaflet.awesome-markers">Leaflet.awesome-markers</a></li>
@@ -541,66 +598,9 @@ UPDATE vozejkmap SET geom = ST_SetSRID(ST_MakePoint(lng, lat), 4326);
 <p><strong>And here we are, ready to use our spatial&nbsp;data!</strong></p>
 <p>Feel free to <a href="https://github.com/zimmicz/vozejkmap-to-postgis">grab the code</a> at&nbsp;GitHub.</p>
 </article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2014/postgis-spatial-indexing-with-st_intersects/" rel="bookmark" title="Permalink to PostGIS Spatial Indexing With ST_Intersects">PostGIS Spatial Indexing With&nbsp;ST_Intersects</a></h1>
-    <aside><span>Nov 23, 2014</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p><a href="http://postgis.net/docs/ST_Intersects.html">PostGIS docs</a> clearly states that:
-    &gt; This function call will automatically include a bounding box comparison that will make use of any indexes that are available on the&nbsp;geometries.</p>
-<p>That means (or at least I think so) that you shouldn&#8217;t bother with using <a href="http://postgis.net/docs/reference.html#Operators">operators</a> before calling this&nbsp;function.</p>
-<p><a href="http://slides.com/michalzimmermann">I was preparing</a> my second lecture on PostGIS and I was experimenting a bit and came up with an interesting thing on this&nbsp;matter:</p>
-<p>Let&#8217;s have two <span class="caps">SQL</span> relations, <code>roads</code> and <code>regions</code>. I would like to retrieve every road that intersects a certain region. Spatial indexes were built beforehand on both&nbsp;tables.</p>
-<p>First&nbsp;try:</p>
-<div class="highlight"><pre><span></span>EXPLAIN ANALYZE SELECT roads.* FROM roads
-JOIN regions ON ST_Intersects(roads.geom, regions.geom)
-WHERE regions.&quot;NAZEV&quot; = &#39;Jihomoravský&#39;;`
-</pre></div>
-
-
-<p>And here comes the&nbsp;result:</p>
-<div class="highlight"><pre><span></span>Nested Loop  (cost=4.85..324.26 rows=249 width=214) (actual time=45.102..5101.472 rows=74253 loops=1)
--&gt;  Seq Scan on regions  (cost=0.00..12.62 rows=1 width=32) (actual time=0.015..0.018 rows=1 loops=1)
-     Filter: ((&quot;NAZEV&quot;)::text = &#39;Jihomoravský&#39;::text)
-     Rows Removed by Filter: 13
--&gt;  Bitmap Heap Scan on roads  (cost=4.85..311.38 rows=25 width=214) (actual time=45.079..4931.495 rows=74253 loops=1)
-     Recheck Cond: (geom &amp;&amp; regions.geom)
-     Rows Removed by Index Recheck: 154841
-     Filter: _st_intersects(geom, regions.geom)
-     Rows Removed by Filter: 71212
-     -&gt;  Bitmap Index Scan on roads_idx  (cost=0.00..4.85 rows=75 width=0) (actual time=40.142..40.142 rows=145465 loops=1)
-           Index Cond: (geom &amp;&amp; regions.geom)
-Total runtime: 5181.459 ms
-</pre></div>
-
-
-<p>I was pretty satisfied with the result, I kept digging deeper&nbsp;though.</p>
-<p>Second&nbsp;try:</p>
-<div class="highlight"><pre><span></span>EXPLAIN ANALYZE SELECT roads.* FROM roads
-JOIN regions ON roads.geom &amp;&amp; regions.geom
-WHERE regions.&quot;NAZEV&quot; = &#39;Jihomoravský&#39; AND ST_Intersects(roads.geom, regions.geom);
-</pre></div>
-
-
-<p>And the&nbsp;result:</p>
-<div class="highlight"><pre><span></span>Nested Loop  (cost=0.29..21.19 rows=1 width=214) (actual time=3.041..3850.302 rows=74253 loops=1)
--&gt;  Seq Scan on regions  (cost=0.00..12.62 rows=1 width=32) (actual time=0.021..0.024 rows=1 loops=1)
-     Filter: ((&quot;NAZEV&quot;)::text = &#39;Jihomoravský&#39;::text)
-     Rows Removed by Filter: 13
--&gt;  Index Scan using roads_idx on roads  (cost=0.29..8.55 rows=1 width=214) (actual time=2.938..3681.432 rows=74253 loops=1)
-     Index Cond: ((geom &amp;&amp; regions.geom) AND (geom &amp;&amp; regions.geom))
-     Filter: _st_intersects(geom, regions.geom)
-     Rows Removed by Filter: 71212
-Total runtime: 3930.270 ms
-</pre></div>
-
-
-<p>Now there&#8217;s a significant difference between total runtimes of both queries and - more important - also a difference between their query plans. The latter is like <strong>20 % faster</strong>.</p>
-<p>I&#8217;m puzzled about this behavior and would appreciate any thoughts on this. Reach me at <a href="http://twitter.com/zimmicz">Twitter</a>, <a href="https://www.linkedin.com/pub/michal-zimmermann/29/8/b30">LinkedIn</a> or e-mail&nbsp;(zimmicz[at]gmail.com).</p>
-</article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/tag/postgis3.html">&laquo; Previous page</a>
+            <a href="https://www.zimmi.cz/posts/tag/postgis5.html">Next page &raquo;</a>
 </aside>    </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.

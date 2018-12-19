@@ -24,6 +24,30 @@
 <h2>Articles by Michal Zimmermann</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2015/using-postgresql-to-update-outdated-map-links/" rel="bookmark" title="Permalink to Using PostgreSQL To Update Outdated Map Links">Using PostgreSQL To Update Outdated Map&nbsp;Links</a></h1>
+    <aside><span>Feb 16, 2015</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/regex.html">regex</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p><a href="http://www.edpp.cz/pdb_mapa-povodnoveho-planu-mesta/">We&#8217;ve rolled out</a> completely new map <span class="caps">GUI</span> at <a href="http://edpp.cz">edpp.cz</a> built on top of <a href="http://ol3js.org">OpenLayers 3</a>. It looks great and has lots of functions both for <span class="caps">BFU</span> and power users. The only pitfall that came with moving away from OpenLayers 2 were remarkable differences in zoom levels between the old map and the new&nbsp;one.</p>
+<p>Each of our maps is defined by our admins (center, zoom level, layers) at the map creation. Lots of links calling different views of map are created as well. They take form of <code>http://edpp.cz/some-map?0=0&amp;1=0...zoom=5</code>. That <code>zoom=&lt;Number&gt;</code> started causing troubles immediately after the map switch. No way my workmates would update them one by one as there were ~4,500 of them. Sounds like a task for little bit of regular expressions and some <span class="caps">SQL</span>&nbsp;updates.</p>
+<div class="highlight"><pre><span></span>UPDATE table
+    SET column = regexp_replace(column, &#39;zoom=\d&#39;, &#39;zoom=&#39; || subquery.zoom, &#39;g&#39;)
+    FROM (
+        SELECT regexp_replace(
+            substring(column from &#39;zoom=\d&#39;),
+            &#39;zoom=(\d)&#39;,
+            &#39;\1&#39;,
+            &#39;g&#39;)::integer + 2 AS zoom, guid
+        FROM table) AS subquery
+    WHERE column ~ &#39;zoom=\d&#39;
+        AND table.guid = subquery.guid
+</pre></div>
+
+
+<p>That&#8217;s what I&#8217;ve come up with. It basically extracts the zoom level from the link, adds number two to its value and writes it back to the&nbsp;string.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2015/leaflet-with-custom-crs-epsg5514/" rel="bookmark" title="Permalink to Leaflet With Custom CRS (EPSG:5514)">Leaflet With Custom <span class="caps">CRS</span> (<span class="caps">EPSG</span>:5514)</a></h1>
     <aside><span>Jan 15, 2015</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/leaflet.html">leaflet</a>    </span>
@@ -219,39 +243,39 @@ WHERE regions.&quot;NAZEV&quot; = &#39;Jihomoravský&#39;;`
 
 
 <p>And here comes the&nbsp;result:</p>
-<div class="highlight"><pre><span></span>Nested Loop  (cost=4.85..324.26 rows=249 width=214) (actual time=45.102..5101.472 rows=74253 loops=1)
--&gt;  Seq Scan on regions  (cost=0.00..12.62 rows=1 width=32) (actual time=0.015..0.018 rows=1 loops=1)
-     Filter: ((&quot;NAZEV&quot;)::text = &#39;Jihomoravský&#39;::text)
-     Rows Removed by Filter: 13
--&gt;  Bitmap Heap Scan on roads  (cost=4.85..311.38 rows=25 width=214) (actual time=45.079..4931.495 rows=74253 loops=1)
-     Recheck Cond: (geom &amp;&amp; regions.geom)
-     Rows Removed by Index Recheck: 154841
-     Filter: _st_intersects(geom, regions.geom)
-     Rows Removed by Filter: 71212
-     -&gt;  Bitmap Index Scan on roads_idx  (cost=0.00..4.85 rows=75 width=0) (actual time=40.142..40.142 rows=145465 loops=1)
-           Index Cond: (geom &amp;&amp; regions.geom)
-Total runtime: 5181.459 ms
+<div class="highlight"><pre><span></span><span class="nt">Nested</span> <span class="nt">Loop</span>  <span class="o">(</span><span class="nt">cost</span><span class="o">=</span><span class="nt">4</span><span class="p">.</span><span class="nc">85</span><span class="o">.</span><span class="p">.</span><span class="nc">324</span><span class="p">.</span><span class="nc">26</span> <span class="nt">rows</span><span class="o">=</span><span class="nt">249</span> <span class="nt">width</span><span class="o">=</span><span class="nt">214</span><span class="o">)</span> <span class="o">(</span><span class="nt">actual</span> <span class="nt">time</span><span class="o">=</span><span class="nt">45</span><span class="p">.</span><span class="nc">102</span><span class="o">.</span><span class="p">.</span><span class="nc">5101</span><span class="p">.</span><span class="nc">472</span> <span class="nt">rows</span><span class="o">=</span><span class="nt">74253</span> <span class="nt">loops</span><span class="o">=</span><span class="nt">1</span><span class="o">)</span>
+<span class="nt">-</span><span class="o">&amp;</span><span class="nt">gt</span><span class="o">;</span>  <span class="nt">Seq</span> <span class="nt">Scan</span> <span class="nt">on</span> <span class="nt">regions</span>  <span class="o">(</span><span class="nt">cost</span><span class="o">=</span><span class="nt">0</span><span class="p">.</span><span class="nc">00</span><span class="o">.</span><span class="p">.</span><span class="nc">12</span><span class="p">.</span><span class="nc">62</span> <span class="nt">rows</span><span class="o">=</span><span class="nt">1</span> <span class="nt">width</span><span class="o">=</span><span class="nt">32</span><span class="o">)</span> <span class="o">(</span><span class="nt">actual</span> <span class="nt">time</span><span class="o">=</span><span class="nt">0</span><span class="p">.</span><span class="nc">015</span><span class="o">.</span><span class="p">.</span><span class="nc">0</span><span class="p">.</span><span class="nc">018</span> <span class="nt">rows</span><span class="o">=</span><span class="nt">1</span> <span class="nt">loops</span><span class="o">=</span><span class="nt">1</span><span class="o">)</span>
+     <span class="nt">Filter</span><span class="o">:</span> <span class="o">((</span><span class="s2">&quot;NAZEV&quot;</span><span class="o">)</span><span class="p">::</span><span class="nd">text</span> <span class="o">=</span> <span class="s1">&#39;Jihomoravský&#39;</span><span class="p">::</span><span class="nd">text</span><span class="o">)</span>
+     <span class="nt">Rows</span> <span class="nt">Removed</span> <span class="nt">by</span> <span class="nt">Filter</span><span class="o">:</span> <span class="nt">13</span>
+<span class="nt">-</span><span class="o">&amp;</span><span class="nt">gt</span><span class="o">;</span>  <span class="nt">Bitmap</span> <span class="nt">Heap</span> <span class="nt">Scan</span> <span class="nt">on</span> <span class="nt">roads</span>  <span class="o">(</span><span class="nt">cost</span><span class="o">=</span><span class="nt">4</span><span class="p">.</span><span class="nc">85</span><span class="o">.</span><span class="p">.</span><span class="nc">311</span><span class="p">.</span><span class="nc">38</span> <span class="nt">rows</span><span class="o">=</span><span class="nt">25</span> <span class="nt">width</span><span class="o">=</span><span class="nt">214</span><span class="o">)</span> <span class="o">(</span><span class="nt">actual</span> <span class="nt">time</span><span class="o">=</span><span class="nt">45</span><span class="p">.</span><span class="nc">079</span><span class="o">.</span><span class="p">.</span><span class="nc">4931</span><span class="p">.</span><span class="nc">495</span> <span class="nt">rows</span><span class="o">=</span><span class="nt">74253</span> <span class="nt">loops</span><span class="o">=</span><span class="nt">1</span><span class="o">)</span>
+     <span class="nt">Recheck</span> <span class="nt">Cond</span><span class="o">:</span> <span class="o">(</span><span class="nt">geom</span> <span class="o">&amp;</span><span class="nt">amp</span><span class="o">;&amp;</span><span class="nt">amp</span><span class="o">;</span> <span class="nt">regions</span><span class="p">.</span><span class="nc">geom</span><span class="o">)</span>
+     <span class="nt">Rows</span> <span class="nt">Removed</span> <span class="nt">by</span> <span class="nt">Index</span> <span class="nt">Recheck</span><span class="o">:</span> <span class="nt">154841</span>
+     <span class="nt">Filter</span><span class="o">:</span> <span class="nt">_st_intersects</span><span class="o">(</span><span class="nt">geom</span><span class="o">,</span> <span class="nt">regions</span><span class="p">.</span><span class="nc">geom</span><span class="o">)</span>
+     <span class="nt">Rows</span> <span class="nt">Removed</span> <span class="nt">by</span> <span class="nt">Filter</span><span class="o">:</span> <span class="nt">71212</span>
+     <span class="nt">-</span><span class="o">&amp;</span><span class="nt">gt</span><span class="o">;</span>  <span class="nt">Bitmap</span> <span class="nt">Index</span> <span class="nt">Scan</span> <span class="nt">on</span> <span class="nt">roads_idx</span>  <span class="o">(</span><span class="nt">cost</span><span class="o">=</span><span class="nt">0</span><span class="p">.</span><span class="nc">00</span><span class="o">.</span><span class="p">.</span><span class="nc">4</span><span class="p">.</span><span class="nc">85</span> <span class="nt">rows</span><span class="o">=</span><span class="nt">75</span> <span class="nt">width</span><span class="o">=</span><span class="nt">0</span><span class="o">)</span> <span class="o">(</span><span class="nt">actual</span> <span class="nt">time</span><span class="o">=</span><span class="nt">40</span><span class="p">.</span><span class="nc">142</span><span class="o">.</span><span class="p">.</span><span class="nc">40</span><span class="p">.</span><span class="nc">142</span> <span class="nt">rows</span><span class="o">=</span><span class="nt">145465</span> <span class="nt">loops</span><span class="o">=</span><span class="nt">1</span><span class="o">)</span>
+           <span class="nt">Index</span> <span class="nt">Cond</span><span class="o">:</span> <span class="o">(</span><span class="nt">geom</span> <span class="o">&amp;</span><span class="nt">amp</span><span class="o">;&amp;</span><span class="nt">amp</span><span class="o">;</span> <span class="nt">regions</span><span class="p">.</span><span class="nc">geom</span><span class="o">)</span>
+<span class="nt">Total</span> <span class="nt">runtime</span><span class="o">:</span> <span class="nt">5181</span><span class="p">.</span><span class="nc">459</span> <span class="nt">ms</span>
 </pre></div>
 
 
 <p>I was pretty satisfied with the result, I kept digging deeper&nbsp;though.</p>
 <p>Second&nbsp;try:</p>
 <div class="highlight"><pre><span></span>EXPLAIN ANALYZE SELECT roads.* FROM roads
-JOIN regions ON roads.geom &amp;&amp; regions.geom
+JOIN regions ON roads.geom &amp;amp;&amp;amp; regions.geom
 WHERE regions.&quot;NAZEV&quot; = &#39;Jihomoravský&#39; AND ST_Intersects(roads.geom, regions.geom);
 </pre></div>
 
 
 <p>And the&nbsp;result:</p>
-<div class="highlight"><pre><span></span>Nested Loop  (cost=0.29..21.19 rows=1 width=214) (actual time=3.041..3850.302 rows=74253 loops=1)
--&gt;  Seq Scan on regions  (cost=0.00..12.62 rows=1 width=32) (actual time=0.021..0.024 rows=1 loops=1)
-     Filter: ((&quot;NAZEV&quot;)::text = &#39;Jihomoravský&#39;::text)
-     Rows Removed by Filter: 13
--&gt;  Index Scan using roads_idx on roads  (cost=0.29..8.55 rows=1 width=214) (actual time=2.938..3681.432 rows=74253 loops=1)
-     Index Cond: ((geom &amp;&amp; regions.geom) AND (geom &amp;&amp; regions.geom))
-     Filter: _st_intersects(geom, regions.geom)
-     Rows Removed by Filter: 71212
-Total runtime: 3930.270 ms
+<div class="highlight"><pre><span></span><span class="nt">Nested</span> <span class="nt">Loop</span>  <span class="o">(</span><span class="nt">cost</span><span class="o">=</span><span class="nt">0</span><span class="p">.</span><span class="nc">29</span><span class="o">.</span><span class="p">.</span><span class="nc">21</span><span class="p">.</span><span class="nc">19</span> <span class="nt">rows</span><span class="o">=</span><span class="nt">1</span> <span class="nt">width</span><span class="o">=</span><span class="nt">214</span><span class="o">)</span> <span class="o">(</span><span class="nt">actual</span> <span class="nt">time</span><span class="o">=</span><span class="nt">3</span><span class="p">.</span><span class="nc">041</span><span class="o">.</span><span class="p">.</span><span class="nc">3850</span><span class="p">.</span><span class="nc">302</span> <span class="nt">rows</span><span class="o">=</span><span class="nt">74253</span> <span class="nt">loops</span><span class="o">=</span><span class="nt">1</span><span class="o">)</span>
+<span class="nt">-</span><span class="o">&amp;</span><span class="nt">gt</span><span class="o">;</span>  <span class="nt">Seq</span> <span class="nt">Scan</span> <span class="nt">on</span> <span class="nt">regions</span>  <span class="o">(</span><span class="nt">cost</span><span class="o">=</span><span class="nt">0</span><span class="p">.</span><span class="nc">00</span><span class="o">.</span><span class="p">.</span><span class="nc">12</span><span class="p">.</span><span class="nc">62</span> <span class="nt">rows</span><span class="o">=</span><span class="nt">1</span> <span class="nt">width</span><span class="o">=</span><span class="nt">32</span><span class="o">)</span> <span class="o">(</span><span class="nt">actual</span> <span class="nt">time</span><span class="o">=</span><span class="nt">0</span><span class="p">.</span><span class="nc">021</span><span class="o">.</span><span class="p">.</span><span class="nc">0</span><span class="p">.</span><span class="nc">024</span> <span class="nt">rows</span><span class="o">=</span><span class="nt">1</span> <span class="nt">loops</span><span class="o">=</span><span class="nt">1</span><span class="o">)</span>
+     <span class="nt">Filter</span><span class="o">:</span> <span class="o">((</span><span class="s2">&quot;NAZEV&quot;</span><span class="o">)</span><span class="p">::</span><span class="nd">text</span> <span class="o">=</span> <span class="s1">&#39;Jihomoravský&#39;</span><span class="p">::</span><span class="nd">text</span><span class="o">)</span>
+     <span class="nt">Rows</span> <span class="nt">Removed</span> <span class="nt">by</span> <span class="nt">Filter</span><span class="o">:</span> <span class="nt">13</span>
+<span class="nt">-</span><span class="o">&amp;</span><span class="nt">gt</span><span class="o">;</span>  <span class="nt">Index</span> <span class="nt">Scan</span> <span class="nt">using</span> <span class="nt">roads_idx</span> <span class="nt">on</span> <span class="nt">roads</span>  <span class="o">(</span><span class="nt">cost</span><span class="o">=</span><span class="nt">0</span><span class="p">.</span><span class="nc">29</span><span class="o">.</span><span class="p">.</span><span class="nc">8</span><span class="p">.</span><span class="nc">55</span> <span class="nt">rows</span><span class="o">=</span><span class="nt">1</span> <span class="nt">width</span><span class="o">=</span><span class="nt">214</span><span class="o">)</span> <span class="o">(</span><span class="nt">actual</span> <span class="nt">time</span><span class="o">=</span><span class="nt">2</span><span class="p">.</span><span class="nc">938</span><span class="o">.</span><span class="p">.</span><span class="nc">3681</span><span class="p">.</span><span class="nc">432</span> <span class="nt">rows</span><span class="o">=</span><span class="nt">74253</span> <span class="nt">loops</span><span class="o">=</span><span class="nt">1</span><span class="o">)</span>
+     <span class="nt">Index</span> <span class="nt">Cond</span><span class="o">:</span> <span class="o">((</span><span class="nt">geom</span> <span class="o">&amp;</span><span class="nt">amp</span><span class="o">;&amp;</span><span class="nt">amp</span><span class="o">;</span> <span class="nt">regions</span><span class="p">.</span><span class="nc">geom</span><span class="o">)</span> <span class="nt">AND</span> <span class="o">(</span><span class="nt">geom</span> <span class="o">&amp;</span><span class="nt">amp</span><span class="o">;&amp;</span><span class="nt">amp</span><span class="o">;</span> <span class="nt">regions</span><span class="p">.</span><span class="nc">geom</span><span class="o">))</span>
+     <span class="nt">Filter</span><span class="o">:</span> <span class="nt">_st_intersects</span><span class="o">(</span><span class="nt">geom</span><span class="o">,</span> <span class="nt">regions</span><span class="p">.</span><span class="nc">geom</span><span class="o">)</span>
+     <span class="nt">Rows</span> <span class="nt">Removed</span> <span class="nt">by</span> <span class="nt">Filter</span><span class="o">:</span> <span class="nt">71212</span>
+<span class="nt">Total</span> <span class="nt">runtime</span><span class="o">:</span> <span class="nt">3930</span><span class="p">.</span><span class="nc">270</span> <span class="nt">ms</span>
 </pre></div>
 
 
@@ -269,38 +293,6 @@ Total runtime: 3930.270 ms
 
 
 <p>Whenever you need to prepend anything to your&nbsp;files.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2014/migrating-geoserver-and-checking-for-missing-data/" rel="bookmark" title="Permalink to Migrating Geoserver And Checking For Missing Data">Migrating Geoserver And Checking For Missing&nbsp;Data</a></h1>
-    <aside><span>Oct 29, 2014</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/geoserver.html">geoserver</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
-    </aside>
-    <p>I&#8217;ve upgraded a handful of Geoserver installations and it has never been flawless. If you&#8217;re lucky you end up with just <em>some</em> layers missing, if you&#8217;re not, you&#8217;ll miss a bunch of them (together with layergroups, some stores, workspaces might screw up&nbsp;etc.).</p>
-<p>But how do you check for missing data before switching to the newer version? Thanks to the <a href="http://docs.geoserver.org/stable/en/user/rest/api/index.html"><span class="caps">REST</span> <span class="caps">API</span> implemented within Geoserver</a>, it&#8217;s rather&nbsp;easy.</p>
-<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
-<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
-<span class="kn">from</span> <span class="nn">requests.auth</span> <span class="kn">import</span> <span class="n">HTTPBasicAuth</span>
-
-<span class="n">req</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;http://example.com/geoserver/rest/layers&#39;</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="n">HTTPBasicAuth</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">))</span>
-
-<span class="n">html</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
-<span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="k">for</span> <span class="n">link</span> <span class="ow">in</span> <span class="n">html</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">):</span>
-    <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
-    <span class="n">href</span> <span class="o">=</span> <span class="n">link</span><span class="o">.</span><span class="n">get_text</span><span class="p">()</span>
-    <span class="k">print</span> <span class="n">i</span>
-
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;list.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">href</span><span class="p">)</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-</pre></div>
-
-
-<p>We needed to migrate ~ 17,000 layers last week, and yes, we could have just shut the door and spend couple of nights checking one after another, if we were the dumbest <span class="caps">GIS</span> company&nbsp;ever.</p>
-<p>As I wanted to make it a bit easier I wrote the simple Python script (see above) that just authenticates against Geoserver and downloads the list of layers. I actually had to do that twice - both old and new instance. A <a href="https://www.diffchecker.com/">simple file comparison</a> followed and I got a list of missing layers in less than two&nbsp;minutes.</p>
-<p>If you do the same to workspaces, stores and layergroups, your chances of not losing some data after the switch are pretty&nbsp;high.</p>
-<p>I guess it&#8217;s reasonable to check your maps by hand as well, but this gives you the picture of the current state of your data real&nbsp;quick.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/author/michal-zimmermann13.html">&laquo; Previous page</a>

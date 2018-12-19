@@ -15,7 +15,7 @@
     <meta name="tags" content="bash" />
     <meta property="og:image" content="https://www.zimmi.cz/posts/assets/postgresql-dollar-quoting-inside-bash-heredoc/bash.png" />
   <meta property="og:title" content="PostgreSQL Dollar Quoting inside Bash Heredoc" />
-  <meta property="og:description" content="Yesterday I spent two very unpleasant hours debugging the weirdest SQL error I’ve seen in my life, running the below query (simplified for this post). psql -qAt --no-psqlrc <<BACKUP DO $$ DECLARE r record; BEGIN RAISE INFO '%', 'info'; END $$; BACKUP..." />
+  <meta property="og:description" content="Yesterday I spent two very unpleasant hours debugging the weirdest SQL error I’ve seen in my life, running the below query (simplified for this post). psql -qAt --no-psqlrc &lt;&lt;BACKUP DO $$ DECLARE r record; BEGIN RAISE INFO '%', 'info'; END $$;..." />
   <meta property="og:url" content="https://www.zimmi.cz/posts/2017/postgresql-dollar-quoting-inside-bash-heredoc/" />
         <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
 </head>
@@ -38,7 +38,7 @@
     <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
 <p>Yesterday I spent two very unpleasant hours debugging the weirdest <span class="caps">SQL</span> error I&#8217;ve seen in my life, running the below query (simplified for this&nbsp;post).</p>
-<div class="highlight"><pre><span></span><span class="n">psql</span> <span class="o">-</span><span class="n">qAt</span> <span class="c1">--no-psqlrc &lt;&lt;BACKUP</span>
+<div class="highlight"><pre><span></span><span class="n">psql</span> <span class="o">-</span><span class="n">qAt</span> <span class="c1">--no-psqlrc &amp;lt;&amp;lt;BACKUP</span>
 <span class="k">DO</span>
 <span class="err">$$</span>
 <span class="k">DECLARE</span> <span class="n">r</span> <span class="n">record</span><span class="p">;</span>
@@ -65,7 +65,7 @@ LINE <span class="m">2</span>: <span class="m">1111</span><span class="p">;</spa
 <p>You stare on the screen for a while, absolutely sure that number <code>1111</code> is nowhere close to the data you work with. You try again. Another error. You save the code into a file and try again. It works. What the <em>heck</em>? You try again using the bash heredoc. Another&nbsp;failure.</p>
 <p>The minute you realize <code>$$</code> is being substituted with the <span class="caps">ID</span> of the current process, you feel like the dumbest person on Earth. Yet the happiest one at the same&nbsp;time.</p>
 <p>The solution is&nbsp;trivial.</p>
-<div class="highlight"><pre><span></span><span class="n">psql</span> <span class="o">-</span><span class="n">qAt</span> <span class="c1">--no-psqlrc &lt;&lt;BACKUP</span>
+<div class="highlight"><pre><span></span><span class="n">psql</span> <span class="o">-</span><span class="n">qAt</span> <span class="c1">--no-psqlrc &amp;lt;&amp;lt;BACKUP</span>
 <span class="k">DO</span>
 <span class="err">\$\$</span>
 <span class="k">DECLARE</span> <span class="n">r</span> <span class="n">record</span><span class="p">;</span>
@@ -79,11 +79,11 @@ LINE <span class="m">2</span>: <span class="m">1111</span><span class="p">;</spa
 
 <h3>More reading</h3>
     <ul>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/dead-simple-random-points-in-polygons-with-postgis/">Dead Simple Random Points in Polygons with&nbsp;PostGIS</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/finding-polygons-lying-across-other-polygons-with-postgis/">Finding Polygons Lying across Other Polygons with&nbsp;PostGIS</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-polygon-from-centroid/">PostGIS Custom Function to Create Polygon from&nbsp;Centroid</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/syncing-two-postgresql-databases-faster/">Syncing Two PostgreSQL Databases&nbsp;Faster</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/counting-substring-occurrences-in-postgresql/">Counting substring occurrences in&nbsp;PostgreSQL</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/executing-dynamic-sql-query-right-away/">Executing dynamic <span class="caps">SQL</span> query right&nbsp;away</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/upgrading-postgresql-95-to-postgresql-96-with-postgis/">Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with&nbsp;PostGIS</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-wind-rose/">PostGIS Custom Function to Create Wind&nbsp;Rose</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
 <script>

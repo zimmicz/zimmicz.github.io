@@ -46,7 +46,7 @@ LOCALE = 'en_US.UTF-8'
 CATEGORIES_SAVE_AS = 'categories/index.html'
 TAGS_SAVE_AS = 'tags/index.html'
 
-PLUGIN_PATHS = ['content/pelican-plugins']
+PLUGIN_PATHS = ['pelican-plugins']
 PLUGINS = ['neighbors', 'assets', 'related_posts', 'series']
 
 IGNORE_FILES = ['*.rst', 'pelican-plugins/**/*.md']

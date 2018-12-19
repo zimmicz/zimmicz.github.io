@@ -24,6 +24,72 @@
 <h2 class="text-center">Articles tagged with postgis tag</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-iii/" rel="bookmark" title="Permalink to PostGIS Case Study: Vozejkmap Open Data (Part III)">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">III</span>)</a></h1>
+    <aside><span>Nov 14, 2015</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/leaflet.html">leaflet</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/web-maps.html">web maps</a></span>
+    </aside>
+    <p>After a while I got back to my <a href="https://www.zimmi.cz/posts/2014/postgis-case-study-vozejkmap-open-data-part-i/">PostGIS open data</a> <a href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-ii/">case study</a>. Last time I left it with clustering implemented, looking forward to incorporate <a href="http://turfjs.org">Turf.js</a> in the future. <em>And the future is now.</em> <a href="https://github.com/zimmicz/vozejkmap-to-postgis">The code is still available on&nbsp;GitHub.</a></p>
+<h2>Subgroup&nbsp;clustering</h2>
+<p>Vozejkmap data is categorized based on the place type (banks, parking lots, pubs, &hellip;). One of the core features of map showing such data should be the easy way to turn these categories on and&nbsp;off.</p>
+<p>As far as I know, it&#8217;s not trivial to do this with the standard Leaflet library. Extending <code>L.control.layers</code> and implement its <code>addOverlay</code>, <code>removeOverlay</code> methods on your own might be the way to add needed behavior. Fortunately, there&#8217;s an easier option thanks to <a href="https://github.com/ghybs/Leaflet.FeatureGroup.SubGroup">Leaflet.FeatureGroup.SubGroup</a> that can handle such use case and is really straightforward. See the code&nbsp;below.</p>
+<div class="highlight"><pre><span></span><span class="nx">cluster</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">markerClusterGroup</span><span class="p">({</span>
+    <span class="nx">chunkedLoading</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nx">chunkInterval</span><span class="o">:</span> <span class="mi">500</span>
+<span class="p">});</span>
+
+<span class="nx">cluster</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
+
+<span class="p">...</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">category</span> <span class="k">in</span> <span class="nx">categories</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// just use L.featureGroup.subGroup instead of L.layerGroup or L.featureGroup</span>
+    <span class="nx">overlays</span><span class="p">[</span><span class="nx">my</span><span class="p">.</span><span class="nx">Style</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="nx">category</span><span class="p">).</span><span class="nx">type</span><span class="p">]</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">featureGroup</span><span class="p">.</span><span class="nx">subGroup</span><span class="p">(</span><span class="nx">cluster</span><span class="p">,</span> <span class="nx">categories</span><span class="p">[</span><span class="nx">category</span><span class="p">]);</span>
+<span class="p">}</span>
+
+<span class="nx">mapkey</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">control</span><span class="p">.</span><span class="nx">layers</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">overlays</span><span class="p">).</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
+</pre></div>
+
+
+<p>With this piece of code you get a map key with checkboxes for all the categories, yet they&#8217;re still kept in the single cluster on the map.&nbsp;Brilliant!</p>
+<p><img src="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/map.png" title="vozejkmap.cz data map" class="img-responsive centered"></p>
+<h2>Using Turf.js for&nbsp;analysis</h2>
+<p>Turf is one of those libraries I get amazed easily with, spending a week trying to find a use case, finally putting it aside with <em>&#8220;I&#8217;ll get back to it later&#8221;</em>. I usually don&#8217;t. This time it&#8217;s&nbsp;different.</p>
+<p>I use Turf to get the nearest neighbor for any marker on click. My first try ended up with the same marker being the result as it was a member of a feature collection passed to <code>turf.nearest()</code> method. After snooping around the docs I found <code>turf.remove()</code> method that can filter GeoJSON based on key-value&nbsp;pair.</p>
+<p>Another handy function is <code>turf.distance()</code> that gives you distance between two points. The code below adds an information about the nearest point and its distance into the&nbsp;popup.</p>
+<div class="highlight"><pre><span></span><span class="c1">// data is a geojson feature collection</span>
+<span class="nx">json</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">geoJson</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span> <span class="p">{</span>
+    <span class="nx">onEachFeature</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">feature</span><span class="p">,</span> <span class="nx">layer</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">layer</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;click&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kd">var</span> <span class="nx">nearest</span> <span class="o">=</span> <span class="nx">turf</span><span class="p">.</span><span class="nx">nearest</span><span class="p">(</span><span class="nx">layer</span><span class="p">.</span><span class="nx">toGeoJSON</span><span class="p">(),</span> <span class="nx">turf</span><span class="p">.</span><span class="nx">remove</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="nx">feature</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">title</span><span class="p">)),</span>
+                <span class="nx">distance</span> <span class="o">=</span> <span class="nx">turf</span><span class="p">.</span><span class="nx">distance</span><span class="p">(</span><span class="nx">layer</span><span class="p">.</span><span class="nx">toGeoJSON</span><span class="p">(),</span> <span class="nx">nearest</span><span class="p">,</span> <span class="s2">&quot;kilometers&quot;</span><span class="p">).</span><span class="nx">toPrecision</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+                <span class="nx">popup</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">popup</span><span class="p">({</span><span class="nx">offset</span><span class="o">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">35</span><span class="p">]}).</span><span class="nx">setLatLng</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">latlng</span><span class="p">),</span>
+                <span class="nx">content</span> <span class="o">=</span> <span class="nx">L</span><span class="p">.</span><span class="nx">Util</span><span class="p">.</span><span class="nx">template</span><span class="p">(</span>
+                    <span class="s2">&quot;&amp;lt;h1&amp;gt;{title}&amp;lt;/h1&amp;gt;&amp;lt;p&amp;gt;{description}&amp;lt;/p&amp;gt; \</span>
+<span class="s2">                    &amp;lt;p&amp;gt;Nejbližší bod: {nearest} je {distance} km daleko.&amp;lt;/p&amp;gt;&quot;</span><span class="p">,</span> <span class="p">{</span>
+                    <span class="nx">title</span><span class="o">:</span> <span class="nx">feature</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">title</span><span class="p">,</span>
+                    <span class="nx">description</span><span class="o">:</span> <span class="nx">feature</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">description</span><span class="p">,</span>
+                    <span class="nx">nearest</span><span class="o">:</span> <span class="nx">nearest</span><span class="p">.</span><span class="nx">properties</span><span class="p">.</span><span class="nx">title</span><span class="p">,</span>
+                    <span class="nx">distance</span><span class="o">:</span> <span class="nx">distance</span>
+                <span class="p">});</span>
+
+            <span class="nx">popup</span><span class="p">.</span><span class="nx">setContent</span><span class="p">(</span><span class="nx">content</span><span class="p">);</span>
+            <span class="nx">popup</span><span class="p">.</span><span class="nx">openOn</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
+
+            <span class="p">...</span>
+</pre></div>
+
+
+<p>From what I&#8217;ve tried so far, Turf seems to be incredibly fast and easy to use. I&#8217;ll try to find the nearest point for any of the categories, that could take Turf some&nbsp;time.</p>
+<h2>Update</h2>
+<p>Turf is blazing fast! I&#8217;ve implemented nearest point for each of the categories and it gets done in a blink of an eye. Some screenshots below. Geolocation implemented as&nbsp;well.</p>
+<p><img src="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen1.png" title="vozejkmap.cz data map" class="img-responsive centered"> You can locate the point&nbsp;easily.</p>
+
+<p><img src="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen2.png" title="vozejkmap.cz data map" class="img-responsive centered"> You can hide the&nbsp;infobox.</p>
+
+<p><img src="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen3.png" title="vozejkmap.cz data map" class="img-responsive centered">You can jump to any of the nearest&nbsp;places.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/" rel="bookmark" title="Permalink to Installing PostGIS 2.2 with SFCGAL on Ubuntu-based OS">Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span></a></h1>
     <aside><span>Oct 29, 2015</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
@@ -60,15 +126,15 @@ apt-get install -y postgresql-9.4 <span class="se">\</span>
 
 <span class="nb">cd</span> /tmp
 touch download.txt
-cat <span class="s">&lt;&lt;EOT &gt;&gt; download.txt</span>
-<span class="s">https://gmplib.org/download/gmp/gmp-6.0.0a.tar.bz2</span>
-<span class="s">https://github.com/Oslandia/SFCGAL/archive/v1.2.0.tar.gz</span>
-<span class="s">http://www.mpfr.org/mpfr-current/mpfr-3.1.3.tar.gz</span>
-<span class="s">http://downloads.sourceforge.net/project/boost/boost/1.59.0/boost_1_59_0.tar.gz</span>
-<span class="s">https://github.com/CGAL/cgal/archive/releases/CGAL-4.6.3.tar.gz</span>
-<span class="s">http://download.osgeo.org/postgis/source/postgis-2.2.0.tar.gz</span>
+cat <span class="p">&amp;</span>lt<span class="p">;&amp;</span>lt<span class="p">;</span>EOT <span class="p">&amp;</span>gt<span class="p">;&amp;</span>gt<span class="p">;</span> download.txt
+https://gmplib.org/download/gmp/gmp-6.0.0a.tar.bz2
+https://github.com/Oslandia/SFCGAL/archive/v1.2.0.tar.gz
+http://www.mpfr.org/mpfr-current/mpfr-3.1.3.tar.gz
+http://downloads.sourceforge.net/project/boost/boost/1.59.0/boost_1_59_0.tar.gz
+https://github.com/CGAL/cgal/archive/releases/CGAL-4.6.3.tar.gz
+http://download.osgeo.org/postgis/source/postgis-2.2.0.tar.gz
 
-<span class="s">EOT</span>
+EOT
 
 cat download.txt <span class="p">|</span> xargs -n <span class="m">1</span> -P <span class="m">8</span> wget <span class="c1"># make wget a little bit faster</span>
 
@@ -81,30 +147,30 @@ tar xzf postgis-2.2.0.tar.gz
 
 <span class="nv">CORES</span><span class="o">=</span><span class="k">$(</span>nproc<span class="k">)</span>
 
-<span class="k">if</span> <span class="o">[[</span> <span class="nv">$CORES</span> &gt; <span class="m">1</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
+<span class="k">if</span> <span class="o">[[</span> <span class="nv">$CORES</span> <span class="p">&amp;</span>gt<span class="p">;</span> <span class="m">1</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
     <span class="nv">CORES</span><span class="o">=</span><span class="k">$(</span>expr <span class="nv">$CORES</span> - <span class="m">1</span><span class="k">)</span> <span class="c1"># be nice to your PC</span>
 <span class="k">fi</span>
 
 <span class="nb">cd</span> gmp-6.0.0
-./configure <span class="o">&amp;&amp;</span> make -j <span class="nv">$CORES</span> <span class="o">&amp;&amp;</span> sudo make -j <span class="nv">$CORES</span> install
+./configure <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> make -j <span class="nv">$CORES</span> <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> sudo make -j <span class="nv">$CORES</span> install
 
 <span class="nb">cd</span> ..
 <span class="nb">cd</span> mpfr-3.1.3
-./configure <span class="o">&amp;&amp;</span> make -j <span class="nv">$CORES</span> <span class="o">&amp;&amp;</span> sudo make -j <span class="nv">$CORES</span> install
+./configure <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> make -j <span class="nv">$CORES</span> <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> sudo make -j <span class="nv">$CORES</span> install
 
 <span class="nb">cd</span> ..
 <span class="nb">cd</span> boost_1_59_0
-./bootstrap.sh --prefix<span class="o">=</span>/usr/local --with-libraries<span class="o">=</span>all <span class="o">&amp;&amp;</span> sudo ./b2 install <span class="c1"># there might be some warnings along the way, don&#39;t panic</span>
+./bootstrap.sh --prefix<span class="o">=</span>/usr/local --with-libraries<span class="o">=</span>all <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> sudo ./b2 install <span class="c1"># there might be some warnings along the way, don&#39;t panic</span>
 <span class="nb">echo</span> <span class="s2">&quot;/usr/local/lib&quot;</span> <span class="p">|</span> sudo tee /etc/ld.so.conf.d/boost.conf
 sudo ldconfig
 
 <span class="nb">cd</span> ..
 <span class="nb">cd</span> cgal-releases-CGAL-4.6.3
-cmake . <span class="o">&amp;&amp;</span> make -j <span class="nv">$CORES</span> <span class="o">&amp;&amp;</span> sudo make -j <span class="nv">$CORES</span> install
+cmake . <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> make -j <span class="nv">$CORES</span> <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> sudo make -j <span class="nv">$CORES</span> install
 
 <span class="nb">cd</span> ..
 <span class="nb">cd</span> SFCGAL-1.2.0/
-cmake . <span class="o">&amp;&amp;</span> make -j <span class="nv">$CORES</span> <span class="o">&amp;&amp;</span> sudo make -j <span class="nv">$CORES</span> install
+cmake . <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> make -j <span class="nv">$CORES</span> <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> sudo make -j <span class="nv">$CORES</span> install
 
 <span class="nb">cd</span> ..
 <span class="nb">cd</span> postgis-2.2.0
@@ -117,8 +183,8 @@ cmake . <span class="o">&amp;&amp;</span> make -j <span class="nv">$CORES</span>
     --with-gdalconfig<span class="o">=</span>/usr/bin/gdal-config <span class="se">\</span>
     --with-raster <span class="se">\</span>
     --with-topology <span class="se">\</span>
-    --with-sfcgal<span class="o">=</span>/usr/local/bin/sfcgal-config <span class="o">&amp;&amp;</span> <span class="se">\</span>
-make <span class="o">&amp;&amp;</span> make cheatsheets <span class="o">&amp;&amp;</span> sudo make install <span class="c1"># deliberately one CPU only</span>
+    --with-sfcgal<span class="o">=</span>/usr/local/bin/sfcgal-config <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> <span class="se">\</span>
+make <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> make cheatsheets <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> sudo make install <span class="c1"># deliberately one CPU only</span>
 
 sudo -u postgres psql
 sudo -u postgres createdb spatial_template
@@ -296,7 +362,7 @@ sudo -u postgres psql -d spatial_template -c <span class="s2">&quot;SELECT postg
         <span class="p">),</span>
         <span class="n">b</span><span class="p">.</span><span class="n">geom</span>
     <span class="p">)</span> <span class="k">AND</span>
-    <span class="k">abs</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">value</span> <span class="o">-</span> <span class="n">b</span><span class="p">.</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">400</span>
+    <span class="k">abs</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">value</span> <span class="o">-</span> <span class="n">b</span><span class="p">.</span><span class="n">value</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="mi">400</span>
 </pre></div>
 
 
@@ -312,15 +378,15 @@ sudo -u postgres psql -d spatial_template -c <span class="s2">&quot;SELECT postg
     <span class="k">SELECT</span>
         <span class="n">a</span><span class="p">.</span><span class="n">gid</span><span class="p">,</span>
         <span class="n">b</span><span class="p">.</span><span class="n">gid</span><span class="p">,</span>
-        <span class="n">a</span><span class="p">.</span><span class="n">geom</span> <span class="o">&lt;-&gt;</span> <span class="n">b</span><span class="p">.</span><span class="n">geom</span> <span class="n">distance</span>
+        <span class="n">a</span><span class="p">.</span><span class="n">geom</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">b</span><span class="p">.</span><span class="n">geom</span> <span class="n">distance</span>
     <span class="k">FROM</span>
         <span class="n">shp1</span> <span class="n">a</span><span class="p">,</span> <span class="n">shp2</span> <span class="n">b</span>
     <span class="k">WHERE</span>
-        <span class="k">abs</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">value</span> <span class="o">-</span> <span class="n">b</span><span class="p">.</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">400</span> <span class="k">AND</span>
+        <span class="k">abs</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">value</span> <span class="o">-</span> <span class="n">b</span><span class="p">.</span><span class="n">value</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="mi">400</span> <span class="k">AND</span>
         <span class="n">ST_DWithin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="mi">2000</span><span class="p">)</span>
     <span class="p">)</span> <span class="n">sq</span>
 <span class="k">WHERE</span>
-    <span class="n">distance</span> <span class="o">&gt;</span> <span class="mi">500</span><span class="p">;</span>
+    <span class="n">distance</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="mi">500</span><span class="p">;</span>
 </pre></div>
 
 
@@ -353,7 +419,7 @@ sudo -u postgres psql -d spatial_template -c <span class="s2">&quot;SELECT postg
         FROM land_blocks -- being a table with info about all the agricultural land blocks
         JOIN users u ON id_uz = id
         GROUP BY cad_code, u.id
-        HAVING SUM(acreage) &gt; 10
+        HAVING SUM(acreage) &amp;gt; 10
 ),
 ints AS (
     SELECT
@@ -363,7 +429,7 @@ ints AS (
     FROM cadastral_community ku
     JOIN cadastral_community ku2
         ON ST_Intersects(ku.geom, ku2.geom)
-    WHERE ku.cad_code &lt;&gt; ku2.cad_code
+    WHERE ku.cad_code &amp;lt;&amp;gt; ku2.cad_code
 )
 SELECT
     DISTINCT ON (surrounding, cad_name, u.zipcode, u.city, u.street, u.name)
@@ -390,63 +456,6 @@ JOIN ints
 <li><code>DISTINCT ON</code> cleans up the list so the same owners don&#8217;t appear more than once for any given c.&nbsp;community.</li>
 </ul>
 <p>Writing this makes me realize the list should be probably sorted by area so only the occurence with the biggest value is kept for each c. community. Simple <code>ORDER BY</code> should deal with this just fine. Or even more sophisticated, using <code>GROUP BY</code> to output the total acreage in all surrounding c.&nbsp;communities.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2015/postgis-count-line-self-intersections/" rel="bookmark" title="Permalink to PostGIS: Count Line Self-Intersections">PostGIS: Count Line&nbsp;Self-Intersections</a></h1>
-    <aside><span>Mar 30, 2015</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p><a href="https://gis.stackexchange.com/questions/107927/counting-self-intersections-of-linestring-using-postgis/140674#140674">Is there a way of using PostgreSQL + PostGIS for finding the number of self intersections in a linestring?</a> was a question that made me think of this problem. I came up with a solution that takes just a few lines of&nbsp;code.</p>
-<p>Assume the following&nbsp;geometries:</p>
-<div class="highlight"><pre><span></span>CREATE TABLE test2 (
-    id integer NOT NULL,
-    wkb_geometry geometry(LineString,5514)
-);
-COPY test2 (id, wkb_geometry) FROM stdin;
-1   01020000208A15000004000000CCDC7845E339EEBFF2003B4A8A08E1BFE4154DAB7C31DCBF24C2042773E3E53F2287BA2CC591E43F604749BFE3B2E2BF2AE9770A11B8F0BF9C91435D56C0C63F
-2   01020000208A1500000600000050212BF9E63EC03F1FA046FD69F1EA3F504D44212915EA3F74A99EDF44E3F33F2CE2805DFAB1F33F805D24B1B189DC3F9834DE5938C1F53FB56F1FBF8AAFEC3F24D0C85B4666EA3FF311B0D8D75BE93F306EAA073894D23FA841B27E3404F33F
-\.
-</pre></div>
-
-
-<p><img src="/posts/assets/postgis-count-line-self-intersections/lines.png" title="Self-intersecting lines" class="img-responsive centered"></p>
-<p>Note that those geometries are valid while not being simple, thus, <code>ST_IsValidReason()</code> wouldn&#8217;t help much. What if we compared it to their single counterparts? Those would have had vertices at intersections. Once you know the original number of vertices and the number of simple geometry vertices, it is fairly easy to subtract those&nbsp;two.</p>
-<div class="highlight"><pre><span></span>WITH noded AS (
-SELECT id, COUNT(id)
-FROM (
-    SELECT DISTINCT (ST_DumpPoints(ST_Node(wkb_geometry))).geom, id
-    FROM test
-) tmp  group by id
-),
-test AS (
-    SELECT id, COUNT(id)
-        FROM (
-            SELECT DISTINCT (ST_DumpPoints(wkb_geometry)).geom, id
-            FROM test
-        ) tmp  group by id
-)
-
-SELECT noded.id, noded.count - test.count cnt FROM noded JOIN test USING (id);
-</pre></div>
-
-
-<p>This query gives you geometry id and the difference in number of vertices between the original and simple geometry. Note the <code>DISTINCT</code> in the <code>noded</code> <span class="caps">CTE</span> - with <code>ST_Node()</code> you get <code>one vertex x number of intersecting lines</code> for each intersection. <code>DISTINCT</code> gives you just one of&nbsp;them.</p>
-<p>The query result on my <code>test</code> table:
-<table>
-    <tr>
-        <th>id</th>
-        <th>cnt</th>
-    </tr>
-    <tr>
-        <td>1</td>
-        <td>1</td>
-    </tr>
-    <tr>
-        <td>2</td>
-        <td>2</td>
-    </tr>
-</table></p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/tag/postgis2.html">&laquo; Previous page</a>

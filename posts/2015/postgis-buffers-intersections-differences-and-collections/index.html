@@ -82,7 +82,7 @@ SELECT id,
     (ST_DumpRings(wkb_geometry)).geom::geometry(&#39;Polygon&#39;, 2154) as wkb_geometry,
     unnest((ST_DumpRings(wkb_geometry)).path) as path
 FROM :table
-WHERE ST_NRings(wkb_geometry) &gt; 1
+WHERE ST_NRings(wkb_geometry) &amp;gt; 1
 );
 </pre></div>
 
@@ -98,7 +98,7 @@ WHERE ST_NRings(wkb_geometry) &gt; 1
                 ST_Buffer(holes.wkb_geometry,-1),
                 :table.wkb_geometry
             )
-        AND holes.wkb_geometry &amp;&amp; :table.wkb_geometry
+        AND holes.wkb_geometry &amp;amp;&amp;amp; :table.wkb_geometry
 );
 </pre></div>
 
@@ -211,11 +211,11 @@ ALTER TABLE uni ADD PRIMARY KEY(id);
 
 <h3>More reading</h3>
     <ul>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/postgis-case-study-vozejkmap-open-data-part-i/">PostGIS Case Study: VozejkMap Open Data (Part&nbsp;I)</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/finding-polygons-lying-across-other-polygons-with-postgis/">Finding Polygons Lying across Other Polygons with&nbsp;PostGIS</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-iii/">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">III</span>)</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/">Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span></a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/dead-simple-random-points-in-polygons-with-postgis/">Dead Simple Random Points in Polygons with&nbsp;PostGIS</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-rectangular-grid-creation/">PostGIS: Rectangular Grid&nbsp;Creation</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-wind-rose/">PostGIS Custom Function to Create Wind&nbsp;Rose</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-polygon-from-centroid/">PostGIS Custom Function to Create Polygon from&nbsp;Centroid</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/centos-postgis-upgrade-hell-yet-again">CentOS PostGIS Upgrade Hell&#8230; Yet&nbsp;Again</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
 <script>

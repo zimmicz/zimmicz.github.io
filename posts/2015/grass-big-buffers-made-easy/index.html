@@ -71,7 +71,7 @@ v.db.addcolumn <span class="nv">map</span><span class="o">=</span>combined_050_i
 v.db.update <span class="nv">map</span><span class="o">=</span>combined_050_in <span class="nv">column</span><span class="o">=</span>id_1 <span class="nv">value</span><span class="o">=</span><span class="m">1</span>
 v.dissolve <span class="nv">input</span><span class="o">=</span>combined_050_in <span class="nv">column</span><span class="o">=</span>id_1 <span class="nv">output</span><span class="o">=</span>combined_050_dissolve --overwrite
 
-<span class="c1"># get rid of &lt; 10cm edges</span>
+<span class="c1"># get rid of &amp;lt; 10cm edges</span>
 v.generalize <span class="nv">input</span><span class="o">=</span>combined_050_dissolve <span class="nv">output</span><span class="o">=</span>combined_050_gen <span class="nv">method</span><span class="o">=</span>reduction <span class="nv">threshold</span><span class="o">=</span><span class="m">0</span>.1 --overwrite
 v.out.ogr <span class="nv">input</span><span class="o">=</span>combined_050_gen <span class="nv">output</span><span class="o">=</span>combined_050_gen <span class="nv">format</span><span class="o">=</span>ESRI_Shapefile --overwrite
 v.in.ogr <span class="nv">input</span><span class="o">=</span>combined_050_gen <span class="nv">output</span><span class="o">=</span>combined_050_gen <span class="nv">snap</span><span class="o">=</span>-1 --overwrite

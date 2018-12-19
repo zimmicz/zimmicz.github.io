@@ -30,7 +30,7 @@
     <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
     <p>Yesterday I spent two very unpleasant hours debugging the weirdest <span class="caps">SQL</span> error I&#8217;ve seen in my life, running the below query (simplified for this&nbsp;post).</p>
-<div class="highlight"><pre><span></span><span class="n">psql</span> <span class="o">-</span><span class="n">qAt</span> <span class="c1">--no-psqlrc &lt;&lt;BACKUP</span>
+<div class="highlight"><pre><span></span><span class="n">psql</span> <span class="o">-</span><span class="n">qAt</span> <span class="c1">--no-psqlrc &amp;lt;&amp;lt;BACKUP</span>
 <span class="k">DO</span>
 <span class="err">$$</span>
 <span class="k">DECLARE</span> <span class="n">r</span> <span class="n">record</span><span class="p">;</span>
@@ -57,7 +57,7 @@ LINE <span class="m">2</span>: <span class="m">1111</span><span class="p">;</spa
 <p>You stare on the screen for a while, absolutely sure that number <code>1111</code> is nowhere close to the data you work with. You try again. Another error. You save the code into a file and try again. It works. What the <em>heck</em>? You try again using the bash heredoc. Another&nbsp;failure.</p>
 <p>The minute you realize <code>$$</code> is being substituted with the <span class="caps">ID</span> of the current process, you feel like the dumbest person on Earth. Yet the happiest one at the same&nbsp;time.</p>
 <p>The solution is&nbsp;trivial.</p>
-<div class="highlight"><pre><span></span><span class="n">psql</span> <span class="o">-</span><span class="n">qAt</span> <span class="c1">--no-psqlrc &lt;&lt;BACKUP</span>
+<div class="highlight"><pre><span></span><span class="n">psql</span> <span class="o">-</span><span class="n">qAt</span> <span class="c1">--no-psqlrc &amp;lt;&amp;lt;BACKUP</span>
 <span class="k">DO</span>
 <span class="err">\$\$</span>
 <span class="k">DECLARE</span> <span class="n">r</span> <span class="n">record</span><span class="p">;</span>
@@ -245,7 +245,7 @@ find -type f -not -path <span class="s1">&#39;./PVP_fvu_p_Bechovice_SHP*&#39;</s
 </ol>
 <p>The bash script proposal might look as&nbsp;follows:</p>
 <div class="highlight"><pre><span></span><span class="c1"># store indices and constraint definitions</span>
-psql -qAt -d target -v <span class="nv">schemas</span><span class="o">=</span><span class="s1">&#39;schema1&#39;</span>,<span class="s1">&#39;schema2&#39;</span> -f create_indices_constraints.sql &gt; create.sql
+psql -qAt -d target -v <span class="nv">schemas</span><span class="o">=</span><span class="s1">&#39;schema1&#39;</span>,<span class="s1">&#39;schema2&#39;</span> -f create_indices_constraints.sql <span class="p">&amp;</span>gt<span class="p">;</span> create.sql
 
 <span class="c1"># drop indices and constraints</span>
 psql -qAt -d target -v <span class="nv">schemas</span><span class="o">=</span><span class="s1">&#39;schema1&#39;</span>,<span class="s1">&#39;schema2&#39;</span> -f drop_indices_constraints.sql <span class="p">|</span> psql -d target
@@ -282,7 +282,7 @@ unrar dem.rar -d copernicus
 
 
 <p>And here comes the&nbsp;Alps.</p>
-<p class="text-center"><img title="Hillshade" src="{filename}/assets/color-relief-shaded-map-using-open-data-and-open-source-software/hillshade.png" class="center"></p>
+<p class="text-center"><img title="Hillshade" src="https://www.zimmi.cz/posts/assets/color-relief-shaded-map-using-open-data-and-open-source-software/hillshade.png" class="center"></p>
 
 <p>To create a color relief you need a ramp of heights with colors. <a href="http://cartographicperspectives.org/index.php/journal/article/viewFile/20/70">&#8220;The Development and Rationale of Cross-blended Hypsometric Tints&#8221;</a> by T. Patterson and B. Jenny is a great read on <strong>hypsometric tints</strong>. They also give advice on what colors to choose in different environments (see the table at the last page of the article). I settled for warm humid color&nbsp;values.</p>
 <table class="center">
@@ -358,7 +358,7 @@ unrar dem.rar -d copernicus
 
 
 <p>And here comes hypsometric&nbsp;tints.</p>
-<p class="text-center"><img title="Color relief" src="{filename}/assets/color-relief-shaded-map-using-open-data-and-open-source-software/color_relief.png" class="center"></p>
+<p class="text-center"><img title="Color relief" src="https://www.zimmi.cz/posts/assets/color-relief-shaded-map-using-open-data-and-open-source-software/color_relief.png" class="center"></p>
 
 <p>Add a bit of compression and some overviews to make it smaller and load&nbsp;faster.</p>
 <div class="highlight"><pre><span></span>gdal_translate -of GTiff -co <span class="nv">TILED</span><span class="o">=</span>YES -co <span class="nv">COMPRESS</span><span class="o">=</span>DEFLATE color_relief.tif color_relief.compress.tif
@@ -374,7 +374,7 @@ gdaladdo hillshade.tif <span class="m">2</span> <span class="m">4</span> <span c
 
 <h2>Map&nbsp;composition</h2>
 <p>I chose Austria for its excessive amount of freely available datasets. What I didn&#8217;t take into consideration was my lack of knowledge when it comes to German (#fail). States come from <a href="http://data.gv.at">data.gv.at</a> and was dissolved from smaller administrative units. State capitals were downloaded from <a href="http://naturalearth.com">naturalearth.com</a>.</p>
-<p class="text-center"><a href="https://www.zimmi.cz/posts/assets/color-relief-shaded-map-using-open-data-and-open-source-software/map.pdf" title="Click for PDF version"><img title="Austria" src="{filename}/assets/color-relief-shaded-map-using-open-data-and-open-source-software/map.png" class="center"></a></p>
+<p class="text-center"><a href="https://www.zimmi.cz/posts/assets/color-relief-shaded-map-using-open-data-and-open-source-software/map.pdf" title="Click for PDF version"><img title="Austria" src="https://www.zimmi.cz/posts/assets/color-relief-shaded-map-using-open-data-and-open-source-software/map.png" class="center"></a></p>
 
 <p>I&#8217;d like to add some more thematic layers in the future. And translate the map to&nbsp;English.</p>
 <h2>Few words on <span class="caps">INSPIRE</span>&nbsp;Geoportal</h2>

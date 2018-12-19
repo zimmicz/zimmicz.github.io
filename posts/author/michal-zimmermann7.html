@@ -24,6 +24,35 @@
 <h2>Articles by Michal Zimmermann</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2016/introducing-blind-maps-project/" rel="bookmark" title="Permalink to Introducing Blind Maps Project">Introducing Blind Maps&nbsp;Project</a></h1>
+    <aside><span>Nov 2, 2016</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/leaflet.html">leaflet</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/web-maps.html">web maps</a></span>
+    </aside>
+    <p>I&#8217;d like to introduce you to my little pet project, which might just as well be awarded <em>the first pet project I&#8217;ve ever completed</em>, called <a href="https://www.zimmi.cz/blind-maps">Blind maps</a>.</p>
+<p>It&#8217;s a very simple, yet useful web application built on top of the great <a href="../../tag/leaflet.html">Leaflet</a> library meant to help you get to know our world a bit better. As the name suggests, the app shows you, well&hellip; a blind map, and you try to fill as many features as you&nbsp;can.</p>
+<div class="text-center"><img src="/posts/assets/introducing-blind-maps-project/map.png" /></div>
+
+<p>The app is ready and can be&nbsp;used:</p>
+<ul>
+<li>online at <a href="https://www.zimmi.cz/blind-maps/">Blind maps</a> with the map of your choice (if&nbsp;available)</li>
+<li>offline, downloaded to your computer and filled with whatever data you&nbsp;want</li>
+</ul>
+<p>What I find great about this project is the ease of adding new dataset. For starters, I filled it with data coming from <a href="naturalearthdata.com">Natural Earth</a>:</p>
+<ul>
+<li><span class="caps">CONUS</span>&nbsp;states</li>
+<li>European&nbsp;states</li>
+<li>World&nbsp;capitals</li>
+</ul>
+<p>If you wish, feel free to send me a pull request with GeoJSON data, I&#8217;ll be happy to have more datasets available! The process is described at the <a href="https://www.zimmi.cz/blind-maps">project homepage</a>.</p>
+<p>As you notice at the project homepage, there are two versions of the game&nbsp;available:</p>
+<ul>
+<li>one lets you find map features by their&nbsp;names</li>
+<li>the other one lets you type name highlighted feature (much&nbsp;tougher)</li>
+</ul>
+<p>Have&nbsp;fun!</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2016/degrees-to-decimal-with-javascript-reworked/" rel="bookmark" title="Permalink to Degrees To Decimal With Javascript Reworked">Degrees To Decimal With Javascript&nbsp;Reworked</a></h1>
     <aside><span>Oct 28, 2016</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>    </span>
@@ -176,77 +205,6 @@
 
 <div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">ST_PolygonFromCentroid</span><span class="p">(</span><span class="n">ST_SetSRID</span><span class="p">(</span><span class="n">ST_MakePoint</span><span class="p">(</span><span class="mi">13</span><span class="p">.</span><span class="mi">912</span><span class="p">,</span><span class="mi">50</span><span class="p">.</span><span class="mi">633</span><span class="p">),</span><span class="mi">4326</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 </pre></div>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2016/finding-polygons-lying-across-other-polygons-with-postgis/" rel="bookmark" title="Permalink to Finding Polygons Lying across Other Polygons with PostGIS">Finding Polygons Lying across Other Polygons with&nbsp;PostGIS</a></h1>
-    <aside><span>Aug 5, 2016</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p>Doing overlays (<code>ST_Intersection()</code>) in PostGIS based on spatial relationships (<code>ST_Intersects()</code>, <code>ST_Contains()</code>, &hellip;) is so easy it is not something you get particularly excited&nbsp;about.</p>
-<p>Today I faced a bit more interesting task: <strong>given two polygon layers, get me all the polygons from layer A such that they lie across the polygons from layer B and&hellip; a picture worth a thousand words,&nbsp;right?</strong></p>
-<div class="text-center"><img src="/posts/assets/finding-polygons-lying-across-other-polygons-with-postgis/polygons.svg" /></div>
-
-<p>I hope you got the idea, it is fairly&nbsp;simple:</p>
-<ol>
-<li>Intersect A (red, blue) with B&nbsp;(green)</li>
-<li>Subtract the result of previous from layer&nbsp;A</li>
-<li>Combine results from steps 1 and&nbsp;2</li>
-<li>Keep polygon only if its id occurs more than twice (that means it went straight through the layer&nbsp;B)</li>
-<li>Profit!</li>
-</ol>
-<!-- codeblock -->
-
-<div class="highlight"><pre><span></span><span class="k">WITH</span> <span class="n">overlays</span> <span class="k">AS</span> <span class="p">(</span>
-<span class="cm">/* nothing fancy here */</span>
-    <span class="k">SELECT</span>
-        <span class="n">A</span><span class="p">.</span><span class="n">ogc_fid</span> <span class="n">a_id</span><span class="p">,</span>
-        <span class="n">B</span><span class="p">.</span><span class="n">ogc_fid</span> <span class="n">b_id</span><span class="p">,</span>
-        <span class="n">ST_Intersection</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">B</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">geom</span><span class="p">,</span>
-        <span class="n">ST_Area</span><span class="p">(</span><span class="n">ST_Intersection</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">B</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">area_shared</span>
-    <span class="k">FROM</span> <span class="n">A</span>
-    <span class="k">JOIN</span> <span class="n">B</span> <span class="k">ON</span> <span class="p">(</span><span class="n">ST_Intersects</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">B</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span>
-<span class="p">),</span>
-<span class="n">diffs</span> <span class="k">AS</span> <span class="p">(</span>
-<span class="cm">/* note this is a 1:1 relationship in ST_Difference */</span>
-<span class="cm">/* a little hack is needed to prevent PostGIS from returning its usual difference mess */</span>
-    <span class="k">SELECT</span>
-        <span class="n">o</span><span class="p">.</span><span class="n">a_id</span><span class="p">,</span>
-        <span class="n">o</span><span class="p">.</span><span class="n">b_id</span><span class="p">,</span>
-        <span class="p">(</span><span class="n">ST_Dump</span><span class="p">(</span><span class="n">ST_Difference</span><span class="p">(</span><span class="n">ST_Buffer</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="o">-</span><span class="mi">0</span><span class="p">.</span><span class="mi">0001</span><span class="p">),</span> <span class="n">o</span><span class="p">.</span><span class="n">geom</span><span class="p">))).</span><span class="n">geom</span><span class="p">,</span> <span class="c1">-- ugly hack</span>
-        <span class="n">o</span><span class="p">.</span><span class="n">area_shared</span>
-    <span class="k">FROM</span> <span class="n">overlays</span> <span class="n">o</span>
-    <span class="k">JOIN</span> <span class="n">A</span> <span class="k">ON</span> <span class="p">(</span><span class="n">o</span><span class="p">.</span><span class="n">a_id</span> <span class="o">=</span> <span class="n">A</span><span class="p">.</span><span class="n">id</span><span class="p">)</span>
-<span class="p">),</span>
-
-<span class="n">merged</span> <span class="k">AS</span> <span class="p">(</span>
-<span class="cm">/* put those two result sets together */</span>
-    <span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">overlays</span>
-    <span class="k">UNION</span> <span class="k">ALL</span>
-    <span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">diffs</span>
-<span class="p">),</span>
-
-<span class="n">merged_reduced</span> <span class="k">AS</span> <span class="p">(</span>
-<span class="cm">/* get only those A polygons that consist of three parts at least for each intersection with B polygon */</span>
-  <span class="k">SELECT</span>
-    <span class="n">m</span><span class="p">.</span><span class="o">*</span>
-  <span class="k">FROM</span> <span class="n">merged</span> <span class="n">m</span>
-  <span class="k">JOIN</span> <span class="p">(</span>
-    <span class="k">SELECT</span>
-      <span class="n">a_id</span><span class="p">,</span>
-      <span class="n">b_id</span>
-    <span class="k">FROM</span> <span class="n">merged</span>
-    <span class="k">GROUP</span> <span class="k">BY</span> <span class="n">a_id</span><span class="p">,</span> <span class="n">b_id</span>
-    <span class="k">HAVING</span> <span class="k">COUNT</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="mi">2</span>
-  <span class="p">)</span> <span class="n">a</span> <span class="k">ON</span> <span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">a_id</span> <span class="o">=</span> <span class="n">m</span><span class="p">.</span><span class="n">a_id</span> <span class="k">AND</span> <span class="n">a</span><span class="p">.</span><span class="n">b_id</span> <span class="o">=</span> <span class="n">m</span><span class="p">.</span><span class="n">b_id</span><span class="p">)</span>
-<span class="p">)</span>
-<span class="cm">/* do as you wish with the result */</span>
-<span class="k">SELECT</span> <span class="o">*</span>
-<span class="k">FROM</span> <span class="n">merged_reduced</span><span class="p">;</span>
-</pre></div>
-
-
-<p>In my case, centerlines of layer B were also included and their length inside each intersection was used to divide the area of the smallest part with. It was fun,&nbsp;actually.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/author/michal-zimmermann6.html">&laquo; Previous page</a>

@@ -131,55 +131,55 @@
 <h2>Data adjustment <span class="amp">&amp;</span>&nbsp;animation</h2>
 <p><strong><span class="caps">SMIL</span></strong> is a <span class="caps">XML</span> based language for multimedia representation. It comes ready for timing, animation, visual transitions etc. I guess it might be considered easier to read for a web development beginner. Once you start using it, you immediately realize it suffers from the same disease like <span class="caps">XML</span> does: it is so&nbsp;wordy!</p>
 <p>Let&#8217;s get back to my example. To animate airports one by one, let&#8217;s give them unique ids, so they look something&nbsp;like:</p>
-<div class="highlight"><pre><span></span><span class="nt">&lt;circle</span> <span class="na">id=</span><span class="s">&quot;brs&quot;</span> <span class="na">stroke-opacity=</span><span class="s">&quot;0&quot;</span> <span class="na">fill-opacity=</span><span class="s">&quot;0&quot;</span> <span class="na">cx=</span><span class="s">&quot;476.597304864&quot;</span> <span class="na">cy=</span><span class="s">&quot;539.487783171&quot;</span> <span class="na">data-abbrev=</span><span class="s">&quot;BRS&quot;</span> <span class="na">data-name=</span><span class="s">&quot;Bristol Int&#39;l&quot;</span> <span class="na">r=</span><span class="s">&quot;3&quot;</span><span class="nt">/&gt;</span>
+<div class="highlight"><pre><span></span><span class="ni">&amp;lt;</span>circle id=&quot;brs&quot; stroke-opacity=&quot;0&quot; fill-opacity=&quot;0&quot; cx=&quot;476.597304864&quot; cy=&quot;539.487783171&quot; data-abbrev=&quot;BRS&quot; data-name=&quot;Bristol Int&#39;l&quot; r=&quot;3&quot;/<span class="ni">&amp;gt;</span>
 </pre></div>
 
 
 <p>That&#8217;s something you do by hand as kartograph doesn&#8217;t give ids to <span class="caps">SVG</span> elements. Once you&#8217;re done with that, you can run <span class="caps">SMIL</span> animation. If you look closer at the final map, you&#8217;ll notice there are three properties animated for each airport: fill opacity, stroke opacity and radius. Each property needs to use separate <span class="caps">SMIL</span> <code>&lt;animate /&gt;</code>, which might look like the one&nbsp;below:</p>
-<div class="highlight"><pre><span></span><span class="nt">&lt;animate</span> <span class="na">attributeName=</span><span class="s">&quot;fill-opacity&quot;</span>
-    <span class="na">id=</span><span class="s">&quot;kos_ani_fo&quot;</span>
-    <span class="na">from=</span><span class="s">&quot;0&quot;</span>
-    <span class="na">to=</span><span class="s">&quot;1&quot;</span>
-    <span class="na">begin=</span><span class="s">&quot;osr_ani.end&quot;</span>
-    <span class="na">dur=</span><span class="s">&quot;0.25s&quot;</span>
-    <span class="na">fill=</span><span class="s">&quot;freeze&quot;</span>
-    <span class="na">xlink:href=</span><span class="s">&quot;#kos&quot;</span>
-<span class="nt">/&gt;</span>
-<span class="nt">&lt;animate</span> <span class="na">attributeName=</span><span class="s">&quot;stroke-opacity&quot;</span>
-    <span class="na">id=</span><span class="s">&quot;kos_ani_so&quot;</span>
-    <span class="na">from=</span><span class="s">&quot;0&quot;</span>
-    <span class="na">to=</span><span class="s">&quot;1&quot;</span>
-    <span class="na">begin=</span><span class="s">&quot;osr_ani.end&quot;</span>
-    <span class="na">dur=</span><span class="s">&quot;0.25s&quot;</span>
-    <span class="na">fill=</span><span class="s">&quot;freeze&quot;</span>
-    <span class="na">xlink:href=</span><span class="s">&quot;#kos&quot;</span>
-<span class="nt">/&gt;</span>
-<span class="nt">&lt;animate</span> <span class="na">attributeName=</span><span class="s">&quot;r&quot;</span>
-    <span class="na">id=</span><span class="s">&quot;kos_ani_r&quot;</span>
-    <span class="na">from=</span><span class="s">&quot;10px&quot;</span>
-    <span class="na">to=</span><span class="s">&quot;3px&quot;</span>
-    <span class="na">begin=</span><span class="s">&quot;osr_ani.end&quot;</span>
-    <span class="na">dur=</span><span class="s">&quot;0.25s&quot;</span>
-    <span class="na">xlink:href=</span><span class="s">&quot;#kos&quot;</span>
-<span class="nt">/&gt;</span>
+<div class="highlight"><pre><span></span><span class="ni">&amp;lt;</span>animate attributeName=&quot;fill-opacity&quot;
+    id=&quot;kos_ani_fo&quot;
+    from=&quot;0&quot;
+    to=&quot;1&quot;
+    begin=&quot;osr_ani.end&quot;
+    dur=&quot;0.25s&quot;
+    fill=&quot;freeze&quot;
+    xlink:href=&quot;#kos&quot;
+/<span class="ni">&amp;gt;</span>
+<span class="ni">&amp;lt;</span>animate attributeName=&quot;stroke-opacity&quot;
+    id=&quot;kos_ani_so&quot;
+    from=&quot;0&quot;
+    to=&quot;1&quot;
+    begin=&quot;osr_ani.end&quot;
+    dur=&quot;0.25s&quot;
+    fill=&quot;freeze&quot;
+    xlink:href=&quot;#kos&quot;
+/<span class="ni">&amp;gt;</span>
+<span class="ni">&amp;lt;</span>animate attributeName=&quot;r&quot;
+    id=&quot;kos_ani_r&quot;
+    from=&quot;10px&quot;
+    to=&quot;3px&quot;
+    begin=&quot;osr_ani.end&quot;
+    dur=&quot;0.25s&quot;
+    xlink:href=&quot;#kos&quot;
+/<span class="ni">&amp;gt;</span>
 </pre></div>
 
 
 <p>I guess you get the idea how long this would take for more airports. Make sure to notice that <span class="caps">SMIL</span> can start animation based on another animation&#8217;s end (<code>osr_ani.end</code>) - that&#8217;s pretty&nbsp;neat.</p>
 <p>Airways animation works almost the same. First, add unique id to each&nbsp;airway:</p>
-<div class="highlight"><pre><span></span><span class="nt">&lt;path</span> <span class="na">d=</span><span class="s">&quot;M550.9,562.9L568.0,495.0 &quot;</span> <span class="na">id=</span><span class="s">&quot;travel-arn&quot;</span><span class="nt">/&gt;</span>
+<div class="highlight"><pre><span></span><span class="ni">&amp;lt;</span>path d=&quot;M550.9,562.9L568.0,495.0 &quot; id=&quot;travel-arn&quot;/<span class="ni">&amp;gt;</span>
 </pre></div>
 
 
 <p>Second, start animation after all the airports are visible on the map. Notice the initial definition of <code>d</code> attribute - it&#8217;s a line with zero&nbsp;length.</p>
-<div class="highlight"><pre><span></span><span class="nt">&lt;animate</span> <span class="na">attributeName=</span><span class="s">&quot;d&quot;</span>
-    <span class="na">id=</span><span class="s">&quot;path_ani&quot;</span>
-    <span class="na">from=</span><span class="s">&quot;M550.9,562.9L550.9,562.9&quot;</span>
-    <span class="na">to=</span><span class="s">&quot;M550.9,562.9L568.0,495.0&quot;</span>
-    <span class="na">begin=</span><span class="s">&quot;icn_ani_r.end&quot;</span>
-    <span class="na">dur=</span><span class="s">&quot;3s&quot;</span>
-    <span class="na">xlink:href=</span><span class="s">&quot;#travel-arn&quot;</span>
-<span class="nt">/&gt;</span>
+<div class="highlight"><pre><span></span><span class="ni">&amp;lt;</span>animate attributeName=&quot;d&quot;
+    id=&quot;path_ani&quot;
+    from=&quot;M550.9,562.9L550.9,562.9&quot;
+    to=&quot;M550.9,562.9L568.0,495.0&quot;
+    begin=&quot;icn_ani_r.end&quot;
+    dur=&quot;3s&quot;
+    xlink:href=&quot;#travel-arn&quot;
+/<span class="ni">&amp;gt;</span>
 </pre></div>
 
 

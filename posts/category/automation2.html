@@ -108,7 +108,7 @@ v.db.addcolumn <span class="nv">map</span><span class="o">=</span>combined_050_i
 v.db.update <span class="nv">map</span><span class="o">=</span>combined_050_in <span class="nv">column</span><span class="o">=</span>id_1 <span class="nv">value</span><span class="o">=</span><span class="m">1</span>
 v.dissolve <span class="nv">input</span><span class="o">=</span>combined_050_in <span class="nv">column</span><span class="o">=</span>id_1 <span class="nv">output</span><span class="o">=</span>combined_050_dissolve --overwrite
 
-<span class="c1"># get rid of &lt; 10cm edges</span>
+<span class="c1"># get rid of &amp;lt; 10cm edges</span>
 v.generalize <span class="nv">input</span><span class="o">=</span>combined_050_dissolve <span class="nv">output</span><span class="o">=</span>combined_050_gen <span class="nv">method</span><span class="o">=</span>reduction <span class="nv">threshold</span><span class="o">=</span><span class="m">0</span>.1 --overwrite
 v.out.ogr <span class="nv">input</span><span class="o">=</span>combined_050_gen <span class="nv">output</span><span class="o">=</span>combined_050_gen <span class="nv">format</span><span class="o">=</span>ESRI_Shapefile --overwrite
 v.in.ogr <span class="nv">input</span><span class="o">=</span>combined_050_gen <span class="nv">output</span><span class="o">=</span>combined_050_gen <span class="nv">snap</span><span class="o">=</span>-1 --overwrite
@@ -152,8 +152,8 @@ v.out.postgis <span class="nv">input</span><span class="o">=</span>buffer_050_gr
 
 <span class="n">BOTTOM_LEFT</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">679363</span><span class="p">,</span><span class="o">-</span><span class="mi">1120688</span><span class="p">)</span>
 <span class="n">TOP_RIGHT</span>   <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">565171</span><span class="p">,</span><span class="o">-</span><span class="mi">1042703</span><span class="p">)</span>
-<span class="n">SRS_WIDTH</span>   <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="o">-</span><span class="mi">639084</span> <span class="o">-</span> <span class="o">-</span><span class="mi">638825</span><span class="p">)</span> <span class="c1"># tile width in units of crs =&gt; 259 m</span>
-<span class="n">SRS_HEIGHT</span>  <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="o">-</span><span class="mi">1070426</span> <span class="o">-</span> <span class="o">-</span><span class="mi">1070273</span><span class="p">)</span> <span class="c1"># tile height in units of crs =&gt; 153 m</span>
+<span class="n">SRS_WIDTH</span>   <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="o">-</span><span class="mi">639084</span> <span class="o">-</span> <span class="o">-</span><span class="mi">638825</span><span class="p">)</span> <span class="c1"># tile width in units of crs =&amp;gt; 259 m</span>
+<span class="n">SRS_HEIGHT</span>  <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="o">-</span><span class="mi">1070426</span> <span class="o">-</span> <span class="o">-</span><span class="mi">1070273</span><span class="p">)</span> <span class="c1"># tile height in units of crs =&amp;gt; 153 m</span>
 <span class="n">PX_WIDTH</span>    <span class="o">=</span> <span class="mi">977</span>
 <span class="n">PX_HEIGHT</span>   <span class="o">=</span> <span class="mi">578</span>
 

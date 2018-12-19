@@ -24,6 +24,72 @@
 <h2>Articles by Michal Zimmermann</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-wal-archiving/" rel="bookmark" title="Permalink to PostgreSQL Backup and Recovery Orchestration: WAL Archiving">PostgreSQL Backup and Recovery Orchestration: <span class="caps">WAL</span>&nbsp;Archiving</a></h1>
+    <aside><span>Feb 12, 2018</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p>Just a very few of my day-to-day work tasks can be accomplished without PostgreSQL. For years I&#8217;ve been a (power) user of this wonderful relational database, knowing almost nothing about how its internals really work. Faced with the need to build a backup and recovery strategy, I&#8217;ve recently read up <em>a lot</em> on this&nbsp;topic.</p>
+<p>As I don&#8217;t find it very odd for a <span class="caps">GIS</span> person to be given such an extraordinary task (nobody wants to lose the priceless spatial data, right?), I hope this series might shed light on how to prepare and manage the backup/recovery process to those, who are up to such a task. I won&#8217;t be discussing backup strategies based on <code>pg_backup</code> tool, as those don&#8217;t offer neither continuous archivation, nor point-in-time-recovery (<span class="caps">PITR</span>) - those two features disqualifies it as <a href="https://www.clevermaps.cz">CleverMaps</a> production backup&nbsp;strategy.</p>
+<p><strong>That leaves us with taking periodic base backups combined with continuous <span class="caps">WAL</span> archivation, as described&nbsp;below.</strong></p>
+<h2>Taking base&nbsp;backups</h2>
+<p>Archived <span class="caps">WAL</span> segments are worthless without a base backup they can be run on. It&#8217;s crucial to have consistent, periodic base backups to keep your data&nbsp;safe.</p>
+<p><a href="https://www.postgresql.org/docs/current/static/app-pgbasebackup.html"><code>pg_basebackup</code></a> takes base backup of PostgreSQL cluster. Nothing fancy. Gzipping the output folder once the backup is done is definitely a good&nbsp;idea.</p>
+<div class="highlight"><pre><span></span>pg_basebackup <span class="se">\</span>
+    --pgdata<span class="o">=</span>/mnt/backup/base/backup_number <span class="se">\</span>
+    --format<span class="o">=</span>plain <span class="se">\</span>
+    --write-recovery-conf <span class="se">\</span>
+    --xlog-method<span class="o">=</span>stream <span class="se">\</span>
+    --label<span class="o">=</span><span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span> <span class="se">\</span>
+    --checkpoint<span class="o">=</span>fast <span class="se">\</span>
+    --progress <span class="se">\</span>
+    --verbose
+</pre></div>
+
+
+<p>In our current environment, we take a base backup of each of our clusters once a&nbsp;week.</p>
+<h2><span class="caps">WAL</span> archiving&nbsp;configuration</h2>
+<p>To properly set <span class="caps">WAL</span> archiving, several <code>postgresql.conf</code> settings has to be&nbsp;adjusted:</p>
+<ul>
+<li><code>wal_level = replica</code></li>
+<li><code>archive_mode = on</code></li>
+<li><code>archive_command = test ! -f /backup/wal/%f &amp;&amp; cp %p /backup/wal/%f</code></li>
+</ul>
+<p>Setting <code>wal_level</code> to <code>replica</code> writes enough information for <span class="caps">WAL</span> archiving. Turning on <code>archive_mode</code> will run <code>archive_command</code> each time a <span class="caps">WAL</span> segment is completed. <code>archive_command</code> might be anything from simple <code>cp</code> to <code>rsync</code> or <code>aws s3 cp</code> commands. It is absolutely critical that the command returns <strong>non-zero exit code</strong> in case of failure (including when a file with the same name already exists in your backup&nbsp;folder).</p>
+<p>That&#8217;s it, after reloading PostgreSQL service, new <span class="caps">WAL</span> files should be copied to <code>/backup/wal</code> directory. The PostgreSQL process user (<code>postgres</code> usually) has to be able to write to the&nbsp;location.</p>
+<h3>Pitfalls</h3>
+<ul>
+<li>If <code>archive_command</code> fails, <span class="caps">WAL</span> segment remains on your database drive. If it keeps failing long enough, you&#8217;ll run out of space and the database will&nbsp;crash.</li>
+<li>If the backup location fills up, the above-mentioned happens as&nbsp;well.</li>
+<li>If you lose or corrupt any of the archived <span class="caps">WAL</span> segments, you won&#8217;t be able to pass through. That&#8217;s why you want to be sure that your <code>archive_command</code> actually does what you think it&nbsp;does.</li>
+</ul>
+<h3>Tips</h3>
+<p>It might be a real <span class="caps">PITA</span> (fiddling around <span class="caps">WAL</span> segments included) to start a crashed database cluster with no space left. Keeping a dummy file in your <code>pg_xlog</code> location might save you a lot of trouble. Create one with following command. If you run out of space, remove this file and you get 300 <span class="caps">MB</span> for free. Don&#8217;t forget to recreate it after you start the&nbsp;cluster.</p>
+<div class="highlight"><pre><span></span>dd <span class="k">if</span><span class="o">=</span>/dev/zero <span class="nv">of</span><span class="o">=</span>/path_to_your_database_cluster/pg_xlog/DO_NOT_MOVE_THIS_FILE <span class="nv">bs</span><span class="o">=</span>1MB <span class="nv">count</span><span class="o">=</span><span class="m">300</span>
+</pre></div>
+
+
+<p>There&#8217;s no need to keep archived <span class="caps">WAL</span> segments forever. They&#8217;re only needed until you take another base backup. Again, deleting <span class="caps">WAL</span> segments manually (or using <code>find ! -newer previous_base_backup.tar.gz</code>) might lead to accidental corruption of your backups. It&#8217;s much safer to use <a href="https://www.postgresql.org/docs/9.6/static/pgarchivecleanup.html"><code>pg_archivecleanup</code></a> pointed to your <span class="caps">WAL</span> backup folder, referencing the last <strong>sucessful</strong> full backup. Below is the script we use to keep our <span class="caps">WAL</span> backup folder of reasonable size, keeping the last three full&nbsp;backups.</p>
+<div class="highlight"><pre><span></span><span class="c1"># Find base_backup files not older than 3 weeks</span>
+<span class="c1"># Sort by date</span>
+<span class="c1"># Use the oldest one as a reference</span>
+<span class="nv">OLDEST_BASE_BACKUP</span><span class="o">=</span><span class="k">$(</span>basename <span class="k">$(</span>find <span class="si">${</span><span class="nv">CR_WAL_BACKUP_DIR</span><span class="si">}</span>/u/p/ -type f -iname <span class="s2">&quot;*.backup&quot;</span> -mtime -21 -print0 <span class="p">|</span> <span class="se">\</span>
+xargs -0 ls -t <span class="p">|</span> <span class="se">\</span>
+tail -n <span class="m">1</span><span class="k">))</span>
+
+<span class="c1"># Find all subfolders</span>
+<span class="c1"># Except the u/p backup subfolder</span>
+<span class="c1"># Execute pg_archivecleanup for each of the subfolders</span>
+find <span class="nv">$CR_WAL_BACKUP_DIR</span> <span class="se">\</span>
+    -type d <span class="se">\</span>
+    -not -path <span class="s2">&quot;</span><span class="si">${</span><span class="nv">CR_WAL_BACKUP_DIR</span><span class="si">}</span><span class="s2">u*&quot;</span> <span class="se">\</span>
+    -exec pg_archivecleanup -d <span class="o">{}</span> <span class="nv">$OLDEST_BASE_BACKUP</span> <span class="se">\;</span>
+</pre></div>
+
+
+<p>Functional backups are crucial part of a solid backup/recovery system. They&#8217;re still just one half of that system, though. <strong>If not tested thoroughly</strong>, they&#8217;re even less than that. More on testing backups and recovering from failures next&nbsp;time.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-testing-your-code/" rel="bookmark" title="Permalink to QGIS Plugin Development: Testing Your Code"><span class="caps">QGIS</span> Plugin Development: Testing Your&nbsp;Code</a></h1>
     <aside><span>Nov 30, 2017</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">QGIS</a>    </span>
@@ -297,117 +363,6 @@
 <li>custom attributes: this version expects both layers to have the same attribute with the same data&nbsp;type.</li>
 <li><span class="caps">GUI</span>: a very simple PyQt widget will turn this console-based script into a custom plugin. That&#8217;s what&#8217;s going to be&nbsp;next.</li>
 </ul>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/" rel="bookmark" title="Permalink to QGIS Plugin Development: Using Python Console"><span class="caps">QGIS</span> Plugin Development: Using Python&nbsp;Console</a></h1>
-    <aside><span>Nov 2, 2017</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">QGIS</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/qgis.html">QGIS</a></span>
-    </aside>
-    <p>As mentioned in <a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-getting-started/">previous part</a> of the series, the <span class="caps">QGIS</span> Python console is an entry point to <span class="caps">GIS</span> workflow automation within <span class="caps">QGIS</span>. Remember there&#8217;s an <code>iface</code> object representing <code>qgis.gui.QgisInterface</code> instance within the console that gives you access to the whole <span class="caps">QGIS</span> <span class="caps">GUI</span>. Let&#8217;s see what we can do inside the&nbsp;console.</p>
-<h2>Loading vector layers&nbsp;folder</h2>
-<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">glob</span>
-<span class="kn">from</span> <span class="nn">qgis.core</span> <span class="kn">import</span> <span class="n">QgsMapLayerRegistry</span><span class="p">,</span> <span class="n">QgsVectorLayer</span>
-
-<span class="k">def</span> <span class="nf">load_folder</span><span class="p">(</span><span class="n">folder</span><span class="p">):</span>
-    <span class="n">VALID_EXTENSIONS</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;.geojson&#39;</span><span class="p">,</span> <span class="s1">&#39;.gpkg&#39;</span><span class="p">,</span> <span class="s1">&#39;.shp&#39;</span><span class="p">)</span>
-    <span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;{}/*&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">folder</span><span class="p">))</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">VALID_EXTENSIONS</span><span class="p">)]</span>
-
-    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
-        <span class="n">layer</span> <span class="o">=</span> <span class="n">QgsVectorLayer</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;ogr&#39;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">layer</span><span class="o">.</span><span class="n">isValid</span><span class="p">():</span>
-            <span class="n">iface</span><span class="o">.</span><span class="n">messageBar</span><span class="p">()</span><span class="o">.</span><span class="n">pushCritical</span><span class="p">(</span><span class="s2">&quot;Failed to load:&quot;</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
-            <span class="k">continue</span>
-
-        <span class="n">QgsMapLayerRegistry</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span><span class="o">.</span><span class="n">addMapLayer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
-
-<span class="n">load_folder</span><span class="p">(</span><span class="s2">&quot;path/to/your/vector/files/folder&quot;</span><span class="p">)</span>
-</pre></div>
-
-
-<ul>
-<li><code>QgsMapLayerRegistry</code> represents <em>Layers Panel</em> as present in the <span class="caps">QGIS</span> <span class="caps">GUI</span></li>
-<li><code>iface.messageBar()</code> returns the message bar of the main app and lets you notify the user of what&#8217;s going on under the&nbsp;hood</li>
-<li><code>QgsVectorLayer</code> represents a vector layer with its underlying vector data&nbsp;sets</li>
-</ul>
-<h2>Editing active layer attribute&nbsp;table</h2>
-<p>The following code demonstrates the possibility to edit vector layer attribute table via&nbsp;console.</p>
-<ul>
-<li>Any attribute to be written has to come in form of a <code>qgis.core.QgsField</code> - this is more or less an encapsulation of an attribute name and its type (<code>PyQt4.QtCore.QVariant</code> to be&nbsp;precise)</li>
-<li>The underlying data provider has to be capable of attribute addition (<code>caps &amp; QgsVectorDataProvider.AddAttributes</code>)</li>
-<li><code>QgsVectorLayer.addAttribute</code> method returns boolean rather than throwing an&nbsp;exception</li>
-</ul>
-<!-- -->
-
-<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qgis.core</span> <span class="kn">import</span> <span class="n">QgsField</span>
-<span class="kn">from</span> <span class="nn">qgis.gui</span> <span class="kn">import</span> <span class="n">QgsMessageBar</span>
-<span class="kn">from</span> <span class="nn">PyQt4.QtCore</span> <span class="kn">import</span> <span class="n">QVariant</span>
-
-
-<span class="k">def</span> <span class="nf">edit_active_layer</span><span class="p">(</span><span class="n">attr_name</span><span class="p">,</span> <span class="n">attr_type</span><span class="p">):</span>
-    <span class="n">layer</span> <span class="o">=</span> <span class="n">iface</span><span class="o">.</span><span class="n">activeLayer</span><span class="p">()</span>
-    <span class="n">caps</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="n">dataProvider</span><span class="p">()</span><span class="o">.</span><span class="n">capabilities</span><span class="p">()</span>
-
-    <span class="k">if</span> <span class="n">caps</span> <span class="o">&amp;</span> <span class="n">QgsVectorDataProvider</span><span class="o">.</span><span class="n">AddAttributes</span><span class="p">:</span>
-        <span class="n">layer</span><span class="o">.</span><span class="n">startEditing</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">layer</span><span class="o">.</span><span class="n">addAttribute</span><span class="p">(</span><span class="n">QgsField</span><span class="p">(</span><span class="n">attr_name</span><span class="p">,</span> <span class="n">attr_type</span><span class="p">)):</span>
-            <span class="n">iface</span><span class="o">.</span><span class="n">messageBar</span><span class="p">()</span><span class="o">.</span><span class="n">pushMessage</span><span class="p">(</span><span class="s2">&quot;Attribute {0} was successfully added to the active layer.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">attr_name</span><span class="p">),</span> <span class="n">QgsMessageBar</span><span class="o">.</span><span class="n">SUCCESS</span><span class="p">)</span>
-            <span class="n">layer</span><span class="o">.</span><span class="n">commitChanges</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">iface</span><span class="o">.</span><span class="n">messageBar</span><span class="p">()</span><span class="o">.</span><span class="n">pushMessage</span><span class="p">(</span><span class="s2">&quot;Attribute {0} was not added. Does it already exist?&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">attr_name</span><span class="p">),</span> <span class="n">QgsMessageBar</span><span class="o">.</span><span class="n">CRITICAL</span><span class="p">)</span>
-            <span class="n">layer</span><span class="o">.</span><span class="n">rollBack</span><span class="p">()</span>
-
-<span class="n">edit_active_layer</span><span class="p">(</span><span class="s2">&quot;new_string_attribute&quot;</span><span class="p">,</span> <span class="n">QVariant</span><span class="o">.</span><span class="n">String</span><span class="p">)</span>
-</pre></div>
-
-
-<p>The whole series aims to present a plugin capable of writing a new attribute and its value to an existing layer. Thus, this code might come handy in the&nbsp;future.</p>
-<h2>Creating a new vector&nbsp;layer</h2>
-<p>It&#8217;s possible to create a whole new vector layer with <span class="caps">QGIS</span> Python console. I present a very simple <code>create_new_layer</code> function, yet I hope you can imagine the ways it can be&nbsp;tweaked.</p>
-<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qgis.core</span> <span class="kn">import</span> <span class="n">QgsField</span><span class="p">,</span> <span class="n">QgsFields</span><span class="p">,</span> <span class="n">QgsVectorLayer</span><span class="p">,</span> <span class="n">QgsFeature</span><span class="p">,</span> <span class="n">QgsGeometry</span><span class="p">,</span> <span class="n">QgsPoint</span>
-<span class="kn">from</span> <span class="nn">PyQt4.QtCore</span> <span class="kn">import</span> <span class="n">QVariant</span>
-
-<span class="k">def</span> <span class="nf">create_new_layer</span><span class="p">():</span>
-    <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;/path/to/your/vector/file.gpkg&quot;</span>
-
-    <span class="n">fields</span> <span class="o">=</span> <span class="n">QgsFields</span><span class="p">()</span>
-    <span class="n">fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">QgsField</span><span class="p">(</span><span class="s2">&quot;attr1&quot;</span><span class="p">,</span> <span class="n">QVariant</span><span class="o">.</span><span class="n">String</span><span class="p">))</span>
-    <span class="n">fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">QgsField</span><span class="p">(</span><span class="s2">&quot;attr2&quot;</span><span class="p">,</span> <span class="n">QVariant</span><span class="o">.</span><span class="n">Int</span><span class="p">))</span>
-
-    <span class="nb">file</span> <span class="o">=</span> <span class="n">QgsVectorFileWriter</span><span class="p">(</span>
-        <span class="n">filename</span><span class="p">,</span>
-        <span class="s2">&quot;UTF8&quot;</span><span class="p">,</span>
-        <span class="n">fields</span><span class="p">,</span>
-        <span class="n">QGis</span><span class="o">.</span><span class="n">WKBPoint</span><span class="p">,</span>
-        <span class="n">QgsCoordinateReferenceSystem</span><span class="p">(</span><span class="mi">4326</span><span class="p">),</span>
-        <span class="s2">&quot;GPKG&quot;</span>
-    <span class="p">)</span>
-
-    <span class="n">layer</span> <span class="o">=</span> <span class="n">QgsVectorLayer</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;ogr&quot;</span><span class="p">)</span>
-    <span class="n">QgsMapLayerRegistry</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span><span class="o">.</span><span class="n">addMapLayer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">layer</span><span class="o">.</span><span class="n">dataProvider</span><span class="p">()</span><span class="o">.</span><span class="n">capabilities</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">QgsVectorDataProvider</span><span class="o">.</span><span class="n">AddAttributes</span><span class="p">:</span>
-        <span class="k">pass</span>
-
-    <span class="n">feature</span> <span class="o">=</span> <span class="n">QgsFeature</span><span class="p">(</span><span class="n">layer</span><span class="o">.</span><span class="n">pendingFields</span><span class="p">())</span>
-    <span class="n">feature</span><span class="o">.</span><span class="n">setGeometry</span><span class="p">(</span><span class="n">QgsGeometry</span><span class="p">()</span><span class="o">.</span><span class="n">fromPoint</span><span class="p">(</span><span class="n">QgsPoint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
-    <span class="n">feature</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;attr1&quot;</span><span class="p">,</span> <span class="s2">&quot;attr1&quot;</span><span class="p">)</span>
-    <span class="n">feature</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;attr2&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-
-    <span class="n">layer</span><span class="o">.</span><span class="n">startEditing</span><span class="p">()</span>
-
-    <span class="k">if</span> <span class="n">layer</span><span class="o">.</span><span class="n">addFeature</span><span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="bp">True</span><span class="p">):</span>
-        <span class="n">layer</span><span class="o">.</span><span class="n">commitChanges</span><span class="p">()</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">layer</span><span class="o">.</span><span class="n">rollBack</span><span class="p">()</span>
-        <span class="n">iface</span><span class="o">.</span><span class="n">messageBar</span><span class="p">()</span><span class="o">.</span><span class="n">pushMessage</span><span class="p">(</span><span class="s2">&quot;Feature addition failed.&quot;</span><span class="p">,</span> <span class="n">QgsMessageBar</span><span class="o">.</span><span class="n">CRITICAL</span><span class="p">)</span>
-
-<span class="n">create_new_layer</span><span class="p">()</span>
-</pre></div>
-
-
-<p>Those were just few examples of what can be done with <span class="caps">QGIS</span> <span class="caps">API</span> and Python console. Next time, I&#8217;d like to focus on spatial joins inside <span class="caps">QGIS</span> - another step to the final&nbsp;plugin.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/author/michal-zimmermann.html">&laquo; Previous page</a>

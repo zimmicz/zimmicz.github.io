@@ -92,11 +92,11 @@ wget -q <span class="nv">$URL</span> -O <span class="nv">$CSVFILE</span>
 <span class="k">fi</span>
 
 <span class="nb">echo</span> <span class="s2">&quot;converting to utf-8&quot;</span>
-iconv -f WINDOWS-1250 -t UTF-8 <span class="nv">$CSVFILE</span> -o <span class="nv">$CSVUTF8FILE</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
+iconv -f WINDOWS-1250 -t UTF-8 <span class="nv">$CSVFILE</span> -o <span class="nv">$CSVUTF8FILE</span> <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> <span class="se">\</span>
 <span class="nb">echo</span> <span class="s2">&quot;modifying </span><span class="si">${</span><span class="nv">FILE</span><span class="si">}</span><span class="s2">&quot;</span>
-sed -i <span class="s1">&#39;s/^M$//&#39;</span> <span class="nv">$CSVUTF8FILE</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
-sed -i <span class="s1">&#39;s/\r$//&#39;</span> <span class="nv">$CSVUTF8FILE</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
-sed -i <span class="s1">&#39;s/;*$//g&#39;</span> <span class="nv">$CSVUTF8FILE</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
+sed -i <span class="s1">&#39;s/^M$//&#39;</span> <span class="nv">$CSVUTF8FILE</span> <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> <span class="se">\</span>
+sed -i <span class="s1">&#39;s/\r$//&#39;</span> <span class="nv">$CSVUTF8FILE</span> <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> <span class="se">\</span>
+sed -i <span class="s1">&#39;s/;*$//g&#39;</span> <span class="nv">$CSVUTF8FILE</span> <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> <span class="se">\</span>
 sed -i <span class="s1">&#39;1d&#39;</span> <span class="nv">$CSVUTF8FILE</span>
 
 <span class="nb">echo</span> <span class="s2">&quot;importing to database&quot;</span>
@@ -115,11 +115,11 @@ rm <span class="nv">$CSVFILE</span> <span class="nv">$CSVUTF8FILE</span>
 
 <h3>More reading</h3>
     <ul>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/">Plotting the Czech Cadastre Land Use with d3: Data Load (part <span class="caps">III</span>)</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/plotting-the-czech-cadastre-land-use-with-d3-data-viz-part-iv/">Plotting the Czech Cadastre Land Use with d3: Data Viz (part <span class="caps">IV</span>)</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-iii/">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">III</span>)</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/postgis-case-study-vozejkmap-open-data-part-i/">PostGIS Case Study: VozejkMap Open Data (Part&nbsp;I)</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/liftago-open-dataset-infographics/">Liftago Open Dataset&nbsp;Infographics</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
 <script>

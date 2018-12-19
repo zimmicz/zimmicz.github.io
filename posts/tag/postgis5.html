@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+        <title>Michal Zimmermann | tag: postgis</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
+</head>
+<body>
+    <nav role="navigation">
+        <ul>
+            <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
+            <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
+            <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
+        </ul>
+    </nav>
+    <header>
+        <h1><a href="/posts">Michal Zimmermann<small>Pieces of knowledge from the world of GIS.</small></a></h1>
+    </header>
+    <main>
+<h2 class="text-center">Articles tagged with postgis tag</h2>
+
+<article>
+    <h1><a href="https://www.zimmi.cz/posts/2014/postgis-spatial-indexing-with-st_intersects/" rel="bookmark" title="Permalink to PostGIS Spatial Indexing With ST_Intersects">PostGIS Spatial Indexing With&nbsp;ST_Intersects</a></h1>
+    <aside><span>Nov 23, 2014</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p><a href="http://postgis.net/docs/ST_Intersects.html">PostGIS docs</a> clearly states that:
+    &gt; This function call will automatically include a bounding box comparison that will make use of any indexes that are available on the&nbsp;geometries.</p>
+<p>That means (or at least I think so) that you shouldn&#8217;t bother with using <a href="http://postgis.net/docs/reference.html#Operators">operators</a> before calling this&nbsp;function.</p>
+<p><a href="http://slides.com/michalzimmermann">I was preparing</a> my second lecture on PostGIS and I was experimenting a bit and came up with an interesting thing on this&nbsp;matter:</p>
+<p>Let&#8217;s have two <span class="caps">SQL</span> relations, <code>roads</code> and <code>regions</code>. I would like to retrieve every road that intersects a certain region. Spatial indexes were built beforehand on both&nbsp;tables.</p>
+<p>First&nbsp;try:</p>
+<div class="highlight"><pre><span></span>EXPLAIN ANALYZE SELECT roads.* FROM roads
+JOIN regions ON ST_Intersects(roads.geom, regions.geom)
+WHERE regions.&quot;NAZEV&quot; = &#39;Jihomoravský&#39;;`
+</pre></div>
+
+
+<p>And here comes the&nbsp;result:</p>
+<div class="highlight"><pre><span></span><span class="nt">Nested</span> <span class="nt">Loop</span>  <span class="o">(</span><span class="nt">cost</span><span class="o">=</span><span class="nt">4</span><span class="p">.</span><span class="nc">85</span><span class="o">.</span><span class="p">.</span><span class="nc">324</span><span class="p">.</span><span class="nc">26</span> <span class="nt">rows</span><span class="o">=</span><span class="nt">249</span> <span class="nt">width</span><span class="o">=</span><span class="nt">214</span><span class="o">)</span> <span class="o">(</span><span class="nt">actual</span> <span class="nt">time</span><span class="o">=</span><span class="nt">45</span><span class="p">.</span><span class="nc">102</span><span class="o">.</span><span class="p">.</span><span class="nc">5101</span><span class="p">.</span><span class="nc">472</span> <span class="nt">rows</span><span class="o">=</span><span class="nt">74253</span> <span class="nt">loops</span><span class="o">=</span><span class="nt">1</span><span class="o">)</span>
+<span class="nt">-</span><span class="o">&amp;</span><span class="nt">gt</span><span class="o">;</span>  <span class="nt">Seq</span> <span class="nt">Scan</span> <span class="nt">on</span> <span class="nt">regions</span>  <span class="o">(</span><span class="nt">cost</span><span class="o">=</span><span class="nt">0</span><span class="p">.</span><span class="nc">00</span><span class="o">.</span><span class="p">.</span><span class="nc">12</span><span class="p">.</span><span class="nc">62</span> <span class="nt">rows</span><span class="o">=</span><span class="nt">1</span> <span class="nt">width</span><span class="o">=</span><span class="nt">32</span><span class="o">)</span> <span class="o">(</span><span class="nt">actual</span> <span class="nt">time</span><span class="o">=</span><span class="nt">0</span><span class="p">.</span><span class="nc">015</span><span class="o">.</span><span class="p">.</span><span class="nc">0</span><span class="p">.</span><span class="nc">018</span> <span class="nt">rows</span><span class="o">=</span><span class="nt">1</span> <span class="nt">loops</span><span class="o">=</span><span class="nt">1</span><span class="o">)</span>
+     <span class="nt">Filter</span><span class="o">:</span> <span class="o">((</span><span class="s2">&quot;NAZEV&quot;</span><span class="o">)</span><span class="p">::</span><span class="nd">text</span> <span class="o">=</span> <span class="s1">&#39;Jihomoravský&#39;</span><span class="p">::</span><span class="nd">text</span><span class="o">)</span>
+     <span class="nt">Rows</span> <span class="nt">Removed</span> <span class="nt">by</span> <span class="nt">Filter</span><span class="o">:</span> <span class="nt">13</span>
+<span class="nt">-</span><span class="o">&amp;</span><span class="nt">gt</span><span class="o">;</span>  <span class="nt">Bitmap</span> <span class="nt">Heap</span> <span class="nt">Scan</span> <span class="nt">on</span> <span class="nt">roads</span>  <span class="o">(</span><span class="nt">cost</span><span class="o">=</span><span class="nt">4</span><span class="p">.</span><span class="nc">85</span><span class="o">.</span><span class="p">.</span><span class="nc">311</span><span class="p">.</span><span class="nc">38</span> <span class="nt">rows</span><span class="o">=</span><span class="nt">25</span> <span class="nt">width</span><span class="o">=</span><span class="nt">214</span><span class="o">)</span> <span class="o">(</span><span class="nt">actual</span> <span class="nt">time</span><span class="o">=</span><span class="nt">45</span><span class="p">.</span><span class="nc">079</span><span class="o">.</span><span class="p">.</span><span class="nc">4931</span><span class="p">.</span><span class="nc">495</span> <span class="nt">rows</span><span class="o">=</span><span class="nt">74253</span> <span class="nt">loops</span><span class="o">=</span><span class="nt">1</span><span class="o">)</span>
+     <span class="nt">Recheck</span> <span class="nt">Cond</span><span class="o">:</span> <span class="o">(</span><span class="nt">geom</span> <span class="o">&amp;</span><span class="nt">amp</span><span class="o">;&amp;</span><span class="nt">amp</span><span class="o">;</span> <span class="nt">regions</span><span class="p">.</span><span class="nc">geom</span><span class="o">)</span>
+     <span class="nt">Rows</span> <span class="nt">Removed</span> <span class="nt">by</span> <span class="nt">Index</span> <span class="nt">Recheck</span><span class="o">:</span> <span class="nt">154841</span>
+     <span class="nt">Filter</span><span class="o">:</span> <span class="nt">_st_intersects</span><span class="o">(</span><span class="nt">geom</span><span class="o">,</span> <span class="nt">regions</span><span class="p">.</span><span class="nc">geom</span><span class="o">)</span>
+     <span class="nt">Rows</span> <span class="nt">Removed</span> <span class="nt">by</span> <span class="nt">Filter</span><span class="o">:</span> <span class="nt">71212</span>
+     <span class="nt">-</span><span class="o">&amp;</span><span class="nt">gt</span><span class="o">;</span>  <span class="nt">Bitmap</span> <span class="nt">Index</span> <span class="nt">Scan</span> <span class="nt">on</span> <span class="nt">roads_idx</span>  <span class="o">(</span><span class="nt">cost</span><span class="o">=</span><span class="nt">0</span><span class="p">.</span><span class="nc">00</span><span class="o">.</span><span class="p">.</span><span class="nc">4</span><span class="p">.</span><span class="nc">85</span> <span class="nt">rows</span><span class="o">=</span><span class="nt">75</span> <span class="nt">width</span><span class="o">=</span><span class="nt">0</span><span class="o">)</span> <span class="o">(</span><span class="nt">actual</span> <span class="nt">time</span><span class="o">=</span><span class="nt">40</span><span class="p">.</span><span class="nc">142</span><span class="o">.</span><span class="p">.</span><span class="nc">40</span><span class="p">.</span><span class="nc">142</span> <span class="nt">rows</span><span class="o">=</span><span class="nt">145465</span> <span class="nt">loops</span><span class="o">=</span><span class="nt">1</span><span class="o">)</span>
+           <span class="nt">Index</span> <span class="nt">Cond</span><span class="o">:</span> <span class="o">(</span><span class="nt">geom</span> <span class="o">&amp;</span><span class="nt">amp</span><span class="o">;&amp;</span><span class="nt">amp</span><span class="o">;</span> <span class="nt">regions</span><span class="p">.</span><span class="nc">geom</span><span class="o">)</span>
+<span class="nt">Total</span> <span class="nt">runtime</span><span class="o">:</span> <span class="nt">5181</span><span class="p">.</span><span class="nc">459</span> <span class="nt">ms</span>
+</pre></div>
+
+
+<p>I was pretty satisfied with the result, I kept digging deeper&nbsp;though.</p>
+<p>Second&nbsp;try:</p>
+<div class="highlight"><pre><span></span>EXPLAIN ANALYZE SELECT roads.* FROM roads
+JOIN regions ON roads.geom &amp;amp;&amp;amp; regions.geom
+WHERE regions.&quot;NAZEV&quot; = &#39;Jihomoravský&#39; AND ST_Intersects(roads.geom, regions.geom);
+</pre></div>
+
+
+<p>And the&nbsp;result:</p>
+<div class="highlight"><pre><span></span><span class="nt">Nested</span> <span class="nt">Loop</span>  <span class="o">(</span><span class="nt">cost</span><span class="o">=</span><span class="nt">0</span><span class="p">.</span><span class="nc">29</span><span class="o">.</span><span class="p">.</span><span class="nc">21</span><span class="p">.</span><span class="nc">19</span> <span class="nt">rows</span><span class="o">=</span><span class="nt">1</span> <span class="nt">width</span><span class="o">=</span><span class="nt">214</span><span class="o">)</span> <span class="o">(</span><span class="nt">actual</span> <span class="nt">time</span><span class="o">=</span><span class="nt">3</span><span class="p">.</span><span class="nc">041</span><span class="o">.</span><span class="p">.</span><span class="nc">3850</span><span class="p">.</span><span class="nc">302</span> <span class="nt">rows</span><span class="o">=</span><span class="nt">74253</span> <span class="nt">loops</span><span class="o">=</span><span class="nt">1</span><span class="o">)</span>
+<span class="nt">-</span><span class="o">&amp;</span><span class="nt">gt</span><span class="o">;</span>  <span class="nt">Seq</span> <span class="nt">Scan</span> <span class="nt">on</span> <span class="nt">regions</span>  <span class="o">(</span><span class="nt">cost</span><span class="o">=</span><span class="nt">0</span><span class="p">.</span><span class="nc">00</span><span class="o">.</span><span class="p">.</span><span class="nc">12</span><span class="p">.</span><span class="nc">62</span> <span class="nt">rows</span><span class="o">=</span><span class="nt">1</span> <span class="nt">width</span><span class="o">=</span><span class="nt">32</span><span class="o">)</span> <span class="o">(</span><span class="nt">actual</span> <span class="nt">time</span><span class="o">=</span><span class="nt">0</span><span class="p">.</span><span class="nc">021</span><span class="o">.</span><span class="p">.</span><span class="nc">0</span><span class="p">.</span><span class="nc">024</span> <span class="nt">rows</span><span class="o">=</span><span class="nt">1</span> <span class="nt">loops</span><span class="o">=</span><span class="nt">1</span><span class="o">)</span>
+     <span class="nt">Filter</span><span class="o">:</span> <span class="o">((</span><span class="s2">&quot;NAZEV&quot;</span><span class="o">)</span><span class="p">::</span><span class="nd">text</span> <span class="o">=</span> <span class="s1">&#39;Jihomoravský&#39;</span><span class="p">::</span><span class="nd">text</span><span class="o">)</span>
+     <span class="nt">Rows</span> <span class="nt">Removed</span> <span class="nt">by</span> <span class="nt">Filter</span><span class="o">:</span> <span class="nt">13</span>
+<span class="nt">-</span><span class="o">&amp;</span><span class="nt">gt</span><span class="o">;</span>  <span class="nt">Index</span> <span class="nt">Scan</span> <span class="nt">using</span> <span class="nt">roads_idx</span> <span class="nt">on</span> <span class="nt">roads</span>  <span class="o">(</span><span class="nt">cost</span><span class="o">=</span><span class="nt">0</span><span class="p">.</span><span class="nc">29</span><span class="o">.</span><span class="p">.</span><span class="nc">8</span><span class="p">.</span><span class="nc">55</span> <span class="nt">rows</span><span class="o">=</span><span class="nt">1</span> <span class="nt">width</span><span class="o">=</span><span class="nt">214</span><span class="o">)</span> <span class="o">(</span><span class="nt">actual</span> <span class="nt">time</span><span class="o">=</span><span class="nt">2</span><span class="p">.</span><span class="nc">938</span><span class="o">.</span><span class="p">.</span><span class="nc">3681</span><span class="p">.</span><span class="nc">432</span> <span class="nt">rows</span><span class="o">=</span><span class="nt">74253</span> <span class="nt">loops</span><span class="o">=</span><span class="nt">1</span><span class="o">)</span>
+     <span class="nt">Index</span> <span class="nt">Cond</span><span class="o">:</span> <span class="o">((</span><span class="nt">geom</span> <span class="o">&amp;</span><span class="nt">amp</span><span class="o">;&amp;</span><span class="nt">amp</span><span class="o">;</span> <span class="nt">regions</span><span class="p">.</span><span class="nc">geom</span><span class="o">)</span> <span class="nt">AND</span> <span class="o">(</span><span class="nt">geom</span> <span class="o">&amp;</span><span class="nt">amp</span><span class="o">;&amp;</span><span class="nt">amp</span><span class="o">;</span> <span class="nt">regions</span><span class="p">.</span><span class="nc">geom</span><span class="o">))</span>
+     <span class="nt">Filter</span><span class="o">:</span> <span class="nt">_st_intersects</span><span class="o">(</span><span class="nt">geom</span><span class="o">,</span> <span class="nt">regions</span><span class="p">.</span><span class="nc">geom</span><span class="o">)</span>
+     <span class="nt">Rows</span> <span class="nt">Removed</span> <span class="nt">by</span> <span class="nt">Filter</span><span class="o">:</span> <span class="nt">71212</span>
+<span class="nt">Total</span> <span class="nt">runtime</span><span class="o">:</span> <span class="nt">3930</span><span class="p">.</span><span class="nc">270</span> <span class="nt">ms</span>
+</pre></div>
+
+
+<p>Now there&#8217;s a significant difference between total runtimes of both queries and - more important - also a difference between their query plans. The latter is like <strong>20 % faster</strong>.</p>
+<p>I&#8217;m puzzled about this behavior and would appreciate any thoughts on this. Reach me at <a href="http://twitter.com/zimmicz">Twitter</a>, <a href="https://www.linkedin.com/pub/michal-zimmermann/29/8/b30">LinkedIn</a> or e-mail&nbsp;(zimmicz[at]gmail.com).</p>
+</article>
+<aside id="pagination">
+            <a href="https://www.zimmi.cz/posts/tag/postgis4.html">&laquo; Previous page</a>
+</aside>    </main>
+    <footer>
+        Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
+        Proudly powered by <a href="//getpelican.com/">Pelican</a>,
+        which takes great advantage of <a href="//python.org">Python</a>.
+    </footer>
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-43432739-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments)};
+  gtag('js', new Date());
+
+  gtag('config', 'UA-43432739-2');
+</script>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NW8R37N');</script>
+<!-- End Google Tag Manager -->
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NW8R37N"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<script src="https://www.zimmi.cz/posts/theme/js/echo.min.js"></script>
+<script>
+echo.init({
+  offset: 200,
+  throttle: 250,
+  unload: false
+});
+</script>
+</body>
+</html>

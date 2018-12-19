@@ -23,6 +23,131 @@
     <main>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2018/centos-postgis-upgrade-hell-yet-again" rel="bookmark" title="Permalink to CentOS PostGIS Upgrade Hell… Yet Again">CentOS PostGIS Upgrade Hell&#8230; Yet&nbsp;Again</a></h1>
+    <aside><span>Dec 19, 2018</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p><a href="https://www.zimmi.cz/posts/2017/upgrading-postgresql-95-to-postgresql-96-with-postgis/">PostGIS upgrades used to be a nightmare</a>. Broken dependencies, version mismatches, you name it. Upgrading PostgreSQL 10 with PostGIS 2.4 to PostgreSQL 11 on CentOS has been my mission impossible for two days. And it doesn&#8217;t seem to come to an&nbsp;end.</p>
+<h2>What?&nbsp;Why?</h2>
+<p>We&#8217;re running fairly large spatially enabled PostgreSQL 10 database cluster. To keep up with pretty fast development, I was hoping to <code>pg_upgrade</code> it to PostgreSQL&nbsp;11.</p>
+<h2>Tried and&nbsp;failed</h2>
+<p>I&#8217;ve been trying different upgrade strategies with PostgreSQL 11 already running to no avail. Here comes the&nbsp;list.</p>
+<h3>Install PostGIS 2.4 to PostgreSQL 11 and&nbsp;pg_upgrade</h3>
+<div class="highlight"><pre><span></span>yum install postgis24_11
+systemctl stop postgresql-11
+
+su postgres
+/usr/pgsql-11/bin/pg_upgrade <span class="se">\</span>
+  --check <span class="se">\</span>
+  -b /usr/pgsql-10/bin/ -B /usr/pgsql-11/bin/ <span class="se">\</span>
+  -d /var/lib/pgsql/10/data -D /var/lib/pgsql/11/data <span class="se">\</span>
+  --link <span class="se">\</span>
+  -U root <span class="se">\</span>
+  -o <span class="s1">&#39; -c config_file=/var/lib/pgsql/10/data/postgresql.conf&#39;</span> -O <span class="s1">&#39; -c config_file=/var/lib/pgsql/11/data/postgresql.conf&#39;</span>
+</pre></div>
+
+
+<p>This results&nbsp;in:</p>
+<blockquote>
+<p>Your installation references loadable libraries that are missing from the
+new installation.  You can add these libraries to the new installation,
+or remove the functions using them from the old installation.  A list of
+problem libraries is in the file:&nbsp;loadable_libraries.txt</p>
+</blockquote>
+<p><code>loadable_libraries.txt</code> says the&nbsp;following:</p>
+<div class="highlight"><pre><span></span>could not load library <span class="s2">&quot;</span><span class="nv">$libdir</span><span class="s2">/postgis-2.4&quot;</span>: ERROR:  could not load library <span class="s2">&quot;/usr/pgsql-11/lib/postgis-2.4.so&quot;</span>: /usr/pgsql-11/lib/postgis-2.4.so: undefined symbol: geod_polygon_init
+</pre></div>
+
+
+<p>Duckduckgoing I found the related <a href="https://www.postgresql.org/message-id/15450-a3638dc978caa94d@postgresql.org">PostgreSQL mailing list thread</a>.</p>
+<h3>Build and install PostGIS 2.4 from source to PostgreSQL 11 and&nbsp;pg_upgrade</h3>
+<p>The bug report says there&#8217;s something wrong with <code>proj4</code> version, so I chose <code>proj49</code> and <code>geos37</code>.</p>
+<div class="highlight"><pre><span></span>yum install proj49 proj49-devel
+wget https://download.osgeo.org/postgis/source/postgis-2.4.6.tar.gz
+tar -xzvf postgis-2.4.6.tar.gz
+<span class="nb">cd</span> postgis-2.4.6
+
+./configure <span class="se">\</span>
+  --with-pgconfig<span class="o">=</span>/usr/pgsql-11/bin/pg_config <span class="se">\</span>
+  --with-geosconfig<span class="o">=</span>/usr/geos37/bin/geos-config <span class="se">\</span>
+  --with-projdir<span class="o">=</span>/usr/proj49/
+
+make <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> make install
+</pre></div>
+
+
+<p><code>CREATE EXTENSION postgis</code> fails with <code>could not load library "/usr/pgsql-11/lib/postgis-2.4.so": /usr/pgsql-11/lib/postgis-2.4.so: undefined symbol: geod_polygon_init</code>. Oh&nbsp;my.</p>
+<h3>Install PostGIS 2.5 to PostgreSQL 10 and&nbsp;pg_upgrade</h3>
+<p>Running out of ideas, I tried to install PostGIS 2.5 to our PostgreSQL 10 cluster and&nbsp;pg_upgrade.</p>
+<div class="highlight"><pre><span></span>yum install postgis25_10
+</pre></div>
+
+
+<p>The resulting error appeared almost&nbsp;instantly:</p>
+<div class="highlight"><pre><span></span>Transaction check error:
+file /usr/pgsql-10/bin/shp2pgsql-gui from install of postgis25_10-2.5.1-1.rhel7.x86_64 conflicts with file from package postgis24_10-2.4.5-1.rhel7.x86_64
+file /usr/pgsql-10/lib/liblwgeom.so from install of postgis25_10-2.5.1-1.rhel7.x86_64 conflicts with file from package postgis24_10-2.4.5-1.rhel7.x86_64
+file /usr/pgsql-10/lib/postgis-2.4.so from install of postgis25_10-2.5.1-1.rhel7.x86_64 conflicts with file from package postgis24_10-2.4.5-1.rhel7.x86_64
+file /usr/pgsql-10/share/extension/address_standardizer.control from install of postgis25_10-2.5.1-1.rhel7.x86_64 conflicts with file from package postgis24_10-2.4.5-1.rhel7.x86_64
+file /usr/pgsql-10/share/extension/address_standardizer.sql from install of postgis25_10-2.5.1-1.rhel7.x86_64 conflicts with file from package postgis24_10-2.4.5-1.rhel7.x86_64
+file /usr/pgsql-10/share/extension/address_standardizer_data_us.control from install of postgis25_10-2.5.1-1.rhel7.x86_64 conflicts with file from package postgis24_10-2.4.5-1.rhel7.x86_64
+file /usr/pgsql-10/share/extension/address_standardizer_data_us.sql from install of postgis25_10-2.5.1-1.rhel7.x86_64 conflicts with file from package postgis24_10-2.4.5-1.rhel7.x86_64
+file /usr/pgsql-10/share/extension/postgis.control from install of postgis25_10-2.5.1-1.rhel7.x86_64 conflicts with file from package postgis24_10-2.4.5-1.rhel7.x86_64
+file /usr/pgsql-10/share/extension/postgis_sfcgal.control from install of postgis25_10-2.5.1-1.rhel7.x86_64 conflicts with file from package postgis24_10-2.4.5-1.rhel7.x86_64
+file /usr/pgsql-10/share/extension/postgis_tiger_geocoder.control from install of postgis25_10-2.5.1-1.rhel7.x86_64 conflicts with file from package postgis24_10-2.4.5-1.rhel7.x86_64
+file /usr/pgsql-10/share/extension/postgis_topology.control from install of postgis25_10-2.5.1-1.rhel7.x86_64 conflicts with file from package postgis24_10-2.4.5-1.rhel7.x86_64
+</pre></div>
+
+
+<p>What&nbsp;the&hellip;</p>
+<h3>Build and install PostGIS 2.5 from source to PostgreSQL 10 and&nbsp;pg_upgrade</h3>
+<div class="highlight"><pre><span></span>wget https://download.osgeo.org/postgis/source/postgis-2.5.1.tar.gz
+tar -xzvf postgis-2.5.1.tar.gz
+<span class="nb">cd</span> postgis-2.5.1
+
+./configure <span class="se">\</span>
+  --with-pgconfig<span class="o">=</span>/usr/pgsql-10/bin/pg_config <span class="se">\</span>
+  --with-geosconfig<span class="o">=</span>/usr/geos37/bin/geos-config
+
+make <span class="p">&amp;</span>amp<span class="p">;&amp;</span>amp<span class="p">;</span> make install
+</pre></div>
+
+
+<p><code>CREATE EXTENSION postgis</code> fails with <code>ERROR:  could not load library "/usr/pgsql-10/lib/postgis-2.5.so": /usr/pgsql-10/lib/postgis-2.5.so: undefined symbol: GEOSFrechetDistanceDensify</code>. Again?&nbsp;Really?</p>
+<p><code>GEOSFrechetDistanceDensify</code> was added in <span class="caps">GEOS</span> 3.7 (linked in <code>./configure</code>), yet <code>ldd /usr/pgsql-10/lib/postgis-2.5.so</code> says:</p>
+<div class="highlight"><pre><span></span>linux-vdso.so.1 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span>  <span class="o">(</span>0x00007ffd4c5fa000<span class="o">)</span>
+libgeos_c.so.1 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /usr/geos36/lib64/libgeos_c.so.1 <span class="o">(</span>0x00007f68ddf5a000<span class="o">)</span>
+libproj.so.0 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /lib64/libproj.so.0 <span class="o">(</span>0x00007f68ddd07000<span class="o">)</span>
+libjson-c.so.2 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /lib64/libjson-c.so.2 <span class="o">(</span>0x00007f68ddafc000<span class="o">)</span>
+libxml2.so.2 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /lib64/libxml2.so.2 <span class="o">(</span>0x00007f68dd792000<span class="o">)</span>
+libm.so.6 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /lib64/libm.so.6 <span class="o">(</span>0x00007f68dd48f000<span class="o">)</span>
+libSFCGAL.so.1 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /lib64/libSFCGAL.so.1 <span class="o">(</span>0x00007f68dc9c0000<span class="o">)</span>
+libc.so.6 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /lib64/libc.so.6 <span class="o">(</span>0x00007f68dc5f3000<span class="o">)</span>
+libgeos-3.6.3.so <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /usr/geos36/lib64/libgeos-3.6.3.so <span class="o">(</span>0x00007f68dc244000<span class="o">)</span>
+libstdc++.so.6 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /lib64/libstdc++.so.6 <span class="o">(</span>0x00007f68dbf3d000<span class="o">)</span>
+libgcc_s.so.1 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /lib64/libgcc_s.so.1 <span class="o">(</span>0x00007f68dbd27000<span class="o">)</span>
+libdl.so.2 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /lib64/libdl.so.2 <span class="o">(</span>0x00007f68dbb22000<span class="o">)</span>
+libz.so.1 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /lib64/libz.so.1 <span class="o">(</span>0x00007f68db90c000<span class="o">)</span>
+liblzma.so.5 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /lib64/liblzma.so.5 <span class="o">(</span>0x00007f68db6e6000<span class="o">)</span>
+/lib64/ld-linux-x86-64.so.2 <span class="o">(</span>0x000055960f119000<span class="o">)</span>
+libCGAL.so.11 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /usr/lib64/libCGAL.so.11 <span class="o">(</span>0x00007f68db4bd000<span class="o">)</span>
+libCGAL_Core.so.11 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /usr/lib64/libCGAL_Core.so.11 <span class="o">(</span>0x00007f68db284000<span class="o">)</span>
+libmpfr.so.4 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /usr/lib64/libmpfr.so.4 <span class="o">(</span>0x00007f68db029000<span class="o">)</span>
+libgmp.so.10 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /usr/lib64/libgmp.so.10 <span class="o">(</span>0x00007f68dadb0000<span class="o">)</span>
+libboost_date_time-mt.so.1.53.0 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /usr/lib64/libboost_date_time-mt.so.1.53.0 <span class="o">(</span>0x00007f68dab9f000<span class="o">)</span>
+libboost_thread-mt.so.1.53.0 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /usr/lib64/libboost_thread-mt.so.1.53.0 <span class="o">(</span>0x00007f68da988000<span class="o">)</span>
+libboost_system-mt.so.1.53.0 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /usr/lib64/libboost_system-mt.so.1.53.0 <span class="o">(</span>0x00007f68da783000<span class="o">)</span>
+libboost_serialization-mt.so.1.53.0 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /usr/lib64/libboost_serialization-mt.so.1.53.0 <span class="o">(</span>0x00007f68da517000<span class="o">)</span>
+libpthread.so.0 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /lib64/libpthread.so.0 <span class="o">(</span>0x00007f68da2fa000<span class="o">)</span>
+librt.so.1 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p">;</span> /usr/lib64/librt.so.1 <span class="o">(</span>0x00007f68da0f2000<span class="o">)</span>
+</pre></div>
+
+
+<p>I&#8217;m nearly desperate after spending two days trying to break through. I have ~ 300 <span class="caps">GB</span> of PostgreSQL data to migrate to the current version and there seems to be no possible way to do it in&nbsp;CentOS.</p>
+<p>One more thing to note: using <code>yum install postgis25_11</code> and <code>CREATE EXTENSION postgis</code> in v11 database fails with the exact same error like the one above. I really enjoy working with PostgreSQL and PostGIS, yet there&#8217;s hardly something I fear more than trying to upgrade those two things&nbsp;together.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2018/implementing-linked-list-with-postgresql-recursive-cte/" rel="bookmark" title="Permalink to Implementing Linked List with PostgreSQL Recursive CTE">Implementing Linked List with PostgreSQL Recursive <span class="caps">CTE</span></a></h1>
     <aside><span>Nov 26, 2018</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
@@ -377,72 +502,6 @@ tar -czf <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><sp
 <h2>Tips</h2>
 <p>Try to recover from your backups once in a&nbsp;while.</p>
 <p>I forget things and make mistakes. We all do. That&#8217;s why I built an ensemble that takes care of our database automatically. Nothing fancy, just a bunch of good old Bash scripts managed with systemd rathern than cron. Next time, I&#8217;d like to show you the code and walk you through our current&nbsp;setup.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-wal-archiving/" rel="bookmark" title="Permalink to PostgreSQL Backup and Recovery Orchestration: WAL Archiving">PostgreSQL Backup and Recovery Orchestration: <span class="caps">WAL</span>&nbsp;Archiving</a></h1>
-    <aside><span>Feb 12, 2018</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p>Just a very few of my day-to-day work tasks can be accomplished without PostgreSQL. For years I&#8217;ve been a (power) user of this wonderful relational database, knowing almost nothing about how its internals really work. Faced with the need to build a backup and recovery strategy, I&#8217;ve recently read up <em>a lot</em> on this&nbsp;topic.</p>
-<p>As I don&#8217;t find it very odd for a <span class="caps">GIS</span> person to be given such an extraordinary task (nobody wants to lose the priceless spatial data, right?), I hope this series might shed light on how to prepare and manage the backup/recovery process to those, who are up to such a task. I won&#8217;t be discussing backup strategies based on <code>pg_backup</code> tool, as those don&#8217;t offer neither continuous archivation, nor point-in-time-recovery (<span class="caps">PITR</span>) - those two features disqualifies it as <a href="https://www.clevermaps.cz">CleverMaps</a> production backup&nbsp;strategy.</p>
-<p><strong>That leaves us with taking periodic base backups combined with continuous <span class="caps">WAL</span> archivation, as described&nbsp;below.</strong></p>
-<h2>Taking base&nbsp;backups</h2>
-<p>Archived <span class="caps">WAL</span> segments are worthless without a base backup they can be run on. It&#8217;s crucial to have consistent, periodic base backups to keep your data&nbsp;safe.</p>
-<p><a href="https://www.postgresql.org/docs/current/static/app-pgbasebackup.html"><code>pg_basebackup</code></a> takes base backup of PostgreSQL cluster. Nothing fancy. Gzipping the output folder once the backup is done is definitely a good&nbsp;idea.</p>
-<div class="highlight"><pre><span></span>pg_basebackup <span class="se">\</span>
-    --pgdata<span class="o">=</span>/mnt/backup/base/backup_number <span class="se">\</span>
-    --format<span class="o">=</span>plain <span class="se">\</span>
-    --write-recovery-conf <span class="se">\</span>
-    --xlog-method<span class="o">=</span>stream <span class="se">\</span>
-    --label<span class="o">=</span><span class="si">${</span><span class="nv">CR_LABEL</span><span class="si">}</span> <span class="se">\</span>
-    --checkpoint<span class="o">=</span>fast <span class="se">\</span>
-    --progress <span class="se">\</span>
-    --verbose
-</pre></div>
-
-
-<p>In our current environment, we take a base backup of each of our clusters once a&nbsp;week.</p>
-<h2><span class="caps">WAL</span> archiving&nbsp;configuration</h2>
-<p>To properly set <span class="caps">WAL</span> archiving, several <code>postgresql.conf</code> settings has to be&nbsp;adjusted:</p>
-<ul>
-<li><code>wal_level = replica</code></li>
-<li><code>archive_mode = on</code></li>
-<li><code>archive_command = test ! -f /backup/wal/%f &amp;&amp; cp %p /backup/wal/%f</code></li>
-</ul>
-<p>Setting <code>wal_level</code> to <code>replica</code> writes enough information for <span class="caps">WAL</span> archiving. Turning on <code>archive_mode</code> will run <code>archive_command</code> each time a <span class="caps">WAL</span> segment is completed. <code>archive_command</code> might be anything from simple <code>cp</code> to <code>rsync</code> or <code>aws s3 cp</code> commands. It is absolutely critical that the command returns <strong>non-zero exit code</strong> in case of failure (including when a file with the same name already exists in your backup&nbsp;folder).</p>
-<p>That&#8217;s it, after reloading PostgreSQL service, new <span class="caps">WAL</span> files should be copied to <code>/backup/wal</code> directory. The PostgreSQL process user (<code>postgres</code> usually) has to be able to write to the&nbsp;location.</p>
-<h3>Pitfalls</h3>
-<ul>
-<li>If <code>archive_command</code> fails, <span class="caps">WAL</span> segment remains on your database drive. If it keeps failing long enough, you&#8217;ll run out of space and the database will&nbsp;crash.</li>
-<li>If the backup location fills up, the above-mentioned happens as&nbsp;well.</li>
-<li>If you lose or corrupt any of the archived <span class="caps">WAL</span> segments, you won&#8217;t be able to pass through. That&#8217;s why you want to be sure that your <code>archive_command</code> actually does what you think it&nbsp;does.</li>
-</ul>
-<h3>Tips</h3>
-<p>It might be a real <span class="caps">PITA</span> (fiddling around <span class="caps">WAL</span> segments included) to start a crashed database cluster with no space left. Keeping a dummy file in your <code>pg_xlog</code> location might save you a lot of trouble. Create one with following command. If you run out of space, remove this file and you get 300 <span class="caps">MB</span> for free. Don&#8217;t forget to recreate it after you start the&nbsp;cluster.</p>
-<div class="highlight"><pre><span></span>dd <span class="k">if</span><span class="o">=</span>/dev/zero <span class="nv">of</span><span class="o">=</span>/path_to_your_database_cluster/pg_xlog/DO_NOT_MOVE_THIS_FILE <span class="nv">bs</span><span class="o">=</span>1MB <span class="nv">count</span><span class="o">=</span><span class="m">300</span>
-</pre></div>
-
-
-<p>There&#8217;s no need to keep archived <span class="caps">WAL</span> segments forever. They&#8217;re only needed until you take another base backup. Again, deleting <span class="caps">WAL</span> segments manually (or using <code>find ! -newer previous_base_backup.tar.gz</code>) might lead to accidental corruption of your backups. It&#8217;s much safer to use <a href="https://www.postgresql.org/docs/9.6/static/pgarchivecleanup.html"><code>pg_archivecleanup</code></a> pointed to your <span class="caps">WAL</span> backup folder, referencing the last <strong>sucessful</strong> full backup. Below is the script we use to keep our <span class="caps">WAL</span> backup folder of reasonable size, keeping the last three full&nbsp;backups.</p>
-<div class="highlight"><pre><span></span><span class="c1"># Find base_backup files not older than 3 weeks</span>
-<span class="c1"># Sort by date</span>
-<span class="c1"># Use the oldest one as a reference</span>
-<span class="nv">OLDEST_BASE_BACKUP</span><span class="o">=</span><span class="k">$(</span>basename <span class="k">$(</span>find <span class="si">${</span><span class="nv">CR_WAL_BACKUP_DIR</span><span class="si">}</span>/u/p/ -type f -iname <span class="s2">&quot;*.backup&quot;</span> -mtime -21 -print0 <span class="p">|</span> <span class="se">\</span>
-xargs -0 ls -t <span class="p">|</span> <span class="se">\</span>
-tail -n <span class="m">1</span><span class="k">))</span>
-
-<span class="c1"># Find all subfolders</span>
-<span class="c1"># Except the u/p backup subfolder</span>
-<span class="c1"># Execute pg_archivecleanup for each of the subfolders</span>
-find <span class="nv">$CR_WAL_BACKUP_DIR</span> <span class="se">\</span>
-    -type d <span class="se">\</span>
-    -not -path <span class="s2">&quot;</span><span class="si">${</span><span class="nv">CR_WAL_BACKUP_DIR</span><span class="si">}</span><span class="s2">u*&quot;</span> <span class="se">\</span>
-    -exec pg_archivecleanup -d <span class="o">{}</span> <span class="nv">$OLDEST_BASE_BACKUP</span> <span class="se">\;</span>
-</pre></div>
-
-
-<p>Functional backups are crucial part of a solid backup/recovery system. They&#8217;re still just one half of that system, though. <strong>If not tested thoroughly</strong>, they&#8217;re even less than that. More on testing backups and recovering from failures next&nbsp;time.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/index2.html">Next page &raquo;</a>

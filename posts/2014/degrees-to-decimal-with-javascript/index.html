@@ -12,7 +12,7 @@
 
     <meta name="tags" content="javascript" />
   <meta property="og:title" content="Degrees To Decimal With Javascript" />
-  <meta property="og:description" content="I have found a nice way to get decimal value from degrees of longitude and latitude recently: function format(coords) { var decimal = 0, output = [], coords = coords.split(' '); // it might be <br> as well for (var i = 0; i < coords.length; i += 1) {..." />
+  <meta property="og:description" content="I have found a nice way to get decimal value from degrees of longitude and latitude recently: function format(coords) { var decimal = 0, output = [], coords = coords.split(' '); // it might be &lt;br&gt; as well for (var i = 0; i &lt; coords.length; i..." />
   <meta property="og:url" content="https://www.zimmi.cz/posts/2014/degrees-to-decimal-with-javascript/" />
         <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
 </head>
@@ -38,12 +38,12 @@
 <div class="highlight"><pre><span></span><span class="kd">function</span> <span class="nx">format</span><span class="p">(</span><span class="nx">coords</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">decimal</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="nx">output</span>  <span class="o">=</span> <span class="p">[],</span>
-        <span class="nx">coords</span>  <span class="o">=</span> <span class="nx">coords</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;  &#39;</span><span class="p">);</span> <span class="c1">// it might be &lt;br&gt; as well</span>
+        <span class="nx">coords</span>  <span class="o">=</span> <span class="nx">coords</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;  &#39;</span><span class="p">);</span> <span class="c1">// it might be &amp;lt;br&amp;gt; as well</span>
 
-    <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">coords</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&amp;</span><span class="nx">lt</span><span class="p">;</span> <span class="nx">coords</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
         <span class="kd">var</span> <span class="nx">c</span> <span class="o">=</span> <span class="nx">coords</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">);</span>
 
-        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">j</span> <span class="o">&lt;</span> <span class="nx">c</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">j</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">j</span> <span class="o">&amp;</span><span class="nx">lt</span><span class="p">;</span> <span class="nx">c</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">j</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
             <span class="nx">decimal</span> <span class="o">+=</span> <span class="nx">c</span><span class="p">[</span><span class="nx">j</span><span class="p">]</span> <span class="o">/</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="nx">j</span><span class="p">);</span>
         <span class="p">}</span>
 
@@ -62,11 +62,11 @@
 
 <h3>More reading</h3>
     <ul>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part&nbsp;I)</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/twitter-rest-api-data-mining-on-openshift-part-ii/">Twitter <span class="caps">REST</span> <span class="caps">API</span> Data Mining on OpenShift (Part <span class="caps">II</span>)</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/connecting-to-secured-arcgis-server-layer-with-openlayers-3/">Connecting To Secured ArcGIS Server Layer With OpenLayers&nbsp;3</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/plotting-the-czech-cadastre-land-use-with-d3-data-viz-part-iv/">Plotting the Czech Cadastre Land Use with d3: Data Viz (part <span class="caps">IV</span>)</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/introducing-blind-maps-project/">Introducing Blind Maps&nbsp;Project</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/">Plotting the Czech Cadastre Land Use with d3: Data Load (part <span class="caps">III</span>)</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/postgis-as-a-mapbox-vector-tiles-generator/">PostGIS as a Mapbox Vector Tiles&nbsp;generator</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/leaflet-chmi-radar-control/">Leaflet <span class="caps">CHMI</span> Radar&nbsp;Control</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
 <script>

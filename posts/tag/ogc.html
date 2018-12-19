@@ -39,8 +39,8 @@
 
 <span class="n">BOTTOM_LEFT</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">679363</span><span class="p">,</span><span class="o">-</span><span class="mi">1120688</span><span class="p">)</span>
 <span class="n">TOP_RIGHT</span>   <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">565171</span><span class="p">,</span><span class="o">-</span><span class="mi">1042703</span><span class="p">)</span>
-<span class="n">SRS_WIDTH</span>   <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="o">-</span><span class="mi">639084</span> <span class="o">-</span> <span class="o">-</span><span class="mi">638825</span><span class="p">)</span> <span class="c1"># tile width in units of crs =&gt; 259 m</span>
-<span class="n">SRS_HEIGHT</span>  <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="o">-</span><span class="mi">1070426</span> <span class="o">-</span> <span class="o">-</span><span class="mi">1070273</span><span class="p">)</span> <span class="c1"># tile height in units of crs =&gt; 153 m</span>
+<span class="n">SRS_WIDTH</span>   <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="o">-</span><span class="mi">639084</span> <span class="o">-</span> <span class="o">-</span><span class="mi">638825</span><span class="p">)</span> <span class="c1"># tile width in units of crs =&amp;gt; 259 m</span>
+<span class="n">SRS_HEIGHT</span>  <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="o">-</span><span class="mi">1070426</span> <span class="o">-</span> <span class="o">-</span><span class="mi">1070273</span><span class="p">)</span> <span class="c1"># tile height in units of crs =&amp;gt; 153 m</span>
 <span class="n">PX_WIDTH</span>    <span class="o">=</span> <span class="mi">977</span>
 <span class="n">PX_HEIGHT</span>   <span class="o">=</span> <span class="mi">578</span>
 
@@ -158,7 +158,7 @@
                 <span class="nx">callback</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">contents</span><span class="p">);</span> <span class="c1">// response contents is where the token is stored</span>
         <span class="p">}</span>
     <span class="p">};</span>
-    <span class="nx">req</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="s2">&quot;http://server.address/arcgis/tokens/?request=getToken&amp;username=username&amp;password=password&amp;expiration=60&quot;</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+    <span class="nx">req</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="s2">&quot;http://server.address/arcgis/tokens/?request=getToken&amp;amp;username=username&amp;amp;password=password&amp;amp;expiration=60&quot;</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
     <span class="nx">req</span><span class="p">.</span><span class="nx">send</span><span class="p">()</span>
 <span class="p">}</span>
 </pre></div>

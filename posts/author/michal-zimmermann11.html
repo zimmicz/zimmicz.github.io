@@ -24,6 +24,31 @@
 <h2>Articles by Michal Zimmermann</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2015/how-to-use-queue-with-rsync/" rel="bookmark" title="Permalink to How to Use Queue with Rsync">How to Use Queue with&nbsp;Rsync</a></h1>
+    <aside><span>Oct 1, 2015</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
+    </aside>
+    <p>Having more than 120K <span class="caps">5MB</span>+ images that should be moved to the server is a great oportunity for some automatic bash processing. It might be good idea to use <a href="http://www.imagemagick.org/script/index.php">ImageMagick</a> <a href="http://www.imagemagick.org/script/convert.php">convert tool</a> to make images smaller in a simple for loop. <a href="http://www.gnu.org/software/parallel/"><span class="caps">GNU</span> Parallel</a> can significantly increase the performance by running one job per <span class="caps">CPU</span>&nbsp;core.</p>
+<div class="highlight"><pre><span></span>parallel --verbose convert <span class="o">{}</span> -quality <span class="m">40</span>% <span class="o">{}</span> ::: *.jpg
+</pre></div>
+
+
+<p>The <code>parallel</code> modifies several images per second. Uploading these right away seems to be the next step. But how do you tell <code>rsync</code> to check for modified files every now and then? Another for loop mixed with <code>sleep</code> would work, but it just doesn&#8217;t feel&nbsp;right.</p>
+<p>Luckily, there&#8217;s a <a href="http://linux.die.net/man/1/inotifywait"><code>inotifywait</code></a> tool capable of watching changes to files and taking actions based on those&nbsp;changes.</p>
+<div class="highlight"><pre><span></span>inotifywait -e close_write -m --format <span class="s1">&#39;%f&#39;</span> . <span class="p">|</span> <span class="se">\</span>
+<span class="k">while</span> <span class="nb">read</span> file
+<span class="k">do</span>
+    <span class="nb">echo</span> <span class="nv">$file</span>
+    rsync -OWRD0Pq --ignore-existing <span class="nv">$file</span> data@localhost
+<span class="k">done</span>
+</pre></div>
+
+
+<p>By default, <code>inotifywait</code> stops after receiving a single event, while <code>-m</code> flag runs it indefinitely. <code>-e</code> flag defines an event to watch for, in my case that&#8217;s a <code>close_write</code> event. The <code>inotifywait</code> output can be piped to <code>rsync</code> that takes care of syncing local files to remote&nbsp;server.</p>
+<p>The last step, as usual, is&nbsp;profit.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/" rel="bookmark" title="Permalink to Automated Map Creation With QGIS, PostGIS, Python, SVG and ImageMagick">Automated Map Creation With <span class="caps">QGIS</span>, PostGIS, Python, <span class="caps">SVG</span> and&nbsp;ImageMagick</a></h1>
     <aside><span>Aug 9, 2015</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
@@ -233,7 +258,7 @@ gdalwarp -dstalpha -s_srs <span class="s1">&#39;EPSG:5514&#39;</span> -t_srs <sp
         <span class="p">),</span>
         <span class="n">b</span><span class="p">.</span><span class="n">geom</span>
     <span class="p">)</span> <span class="k">AND</span>
-    <span class="k">abs</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">value</span> <span class="o">-</span> <span class="n">b</span><span class="p">.</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">400</span>
+    <span class="k">abs</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">value</span> <span class="o">-</span> <span class="n">b</span><span class="p">.</span><span class="n">value</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="mi">400</span>
 </pre></div>
 
 
@@ -249,15 +274,15 @@ gdalwarp -dstalpha -s_srs <span class="s1">&#39;EPSG:5514&#39;</span> -t_srs <sp
     <span class="k">SELECT</span>
         <span class="n">a</span><span class="p">.</span><span class="n">gid</span><span class="p">,</span>
         <span class="n">b</span><span class="p">.</span><span class="n">gid</span><span class="p">,</span>
-        <span class="n">a</span><span class="p">.</span><span class="n">geom</span> <span class="o">&lt;-&gt;</span> <span class="n">b</span><span class="p">.</span><span class="n">geom</span> <span class="n">distance</span>
+        <span class="n">a</span><span class="p">.</span><span class="n">geom</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">-&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">b</span><span class="p">.</span><span class="n">geom</span> <span class="n">distance</span>
     <span class="k">FROM</span>
         <span class="n">shp1</span> <span class="n">a</span><span class="p">,</span> <span class="n">shp2</span> <span class="n">b</span>
     <span class="k">WHERE</span>
-        <span class="k">abs</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">value</span> <span class="o">-</span> <span class="n">b</span><span class="p">.</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">400</span> <span class="k">AND</span>
+        <span class="k">abs</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">value</span> <span class="o">-</span> <span class="n">b</span><span class="p">.</span><span class="n">value</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="mi">400</span> <span class="k">AND</span>
         <span class="n">ST_DWithin</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="mi">2000</span><span class="p">)</span>
     <span class="p">)</span> <span class="n">sq</span>
 <span class="k">WHERE</span>
-    <span class="n">distance</span> <span class="o">&gt;</span> <span class="mi">500</span><span class="p">;</span>
+    <span class="n">distance</span> <span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="mi">500</span><span class="p">;</span>
 </pre></div>
 
 
@@ -295,35 +320,6 @@ gdalwarp -dstalpha -s_srs <span class="s1">&#39;EPSG:5514&#39;</span> -t_srs <sp
 
 <p>Note <span class="caps">QGIS</span> swallows the first row of the given <span class="caps">CSV</span> file as if it was a header. Don&#8217;t forget about this when creating your own enumerations. Once set, operators will see a friendly combo box instead of a hostile blank input in the attribute&nbsp;table.</p>
 <p>These are just small adjustments that can make a big difference in your <span class="caps">QGIS</span>&nbsp;workflow.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2015/ssh-grass-processing-status-check/" rel="bookmark" title="Permalink to SSH GRASS Processing Status Check"><span class="caps">SSH</span> <span class="caps">GRASS</span> Processing Status&nbsp;Check</a></h1>
-    <aside><span>Jul 21, 2015</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/bash.html">bash</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
-    </aside>
-    <p>I&#8217;ve been running some <span class="caps">GRASS</span>/PostGIS computations on a remote server that were taking hours to finish. Once in a while I checked for their state by issuing <code>tail log_XX.log</code> from my laptop to see if they were ready yet. It suddenly became pretty annoying to check five different logs every ten&nbsp;minutes.</p>
-<p>Instead of waiting and checking the logs, I thought it would be great to automate this. And it would be awesome if checking was fun. So I wrote a simple routine that takes log number as an argument (every process logs to a separate logfile) and checks it every minute until it says <em>done</em>. Right after that <code>notify-send</code> gives me a neat popup and Queen starts playing their <em>We are the champions</em> thanks to <code>mpg123</code>.</p>
-<div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env bash</span>
-<span class="nv">item</span><span class="o">=</span><span class="nv">$1</span>
-
-<span class="k">while</span> true<span class="p">;</span> <span class="k">do</span>
-    <span class="nb">echo</span> <span class="s2">&quot;############ </span><span class="si">${</span><span class="nv">item</span><span class="si">}</span><span class="s2"> ############&quot;</span>
-    <span class="nv">x</span><span class="o">=</span><span class="k">$(</span>ssh user@remote.server <span class="s2">&quot;tail -n 30 path/to/my/log_</span><span class="si">${</span><span class="nv">item</span><span class="si">}</span><span class="s2">.log&quot;</span><span class="k">)</span>
-
-    <span class="k">if</span> <span class="o">[[</span> <span class="nv">$x</span> <span class="o">==</span> *<span class="s2">&quot;done&quot;</span>* <span class="o">]]</span>
-        <span class="k">then</span>
-            notify-send -u critical <span class="s2">&quot;Finally </span><span class="si">${</span><span class="nv">item</span><span class="si">}</span><span class="s2">&quot;</span>
-            mpg123 -n <span class="m">250</span> ~/Music/queen-we_are_the_champions.mp3
-            <span class="nb">exit</span>
-        <span class="k">else</span> <span class="nb">echo</span> <span class="s2">&quot;Not yet&quot;</span>
-    <span class="k">fi</span>
-    sleep <span class="m">60</span>
-<span class="k">done</span>
-</pre></div>
-
-
-<p>What seemed to be really frustrating makes me happy right now. Unless Freddie starts singing in the middle of the&nbsp;night.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/author/michal-zimmermann10.html">&laquo; Previous page</a>

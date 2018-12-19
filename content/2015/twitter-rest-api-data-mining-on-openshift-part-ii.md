@@ -78,8 +78,8 @@ In the last step, the data is loaded with SQL `\copy` command.
 
 Some interesting charts and numbers follow.
 
-<p class="text-center"><img title="Top 100 Twitter users in the Czech Republic" src="{filename}/assets/twitter-rest-api-data-mining-on-openshift-part-ii/authors.png" class="img-responsive centered"></p>
+<p class="text-center"><img title="Top 100 Twitter users in the Czech Republic" src="{static}/assets/twitter-rest-api-data-mining-on-openshift-part-ii/authors.png" class="img-responsive centered"></p>
 
-<p class="text-center"><img title="When people tweet in the Czech Republic" src="{filename}/assets/twitter-rest-api-data-mining-on-openshift-part-ii/hours.png" class="img-responsive centered"></p>
+<p class="text-center"><img title="When people tweet in the Czech Republic" src="{static}/assets/twitter-rest-api-data-mining-on-openshift-part-ii/hours.png" class="img-responsive centered"></p>
 
-<p class="text-center"><img title="Languages on Twitter in the Czech Republic" src="{filename}/assets/twitter-rest-api-data-mining-on-openshift-part-ii/languages.png" class="img-responsive centered"></p>
+<p class="text-center"><img title="Languages on Twitter in the Czech Republic" src="{static}/assets/twitter-rest-api-data-mining-on-openshift-part-ii/languages.png" class="img-responsive centered"></p>
