@@ -1,43 +1,45 @@
 {% extends "base.html" %}
 {% block title %}{{ SITENAME }} | {{ article.title | striptags }}{% endblock %}
 {% block head %}
-  {{ super() }}
-  {% for keyword in article.keywords %}
-    <meta name="keywords" contents="{{keyword}}" />
-  {% endfor %}
+{{ super() }}
+{% for keyword in article.keywords %}
+<meta name="keywords" contents="{{keyword}}" />
+{% endfor %}
 
-  {% for description in article.description %}
-    <meta name="description" contents="{{description}}" />
-  {% endfor %}
+{% for description in article.description %}
+<meta name="description" contents="{{description}}" />
+{% endfor %}
 
-  {% for tag in article.tags %}
-    <meta name="tags" content="{{tag}}" />
-  {% endfor %}
-  {% if article.image %}
-    <meta property="og:image" content="{{ article.image }}" />
-  {% endif %}
-  <meta property="og:title" content="{{ article.title|striptags }}" />
-  <meta property="og:description" content="{{ article.content|striptags|truncate }}" />
-  <meta property="og:url" content="{{ SITEURL }}/{{ article.url }}" />
+{% for tag in article.tags %}
+<meta name="tags" content="{{tag}}" />
+{% endfor %}
+{% if article.image %}
+<meta property="og:image" content="{{ article.image }}" />
+{% endif %}
+<meta property="og:title" content="{{ article.title|striptags }}" />
+<meta property="og:description" content="{{ article.content|striptags|truncate }}" />
+<meta property="og:url" content="{{ SITEURL }}/{{ article.url }}" />
 {% endblock %}
 
 {% block content %}
 <article>
     <h1><a href="{{ SITEURL }}/{{ article.url }}" rel="bookmark" title="Permalink to {{ article.title|striptags }}">{{ article.title }}</a></h1>
     <aside><span>{{ article.date.strftime("%b %-d, %Y") }}</span>
-    {% if tags %}
-    <span>{% for tag in article.tags %}
-    <a class="tag-url" href="{{ SITEURL }}/{{ tag.url }}">{{ tag }}</a>{% if not loop.last %} {% endif %}
-    {% endfor %}
-    </span>
-    {% endif %}
-    {% if article.category %}
-    <span><a class="category-url" href="{{ SITEURL }}/{{ article.category.url }}">{{ article.category }}</a></span>
-    {% endif %}
+        {% if tags %}
+        <span>{% for tag in article.tags %}
+            <a class="tag-url" href="{{ SITEURL }}/{{ tag.url }}">{{ tag }}</a>{% if not loop.last %} {% endif %}
+            {% endfor %}
+        </span>
+        {% endif %}
+        {% if article.category %}
+        <span><a class="category-url" href="{{ SITEURL }}/{{ article.category.url }}">{{ article.category }}</a></span>
+        {% endif %}
     </aside>
-{{ article.content }}
-<aside>
-  {% include 'neighbors.html' %}
-  {% include 'drift.html' %}
-</aside>
-{% endblock %}
+    {{ article.content }}
+    <aside>
+        {% include 'neighbors.html' %}
+        {% if PRODUCTION %}
+            {% include 'drift.html' %}
+        {% endif %}
+    </aside>
+    {% endblock %}

@@ -23,12 +23,6 @@ AUTHOR_FEED_ATOM = None
 AUTHOR_FEED_RSS = None
 FEED_ALL_RSS = 'feed.xml'
 
-# Blogroll
-LINKS = ()
-
-# Social widget
-SOCIAL = ()
-
 DEFAULT_PAGINATION = 5
 
 # Uncomment following line if you want document-relative URLs when developing

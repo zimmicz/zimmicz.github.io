@@ -10,15 +10,16 @@ import sys
 sys.path.append(os.curdir)
 from pelicanconf import *
 
-SITEURL = 'https://www.zimmi.cz/posts'
-RELATIVE_URLS = False
-THEME = 'content/theme/simple'
-FEED_DOMAIN = SITEURL
-FEED_ALL_ATOM = 'atom.xml'
 CATEGORY_FEED_ATOM = None
-FEED_ALL_RSS = 'feed.xml'
-OUTPUT_PATH = 'posts/'
 DELETE_OUTPUT_DIRECTORY = False
+FEED_ALL_ATOM = 'atom.xml'
+FEED_ALL_RSS = 'feed.xml'
+FEED_DOMAIN = SITEURL
+OUTPUT_PATH = 'posts/'
+PRODUCTION = True
+RELATIVE_URLS = False
+SITEURL = 'https://www.zimmi.cz/posts'
+THEME = 'content/theme/simple'
 TYPOGRIFY = True
 
 # Following items are often useful when publishing
