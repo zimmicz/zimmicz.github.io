@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html lang="en" prefix="og: http://ogp.me/ns#">
 <head>
-          <title>Michal Zimmermann | Analyzing Twitter Languages With Streaming API</title>
+        <title>Michal Zimmermann | Analyzing Twitter Languages With Streaming API</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
-        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link href="http://localhost:8000/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="http://localhost:8000/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
 
 
 
-    <meta name="tags" content="javascript" />
-    <meta name="tags" content="leaflet" />
-    <meta name="tags" content="twitter" />
-  <meta property="og:title" content="Analyzing Twitter Languages With Streaming API" />
-  <meta property="og:description" content="I am writing a diploma thesis focused on extracting spatial data from social networks. I have been working mainly with Twitter API and results I have got so far look really promising. This post was written as a reaction to many retweets I got when I..." />
-  <meta property="og:url" content="https://www.zimmi.cz/posts/2014/analyzing-twitter-languages-with-streaming-api/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
+<meta name="tags" content="javascript" />
+<meta name="tags" content="leaflet" />
+<meta name="tags" content="twitter" />
+<meta property="og:title" content="Analyzing Twitter Languages With Streaming API" />
+<meta property="og:description" content="I am writing a diploma thesis focused on extracting spatial data from social networks. I have been working mainly with Twitter API and results I have got so far look really promising. This post was written as a reaction to many retweets I got when I..." />
+<meta property="og:url" content="https://www.zimmi.cz/posts/2014/analyzing-twitter-languages-with-streaming-api/" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?6d23b170">
 </head>
 <body>
     <nav role="navigation">
@@ -24,6 +24,13 @@
             <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
             <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
             <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
+            <li>
+                <form class="search" name="x" action="//duckduckgo.com/" target="_blank">
+                    <input type="hidden" value="zimmi.cz/posts" name="sites"></input>
+                    <input class="search-input" type="search" placeholder="Search" name="q"></input>
+                    <input class="button" type="submit" value="Go"></input>
+                </form>
+            </li>
         </ul>
     </nav>
     <header>
@@ -33,10 +40,10 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2014/analyzing-twitter-languages-with-streaming-api/" rel="bookmark" title="Permalink to Analyzing Twitter Languages With Streaming API">Analyzing Twitter Languages With Streaming <span class="caps">API</span></a></h1>
     <aside><span>Sep 2, 2014</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/leaflet.html">leaflet</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/twitter.html">twitter</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+        <span>            <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>             <a class="tag-url" href="https://www.zimmi.cz/posts/tag/leaflet.html">leaflet</a>             <a class="tag-url" href="https://www.zimmi.cz/posts/tag/twitter.html">twitter</a>        </span>
+        <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
     </aside>
-<p>I am writing a diploma thesis focused on extracting spatial data from social networks. I have been working mainly with Twitter <span class="caps">API</span> and results I have got so far look really promising. This post was written as a reaction to many retweets I got when I shared one of my visualizations. It aims to make it clear how to connect to Twitter Streaming <span class="caps">API</span> using <a href="http://nodejs.org/">node.js</a>, <a href="http://leafletjs.com/">Leaflet</a> and <a href="http://sqlite.org/">SQLite</a> and retrieve tweets to analyze them&nbsp;later.</p>
+    <p>I am writing a diploma thesis focused on extracting spatial data from social networks. I have been working mainly with Twitter <span class="caps">API</span> and results I have got so far look really promising. This post was written as a reaction to many retweets I got when I shared one of my visualizations. It aims to make it clear how to connect to Twitter Streaming <span class="caps">API</span> using <a href="http://nodejs.org/">node.js</a>, <a href="http://leafletjs.com/">Leaflet</a> and <a href="http://sqlite.org/">SQLite</a> and retrieve tweets to analyze them&nbsp;later.</p>
 
 <p>If you have any further questions after reading this paper, feel free to contact me via <a href="https://twitter.com/zimmicz">Twitter</a> or <a href="mailto:zimmicz@gmail.com">e-mail</a>. I must say right here <strong>that the code will be shared as well as the map</strong>, but there are still some bugs/features I would like to&nbsp;remove/add.</p>
 
@@ -111,15 +118,15 @@
 <div class="text-center"><img width="60%" height="60%" src="/posts/assets/analyzing-twitter-languages-with-streaming-api/screenshot.png" title="Final geoviz using Leaflet" class="img-rounded"><p><strong>Figure:</strong> Final map screenshot. A legend is used to turn nationalities on and off. You are looking at Prague by the&nbsp;way.</p></div>
 
 <p>Obviously the most tweets were sent from the most populated places, e.g. Prague, Brno,&nbsp;Ostrava. </p>
-<aside>
+    <aside>
 
 <h3>More reading</h3>
     <ul>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/introducing-blind-maps-project/">Introducing Blind Maps&nbsp;Project</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/leaflet-chmi-radar-control/">Leaflet <span class="caps">CHMI</span> Radar&nbsp;Control</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/introducing-blind-maps-project/">Introducing Blind Maps&nbsp;Project</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/twitter-rest-api-data-mining-on-openshift-part-ii/">Twitter <span class="caps">REST</span> <span class="caps">API</span> Data Mining on OpenShift (Part <span class="caps">II</span>)</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/twitter-rest-api-data-mining-on-openshift-part-i/">Twitter <span class="caps">REST</span> <span class="caps">API</span> Data Mining on OpenShift (Part&nbsp;I)</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/leaflet-with-custom-crs-epsg5514/">Leaflet With Custom <span class="caps">CRS</span> (<span class="caps">EPSG</span>:5514)</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/twitter-rest-api-data-mining-on-openshift-part-i/">Twitter <span class="caps">REST</span> <span class="caps">API</span> Data Mining on OpenShift (Part&nbsp;I)</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
 <script>
@@ -145,7 +152,7 @@
     drift.load('caacyauy5t6b');
 
 </script>
-<!-- End of Async Drift Code --></aside>
+<!-- End of Async Drift Code -->    </aside>
     </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.

@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html lang="en" prefix="og: http://ogp.me/ns#">
 <head>
-          <title>Michal Zimmermann | CentOS PostGIS Upgrade Hell… Yet Again</title>
+        <title>Michal Zimmermann | CentOS PostGIS Upgrade Hell… Yet Again</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
-        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link href="http://localhost:8000/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="http://localhost:8000/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
 
 
 
-    <meta name="tags" content="postgresql" />
-    <meta name="tags" content="postgis" />
-  <meta property="og:title" content="CentOS PostGIS Upgrade Hell… Yet Again" />
-  <meta property="og:description" content="PostGIS upgrades used to be a nightmare. Broken dependencies, version mismatches, you name it. Upgrading PostgreSQL 10 with PostGIS 2.4 to PostgreSQL 11 on CentOS has been my mission impossible for two days. And it doesn’t seem to come to an end...." />
-  <meta property="og:url" content="https://www.zimmi.cz/posts/2018/centos-postgis-upgrade-hell-yet-again" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
+<meta name="tags" content="postgresql" />
+<meta name="tags" content="postgis" />
+<meta property="og:title" content="CentOS PostGIS Upgrade Hell… Yet Again" />
+<meta property="og:description" content="PostGIS upgrades used to be a nightmare. Broken dependencies, version mismatches, you name it. Upgrading PostgreSQL 10 with PostGIS 2.4 to PostgreSQL 11 on CentOS has been my mission impossible for two days. And it doesn’t seem to come to an end...." />
+<meta property="og:url" content="https://www.zimmi.cz/posts/2018/centos-postgis-upgrade-hell-yet-again" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?6d23b170">
 </head>
 <body>
     <nav role="navigation">
@@ -23,6 +23,13 @@
             <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
             <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
             <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
+            <li>
+                <form class="search" name="x" action="//duckduckgo.com/" target="_blank">
+                    <input type="hidden" value="zimmi.cz/posts" name="sites"></input>
+                    <input class="search-input" type="search" placeholder="Search" name="q"></input>
+                    <input class="button" type="submit" value="Go"></input>
+                </form>
+            </li>
         </ul>
     </nav>
     <header>
@@ -32,10 +39,10 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2018/centos-postgis-upgrade-hell-yet-again" rel="bookmark" title="Permalink to CentOS PostGIS Upgrade Hell… Yet Again">CentOS PostGIS Upgrade Hell&#8230; Yet&nbsp;Again</a></h1>
     <aside><span>Dec 19, 2018</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+        <span>            <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>             <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>        </span>
+        <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
-<p><a href="https://www.zimmi.cz/posts/2017/upgrading-postgresql-95-to-postgresql-96-with-postgis/">PostGIS upgrades used to be a nightmare</a>. Broken dependencies, version mismatches, you name it. Upgrading PostgreSQL 10 with PostGIS 2.4 to PostgreSQL 11 on CentOS has been my mission impossible for two days. And it doesn&#8217;t seem to come to an&nbsp;end.</p>
+    <p><a href="https://www.zimmi.cz/posts/2017/upgrading-postgresql-95-to-postgresql-96-with-postgis/">PostGIS upgrades used to be a nightmare</a>. Broken dependencies, version mismatches, you name it. Upgrading PostgreSQL 10 with PostGIS 2.4 to PostgreSQL 11 on CentOS has been my mission impossible for two days. And it doesn&#8217;t seem to come to an&nbsp;end.</p>
 <h2>What?&nbsp;Why?</h2>
 <p>We&#8217;re running fairly large spatially enabled PostgreSQL 10 database cluster. To keep up with pretty fast development, I was hoping to <code>pg_upgrade</code> it to PostgreSQL&nbsp;11.</p>
 <h2>Tried and&nbsp;failed</h2>
@@ -153,15 +160,15 @@ librt.so.1 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p"
 
 <p>I&#8217;m nearly desperate after spending two days trying to break through. I have ~ 300 <span class="caps">GB</span> of PostgreSQL data to migrate to the current version and there seems to be no possible way to do it in&nbsp;CentOS.</p>
 <p>One more thing to note: using <code>yum install postgis25_11</code> and <code>CREATE EXTENSION postgis</code> in v11 database fails with the exact same error like the one above. I really enjoy working with PostgreSQL and PostGIS, yet there&#8217;s hardly something I fear more than trying to upgrade those two things&nbsp;together.</p>
-<aside>
+    <aside>
 
 <h3>More reading</h3>
     <ul>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-buffers-intersections-differences-and-collections/">PostGIS: Buffers, Intersections, Differences And&nbsp;Collections</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-ii/">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">II</span>)</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-count-line-self-intersections/">PostGIS: Count Line&nbsp;Self-Intersections</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/finding-polygons-lying-across-other-polygons-with-postgis/">Finding Polygons Lying across Other Polygons with&nbsp;PostGIS</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-iii/">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">III</span>)</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/">Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span></a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-polygon-from-centroid/">PostGIS Custom Function to Create Polygon from&nbsp;Centroid</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
 <script>
@@ -187,7 +194,7 @@ librt.so.1 <span class="o">=</span><span class="p">&amp;</span>gt<span class="p"
     drift.load('caacyauy5t6b');
 
 </script>
-<!-- End of Async Drift Code --></aside>
+<!-- End of Async Drift Code -->    </aside>
     </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.

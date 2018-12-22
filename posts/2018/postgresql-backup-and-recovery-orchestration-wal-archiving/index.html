@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html lang="en" prefix="og: http://ogp.me/ns#">
 <head>
-          <title>Michal Zimmermann | PostgreSQL Backup and Recovery Orchestration: WAL Archiving</title>
+        <title>Michal Zimmermann | PostgreSQL Backup and Recovery Orchestration: WAL Archiving</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
-        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link href="http://localhost:8000/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="http://localhost:8000/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
 
 
 
-    <meta name="tags" content="postgresql" />
-    <meta name="tags" content="linux" />
-    <meta property="og:image" content="https://www.zimmi.cz/posts/assets/postgresql-backup-and-recovery-orchestration/postgresql_recovery.jpg" />
-  <meta property="og:title" content="PostgreSQL Backup and Recovery Orchestration: WAL Archiving" />
-  <meta property="og:description" content="Just a very few of my day-to-day work tasks can be accomplished without PostgreSQL. For years I’ve been a (power) user of this wonderful relational database, knowing almost nothing about how its internals really work. Faced with the need to build a..." />
-  <meta property="og:url" content="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-wal-archiving/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
+<meta name="tags" content="postgresql" />
+<meta name="tags" content="linux" />
+<meta property="og:image" content="https://www.zimmi.cz/posts/assets/postgresql-backup-and-recovery-orchestration/postgresql_recovery.jpg" />
+<meta property="og:title" content="PostgreSQL Backup and Recovery Orchestration: WAL Archiving" />
+<meta property="og:description" content="Just a very few of my day-to-day work tasks can be accomplished without PostgreSQL. For years I’ve been a (power) user of this wonderful relational database, knowing almost nothing about how its internals really work. Faced with the need to build a..." />
+<meta property="og:url" content="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-wal-archiving/" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?6d23b170">
 </head>
 <body>
     <nav role="navigation">
@@ -24,6 +24,13 @@
             <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
             <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
             <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
+            <li>
+                <form class="search" name="x" action="//duckduckgo.com/" target="_blank">
+                    <input type="hidden" value="zimmi.cz/posts" name="sites"></input>
+                    <input class="search-input" type="search" placeholder="Search" name="q"></input>
+                    <input class="button" type="submit" value="Go"></input>
+                </form>
+            </li>
         </ul>
     </nav>
     <header>
@@ -33,10 +40,10 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-wal-archiving/" rel="bookmark" title="Permalink to PostgreSQL Backup and Recovery Orchestration: WAL Archiving">PostgreSQL Backup and Recovery Orchestration: <span class="caps">WAL</span>&nbsp;Archiving</a></h1>
     <aside><span>Feb 12, 2018</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+        <span>            <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>             <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>        </span>
+        <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
-<p>Just a very few of my day-to-day work tasks can be accomplished without PostgreSQL. For years I&#8217;ve been a (power) user of this wonderful relational database, knowing almost nothing about how its internals really work. Faced with the need to build a backup and recovery strategy, I&#8217;ve recently read up <em>a lot</em> on this&nbsp;topic.</p>
+    <p>Just a very few of my day-to-day work tasks can be accomplished without PostgreSQL. For years I&#8217;ve been a (power) user of this wonderful relational database, knowing almost nothing about how its internals really work. Faced with the need to build a backup and recovery strategy, I&#8217;ve recently read up <em>a lot</em> on this&nbsp;topic.</p>
 <p>As I don&#8217;t find it very odd for a <span class="caps">GIS</span> person to be given such an extraordinary task (nobody wants to lose the priceless spatial data, right?), I hope this series might shed light on how to prepare and manage the backup/recovery process to those, who are up to such a task. I won&#8217;t be discussing backup strategies based on <code>pg_backup</code> tool, as those don&#8217;t offer neither continuous archivation, nor point-in-time-recovery (<span class="caps">PITR</span>) - those two features disqualifies it as <a href="https://www.clevermaps.cz">CleverMaps</a> production backup&nbsp;strategy.</p>
 <p><strong>That leaves us with taking periodic base backups combined with continuous <span class="caps">WAL</span> archivation, as described&nbsp;below.</strong></p>
 <h2>Taking base&nbsp;backups</h2>
@@ -95,7 +102,7 @@ find <span class="nv">$CR_WAL_BACKUP_DIR</span> <span class="se">\</span>
 
 
 <p>Functional backups are crucial part of a solid backup/recovery system. They&#8217;re still just one half of that system, though. <strong>If not tested thoroughly</strong>, they&#8217;re even less than that. More on testing backups and recovering from failures next&nbsp;time.</p>
-<aside>
+    <aside>
 <h3>This post is part 1 of the "PostgreSQL Backup and Recovery Orchestration" series:</h3>
     <ol class="parts">
             <li>
@@ -114,8 +121,8 @@ find <span class="nv">$CR_WAL_BACKUP_DIR</span> <span class="se">\</span>
 
 <h3>More reading</h3>
     <ul>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-bash-automation/">PostgreSQL Backup and Recovery Orchestration: Bash&nbsp;Automation</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/">Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span></a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-bash-automation/">PostgreSQL Backup and Recovery Orchestration: Bash&nbsp;Automation</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/postgresql-remote-access/">PostgreSQL Remote&nbsp;Access</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-recovery/">PostgreSQL Backup and Recovery Orchestration:&nbsp;Recovery</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-systemd-automation/">PostgreSQL Backup and Recovery Orchestration: systemd&nbsp;Automation</a></li>
@@ -144,7 +151,7 @@ find <span class="nv">$CR_WAL_BACKUP_DIR</span> <span class="se">\</span>
     drift.load('caacyauy5t6b');
 
 </script>
-<!-- End of Async Drift Code --></aside>
+<!-- End of Async Drift Code -->    </aside>
     </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.

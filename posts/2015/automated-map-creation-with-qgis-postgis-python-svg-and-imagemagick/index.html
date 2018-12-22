@@ -1,24 +1,24 @@
 <!DOCTYPE html>
 <html lang="en" prefix="og: http://ogp.me/ns#">
 <head>
-          <title>Michal Zimmermann | Automated Map Creation With QGIS, PostGIS, Python, SVG and ImageMagick</title>
+        <title>Michal Zimmermann | Automated Map Creation With QGIS, PostGIS, Python, SVG and ImageMagick</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
-        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link href="http://localhost:8000/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="http://localhost:8000/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
 
 
 
-    <meta name="tags" content="qgis" />
-    <meta name="tags" content="postgis" />
-    <meta name="tags" content="python" />
-    <meta name="tags" content="svg" />
-    <meta name="tags" content="linux" />
-  <meta property="og:title" content="Automated Map Creation With QGIS, PostGIS, Python, SVG and ImageMagick" />
-  <meta property="og:description" content="As mentioned in QGIS Tips For Collaborative Mapping we’re in the middle of crop evaluation project at CleverMaps. With the QGIS workflow up and running, I’ve been focused on different QGIS related task: automatic map generation for land blocks that..." />
-  <meta property="og:url" content="https://www.zimmi.cz/posts/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
+<meta name="tags" content="qgis" />
+<meta name="tags" content="postgis" />
+<meta name="tags" content="python" />
+<meta name="tags" content="svg" />
+<meta name="tags" content="linux" />
+<meta property="og:title" content="Automated Map Creation With QGIS, PostGIS, Python, SVG and ImageMagick" />
+<meta property="og:description" content="As mentioned in QGIS Tips For Collaborative Mapping we’re in the middle of crop evaluation project at CleverMaps. With the QGIS workflow up and running, I’ve been focused on different QGIS related task: automatic map generation for land blocks that..." />
+<meta property="og:url" content="https://www.zimmi.cz/posts/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?6d23b170">
 </head>
 <body>
     <nav role="navigation">
@@ -26,6 +26,13 @@
             <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
             <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
             <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
+            <li>
+                <form class="search" name="x" action="//duckduckgo.com/" target="_blank">
+                    <input type="hidden" value="zimmi.cz/posts" name="sites"></input>
+                    <input class="search-input" type="search" placeholder="Search" name="q"></input>
+                    <input class="button" type="submit" value="Go"></input>
+                </form>
+            </li>
         </ul>
     </nav>
     <header>
@@ -35,10 +42,10 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/" rel="bookmark" title="Permalink to Automated Map Creation With QGIS, PostGIS, Python, SVG and ImageMagick">Automated Map Creation With <span class="caps">QGIS</span>, PostGIS, Python, <span class="caps">SVG</span> and&nbsp;ImageMagick</a></h1>
     <aside><span>Aug 9, 2015</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
+        <span>            <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">qgis</a>             <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>             <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>             <a class="tag-url" href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>             <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>        </span>
+        <span><a class="category-url" href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
     </aside>
-<p>As mentioned in <a href="https://www.zimmi.cz/posts/2015/qgis-tips-for-collaborative-mapping/"><span class="caps">QGIS</span> Tips For Collaborative Mapping</a> we&#8217;re in the middle of crop evaluation project at <a href="http://www.clevermaps.cz/">CleverMaps</a>.</p>
+    <p>As mentioned in <a href="https://www.zimmi.cz/posts/2015/qgis-tips-for-collaborative-mapping/"><span class="caps">QGIS</span> Tips For Collaborative Mapping</a> we&#8217;re in the middle of crop evaluation project at <a href="http://www.clevermaps.cz/">CleverMaps</a>.</p>
 <p>With the <span class="caps">QGIS</span> workflow up and running, I&#8217;ve been focused on different <span class="caps">QGIS</span> related task: <strong>automatic map generation</strong> for land blocks that meet certain conditions. The logic behind identifying such land blocks is as&nbsp;follows:</p>
 <ul>
 <li>if the original area and the measured one differ more than 0.5 %&nbsp;or</li>
@@ -176,14 +183,14 @@
 <h2>Conclusion</h2>
 <p>I created pretty efficient semi-automated workflow using several open source technologies that saves me a lot of work. Although <span class="caps">QGIS</span> has some minor pet peeves (scale with decimal places, not showing the entire feature, not substituting variables at times), it definitely makes boring map creation quite amusing. The more I work with big data / on big tasks, the more I find Linux a&nbsp;must-have.</p>
 <p>The whole process was done with <span class="caps">QGIS</span> 2.10, PostGIS 2.1, PostgreSQL 9.3, Python 2.7, ImageMagick&nbsp;6.7.</p>
-<aside>
+    <aside>
 
 <h3>More reading</h3>
     <ul>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/liftago-open-dataset-infographics/">Liftago Open Dataset&nbsp;Infographics</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-testing-your-code/"><span class="caps">QGIS</span> Plugin Development: Testing Your&nbsp;Code</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/">Serving Mapbox Vector Tiles with PostGIS, Nginx and Python&nbsp;Backend</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-attributetransfer-plugin/"><span class="caps">QGIS</span> Plugin Development: AttributeTransfer&nbsp;Plugin</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/">Serving Mapbox Vector Tiles with PostGIS, Nginx and Python&nbsp;Backend</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/">Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span></a></li>
     </ul>
 <!-- Start of Async Drift Code -->
@@ -210,7 +217,7 @@
     drift.load('caacyauy5t6b');
 
 </script>
-<!-- End of Async Drift Code --></aside>
+<!-- End of Async Drift Code -->    </aside>
     </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.

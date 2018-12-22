@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html lang="en" prefix="og: http://ogp.me/ns#">
 <head>
-          <title>Michal Zimmermann | QGIS Plugin Development: Testing Your Code</title>
+        <title>Michal Zimmermann | QGIS Plugin Development: Testing Your Code</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
-        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link href="http://localhost:8000/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="http://localhost:8000/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
 
 
 
-    <meta name="tags" content="python" />
-    <meta name="tags" content="QGIS" />
-  <meta property="og:title" content="QGIS Plugin Development: Testing Your Code" />
-  <meta property="og:description" content="Good news, everyone! The AttributeTransfer plugin has been approved for QGIS Python Plugins Repository. It’s available via QGIS Manage and Install Plugins menu. Feel free to download! Nevertheless, this post (the last in the series) covers QGIS plugin..." />
-  <meta property="og:url" content="https://www.zimmi.cz/posts/2017/qgis-plugin-development-testing-your-code/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
+<meta name="tags" content="python" />
+<meta name="tags" content="QGIS" />
+<meta property="og:title" content="QGIS Plugin Development: Testing Your Code" />
+<meta property="og:description" content="Good news, everyone! The AttributeTransfer plugin has been approved for QGIS Python Plugins Repository. It’s available via QGIS Manage and Install Plugins menu. Feel free to download! Nevertheless, this post (the last in the series) covers QGIS plugin..." />
+<meta property="og:url" content="https://www.zimmi.cz/posts/2017/qgis-plugin-development-testing-your-code/" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?6d23b170">
 </head>
 <body>
     <nav role="navigation">
@@ -23,6 +23,13 @@
             <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
             <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
             <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
+            <li>
+                <form class="search" name="x" action="//duckduckgo.com/" target="_blank">
+                    <input type="hidden" value="zimmi.cz/posts" name="sites"></input>
+                    <input class="search-input" type="search" placeholder="Search" name="q"></input>
+                    <input class="button" type="submit" value="Go"></input>
+                </form>
+            </li>
         </ul>
     </nav>
     <header>
@@ -32,10 +39,10 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-testing-your-code/" rel="bookmark" title="Permalink to QGIS Plugin Development: Testing Your Code"><span class="caps">QGIS</span> Plugin Development: Testing Your&nbsp;Code</a></h1>
     <aside><span>Nov 30, 2017</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">QGIS</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/qgis.html">QGIS</a></span>
+        <span>            <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>             <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">QGIS</a>        </span>
+        <span><a class="category-url" href="https://www.zimmi.cz/posts/category/qgis.html">QGIS</a></span>
     </aside>
-<p>Good news, everyone! The <a href="https://plugins.qgis.org/plugins/AttributeTransfer/">AttributeTransfer</a> plugin has been approved for <a href="https://plugins.qgis.org/plugins/"><span class="caps">QGIS</span> Python Plugins Repository</a>. It&#8217;s available via <span class="caps">QGIS</span> <em>Manage and Install Plugins</em> menu. Feel free to&nbsp;download!</p>
+    <p>Good news, everyone! The <a href="https://plugins.qgis.org/plugins/AttributeTransfer/">AttributeTransfer</a> plugin has been approved for <a href="https://plugins.qgis.org/plugins/"><span class="caps">QGIS</span> Python Plugins Repository</a>. It&#8217;s available via <span class="caps">QGIS</span> <em>Manage and Install Plugins</em> menu. Feel free to&nbsp;download!</p>
 <p>Nevertheless, this post (the last in the series) covers <span class="caps">QGIS</span> plugin testing rather than my personal feelings about the aforementioned&nbsp;success.</p>
 <h2>Testing means&nbsp;mocking</h2>
 <p>To test a <span class="caps">QGIS</span> plugin you need to simulate the environment it&#8217;s meant to run in. And that environment is obviously <span class="caps">QGIS</span> itself, yet it&#8217;s not feasible to launch <span class="caps">QGIS</span> every time you run a test. Luckily, <a href="https://github.com/zimmicz/qgis-attribute-transfer-plugin/blob/master/tests/utilities.py">there&#8217;s a great <code>QGIS</code> mock</a> that gets you going in no time (it completely slipped my mind where I found that piece of code&nbsp;though).</p>
@@ -151,7 +158,7 @@
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
 </pre></div>
-<aside>
+    <aside>
 <h3>This post is part 6 of the "QGIS Plugin Development" series:</h3>
     <ol class="parts">
             <li>
@@ -178,9 +185,9 @@
     <ul>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/"><span class="caps">QGIS</span> Plugin Development: Using Python&nbsp;Console</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/">Automated Map Creation With <span class="caps">QGIS</span>, PostGIS, Python, <span class="caps">SVG</span> and&nbsp;ImageMagick</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-attributetransfer-plugin/"><span class="caps">QGIS</span> Plugin Development: AttributeTransfer&nbsp;Plugin</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-creating-gui-with-qt-designer/"><span class="caps">QGIS</span> Plugin Development: Creating <span class="caps">GUI</span> with Qt&nbsp;Designer</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-getting-started/"><span class="caps">QGIS</span> Plugin Development: Getting&nbsp;Started</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/"><span class="caps">QGIS</span> Plugin Development: Finding Nearest&nbsp;Neighbors</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
 <script>
@@ -206,7 +213,7 @@
     drift.load('caacyauy5t6b');
 
 </script>
-<!-- End of Async Drift Code --></aside>
+<!-- End of Async Drift Code -->    </aside>
     </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.

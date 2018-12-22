@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html lang="en" prefix="og: http://ogp.me/ns#">
 <head>
-          <title>Michal Zimmermann | Using PostgreSQL To Update Outdated Map Links</title>
+        <title>Michal Zimmermann | Using PostgreSQL To Update Outdated Map Links</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
-        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link href="http://localhost:8000/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="http://localhost:8000/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
 
 
 
-    <meta name="tags" content="postgresql" />
-    <meta name="tags" content="regex" />
-  <meta property="og:title" content="Using PostgreSQL To Update Outdated Map Links" />
-  <meta property="og:description" content="We’ve rolled out completely new map GUI at edpp.cz built on top of OpenLayers 3. It looks great and has lots of functions both for BFU and power users. The only pitfall that came with moving away from OpenLayers 2 were remarkable differences in zoom..." />
-  <meta property="og:url" content="https://www.zimmi.cz/posts/2015/using-postgresql-to-update-outdated-map-links/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
+<meta name="tags" content="postgresql" />
+<meta name="tags" content="regex" />
+<meta property="og:title" content="Using PostgreSQL To Update Outdated Map Links" />
+<meta property="og:description" content="We’ve rolled out completely new map GUI at edpp.cz built on top of OpenLayers 3. It looks great and has lots of functions both for BFU and power users. The only pitfall that came with moving away from OpenLayers 2 were remarkable differences in zoom..." />
+<meta property="og:url" content="https://www.zimmi.cz/posts/2015/using-postgresql-to-update-outdated-map-links/" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?6d23b170">
 </head>
 <body>
     <nav role="navigation">
@@ -23,6 +23,13 @@
             <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
             <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
             <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
+            <li>
+                <form class="search" name="x" action="//duckduckgo.com/" target="_blank">
+                    <input type="hidden" value="zimmi.cz/posts" name="sites"></input>
+                    <input class="search-input" type="search" placeholder="Search" name="q"></input>
+                    <input class="button" type="submit" value="Go"></input>
+                </form>
+            </li>
         </ul>
     </nav>
     <header>
@@ -32,10 +39,10 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/using-postgresql-to-update-outdated-map-links/" rel="bookmark" title="Permalink to Using PostgreSQL To Update Outdated Map Links">Using PostgreSQL To Update Outdated Map&nbsp;Links</a></h1>
     <aside><span>Feb 16, 2015</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/regex.html">regex</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+        <span>            <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>             <a class="tag-url" href="https://www.zimmi.cz/posts/tag/regex.html">regex</a>        </span>
+        <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
-<p><a href="http://www.edpp.cz/pdb_mapa-povodnoveho-planu-mesta/">We&#8217;ve rolled out</a> completely new map <span class="caps">GUI</span> at <a href="http://edpp.cz">edpp.cz</a> built on top of <a href="http://ol3js.org">OpenLayers 3</a>. It looks great and has lots of functions both for <span class="caps">BFU</span> and power users. The only pitfall that came with moving away from OpenLayers 2 were remarkable differences in zoom levels between the old map and the new&nbsp;one.</p>
+    <p><a href="http://www.edpp.cz/pdb_mapa-povodnoveho-planu-mesta/">We&#8217;ve rolled out</a> completely new map <span class="caps">GUI</span> at <a href="http://edpp.cz">edpp.cz</a> built on top of <a href="http://ol3js.org">OpenLayers 3</a>. It looks great and has lots of functions both for <span class="caps">BFU</span> and power users. The only pitfall that came with moving away from OpenLayers 2 were remarkable differences in zoom levels between the old map and the new&nbsp;one.</p>
 <p>Each of our maps is defined by our admins (center, zoom level, layers) at the map creation. Lots of links calling different views of map are created as well. They take form of <code>http://edpp.cz/some-map?0=0&amp;1=0...zoom=5</code>. That <code>zoom=&lt;Number&gt;</code> started causing troubles immediately after the map switch. No way my workmates would update them one by one as there were ~4,500 of them. Sounds like a task for little bit of regular expressions and some <span class="caps">SQL</span>&nbsp;updates.</p>
 <div class="highlight"><pre><span></span>UPDATE table
     SET column = regexp_replace(column, &#39;zoom=\d&#39;, &#39;zoom=&#39; || subquery.zoom, &#39;g&#39;)
@@ -52,15 +59,15 @@
 
 
 <p>That&#8217;s what I&#8217;ve come up with. It basically extracts the zoom level from the link, adds number two to its value and writes it back to the&nbsp;string.</p>
-<aside>
+    <aside>
 
 <h3>More reading</h3>
     <ul>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-buffers-intersections-differences-and-collections/">PostGIS: Buffers, Intersections, Differences And&nbsp;Collections</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/upgrading-postgresql-95-to-postgresql-96-with-postgis/">Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with&nbsp;PostGIS</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-ii/">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">II</span>)</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-count-line-self-intersections/">PostGIS: Count Line&nbsp;Self-Intersections</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part&nbsp;I)</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/finding-polygons-lying-across-other-polygons-with-postgis/">Finding Polygons Lying across Other Polygons with&nbsp;PostGIS</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/syncing-two-postgresql-databases-faster/">Syncing Two PostgreSQL Databases&nbsp;Faster</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
 <script>
@@ -86,7 +93,7 @@
     drift.load('caacyauy5t6b');
 
 </script>
-<!-- End of Async Drift Code --></aside>
+<!-- End of Async Drift Code -->    </aside>
     </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.

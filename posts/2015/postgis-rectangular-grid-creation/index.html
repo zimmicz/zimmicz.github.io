@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html lang="en" prefix="og: http://ogp.me/ns#">
 <head>
-          <title>Michal Zimmermann | PostGIS: Rectangular Grid Creation</title>
+        <title>Michal Zimmermann | PostGIS: Rectangular Grid Creation</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
-        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link href="http://localhost:8000/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="http://localhost:8000/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
 
 
 
-    <meta name="tags" content="postgresql" />
-    <meta name="tags" content="postgis" />
-  <meta property="og:title" content="PostGIS: Rectangular Grid Creation" />
-  <meta property="og:description" content="Creating a rectangular grid to cover a given extent with same sized cells is one of the basic GIS tasks I’ve had to solve several times so far. I used QGIS or some Python to give me a bunch of INSERT statements to run in PostGIS database, now I’ve..." />
-  <meta property="og:url" content="https://www.zimmi.cz/posts/2015/postgis-rectangular-grid-creation/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
+<meta name="tags" content="postgresql" />
+<meta name="tags" content="postgis" />
+<meta property="og:title" content="PostGIS: Rectangular Grid Creation" />
+<meta property="og:description" content="Creating a rectangular grid to cover a given extent with same sized cells is one of the basic GIS tasks I’ve had to solve several times so far. I used QGIS or some Python to give me a bunch of INSERT statements to run in PostGIS database, now I’ve..." />
+<meta property="og:url" content="https://www.zimmi.cz/posts/2015/postgis-rectangular-grid-creation/" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?6d23b170">
 </head>
 <body>
     <nav role="navigation">
@@ -23,6 +23,13 @@
             <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
             <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
             <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
+            <li>
+                <form class="search" name="x" action="//duckduckgo.com/" target="_blank">
+                    <input type="hidden" value="zimmi.cz/posts" name="sites"></input>
+                    <input class="search-input" type="search" placeholder="Search" name="q"></input>
+                    <input class="button" type="submit" value="Go"></input>
+                </form>
+            </li>
         </ul>
     </nav>
     <header>
@@ -32,10 +39,10 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/postgis-rectangular-grid-creation/" rel="bookmark" title="Permalink to PostGIS: Rectangular Grid Creation">PostGIS: Rectangular Grid&nbsp;Creation</a></h1>
     <aside><span>Mar 24, 2015</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+        <span>            <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>             <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>        </span>
+        <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
-<p>Creating a rectangular grid to cover a given extent with same sized cells is one of the basic <span class="caps">GIS</span> tasks I&#8217;ve had to solve several times so far. I used <span class="caps">QGIS</span> or some Python to give me a bunch of <code>INSERT</code> statements to run in PostGIS database, now I&#8217;ve come with a final solution at&nbsp;last.</p>
+    <p>Creating a rectangular grid to cover a given extent with same sized cells is one of the basic <span class="caps">GIS</span> tasks I&#8217;ve had to solve several times so far. I used <span class="caps">QGIS</span> or some Python to give me a bunch of <code>INSERT</code> statements to run in PostGIS database, now I&#8217;ve come with a final solution at&nbsp;last.</p>
 <div class="highlight"><pre><span></span><span class="nt">CREATE</span> <span class="nt">OR</span> <span class="nt">REPLACE</span> <span class="nt">FUNCTION</span> <span class="nt">cm_grid</span><span class="o">(</span>
     <span class="nt">blx</span> <span class="nt">float8</span><span class="o">,</span> <span class="nt">--</span> <span class="nt">bottom</span> <span class="nt">left</span> <span class="nt">x</span> <span class="nt">coordinate</span>
     <span class="nt">bly</span> <span class="nt">float8</span><span class="o">,</span> <span class="nt">--</span> <span class="nt">bottom</span> <span class="nt">left</span> <span class="nt">y</span> <span class="nt">coordinate</span>
@@ -130,15 +137,15 @@ FROM cm_grid(-675593.69, -1057711.19, -672254.69, -1054849.19, 333.47, 333.47);
 <li>each cell is indexed with <code>row</code> and <code>col</code> number</li>
 </ul>
 <p>The messy <code>CASE</code> statement makes sure both <code>row</code> and <code>col</code> are of the same length. I used <code>array_to_string</code> for better readability. It might not be the fastest way, didn&#8217;t do any&nbsp;benchmarks.</p>
-<aside>
+    <aside>
 
 <h3>More reading</h3>
     <ul>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-buffers-intersections-differences-and-collections/">PostGIS: Buffers, Intersections, Differences And&nbsp;Collections</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-ii/">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">II</span>)</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-count-line-self-intersections/">PostGIS: Count Line&nbsp;Self-Intersections</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/finding-polygons-lying-across-other-polygons-with-postgis/">Finding Polygons Lying across Other Polygons with&nbsp;PostGIS</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-iii/">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">III</span>)</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/">Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span></a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-polygon-from-centroid/">PostGIS Custom Function to Create Polygon from&nbsp;Centroid</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
 <script>
@@ -164,7 +171,7 @@ FROM cm_grid(-675593.69, -1057711.19, -672254.69, -1054849.19, 333.47, 333.47);
     drift.load('caacyauy5t6b');
 
 </script>
-<!-- End of Async Drift Code --></aside>
+<!-- End of Async Drift Code -->    </aside>
     </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.

@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html lang="en" prefix="og: http://ogp.me/ns#">
 <head>
-          <title>Michal Zimmermann | Geoserver Printing With Mapfish</title>
+        <title>Michal Zimmermann | Geoserver Printing With Mapfish</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
-        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link href="http://localhost:8000/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="http://localhost:8000/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
 
 
 
-    <meta name="tags" content="geoserver" />
-  <meta property="og:title" content="Geoserver Printing With Mapfish" />
-  <meta property="og:description" content="Printing a web map requires a lot more than doing Ctrl + P. MapFish seems to be the best option to use with Geoserver, and it comes ready as an extension. If you installed the module properly, you should be seeing general info at..." />
-  <meta property="og:url" content="https://www.zimmi.cz/posts/2014/geoserver-printing-with-mapfish/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
+<meta name="tags" content="geoserver" />
+<meta property="og:title" content="Geoserver Printing With Mapfish" />
+<meta property="og:description" content="Printing a web map requires a lot more than doing Ctrl + P. MapFish seems to be the best option to use with Geoserver, and it comes ready as an extension. If you installed the module properly, you should be seeing general info at..." />
+<meta property="og:url" content="https://www.zimmi.cz/posts/2014/geoserver-printing-with-mapfish/" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?6d23b170">
 </head>
 <body>
     <nav role="navigation">
@@ -22,6 +22,13 @@
             <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
             <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
             <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
+            <li>
+                <form class="search" name="x" action="//duckduckgo.com/" target="_blank">
+                    <input type="hidden" value="zimmi.cz/posts" name="sites"></input>
+                    <input class="search-input" type="search" placeholder="Search" name="q"></input>
+                    <input class="button" type="submit" value="Go"></input>
+                </form>
+            </li>
         </ul>
     </nav>
     <header>
@@ -31,10 +38,10 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2014/geoserver-printing-with-mapfish/" rel="bookmark" title="Permalink to Geoserver Printing With Mapfish">Geoserver Printing With&nbsp;Mapfish</a></h1>
     <aside><span>Sep 2, 2014</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/geoserver.html">geoserver</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+        <span>            <a class="tag-url" href="https://www.zimmi.cz/posts/tag/geoserver.html">geoserver</a>        </span>
+        <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
     </aside>
-<p>Printing a web map requires a lot more than doing <code>Ctrl + P</code>. <a href="http://mapfish.org/">MapFish</a> seems to be the best option to use with Geoserver, and it comes <a href="http://docs.geoserver.org/stable/en/user/community/printing/">ready as an extension</a>. If you installed the module properly, you should be seeing general info at <a href="http://localhost:8080/geoserver/pdf/info.json">http://localhost:8080/geoserver/pdf/info.json</a>. You&#8217;ll find a <code>config.yaml</code> in <code>data_dir/printing</code>.</p>
+    <p>Printing a web map requires a lot more than doing <code>Ctrl + P</code>. <a href="http://mapfish.org/">MapFish</a> seems to be the best option to use with Geoserver, and it comes <a href="http://docs.geoserver.org/stable/en/user/community/printing/">ready as an extension</a>. If you installed the module properly, you should be seeing general info at <a href="http://localhost:8080/geoserver/pdf/info.json">http://localhost:8080/geoserver/pdf/info.json</a>. You&#8217;ll find a <code>config.yaml</code> in <code>data_dir/printing</code>.</p>
 
 <p>MapFish lets you access three different&nbsp;points:</p>
 
@@ -70,7 +77,7 @@
 <p><em>The bigger paper you use, the smaller <span class="caps">DPI</span> is available</em>, that&#8217;s what I found out messing around with MapFish settings. This means that we&#8217;re using 200 <span class="caps">DPI</span> top for A2 layout and 90 <span class="caps">DPI</span> for A1 and A0 layout,&nbsp;respectively.</p>
 
 <p>JQuery takes care of sending <span class="caps">POST</span> request and fetching the response. <a href="http://www.edpp.cz/poli_mapa-povodnoveho-planu-mesta/">See it in action</a> (Choose <em>Nástroje</em> and <em>Tisknout</em> for&nbsp;printing).</p>
-<aside>
+    <aside>
 
 <h3>More reading</h3>
     <ul>
@@ -100,7 +107,7 @@
     drift.load('caacyauy5t6b');
 
 </script>
-<!-- End of Async Drift Code --></aside>
+<!-- End of Async Drift Code -->    </aside>
     </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.

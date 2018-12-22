@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html lang="en" prefix="og: http://ogp.me/ns#">
 <head>
-          <title>Michal Zimmermann | Routing with GRASS GIS: Catchment Area Calculation</title>
+        <title>Michal Zimmermann | Routing with GRASS GIS: Catchment Area Calculation</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
-        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link href="http://localhost:8000/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="http://localhost:8000/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
 
 
 
-    <meta name="tags" content="grass" />
-    <meta property="og:image" content="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/isolines.png" />
-  <meta property="og:title" content="Routing with GRASS GIS: Catchment Area Calculation" />
-  <meta property="og:description" content="I got my hands on pgRouting in the last post and I’m about to do the same with GRASS GIS in this one. GRASS GIS stores the topology for the native vector format by default, which makes it easy to use for the network analysis. All the commands..." />
-  <meta property="og:url" content="https://www.zimmi.cz/posts/2017/routing-with-grass-gis-catchment-area-calculation/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
+<meta name="tags" content="grass" />
+<meta property="og:image" content="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/isolines.png" />
+<meta property="og:title" content="Routing with GRASS GIS: Catchment Area Calculation" />
+<meta property="og:description" content="I got my hands on pgRouting in the last post and I’m about to do the same with GRASS GIS in this one. GRASS GIS stores the topology for the native vector format by default, which makes it easy to use for the network analysis. All the commands..." />
+<meta property="og:url" content="https://www.zimmi.cz/posts/2017/routing-with-grass-gis-catchment-area-calculation/" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?6d23b170">
 </head>
 <body>
     <nav role="navigation">
@@ -23,6 +23,13 @@
             <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
             <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
             <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
+            <li>
+                <form class="search" name="x" action="//duckduckgo.com/" target="_blank">
+                    <input type="hidden" value="zimmi.cz/posts" name="sites"></input>
+                    <input class="search-input" type="search" placeholder="Search" name="q"></input>
+                    <input class="button" type="submit" value="Go"></input>
+                </form>
+            </li>
         </ul>
     </nav>
     <header>
@@ -32,10 +39,10 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2017/routing-with-grass-gis-catchment-area-calculation/" rel="bookmark" title="Permalink to Routing with GRASS GIS: Catchment Area Calculation">Routing with <span class="caps">GRASS</span> <span class="caps">GIS</span>: Catchment Area&nbsp;Calculation</a></h1>
     <aside><span>Apr 20, 2017</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/grass.html">grass</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
+        <span>            <a class="tag-url" href="https://www.zimmi.cz/posts/tag/grass.html">grass</a>        </span>
+        <span><a class="category-url" href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
     </aside>
-<p>I got my hands on <a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/">pgRouting</a> in the last post and I&#8217;m about to do the same with <span class="caps">GRASS</span> <span class="caps">GIS</span> in this&nbsp;one.</p>
+    <p>I got my hands on <a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/">pgRouting</a> in the last post and I&#8217;m about to do the same with <span class="caps">GRASS</span> <span class="caps">GIS</span> in this&nbsp;one.</p>
 <p><span class="caps">GRASS</span> <span class="caps">GIS</span> stores the topology for the native vector format by default, which makes it easy to use for the network analysis. All the commands associated with the network analysis can be found in the <code>v.net</code> family. The ones I&#8217;m going to discuss in this post are <code>v.net</code> itself, <code>v.net.path</code>, <code>.v.net.alloc</code> and <code>v.net.iso</code>,&nbsp;respectively.</p>
 <h2>Data</h2>
 <p>I&#8217;m going to use the roads data <a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/">from the previous post</a> together with some random points used as catchment areas&nbsp;centers.</p>
@@ -100,7 +107,7 @@ v.net <span class="nv">input</span><span class="o">=</span>network <span class="
 <li>Bridges and tunnels might be an&nbsp;issue.</li>
 <li>Personally, I find <span class="caps">GRASS</span> <span class="caps">GIS</span> easier to use for the network analysis compared to&nbsp;pgRouting.</li>
 </ul>
-<aside>
+    <aside>
 
 <h3>More reading</h3>
     <ul>
@@ -130,7 +137,7 @@ v.net <span class="nv">input</span><span class="o">=</span>network <span class="
     drift.load('caacyauy5t6b');
 
 </script>
-<!-- End of Async Drift Code --></aside>
+<!-- End of Async Drift Code -->    </aside>
     </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.

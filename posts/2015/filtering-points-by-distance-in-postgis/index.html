@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html lang="en" prefix="og: http://ogp.me/ns#">
 <head>
-          <title>Michal Zimmermann | Filtering points by distance in PostGIS</title>
+        <title>Michal Zimmermann | Filtering points by distance in PostGIS</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
-        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link href="http://localhost:8000/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="http://localhost:8000/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
 
 
 
-    <meta name="tags" content="postgis" />
-  <meta property="og:title" content="Filtering points by distance in PostGIS" />
-  <meta property="og:description" content="Filtering really big (millions of rows) point datasets by distance might get catchy when solved with wrong PostGIS functions. Without spatial indexes PostGIS would take ages to finish such task. Someone over StackExchange asked why the next query had..." />
-  <meta property="og:url" content="https://www.zimmi.cz/posts/2015/filtering-points-by-distance-in-postgis/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
+<meta name="tags" content="postgis" />
+<meta property="og:title" content="Filtering points by distance in PostGIS" />
+<meta property="og:description" content="Filtering really big (millions of rows) point datasets by distance might get catchy when solved with wrong PostGIS functions. Without spatial indexes PostGIS would take ages to finish such task. Someone over StackExchange asked why the next query had..." />
+<meta property="og:url" content="https://www.zimmi.cz/posts/2015/filtering-points-by-distance-in-postgis/" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?6d23b170">
 </head>
 <body>
     <nav role="navigation">
@@ -22,6 +22,13 @@
             <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
             <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
             <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
+            <li>
+                <form class="search" name="x" action="//duckduckgo.com/" target="_blank">
+                    <input type="hidden" value="zimmi.cz/posts" name="sites"></input>
+                    <input class="search-input" type="search" placeholder="Search" name="q"></input>
+                    <input class="button" type="submit" value="Go"></input>
+                </form>
+            </li>
         </ul>
     </nav>
     <header>
@@ -31,10 +38,10 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/filtering-points-by-distance-in-postgis/" rel="bookmark" title="Permalink to Filtering points by distance in PostGIS">Filtering points by distance in&nbsp;PostGIS</a></h1>
     <aside><span>Jul 21, 2015</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+        <span>            <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>        </span>
+        <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
-<p>Filtering really big (millions of rows) point datasets by distance might get catchy when solved with wrong PostGIS functions. Without spatial indexes PostGIS would take ages to finish such&nbsp;task.</p>
+    <p>Filtering really big (millions of rows) point datasets by distance might get catchy when solved with wrong PostGIS functions. Without spatial indexes PostGIS would take ages to finish such&nbsp;task.</p>
 <p><a href="https://gis.stackexchange.com/questions/148184/why-the-execution-of-a-query-is-very-slow-using-postgis">Someone over StackExchange asked</a> why the next query had been running for 15 hours (!) with no&nbsp;result:</p>
 <div class="highlight"><pre><span></span><span class="k">SELECT</span>
     <span class="n">a</span><span class="p">.</span><span class="n">gid</span><span class="p">,</span>
@@ -85,15 +92,15 @@
 <li>The outer <code>WHERE</code> clause throws away all the points closer than 500 meters. Remember, we already got only those not further than 2,000 meters from the previous&nbsp;step.</li>
 </ol>
 <p>It took PostGIS 1060545,590 ms (~ 17 minutes) on my Quad-Core Intel® Core™ i5-4210M <span class="caps">CPU</span> @ 2.60GHz, 4 <span class="caps">GB</span> <span class="caps">RAM</span>, 500 <span class="caps">GB</span> <span class="caps">SSD</span> hard drive, PostgreSQL 9.3 and PostGIS 2.1 with two point datasets having 4M and 300K rows,&nbsp;respectively.</p>
-<aside>
+    <aside>
 
 <h3>More reading</h3>
     <ul>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-iii/">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">III</span>)</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-rectangular-grid-creation/">PostGIS: Rectangular Grid&nbsp;Creation</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/dead-simple-random-points-in-polygons-with-postgis/">Dead Simple Random Points in Polygons with&nbsp;PostGIS</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/postgis-case-study-vozejkmap-open-data-part-i/">PostGIS Case Study: VozejkMap Open Data (Part&nbsp;I)</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-ii/">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">II</span>)</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/centos-postgis-upgrade-hell-yet-again">CentOS PostGIS Upgrade Hell&#8230; Yet&nbsp;Again</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/">Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span></a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/postgis-as-a-mapbox-vector-tiles-generator/">PostGIS as a Mapbox Vector Tiles&nbsp;generator</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
 <script>
@@ -119,7 +126,7 @@
     drift.load('caacyauy5t6b');
 
 </script>
-<!-- End of Async Drift Code --></aside>
+<!-- End of Async Drift Code -->    </aside>
     </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.

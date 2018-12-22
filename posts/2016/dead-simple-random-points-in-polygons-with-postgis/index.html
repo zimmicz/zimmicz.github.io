@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html lang="en" prefix="og: http://ogp.me/ns#">
 <head>
-          <title>Michal Zimmermann | Dead Simple Random Points in Polygons with PostGIS</title>
+        <title>Michal Zimmermann | Dead Simple Random Points in Polygons with PostGIS</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
-        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link href="http://localhost:8000/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="http://localhost:8000/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
 
 
 
-    <meta name="tags" content="postgis" />
-    <meta name="tags" content="postgresql" />
-    <meta name="tags" content="sql" />
-  <meta property="og:title" content="Dead Simple Random Points in Polygons with PostGIS" />
-  <meta property="og:description" content="Since PostgreSQL 9.3 there has been a handy little keyword called LATERAL, which - combined with JOIN - might rock your GIS world in a second. To keep it simple, a LATERAL JOIN enables a subquery in the FROM part of a query to reference columns from..." />
-  <meta property="og:url" content="https://www.zimmi.cz/posts/2016/dead-simple-random-points-in-polygons-with-postgis/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
+<meta name="tags" content="postgis" />
+<meta name="tags" content="postgresql" />
+<meta name="tags" content="sql" />
+<meta property="og:title" content="Dead Simple Random Points in Polygons with PostGIS" />
+<meta property="og:description" content="Since PostgreSQL 9.3 there has been a handy little keyword called LATERAL, which - combined with JOIN - might rock your GIS world in a second. To keep it simple, a LATERAL JOIN enables a subquery in the FROM part of a query to reference columns from..." />
+<meta property="og:url" content="https://www.zimmi.cz/posts/2016/dead-simple-random-points-in-polygons-with-postgis/" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?6d23b170">
 </head>
 <body>
     <nav role="navigation">
@@ -24,6 +24,13 @@
             <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
             <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
             <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
+            <li>
+                <form class="search" name="x" action="//duckduckgo.com/" target="_blank">
+                    <input type="hidden" value="zimmi.cz/posts" name="sites"></input>
+                    <input class="search-input" type="search" placeholder="Search" name="q"></input>
+                    <input class="button" type="submit" value="Go"></input>
+                </form>
+            </li>
         </ul>
     </nav>
     <header>
@@ -33,10 +40,10 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2016/dead-simple-random-points-in-polygons-with-postgis/" rel="bookmark" title="Permalink to Dead Simple Random Points in Polygons with PostGIS">Dead Simple Random Points in Polygons with&nbsp;PostGIS</a></h1>
     <aside><span>Aug 3, 2016</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+        <span>            <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>             <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>             <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>        </span>
+        <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
-<p>Since PostgreSQL 9.3 there has been a handy little keyword called <code>LATERAL</code>, which - combined with <code>JOIN</code> - might rock your <span class="caps">GIS</span> world in a second. To keep it simple, a <code>LATERAL JOIN</code> enables a subquery in the <code>FROM</code> part of a query to reference columns from preceding expressions in the <code>FROM</code> list. What the&nbsp;heck?</p>
+    <p>Since PostgreSQL 9.3 there has been a handy little keyword called <code>LATERAL</code>, which - combined with <code>JOIN</code> - might rock your <span class="caps">GIS</span> world in a second. To keep it simple, a <code>LATERAL JOIN</code> enables a subquery in the <code>FROM</code> part of a query to reference columns from preceding expressions in the <code>FROM</code> list. What the&nbsp;heck?</p>
 <p>Imagine that not so unusual request to <strong>generate random points in polygons</strong> (something I needed to do today). Do it automatically without your favorite piece of desktop <span class="caps">GIS</span>&nbsp;software.</p>
 <p>It is pretty easy using <code>LATERAL JOIN</code>:</p>
 <div class="highlight"><pre><span></span><span class="k">SELECT</span>
@@ -109,14 +116,14 @@
 
 <p>The inner <code>SELECT</code> calculates random points based on the extent of the polygon. Note it directly calls <code>a.geom</code>, a value that comes from the previous <code>SELECT</code>! The <code>LATERAL JOIN</code> part is thus run for every row of the previous <code>SELECT</code> statement inside <code>FROM</code> part of the query. This means it will return 201 points for each of the two polygons (run the query inside <span class="caps">QGIS</span> to see the&nbsp;result).</p>
 <p>Note all the points fall inside the polygons by accident, because they are <strong>square</strong>. Otherwise a <code>ST_Contains</code> or <code>ST_Within</code> should be used inside the outermost <code>WHERE</code> query to filter outliers. This part could use some&nbsp;tweaking.</p>
-<aside>
+    <aside>
 
 <h3>More reading</h3>
     <ul>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/finding-polygons-lying-across-other-polygons-with-postgis/">Finding Polygons Lying across Other Polygons with&nbsp;PostGIS</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-polygon-from-centroid/">PostGIS Custom Function to Create Polygon from&nbsp;Centroid</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-wind-rose/">PostGIS Custom Function to Create Wind&nbsp;Rose</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/subdivide-and-conquer-effective-spatial-indexes-in-postgis/">Subdivide and Conquer: Effective Spatial Indexes in&nbsp;PostGIS</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-wind-rose/">PostGIS Custom Function to Create Wind&nbsp;Rose</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-buffers-intersections-differences-and-collections/">PostGIS: Buffers, Intersections, Differences And&nbsp;Collections</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
@@ -143,7 +150,7 @@
     drift.load('caacyauy5t6b');
 
 </script>
-<!-- End of Async Drift Code --></aside>
+<!-- End of Async Drift Code -->    </aside>
     </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.

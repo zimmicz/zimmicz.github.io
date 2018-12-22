@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html lang="en" prefix="og: http://ogp.me/ns#">
 <head>
-          <title>Michal Zimmermann | Animating SVG Maps With SMIL</title>
+        <title>Michal Zimmermann | Animating SVG Maps With SMIL</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
-        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link href="http://localhost:8000/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="http://localhost:8000/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
 
 
 
-    <meta name="tags" content="svg" />
-    <meta name="tags" content="smil" />
-  <meta property="og:title" content="Animating SVG Maps With SMIL" />
-  <meta property="og:description" content="Using SVG to build web maps have both pros and cons and to be honest I don’t know any serious map/GIS project built on top of SVG. However, as a part of my job at university, I was forced to use both SVG and SMIL to produce animated web map (see the..." />
-  <meta property="og:url" content="https://www.zimmi.cz/posts/2015/animating-svg-maps-with-smil/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
+<meta name="tags" content="svg" />
+<meta name="tags" content="smil" />
+<meta property="og:title" content="Animating SVG Maps With SMIL" />
+<meta property="og:description" content="Using SVG to build web maps have both pros and cons and to be honest I don’t know any serious map/GIS project built on top of SVG. However, as a part of my job at university, I was forced to use both SVG and SMIL to produce animated web map (see the..." />
+<meta property="og:url" content="https://www.zimmi.cz/posts/2015/animating-svg-maps-with-smil/" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?6d23b170">
 </head>
 <body>
     <nav role="navigation">
@@ -23,6 +23,13 @@
             <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
             <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
             <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
+            <li>
+                <form class="search" name="x" action="//duckduckgo.com/" target="_blank">
+                    <input type="hidden" value="zimmi.cz/posts" name="sites"></input>
+                    <input class="search-input" type="search" placeholder="Search" name="q"></input>
+                    <input class="button" type="submit" value="Go"></input>
+                </form>
+            </li>
         </ul>
     </nav>
     <header>
@@ -32,10 +39,10 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/animating-svg-maps-with-smil/" rel="bookmark" title="Permalink to Animating SVG Maps With SMIL">Animating <span class="caps">SVG</span> Maps With <span class="caps">SMIL</span></a></h1>
     <aside><span>Apr 29, 2015</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/smil.html">smil</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/web-maps.html">web maps</a></span>
+        <span>            <a class="tag-url" href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>             <a class="tag-url" href="https://www.zimmi.cz/posts/tag/smil.html">smil</a>        </span>
+        <span><a class="category-url" href="https://www.zimmi.cz/posts/category/web-maps.html">web maps</a></span>
     </aside>
-<p>Using <span class="caps">SVG</span> to build web maps have both pros and cons and to be honest I don&#8217;t know any <em>serious</em> map/<span class="caps">GIS</span> project built on top of <span class="caps">SVG</span>. However, as a part of my job at university, I was forced to use both <span class="caps">SVG</span> and <span class="caps">SMIL</span> to produce animated web map (see the small version below or the big one at <a href="https://zimmicz.github.io/svg-smil-airplanes/map.svg">GitHub</a>) and I&#8217;d like to share my&nbsp;findings.</p>
+    <p>Using <span class="caps">SVG</span> to build web maps have both pros and cons and to be honest I don&#8217;t know any <em>serious</em> map/<span class="caps">GIS</span> project built on top of <span class="caps">SVG</span>. However, as a part of my job at university, I was forced to use both <span class="caps">SVG</span> and <span class="caps">SMIL</span> to produce animated web map (see the small version below or the big one at <a href="https://zimmicz.github.io/svg-smil-airplanes/map.svg">GitHub</a>) and I&#8217;d like to share my&nbsp;findings.</p>
 <p><object width="400" data="https://zimmicz.github.io/svg-smil-airplanes/map.svg" type="image/svg+xml"></object></p>
 <h2>Data&nbsp;preprocessing</h2>
 <p>I chose <a href="http://www.naturalearthdata.com/">Natural Earth dataset</a> both for basemap and thematic&nbsp;layer:</p>
@@ -229,7 +236,7 @@
 
 
 <p><span class="caps">SMIL</span> with <span class="caps">SVG</span> seems to be interesting option for web map animation, a bit lengthy though. Syncing animations can easily become pain in the ass (<a href="https://stackoverflow.com/questions/29897355/svg-smil-animatemotion-only-triggers-once/">see StackOverflow thread</a>). Never call your function <code>animate</code> - there is namesake function defined in <a href="https://w3c.github.io/web-animations/">Web Animations <span class="caps">API</span></a> that makes animation crash in Chrome. <code>&lt;animateMotion /&gt;</code> is a great tool to animate elements along&nbsp;path.</p>
-<aside>
+    <aside>
 
 <h3>More reading</h3>
     <ul>
@@ -263,7 +270,7 @@
     drift.load('caacyauy5t6b');
 
 </script>
-<!-- End of Async Drift Code --></aside>
+<!-- End of Async Drift Code -->    </aside>
     </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.

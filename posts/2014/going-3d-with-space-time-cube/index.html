@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html lang="en" prefix="og: http://ogp.me/ns#">
 <head>
-          <title>Michal Zimmermann | Going 3D With Space Time Cube</title>
+        <title>Michal Zimmermann | Going 3D With Space Time Cube</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
-        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link href="http://localhost:8000/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="http://localhost:8000/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
 
 
 
-    <meta name="tags" content="python" />
-    <meta name="tags" content="twitter" />
-  <meta property="og:title" content="Going 3D With Space Time Cube" />
-  <meta property="og:description" content="Seeing Anita’s space-time cube back in 2013 was a moment of woooow for me. I’ve been interested in unusual ways of displaying data ever since I started studying GIS and this one was just great. How the hell did she make it?!, I thought back then. And..." />
-  <meta property="og:url" content="https://www.zimmi.cz/posts/2014/going-3d-with-space-time-cube/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
+<meta name="tags" content="python" />
+<meta name="tags" content="twitter" />
+<meta property="og:title" content="Going 3D With Space Time Cube" />
+<meta property="og:description" content="Seeing Anita’s space-time cube back in 2013 was a moment of woooow for me. I’ve been interested in unusual ways of displaying data ever since I started studying GIS and this one was just great. How the hell did she make it?!, I thought back then. And..." />
+<meta property="og:url" content="https://www.zimmi.cz/posts/2014/going-3d-with-space-time-cube/" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?6d23b170">
 </head>
 <body>
     <nav role="navigation">
@@ -23,6 +23,13 @@
             <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
             <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
             <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
+            <li>
+                <form class="search" name="x" action="//duckduckgo.com/" target="_blank">
+                    <input type="hidden" value="zimmi.cz/posts" name="sites"></input>
+                    <input class="search-input" type="search" placeholder="Search" name="q"></input>
+                    <input class="button" type="submit" value="Go"></input>
+                </form>
+            </li>
         </ul>
     </nav>
     <header>
@@ -32,10 +39,10 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2014/going-3d-with-space-time-cube/" rel="bookmark" title="Permalink to Going 3D With Space Time Cube">Going 3D With Space Time&nbsp;Cube</a></h1>
     <aside><span>Sep 2, 2014</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/twitter.html">twitter</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+        <span>            <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>             <a class="tag-url" href="https://www.zimmi.cz/posts/tag/twitter.html">twitter</a>        </span>
+        <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
     </aside>
-<p>Seeing <a href="http://anitagraser.com/2012/08/05/space-time-cubes-exploring-twitter-streams-3/">Anita&#8217;s space-time cube</a> back in 2013 was a moment of <em>woooow</em> for me. I&#8217;ve been interested in unusual ways of displaying data ever since I started studying <span class="caps">GIS</span> and this one was just great. <em>How the hell did she make it?!</em>, I thought back&nbsp;then.</p>
+    <p>Seeing <a href="http://anitagraser.com/2012/08/05/space-time-cubes-exploring-twitter-streams-3/">Anita&#8217;s space-time cube</a> back in 2013 was a moment of <em>woooow</em> for me. I&#8217;ve been interested in unusual ways of displaying data ever since I started studying <span class="caps">GIS</span> and this one was just great. <em>How the hell did she make it?!</em>, I thought back&nbsp;then.</p>
 
 <p>And I asked her, we had a little e-mail conversation and that was it. I got busy and had to postpone my attemps to create that viz until I dove into my diploma thesis. So&hellip;here you&nbsp;go.</p>
 
@@ -172,15 +179,15 @@ z = map(lat, 16.59971950210866964, 63.68835804244784526, 0, height)
 <h3>How does it&nbsp;look</h3>
 
 <iframe width="420" height="315" src="//www.youtube.com/embed/4jl6-qOiSAE?rel=0" frameborder="0" allowfullscreen></iframe>
-<aside>
+    <aside>
 
 <h3>More reading</h3>
     <ul>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/liftago-open-dataset-infographics/">Liftago Open Dataset&nbsp;Infographics</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/twitter-rest-api-data-mining-on-openshift-part-i/">Twitter <span class="caps">REST</span> <span class="caps">API</span> Data Mining on OpenShift (Part&nbsp;I)</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/"><span class="caps">QGIS</span> Plugin Development: Using Python&nbsp;Console</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/wms-download-for-future-offline-use/"><span class="caps">WMS</span> Download For Future Offline&nbsp;Use</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/postgresql-development-history-revealed-with-postgresql/">PostgreSQL Development History Revealed with&nbsp;PostgreSQL</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/">Automated Map Creation With <span class="caps">QGIS</span>, PostGIS, Python, <span class="caps">SVG</span> and&nbsp;ImageMagick</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/twitter-rest-api-data-mining-on-openshift-part-ii/">Twitter <span class="caps">REST</span> <span class="caps">API</span> Data Mining on OpenShift (Part <span class="caps">II</span>)</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
 <script>
@@ -206,7 +213,7 @@ z = map(lat, 16.59971950210866964, 63.68835804244784526, 0, height)
     drift.load('caacyauy5t6b');
 
 </script>
-<!-- End of Async Drift Code --></aside>
+<!-- End of Async Drift Code -->    </aside>
     </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.

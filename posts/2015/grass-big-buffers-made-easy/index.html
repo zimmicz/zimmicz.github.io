@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html lang="en" prefix="og: http://ogp.me/ns#">
 <head>
-          <title>Michal Zimmermann | GRASS: Big Buffers Made Easy</title>
+        <title>Michal Zimmermann | GRASS: Big Buffers Made Easy</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
-        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link href="http://localhost:8000/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="http://localhost:8000/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
 
 
 
-    <meta name="tags" content="grass" />
-  <meta property="og:title" content="GRASS: Big Buffers Made Easy" />
-  <meta property="og:description" content="Recently I’ve written about struggling with fairly complex geometries in PostGIS. Lesson learned from the last time was to use more smaller geometries instead of several really huge. You can obtain the small ones from the big by cutting it with a..." />
-  <meta property="og:url" content="https://www.zimmi.cz/posts/2015/grass-big-buffers-made-easy/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
+<meta name="tags" content="grass" />
+<meta property="og:title" content="GRASS: Big Buffers Made Easy" />
+<meta property="og:description" content="Recently I’ve written about struggling with fairly complex geometries in PostGIS. Lesson learned from the last time was to use more smaller geometries instead of several really huge. You can obtain the small ones from the big by cutting it with a..." />
+<meta property="og:url" content="https://www.zimmi.cz/posts/2015/grass-big-buffers-made-easy/" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?6d23b170">
 </head>
 <body>
     <nav role="navigation">
@@ -22,6 +22,13 @@
             <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
             <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
             <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
+            <li>
+                <form class="search" name="x" action="//duckduckgo.com/" target="_blank">
+                    <input type="hidden" value="zimmi.cz/posts" name="sites"></input>
+                    <input class="search-input" type="search" placeholder="Search" name="q"></input>
+                    <input class="button" type="submit" value="Go"></input>
+                </form>
+            </li>
         </ul>
     </nav>
     <header>
@@ -31,10 +38,10 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/grass-big-buffers-made-easy/" rel="bookmark" title="Permalink to GRASS: Big Buffers Made Easy"><span class="caps">GRASS</span>: Big Buffers Made&nbsp;Easy</a></h1>
     <aside><span>Apr 20, 2015</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/grass.html">grass</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
+        <span>            <a class="tag-url" href="https://www.zimmi.cz/posts/tag/grass.html">grass</a>        </span>
+        <span><a class="category-url" href="https://www.zimmi.cz/posts/category/automation.html">automation</a></span>
     </aside>
-<p>Recently I&#8217;ve written about <a href="/2015/postgis-buffers-intersections-differences-and-collections/">struggling with fairly complex geometries in PostGIS</a>. Lesson learned from the last time was to use more smaller geometries instead of several really huge. You can obtain the small ones from the big by <a href="/2015/postgis-rectangular-grid-creation/">cutting it with a grid</a>.</p>
+    <p>Recently I&#8217;ve written about <a href="/2015/postgis-buffers-intersections-differences-and-collections/">struggling with fairly complex geometries in PostGIS</a>. Lesson learned from the last time was to use more smaller geometries instead of several really huge. You can obtain the small ones from the big by <a href="/2015/postgis-rectangular-grid-creation/">cutting it with a grid</a>.</p>
 <p>A supervisor of a project I&#8217;ve been working on came up with a task that totally buried the previous process in a blink of an eye: <strong>Give me the buffer (diffed with original geometries) that is smoothed on the outer bounds so there are no edges shorter than 10 cm.</strong> I sighed. Then, I cursed. Then, I gave it a try with PostGIS. Achieving this goal involves these&nbsp;steps:</p>
 <ul>
 <li>Dissolve intersecting&nbsp;buffers</li>
@@ -98,7 +105,7 @@ v.out.postgis <span class="nv">input</span><span class="o">=</span>buffer_050_gr
 <li>It is great to exploit synergy of different <span class="caps">GIS</span> tools used for what they&#8217;re best&nbsp;at.</li>
 </ul>
 <p>The more I work with big data, the more I get used to not seeing them. That&#8217;s kind of a twist after crafting maps at&nbsp;university.</p>
-<aside>
+    <aside>
 
 <h3>More reading</h3>
     <ul>
@@ -128,7 +135,7 @@ v.out.postgis <span class="nv">input</span><span class="o">=</span>buffer_050_gr
     drift.load('caacyauy5t6b');
 
 </script>
-<!-- End of Async Drift Code --></aside>
+<!-- End of Async Drift Code -->    </aside>
     </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.

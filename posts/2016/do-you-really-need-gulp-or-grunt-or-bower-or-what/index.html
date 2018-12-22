@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html lang="en" prefix="og: http://ogp.me/ns#">
 <head>
-          <title>Michal Zimmermann | Do You Really Need Gulp? Or Grunt? Or Bower? Or What?</title>
+        <title>Michal Zimmermann | Do You Really Need Gulp? Or Grunt? Or Bower? Or What?</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
-        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link href="http://localhost:8000/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="http://localhost:8000/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
 
 
 
-    <meta name="tags" content="javascript" />
-  <meta property="og:title" content="Do You Really Need Gulp? Or Grunt? Or Bower? Or What?" />
-  <meta property="og:description" content="Disclaimer: I’m an enthuastic developer, but I do not code for a living. I’m just the ordinary guy who keeps editing a wrong file wondering why the heck the changes are not being applied. TL;DR: I do think npm might be the answer. Wonderful world of..." />
-  <meta property="og:url" content="https://www.zimmi.cz/posts/2016/do-you-really-need-gulp-or-grunt-or-bower-or-what/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
+<meta name="tags" content="javascript" />
+<meta property="og:title" content="Do You Really Need Gulp? Or Grunt? Or Bower? Or What?" />
+<meta property="og:description" content="Disclaimer: I’m an enthuastic developer, but I do not code for a living. I’m just the ordinary guy who keeps editing a wrong file wondering why the heck the changes are not being applied. TL;DR: I do think npm might be the answer. Wonderful world of..." />
+<meta property="og:url" content="https://www.zimmi.cz/posts/2016/do-you-really-need-gulp-or-grunt-or-bower-or-what/" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?6d23b170">
 </head>
 <body>
     <nav role="navigation">
@@ -22,6 +22,13 @@
             <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
             <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
             <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
+            <li>
+                <form class="search" name="x" action="//duckduckgo.com/" target="_blank">
+                    <input type="hidden" value="zimmi.cz/posts" name="sites"></input>
+                    <input class="search-input" type="search" placeholder="Search" name="q"></input>
+                    <input class="button" type="submit" value="Go"></input>
+                </form>
+            </li>
         </ul>
     </nav>
     <header>
@@ -31,10 +38,10 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2016/do-you-really-need-gulp-or-grunt-or-bower-or-what/" rel="bookmark" title="Permalink to Do You Really Need Gulp? Or Grunt? Or Bower? Or What?">Do You Really Need Gulp? Or Grunt? Or Bower? Or&nbsp;What?</a></h1>
     <aside><span>Mar 20, 2016</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+        <span>            <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>        </span>
+        <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
     </aside>
-<p><strong>Disclaimer:</strong> I&#8217;m an enthuastic developer, but I do not code for a living. I&#8217;m just the ordinary guy who keeps editing a wrong file wondering why <em>the heck</em> the changes are not being&nbsp;applied.</p>
+    <p><strong>Disclaimer:</strong> I&#8217;m an enthuastic developer, but I do not code for a living. I&#8217;m just the ordinary guy who keeps editing a wrong file wondering why <em>the heck</em> the changes are not being&nbsp;applied.</p>
 <p><strong><span class="caps">TL</span>;<span class="caps">DR</span>:</strong> I do think <code>npm</code> might be the&nbsp;answer.</p>
 <h2>Wonderful world of JavaScript&nbsp;DevOps</h2>
 <p>When I first started using JavaScript on the server side with <code>node.js</code>, I felt overwhelmed by numerous options to automate tasks. There was <code>npm</code> taking care of backend dependencies. Then I would build a&nbsp;frontend and found out about <code>bower</code> for handling frontend dependencies. Then it would be great to have some kind of minification/obfuscation/uglification/you-name-it task. And the <code>build</code> task. And the <code>build:prod</code> task. And how about <code>eslint</code> task? And then I would end up spending hours doing nothing, just reading blogs about the tools being used by others who do code for a&nbsp;living.</p>
@@ -73,15 +80,15 @@ node_modules/webpack-dev-server/bin/webpack-dev-server.js --quiet --inline --hot
 
 <p>That&#8217;s it. If I need to build code, I run <code>npm run build</code>, which calls some other tasks from <code>scripts</code> section in the <code>package.json</code>.</p>
 <p>That&#8217;s pretty much it. I don&#8217;t think it&#8217;s a silver bullet, but I feel like I finally found peace of mind for my future JavaScript development. At least for a month or so before some other guy comes to&nbsp;town.</p>
-<aside>
+    <aside>
 
 <h3>More reading</h3>
     <ul>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/connecting-to-secured-arcgis-server-layer-with-openlayers-3/">Connecting To Secured ArcGIS Server Layer With OpenLayers&nbsp;3</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/plotting-the-czech-cadastre-land-use-with-d3-data-viz-part-iv/">Plotting the Czech Cadastre Land Use with d3: Data Viz (part <span class="caps">IV</span>)</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/introducing-blind-maps-project/">Introducing Blind Maps&nbsp;Project</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/">Plotting the Czech Cadastre Land Use with d3: Data Load (part <span class="caps">III</span>)</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/leaflet-chmi-radar-control/">Leaflet <span class="caps">CHMI</span> Radar&nbsp;Control</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/">Plotting the Czech Cadastre Land Use with d3: Data Load (part <span class="caps">III</span>)</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/plotting-the-czech-cadastre-land-use-with-d3-data-viz-part-iv/">Plotting the Czech Cadastre Land Use with d3: Data Viz (part <span class="caps">IV</span>)</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/degrees-to-decimal-with-javascript/">Degrees To Decimal With&nbsp;Javascript</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/introducing-blind-maps-project/">Introducing Blind Maps&nbsp;Project</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
 <script>
@@ -107,7 +114,7 @@ node_modules/webpack-dev-server/bin/webpack-dev-server.js --quiet --inline --hot
     drift.load('caacyauy5t6b');
 
 </script>
-<!-- End of Async Drift Code --></aside>
+<!-- End of Async Drift Code -->    </aside>
     </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.

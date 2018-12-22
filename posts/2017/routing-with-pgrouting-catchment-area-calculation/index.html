@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html lang="en" prefix="og: http://ogp.me/ns#">
 <head>
-          <title>Michal Zimmermann | Routing with pgRouting: Catchment Area Calculation</title>
+        <title>Michal Zimmermann | Routing with pgRouting: Catchment Area Calculation</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
-        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link href="http://localhost:8000/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="http://localhost:8000/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
 
 
 
-    <meta name="tags" content="postgis" />
-    <meta name="tags" content="pgrouting" />
-  <meta property="og:title" content="Routing with pgRouting: Catchment Area Calculation" />
-  <meta property="og:description" content="For a long time I’ve wanted to play with pgRouting and that time has finally come. Among many other routing functions there is one that caught my eye, called pgr_drivingdistance. As the documentation says, it returns the driving distance from a start..." />
-  <meta property="og:url" content="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
+<meta name="tags" content="postgis" />
+<meta name="tags" content="pgrouting" />
+<meta property="og:title" content="Routing with pgRouting: Catchment Area Calculation" />
+<meta property="og:description" content="For a long time I’ve wanted to play with pgRouting and that time has finally come. Among many other routing functions there is one that caught my eye, called pgr_drivingdistance. As the documentation says, it returns the driving distance from a start..." />
+<meta property="og:url" content="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?6d23b170">
 </head>
 <body>
     <nav role="navigation">
@@ -23,6 +23,13 @@
             <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
             <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
             <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
+            <li>
+                <form class="search" name="x" action="//duckduckgo.com/" target="_blank">
+                    <input type="hidden" value="zimmi.cz/posts" name="sites"></input>
+                    <input class="search-input" type="search" placeholder="Search" name="q"></input>
+                    <input class="button" type="submit" value="Go"></input>
+                </form>
+            </li>
         </ul>
     </nav>
     <header>
@@ -32,10 +39,10 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/" rel="bookmark" title="Permalink to Routing with pgRouting: Catchment Area Calculation">Routing with pgRouting: Catchment Area&nbsp;Calculation</a></h1>
     <aside><span>Apr 14, 2017</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/pgrouting.html">pgrouting</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+        <span>            <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>             <a class="tag-url" href="https://www.zimmi.cz/posts/tag/pgrouting.html">pgrouting</a>        </span>
+        <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
     </aside>
-<p>For a long time I&#8217;ve wanted to play with <a href="http://pgrouting.org/">pgRouting</a> and that time has finally come. Among many other routing functions there is one that caught my eye, called <code>pgr_drivingdistance</code>. As the documentation says, it <em>returns the driving distance from a start node</em> using Dijkstra algorithm. The aforementioned distance doesn&#8217;t need to be defined in Euclidean space (the real distance between two points), it might be calculated in units of time, slopeness etc. How to get it&nbsp;going?</p>
+    <p>For a long time I&#8217;ve wanted to play with <a href="http://pgrouting.org/">pgRouting</a> and that time has finally come. Among many other routing functions there is one that caught my eye, called <code>pgr_drivingdistance</code>. As the documentation says, it <em>returns the driving distance from a start node</em> using Dijkstra algorithm. The aforementioned distance doesn&#8217;t need to be defined in Euclidean space (the real distance between two points), it might be calculated in units of time, slopeness etc. How to get it&nbsp;going?</p>
 <h2>Data</h2>
 <p><span class="caps">OSM</span> will do as it always does. There is a tool called <code>osm2pgrouting</code> to help you load the data, the pure <span class="caps">GDAL</span> seems to be a better way to me though. Importing the downloaded data is&nbsp;trivial.</p>
 <div class="highlight"><pre><span></span>ogr2ogr -f <span class="s2">&quot;PostgreSQL&quot;</span> PG:<span class="s2">&quot;dbname=pgrouting active_schema=cze&quot;</span> <span class="se">\</span>
@@ -203,15 +210,15 @@
 <li>Pedestrians usually don&#8217;t follow the road&nbsp;network.</li>
 <li>Bridges and tunnels might be an&nbsp;issue.</li>
 </ul>
-<aside>
+    <aside>
 
 <h3>More reading</h3>
     <ul>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-iii/">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">III</span>)</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-rectangular-grid-creation/">PostGIS: Rectangular Grid&nbsp;Creation</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/dead-simple-random-points-in-polygons-with-postgis/">Dead Simple Random Points in Polygons with&nbsp;PostGIS</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/postgis-case-study-vozejkmap-open-data-part-i/">PostGIS Case Study: VozejkMap Open Data (Part&nbsp;I)</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-ii/">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">II</span>)</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/centos-postgis-upgrade-hell-yet-again">CentOS PostGIS Upgrade Hell&#8230; Yet&nbsp;Again</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/">Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span></a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/postgis-as-a-mapbox-vector-tiles-generator/">PostGIS as a Mapbox Vector Tiles&nbsp;generator</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
 <script>
@@ -237,7 +244,7 @@
     drift.load('caacyauy5t6b');
 
 </script>
-<!-- End of Async Drift Code --></aside>
+<!-- End of Async Drift Code -->    </aside>
     </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.

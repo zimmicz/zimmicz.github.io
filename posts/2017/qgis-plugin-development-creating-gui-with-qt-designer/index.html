@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html lang="en" prefix="og: http://ogp.me/ns#">
 <head>
-          <title>Michal Zimmermann | QGIS Plugin Development: Creating GUI with Qt Designer</title>
+        <title>Michal Zimmermann | QGIS Plugin Development: Creating GUI with Qt Designer</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
-        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link href="http://localhost:8000/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="http://localhost:8000/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
 
 
 
-    <meta name="tags" content="python" />
-    <meta name="tags" content="QGIS" />
-    <meta property="og:image" content="https://www.zimmi.cz/posts/assets/qgis-plugin-development-creating-gui-with-qt-designer/qgis.png" />
-  <meta property="og:title" content="QGIS Plugin Development: Creating GUI with Qt Designer" />
-  <meta property="og:description" content="After fiddling with QGIS Python console and implementing nearest neighbor analysis, I’m going to create a very simple GUI for the plugin at last. While QGIS API docs took me few hours to grasp, the PyQGIS ecosystem knocked my socks off. Here comes the..." />
-  <meta property="og:url" content="https://www.zimmi.cz/posts/2017/qgis-plugin-development-creating-gui-with-qt-designer/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
+<meta name="tags" content="python" />
+<meta name="tags" content="QGIS" />
+<meta property="og:image" content="https://www.zimmi.cz/posts/assets/qgis-plugin-development-creating-gui-with-qt-designer/qgis.png" />
+<meta property="og:title" content="QGIS Plugin Development: Creating GUI with Qt Designer" />
+<meta property="og:description" content="After fiddling with QGIS Python console and implementing nearest neighbor analysis, I’m going to create a very simple GUI for the plugin at last. While QGIS API docs took me few hours to grasp, the PyQGIS ecosystem knocked my socks off. Here comes the..." />
+<meta property="og:url" content="https://www.zimmi.cz/posts/2017/qgis-plugin-development-creating-gui-with-qt-designer/" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?6d23b170">
 </head>
 <body>
     <nav role="navigation">
@@ -24,6 +24,13 @@
             <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
             <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
             <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
+            <li>
+                <form class="search" name="x" action="//duckduckgo.com/" target="_blank">
+                    <input type="hidden" value="zimmi.cz/posts" name="sites"></input>
+                    <input class="search-input" type="search" placeholder="Search" name="q"></input>
+                    <input class="button" type="submit" value="Go"></input>
+                </form>
+            </li>
         </ul>
     </nav>
     <header>
@@ -33,10 +40,10 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-creating-gui-with-qt-designer/" rel="bookmark" title="Permalink to QGIS Plugin Development: Creating GUI with Qt Designer"><span class="caps">QGIS</span> Plugin Development: Creating <span class="caps">GUI</span> with Qt&nbsp;Designer</a></h1>
     <aside><span>Nov 16, 2017</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">QGIS</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/qgis.html">QGIS</a></span>
+        <span>            <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>             <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">QGIS</a>        </span>
+        <span><a class="category-url" href="https://www.zimmi.cz/posts/category/qgis.html">QGIS</a></span>
     </aside>
-<p>After fiddling with <a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/"><span class="caps">QGIS</span> Python console</a> and implementing <a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/">nearest neighbor analysis</a>, I&#8217;m going to create a very simple <span class="caps">GUI</span> for the plugin at&nbsp;last.</p>
+    <p>After fiddling with <a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/"><span class="caps">QGIS</span> Python console</a> and implementing <a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/">nearest neighbor analysis</a>, I&#8217;m going to create a very simple <span class="caps">GUI</span> for the plugin at&nbsp;last.</p>
 <p>While <span class="caps">QGIS</span> <span class="caps">API</span> docs took me few hours to grasp, the PyQGIS ecosystem knocked my socks off. Here comes the list of tools you should incorporate into your development process as soon as&nbsp;possible.</p>
 <h2>Plugin&nbsp;Builder</h2>
 <p>The <a href="https://plugins.qgis.org/plugins/pluginbuilder/"><span class="caps">QGIS</span> Plugin Builder</a> is a plugin created to create&hellip; well, other plugins. It gets you going in minutes and lets you code instead of setting up things you don&#8217;t want to be setting up. A definite must-have. Note you should put the plugin inside the <span class="caps">QGIS</span> plugins folder (defaults to ~/.qgis2/python/plugins) in&nbsp;Linux.</p>
@@ -56,7 +63,7 @@
 
 <p>Once loaded with Plugins -&gt; Manage and Install Plugins -&gt; AttributeTransfer, the plugin is available right from the toolbar or Vector menu. It is missing the business logic completely, but I have this covered in <a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/">the previous part</a>.</p>
 <p>All that is to be done is to bind those two parts&nbsp;together.</p>
-<aside>
+    <aside>
 <h3>This post is part 4 of the "QGIS Plugin Development" series:</h3>
     <ol class="parts">
             <li>
@@ -83,9 +90,9 @@
     <ul>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/"><span class="caps">QGIS</span> Plugin Development: Using Python&nbsp;Console</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/">Automated Map Creation With <span class="caps">QGIS</span>, PostGIS, Python, <span class="caps">SVG</span> and&nbsp;ImageMagick</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-attributetransfer-plugin/"><span class="caps">QGIS</span> Plugin Development: AttributeTransfer&nbsp;Plugin</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-getting-started/"><span class="caps">QGIS</span> Plugin Development: Getting&nbsp;Started</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/"><span class="caps">QGIS</span> Plugin Development: Finding Nearest&nbsp;Neighbors</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-attributetransfer-plugin/"><span class="caps">QGIS</span> Plugin Development: AttributeTransfer&nbsp;Plugin</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
 <script>
@@ -111,7 +118,7 @@
     drift.load('caacyauy5t6b');
 
 </script>
-<!-- End of Async Drift Code --></aside>
+<!-- End of Async Drift Code -->    </aside>
     </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.

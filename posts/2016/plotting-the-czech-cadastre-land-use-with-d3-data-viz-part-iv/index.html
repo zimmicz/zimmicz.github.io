@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html lang="en" prefix="og: http://ogp.me/ns#">
 <head>
-          <title>Michal Zimmermann | Plotting the Czech Cadastre Land Use with d3: Data Viz (part IV)</title>
+        <title>Michal Zimmermann | Plotting the Czech Cadastre Land Use with d3: Data Viz (part IV)</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
-        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link href="http://localhost:8000/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="http://localhost:8000/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
 
 
 
-    <meta name="tags" content="d3" />
-    <meta name="tags" content="javascript" />
-    <meta name="tags" content="svg" />
-  <meta property="og:title" content="Plotting the Czech Cadastre Land Use with d3: Data Viz (part IV)" />
-  <meta property="og:description" content="This post is the fourth part of the series summarizing the process of visualizing land use data with bash, PostgreSQL and d3.js. Read other parts: Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I) Plotting the Czech Cadastre Land..." />
-  <meta property="og:url" content="https://www.zimmi.cz/posts/2016/plotting-the-czech-cadastre-land-use-with-d3-data-viz-part-iv/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
+<meta name="tags" content="d3" />
+<meta name="tags" content="javascript" />
+<meta name="tags" content="svg" />
+<meta property="og:title" content="Plotting the Czech Cadastre Land Use with d3: Data Viz (part IV)" />
+<meta property="og:description" content="This post is the fourth part of the series summarizing the process of visualizing land use data with bash, PostgreSQL and d3.js. Read other parts: Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I) Plotting the Czech Cadastre Land..." />
+<meta property="og:url" content="https://www.zimmi.cz/posts/2016/plotting-the-czech-cadastre-land-use-with-d3-data-viz-part-iv/" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?6d23b170">
 </head>
 <body>
     <nav role="navigation">
@@ -24,6 +24,13 @@
             <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
             <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
             <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
+            <li>
+                <form class="search" name="x" action="//duckduckgo.com/" target="_blank">
+                    <input type="hidden" value="zimmi.cz/posts" name="sites"></input>
+                    <input class="search-input" type="search" placeholder="Search" name="q"></input>
+                    <input class="button" type="submit" value="Go"></input>
+                </form>
+            </li>
         </ul>
     </nav>
     <header>
@@ -33,10 +40,10 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2016/plotting-the-czech-cadastre-land-use-with-d3-data-viz-part-iv/" rel="bookmark" title="Permalink to Plotting the Czech Cadastre Land Use with d3: Data Viz (part IV)">Plotting the Czech Cadastre Land Use with d3: Data Viz (part <span class="caps">IV</span>)</a></h1>
     <aside><span>Nov 20, 2016</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/d3.html">d3</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/data.html">data</a></span>
+        <span>            <a class="tag-url" href="https://www.zimmi.cz/posts/tag/d3.html">d3</a>             <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>             <a class="tag-url" href="https://www.zimmi.cz/posts/tag/svg.html">svg</a>        </span>
+        <span><a class="category-url" href="https://www.zimmi.cz/posts/category/data.html">data</a></span>
     </aside>
-<p>This post is the fourth part of the series summarizing the process of visualizing land use data with bash, PostgreSQL and d3.js. Read other&nbsp;parts:</p>
+    <p>This post is the fourth part of the series summarizing the process of visualizing land use data with bash, PostgreSQL and d3.js. Read other&nbsp;parts:</p>
 <ol>
 <li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part&nbsp;I)</a></li>
 <li><a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></li>
@@ -80,15 +87,15 @@
 <p><small>Bottom line: I use localStorage to keep track of the database existence.</small></p>
 <h3>Resume</h3>
 <p>Two pet projects completed in one month definitely means the winter is here! Looking forward to using more&nbsp;vue.js.</p>
-<aside>
+    <aside>
 
 <h3>More reading</h3>
     <ul>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-ii">Plotting the Czech Cadastre Land Use with d3: Data Transformation (part <span class="caps">II</span>)</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/">Plotting the Czech Cadastre Land Use with d3: Data Load (part <span class="caps">III</span>)</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part&nbsp;I)</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/liftago-open-dataset-infographics/">Liftago Open Dataset&nbsp;Infographics</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/connecting-to-secured-arcgis-server-layer-with-openlayers-3/">Connecting To Secured ArcGIS Server Layer With OpenLayers&nbsp;3</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/leaflet-chmi-radar-control/">Leaflet <span class="caps">CHMI</span> Radar&nbsp;Control</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/degrees-to-decimal-with-javascript/">Degrees To Decimal With&nbsp;Javascript</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
 <script>
@@ -114,7 +121,7 @@
     drift.load('caacyauy5t6b');
 
 </script>
-<!-- End of Async Drift Code --></aside>
+<!-- End of Async Drift Code -->    </aside>
     </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.

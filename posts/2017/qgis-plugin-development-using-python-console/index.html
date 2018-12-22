@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html lang="en" prefix="og: http://ogp.me/ns#">
 <head>
-          <title>Michal Zimmermann | QGIS Plugin Development: Using Python Console</title>
+        <title>Michal Zimmermann | QGIS Plugin Development: Using Python Console</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
-        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link href="http://localhost:8000/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="http://localhost:8000/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
 
 
 
-    <meta name="tags" content="python" />
-    <meta name="tags" content="QGIS" />
-    <meta property="og:image" content="https://www.zimmi.cz/posts/assets/qgis-plugin-development-using-python-console/qgis.png" />
-  <meta property="og:title" content="QGIS Plugin Development: Using Python Console" />
-  <meta property="og:description" content="As mentioned in previous part of the series, the QGIS Python console is an entry point to GIS workflow automation within QGIS. Remember there’s an iface object representing qgis.gui.QgisInterface instance within the console that gives you access to..." />
-  <meta property="og:url" content="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
+<meta name="tags" content="python" />
+<meta name="tags" content="QGIS" />
+<meta property="og:image" content="https://www.zimmi.cz/posts/assets/qgis-plugin-development-using-python-console/qgis.png" />
+<meta property="og:title" content="QGIS Plugin Development: Using Python Console" />
+<meta property="og:description" content="As mentioned in previous part of the series, the QGIS Python console is an entry point to GIS workflow automation within QGIS. Remember there’s an iface object representing qgis.gui.QgisInterface instance within the console that gives you access to..." />
+<meta property="og:url" content="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?6d23b170">
 </head>
 <body>
     <nav role="navigation">
@@ -24,6 +24,13 @@
             <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
             <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
             <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
+            <li>
+                <form class="search" name="x" action="//duckduckgo.com/" target="_blank">
+                    <input type="hidden" value="zimmi.cz/posts" name="sites"></input>
+                    <input class="search-input" type="search" placeholder="Search" name="q"></input>
+                    <input class="button" type="submit" value="Go"></input>
+                </form>
+            </li>
         </ul>
     </nav>
     <header>
@@ -33,10 +40,10 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/" rel="bookmark" title="Permalink to QGIS Plugin Development: Using Python Console"><span class="caps">QGIS</span> Plugin Development: Using Python&nbsp;Console</a></h1>
     <aside><span>Nov 2, 2017</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">QGIS</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/qgis.html">QGIS</a></span>
+        <span>            <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>             <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">QGIS</a>        </span>
+        <span><a class="category-url" href="https://www.zimmi.cz/posts/category/qgis.html">QGIS</a></span>
     </aside>
-<p>As mentioned in <a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-getting-started/">previous part</a> of the series, the <span class="caps">QGIS</span> Python console is an entry point to <span class="caps">GIS</span> workflow automation within <span class="caps">QGIS</span>. Remember there&#8217;s an <code>iface</code> object representing <code>qgis.gui.QgisInterface</code> instance within the console that gives you access to the whole <span class="caps">QGIS</span> <span class="caps">GUI</span>. Let&#8217;s see what we can do inside the&nbsp;console.</p>
+    <p>As mentioned in <a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-getting-started/">previous part</a> of the series, the <span class="caps">QGIS</span> Python console is an entry point to <span class="caps">GIS</span> workflow automation within <span class="caps">QGIS</span>. Remember there&#8217;s an <code>iface</code> object representing <code>qgis.gui.QgisInterface</code> instance within the console that gives you access to the whole <span class="caps">QGIS</span> <span class="caps">GUI</span>. Let&#8217;s see what we can do inside the&nbsp;console.</p>
 <h2>Loading vector layers&nbsp;folder</h2>
 <div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">from</span> <span class="nn">qgis.core</span> <span class="kn">import</span> <span class="n">QgsMapLayerRegistry</span><span class="p">,</span> <span class="n">QgsVectorLayer</span>
@@ -140,7 +147,7 @@
 
 
 <p>Those were just few examples of what can be done with <span class="caps">QGIS</span> <span class="caps">API</span> and Python console. Next time, I&#8217;d like to focus on spatial joins inside <span class="caps">QGIS</span> - another step to the final&nbsp;plugin.</p>
-<aside>
+    <aside>
 <h3>This post is part 2 of the "QGIS Plugin Development" series:</h3>
     <ol class="parts">
             <li>
@@ -166,10 +173,10 @@
 <h3>More reading</h3>
     <ul>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/automated-map-creation-with-qgis-postgis-python-svg-and-imagemagick/">Automated Map Creation With <span class="caps">QGIS</span>, PostGIS, Python, <span class="caps">SVG</span> and&nbsp;ImageMagick</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-attributetransfer-plugin/"><span class="caps">QGIS</span> Plugin Development: AttributeTransfer&nbsp;Plugin</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-creating-gui-with-qt-designer/"><span class="caps">QGIS</span> Plugin Development: Creating <span class="caps">GUI</span> with Qt&nbsp;Designer</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-getting-started/"><span class="caps">QGIS</span> Plugin Development: Getting&nbsp;Started</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/"><span class="caps">QGIS</span> Plugin Development: Finding Nearest&nbsp;Neighbors</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-attributetransfer-plugin/"><span class="caps">QGIS</span> Plugin Development: AttributeTransfer&nbsp;Plugin</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
 <script>
@@ -195,7 +202,7 @@
     drift.load('caacyauy5t6b');
 
 </script>
-<!-- End of Async Drift Code --></aside>
+<!-- End of Async Drift Code -->    </aside>
     </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.

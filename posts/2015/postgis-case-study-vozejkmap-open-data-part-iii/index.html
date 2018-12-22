@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html lang="en" prefix="og: http://ogp.me/ns#">
 <head>
-          <title>Michal Zimmermann | PostGIS Case Study: Vozejkmap Open Data (Part III)</title>
+        <title>Michal Zimmermann | PostGIS Case Study: Vozejkmap Open Data (Part III)</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
-        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link href="http://localhost:8000/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="http://localhost:8000/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
 
 
 
-    <meta name="tags" content="postgresql" />
-    <meta name="tags" content="postgis" />
-    <meta name="tags" content="leaflet" />
-    <meta name="tags" content="javascript" />
-  <meta property="og:title" content="PostGIS Case Study: Vozejkmap Open Data (Part III)" />
-  <meta property="og:description" content="After a while I got back to my PostGIS open data case study. Last time I left it with clustering implemented, looking forward to incorporate Turf.js in the future. And the future is now. The code is still available on GitHub. Subgroup clustering..." />
-  <meta property="og:url" content="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-iii/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
+<meta name="tags" content="postgresql" />
+<meta name="tags" content="postgis" />
+<meta name="tags" content="leaflet" />
+<meta name="tags" content="javascript" />
+<meta property="og:title" content="PostGIS Case Study: Vozejkmap Open Data (Part III)" />
+<meta property="og:description" content="After a while I got back to my PostGIS open data case study. Last time I left it with clustering implemented, looking forward to incorporate Turf.js in the future. And the future is now. The code is still available on GitHub. Subgroup clustering..." />
+<meta property="og:url" content="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-iii/" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?6d23b170">
 </head>
 <body>
     <nav role="navigation">
@@ -25,6 +25,13 @@
             <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
             <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
             <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
+            <li>
+                <form class="search" name="x" action="//duckduckgo.com/" target="_blank">
+                    <input type="hidden" value="zimmi.cz/posts" name="sites"></input>
+                    <input class="search-input" type="search" placeholder="Search" name="q"></input>
+                    <input class="button" type="submit" value="Go"></input>
+                </form>
+            </li>
         </ul>
     </nav>
     <header>
@@ -34,10 +41,10 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-iii/" rel="bookmark" title="Permalink to PostGIS Case Study: Vozejkmap Open Data (Part III)">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">III</span>)</a></h1>
     <aside><span>Nov 14, 2015</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/leaflet.html">leaflet</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/web-maps.html">web maps</a></span>
+        <span>            <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>             <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>             <a class="tag-url" href="https://www.zimmi.cz/posts/tag/leaflet.html">leaflet</a>             <a class="tag-url" href="https://www.zimmi.cz/posts/tag/javascript.html">javascript</a>        </span>
+        <span><a class="category-url" href="https://www.zimmi.cz/posts/category/web-maps.html">web maps</a></span>
     </aside>
-<p>After a while I got back to my <a href="https://www.zimmi.cz/posts/2014/postgis-case-study-vozejkmap-open-data-part-i/">PostGIS open data</a> <a href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-ii/">case study</a>. Last time I left it with clustering implemented, looking forward to incorporate <a href="http://turfjs.org">Turf.js</a> in the future. <em>And the future is now.</em> <a href="https://github.com/zimmicz/vozejkmap-to-postgis">The code is still available on&nbsp;GitHub.</a></p>
+    <p>After a while I got back to my <a href="https://www.zimmi.cz/posts/2014/postgis-case-study-vozejkmap-open-data-part-i/">PostGIS open data</a> <a href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-ii/">case study</a>. Last time I left it with clustering implemented, looking forward to incorporate <a href="http://turfjs.org">Turf.js</a> in the future. <em>And the future is now.</em> <a href="https://github.com/zimmicz/vozejkmap-to-postgis">The code is still available on&nbsp;GitHub.</a></p>
 <h2>Subgroup&nbsp;clustering</h2>
 <p>Vozejkmap data is categorized based on the place type (banks, parking lots, pubs, &hellip;). One of the core features of map showing such data should be the easy way to turn these categories on and&nbsp;off.</p>
 <p>As far as I know, it&#8217;s not trivial to do this with the standard Leaflet library. Extending <code>L.control.layers</code> and implement its <code>addOverlay</code>, <code>removeOverlay</code> methods on your own might be the way to add needed behavior. Fortunately, there&#8217;s an easier option thanks to <a href="https://github.com/ghybs/Leaflet.FeatureGroup.SubGroup">Leaflet.FeatureGroup.SubGroup</a> that can handle such use case and is really straightforward. See the code&nbsp;below.</p>
@@ -96,13 +103,13 @@
 <p><img src="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen2.png" title="vozejkmap.cz data map" class="img-responsive centered"> You can hide the&nbsp;infobox.</p>
 
 <p><img src="/posts/assets/postgis-case-study-vozejkmap-open-data-part-iii/screen3.png" title="vozejkmap.cz data map" class="img-responsive centered">You can jump to any of the nearest&nbsp;places.</p>
-<aside>
+    <aside>
 
 <h3>More reading</h3>
     <ul>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-buffers-intersections-differences-and-collections/">PostGIS: Buffers, Intersections, Differences And&nbsp;Collections</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/introducing-blind-maps-project/">Introducing Blind Maps&nbsp;Project</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/leaflet-coordinates-control/">Leaflet Coordinates&nbsp;Control</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-case-study-vozejkmap-open-data-part-ii/">PostGIS Case Study: Vozejkmap Open Data (Part <span class="caps">II</span>)</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-count-line-self-intersections/">PostGIS: Count Line&nbsp;Self-Intersections</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part&nbsp;I)</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/finding-polygons-lying-across-other-polygons-with-postgis/">Finding Polygons Lying across Other Polygons with&nbsp;PostGIS</a></li>
     </ul>
@@ -130,7 +137,7 @@
     drift.load('caacyauy5t6b');
 
 </script>
-<!-- End of Async Drift Code --></aside>
+<!-- End of Async Drift Code -->    </aside>
     </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.

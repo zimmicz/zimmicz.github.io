@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html lang="en" prefix="og: http://ogp.me/ns#">
 <head>
-          <title>Michal Zimmermann | PostgreSQL Remote Access</title>
+        <title>Michal Zimmermann | PostgreSQL Remote Access</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
-        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link href="http://localhost:8000/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="http://localhost:8000/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
 
 
 
-    <meta name="tags" content="postgresql" />
-    <meta name="tags" content="linux" />
-  <meta property="og:title" content="PostgreSQL Remote Access" />
-  <meta property="og:description" content="PostgreSQL is set to listen only to connections coming from localhost by default. I guess that’s fine as far as you don’t need access to the database from anywhere else (like your work network). If you do, you need to log via SSH or use some online..." />
-  <meta property="og:url" content="https://www.zimmi.cz/posts/2014/postgresql-remote-access/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9c0b0056">
+<meta name="tags" content="postgresql" />
+<meta name="tags" content="linux" />
+<meta property="og:title" content="PostgreSQL Remote Access" />
+<meta property="og:description" content="PostgreSQL is set to listen only to connections coming from localhost by default. I guess that’s fine as far as you don’t need access to the database from anywhere else (like your work network). If you do, you need to log via SSH or use some online..." />
+<meta property="og:url" content="https://www.zimmi.cz/posts/2014/postgresql-remote-access/" />
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?6d23b170">
 </head>
 <body>
     <nav role="navigation">
@@ -23,6 +23,13 @@
             <li><a href="https://www.zimmi.cz/posts/categories">Categories</a></li>
             <li><a href="https://www.zimmi.cz/posts/tags">Tags</a></li>
             <li><a href="https://www.zimmi.cz/posts/feed.xml">Subscribe to RSS feed</a></li>
+            <li>
+                <form class="search" name="x" action="//duckduckgo.com/" target="_blank">
+                    <input type="hidden" value="zimmi.cz/posts" name="sites"></input>
+                    <input class="search-input" type="search" placeholder="Search" name="q"></input>
+                    <input class="button" type="submit" value="Go"></input>
+                </form>
+            </li>
         </ul>
     </nav>
     <header>
@@ -32,10 +39,10 @@
 <article>
     <h1><a href="https://www.zimmi.cz/posts/2014/postgresql-remote-access/" rel="bookmark" title="Permalink to PostgreSQL Remote Access">PostgreSQL Remote&nbsp;Access</a></h1>
     <aside><span>Sep 17, 2014</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
+        <span>            <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>             <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>        </span>
+        <span><a class="category-url" href="https://www.zimmi.cz/posts/category/development.html">development</a></span>
     </aside>
-<p>PostgreSQL is set to listen only to connections coming from localhost by default. I guess that&#8217;s fine as far as you don&#8217;t need access to the database from anywhere else (like your work network). If you do, you need to log via <span class="caps">SSH</span> or use some online database management tool (go for <a href="http://adminer.org">Adminer</a> and forget about anything called php[pg|my]admin). Or you can set it up to access connections from other&nbsp;locations.</p>
+    <p>PostgreSQL is set to listen only to connections coming from localhost by default. I guess that&#8217;s fine as far as you don&#8217;t need access to the database from anywhere else (like your work network). If you do, you need to log via <span class="caps">SSH</span> or use some online database management tool (go for <a href="http://adminer.org">Adminer</a> and forget about anything called php[pg|my]admin). Or you can set it up to access connections from other&nbsp;locations.</p>
 <p>You need&nbsp;to:</p>
 <ol>
 <li>set <code>listen_addresses</code> to <code>*</code> in your postgres.conf. That does not mean anyone can connect to your database, that means that the server will listen to connections coming from any available <span class="caps">IP</span>&nbsp;interface.</li>
@@ -48,12 +55,12 @@
 </li>
 </ol>
 <p>You&#8217;re set to remotely connect to your database&nbsp;server.</p>
-<aside>
+    <aside>
 
 <h3>More reading</h3>
     <ul>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-bash-automation/">PostgreSQL Backup and Recovery Orchestration: Bash&nbsp;Automation</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/">Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span></a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-bash-automation/">PostgreSQL Backup and Recovery Orchestration: Bash&nbsp;Automation</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-recovery/">PostgreSQL Backup and Recovery Orchestration:&nbsp;Recovery</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-wal-archiving/">PostgreSQL Backup and Recovery Orchestration: <span class="caps">WAL</span>&nbsp;Archiving</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-systemd-automation/">PostgreSQL Backup and Recovery Orchestration: systemd&nbsp;Automation</a></li>
@@ -82,7 +89,7 @@
     drift.load('caacyauy5t6b');
 
 </script>
-<!-- End of Async Drift Code --></aside>
+<!-- End of Async Drift Code -->    </aside>
     </main>
     <footer>
         Written by <a href="//www.zimmi.cz">Michal Zimmermann</a>.
