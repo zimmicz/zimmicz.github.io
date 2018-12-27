@@ -64,7 +64,7 @@ With everything set, the topology can be built.
 
 This function creates the `cze.roads_noded_vertices_pgr` that contains all the extracted nodes from the network.
 
-<div class="text-center"><img src="/posts/assets/routing-with-pgrouting-catchment-area-calculation/nodes.png" width="70%" /></div>
+<div class="text-center"><img src="{static}/assets/routing-with-pgrouting-catchment-area-calculation/nodes.png" width="70%" /></div>
 
 As already mentioned, measures other than length can be used as a distance, I chose the time to get to a given node on foot.
 

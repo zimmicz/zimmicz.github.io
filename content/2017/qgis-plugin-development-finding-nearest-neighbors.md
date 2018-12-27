@@ -7,7 +7,7 @@ Image: https://www.zimmi.cz/posts/assets/qgis-plugin-development-finding-nearest
 
 I described basics of vector layers manipulation in [the previous part]({filename}../2017/qgis-plugin-development-using-python-console.md) of the series. With my goal in mind (fully functional custom plugin capable of writing an attribute value from a source layer to a target layer based on a feature distance), I'd like to discuss **spatial indexing** and **nearest neighbor analysis**.
 
-<div class="text-center"><img src="/posts/assets/qgis-plugin-development-finding-nearest-neighbors/qgis.png"/></div>
+<div class="text-center"><img src="{static}/assets/qgis-plugin-development-finding-nearest-neighbors/qgis.png"/></div>
 
 The picture above illustrates the task that can be solved solely by using QGIS API. Imagine you're given a source layer with an attribute filled with values. You're given a target layer as well, sadly though, the values in this layer are missing (*not so rare in the GIS world, right?*). Yet you know that the missing attribute value of each feature in the target layer can be filled by the value of its nearest neighbor from the source layer. How do you do that?
 

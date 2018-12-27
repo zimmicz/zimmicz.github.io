@@ -62,7 +62,7 @@ Map JavaScript is rather simple with ~30 lines of code (not taking styles into a
 
 I didn't do much customization apart from styling markers and binding popups.
 
-<img src="/posts/assets/postgis-case-study-vozejkmap-open-data-part-ii/map.png" title="vozejkmap.cz data map" class="img-responsive centered">
+<img src="{static}/assets/postgis-case-study-vozejkmap-open-data-part-ii/map.png" title="vozejkmap.cz data map" class="img-responsive centered">
 
 ## What's next
 

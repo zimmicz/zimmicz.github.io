@@ -57,7 +57,7 @@ Seems like a huge comeback for `CREATE TABLE`.
     FROM postgresql_development.data
     GROUP BY version ORDER BY version;
 
-<div class="text-center"><img src="/posts/assets/postgresql-development-history-revealed-with-postgresql/plot1.png"/></div>
+<div class="text-center"><img src="{static}/assets/postgresql-development-history-revealed-with-postgresql/plot1.png"/></div>
 
 ## The most verbose docs in each version
 
@@ -187,7 +187,7 @@ Poor `REVOKE`, the defeated champion.
 
 Something's going on in an upcoming 10.0 version.
 
-<div class="text-center"><img src="/posts/assets/postgresql-development-history-revealed-with-postgresql/plot2.png"/></div>
+<div class="text-center"><img src="{static}/assets/postgresql-development-history-revealed-with-postgresql/plot2.png"/></div>
 
 All the data was obtained with the following Python script and processed inside the PostgreSQL database. Plots done with [Bokeh](http://bokeh.pydata.org/en/latest/), though I probably wouldn't use it again, the docs site is absurdly sluggish and the info is just all over the place.
 

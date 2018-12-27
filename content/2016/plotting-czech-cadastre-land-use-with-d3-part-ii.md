@@ -7,9 +7,9 @@ save_as: 2016/plotting-czech-cadastre-land-use-with-d3-data-transformation-part-
 
 This post is the second part of the series summarizing the process of visualizing landuse data with bash, PostgreSQL and d3.js. Read other parts:
 
-1. [Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)]({filename}../2016/plotting-czech-cadastre-land-use-with-d3-part-i.md)
+1. [Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)]({filename}/2016/plotting-czech-cadastre-land-use-with-d3-part-i.md)
 2. you're reading it now
-3. [Plotting the Czech Cadastre Land Use with d3: Data Transformation (part III)]({filename}../2016/plotting-czech-cadastre-land-use-with-d3-part-iii.md)
+3. [Plotting the Czech Cadastre Land Use with d3: Data Transformation (part III)]({filename}/2016/plotting-czech-cadastre-land-use-with-d3-part-iii.md)
 
 ## ETL process
 Before the d3 viz can be crafted, it's necessary to:
@@ -20,7 +20,7 @@ Before the d3 viz can be crafted, it's necessary to:
 4. profit (as usual)
 
 ### Extract
-See [Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)]({filename}../2016/plotting-czech-cadastre-landuse-with-d3-part-i.md).
+See [Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)]({filename}/2016/plotting-czech-cadastre-landuse-with-d3-part-i.md).
 
 ### Transform
 
@@ -158,4 +158,4 @@ The `transform.sql` file is used to build the dynamic SQL query, which - once bu
 I'm still considering to store diff values instead of absolute values in those `ARRAY`s - that would save some serious bandwidth!
 
 ## Load
-See [Plotting the Czech Cadastre Land Use with d3: Data Transformation (part III)]({filename}../2016/plotting-czech-cadastre-land-use-with-d3-part-iii.md).
+See [Plotting the Czech Cadastre Land Use with d3: Data Transformation (part III)]({filename}/2016/plotting-czech-cadastre-land-use-with-d3-part-iii.md).

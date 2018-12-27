@@ -7,8 +7,8 @@ save_as: 2016/plotting-czech-cadastre-land-use-with-d3-data-load-part-iii/index.
 
 This post is the third part of the series summarizing the process of visualizing landuse data with bash, PostgreSQL and d3.js. Read other parts:
 
-1. [Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)]({filename}../2016/plotting-czech-cadastre-land-use-with-d3-part-i.md)
-2. [Plotting the Czech Cadastre Land Use with d3: Data Transformation (part II)]({filename}../2016/plotting-czech-cadastre-land-use-with-d3-part-ii.md)
+1. [Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)]({filename}/2016/plotting-czech-cadastre-land-use-with-d3-part-i.md)
+2. [Plotting the Czech Cadastre Land Use with d3: Data Transformation (part II)]({filename}/2016/plotting-czech-cadastre-land-use-with-d3-part-ii.md)
 3. you're reading it now
 
 ## ETL process
@@ -20,11 +20,11 @@ Before the d3 viz can be crafted, it's necessary to:
 4. profit (as usual)
 
 ### Extract
-See [Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)]({filename}../2016/plotting-czech-cadastre-land-use-with-d3-part-i.md).
+See [Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)]({filename}/2016/plotting-czech-cadastre-land-use-with-d3-part-i.md).
 
 ### Transform
 
-See [Plotting the Czech Cadastre Land Use with d3: Data Transformation (part II)]({filename}../2016/plotting-czech-cadastre-land-use-with-d3-part-ii.md).
+See [Plotting the Czech Cadastre Land Use with d3: Data Transformation (part II)]({filename}/2016/plotting-czech-cadastre-land-use-with-d3-part-ii.md).
 
 ## Load
 

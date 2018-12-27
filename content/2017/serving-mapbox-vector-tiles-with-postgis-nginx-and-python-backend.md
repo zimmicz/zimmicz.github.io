@@ -4,14 +4,14 @@ Category: SQL
 Tags: postgis, python
 Image: https://www.zimmi.cz/posts/assets/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/mvt.png
 
-[Since version 2.4.0, PostGIS can serve MVT](({filename}../2017/postgis-as-a-mapbox-vector-tiles-generator.md)) data directly. MVT returning queries put heavy workload on the database though. On top of that, each of the query has to be run again every time a client demands the data. This leaves us with plenty of room to optimize the process.
+[Since version 2.4.0, PostGIS can serve MVT]({filename}/2017/postgis-as-a-mapbox-vector-tiles-generator.md) data directly. MVT returning queries put heavy workload on the database though. On top of that, each of the query has to be run again every time a client demands the data. This leaves us with plenty of room to optimize the process.
 
-<div class="text-center"><img src="/posts/assets/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/election.gif"/></div>
+<div class="text-center"><img src="{static}/assets/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/election.gif"/></div>
 
 
 During the last week, while working on the Czech legislative election data visualization, I've struggled with the server becoming unresponsive far too often due to the issues mentioned above.
 
-<div class="text-center"><img src="/posts/assets/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/schema.png"/></div>
+<div class="text-center"><img src="{static}/assets/serving-mapbox-vector-tiles-with-postgis-nginx-and-python-backend/schema.png"/></div>
 
 According to the schema, the first client to come to the server:
 

@@ -3,14 +3,14 @@ Date: 2015-04-20 21:06
 Tags: grass
 Category: automation
 
-Recently I've written about [struggling with fairly complex geometries in PostGIS](/2015/postgis-buffers-intersections-differences-and-collections/). Lesson learned from the last time was to use more smaller geometries instead of several really huge. You can obtain the small ones from the big by [cutting it with a grid](/2015/postgis-rectangular-grid-creation/).
+Recently I've written about [struggling with fairly complex geometries in PostGIS]({filename}/2015/postgis-buffers-intersections-differences-and-collections.md). Lesson learned from the last time was to use more smaller geometries instead of several really huge. You can obtain the small ones from the big by [cutting it with a grid]({filename}/2015/postgis-rectangular-grid-creation.md).
 
 A supervisor of a project I've been working on came up with a task that totally buried the previous process in a blink of an eye: **Give me the buffer (diffed with original geometries) that is smoothed on the outer bounds so there are no edges shorter than 10 cm.** I sighed. Then, I cursed. Then, I gave it a try with PostGIS. Achieving this goal involves these steps:
 
 * Dissolve intersecting buffers
 * Run some kind of generalization algorithm that is not defined in PostGIS
 * Diff original geometries
-* Cut buffer with grid so it works <del>faster</del> not so slow for the next steps
+* Cut buffer with grid so it is <del>faster</del> not so slow for the next steps
 
 Two of those four are rather problematic with PostGIS: line smoothing and diffing the original geometries (I didn't get to the last one, so it might be 3 of 4 as well).
 

@@ -24,7 +24,7 @@ I'm going to use the roads data [from the previous post]({filename}routing-with-
 
 I got six different points and the pretty dense road network. Note none of the points is connected to the existing network.
 
-<div class="text-center"><img src="/posts/assets/routing-with-grass-gis-catchment-area-calculation/roads_points.png"/></div>
+<div class="text-center"><img src="{static}/assets/routing-with-grass-gis-catchment-area-calculation/roads_points.png"/></div>
 
 You have to have routable network to do the actual routing (the worst sentence ever written). To do so, let's:
 
@@ -46,7 +46,7 @@ Once the network is routable, it is easy to find the shortest path between point
 
 The algorithm doesn't take bridges, tunnels and oneways into account, it's capable of doing so though.
 
-<div class="text-center"><img src="/posts/assets/routing-with-grass-gis-catchment-area-calculation/shortest_path.png" width="70%"/></div>
+<div class="text-center"><img src="{static}/assets/routing-with-grass-gis-catchment-area-calculation/shortest_path.png" width="70%"/></div>
 
 ## Distributing the subnets for nearest centers
 
@@ -55,7 +55,7 @@ The algorithm doesn't take bridges, tunnels and oneways into account, it's capab
 
 `v.net.alloc` module takes the given centers and distributes the network so each of its parts belongs to exactly one center - the nearest one (speaking the distance, time units, &hellip;).
 
-<div class="text-center"><img src="/posts/assets/routing-with-grass-gis-catchment-area-calculation/subnets.png" width="70%"/></div>
+<div class="text-center"><img src="{static}/assets/routing-with-grass-gis-catchment-area-calculation/subnets.png" width="70%"/></div>
 
 ## Creating catchment areas
 
@@ -64,11 +64,11 @@ The algorithm doesn't take bridges, tunnels and oneways into account, it's capab
 
 `v.net.iso` splits net by cost isolines. Again, the costs might be specified as lengths, time units, &hellip;.
 
-<div class="text-center"><img src="/posts/assets/routing-with-grass-gis-catchment-area-calculation/isolines.png" width="70%"/></div>
+<div class="text-center"><img src="{static}/assets/routing-with-grass-gis-catchment-area-calculation/isolines.png" width="70%"/></div>
 
 Two different ways lead to the actual catchment area creation. First, you extract nodes from the roads with their values, turn them into the raster grid and either extract contours or polygonize the raster. I find the last step suboptimal and would love to find another way of polygonizing the results.
 
-<div class="text-center"><img src="/posts/assets/routing-with-grass-gis-catchment-area-calculation/catchment_area.gif" width="70%"/></div>
+<div class="text-center"><img src="{static}/assets/routing-with-grass-gis-catchment-area-calculation/catchment_area.gif" width="70%"/></div>
 
 Note when extracting contours the interval has to be set to the reasonable number depending on the nodes values.
 

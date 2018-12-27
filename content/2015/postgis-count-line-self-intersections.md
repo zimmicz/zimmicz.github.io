@@ -16,7 +16,7 @@ Assume the following geometries:
     2   01020000208A1500000600000050212BF9E63EC03F1FA046FD69F1EA3F504D44212915EA3F74A99EDF44E3F33F2CE2805DFAB1F33F805D24B1B189DC3F9834DE5938C1F53FB56F1FBF8AAFEC3F24D0C85B4666EA3FF311B0D8D75BE93F306EAA073894D23FA841B27E3404F33F
     \.
 
-<img src="/posts/assets/postgis-count-line-self-intersections/lines.png" title="Self-intersecting lines" class="img-responsive centered">
+<img src="{static}/assets/postgis-count-line-self-intersections/lines.png" title="Self-intersecting lines" class="img-responsive centered">
 
 Note that those geometries are valid while not being simple, thus, `ST_IsValidReason()` wouldn't help much. What if we compared it to their single counterparts? Those would have had vertices at intersections. Once you know the original number of vertices and the number of simple geometry vertices, it is fairly easy to subtract those two.
 

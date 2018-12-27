@@ -5,8 +5,8 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-        <link href="http://localhost:8000/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
-        <link href="http://localhost:8000/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
+        <link href="https://www.zimmi.cz/posts/atom.xml" type="application/atom+xml" rel="alternate" title="Michal Zimmermann Full Atom Feed" />
+        <link href="https://www.zimmi.cz/posts/feed.xml" type="application/rss+xml" rel="alternate" title="Michal Zimmermann Full RSS Feed" />
         <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?0c7c5d39">
 </head>
 <body>
@@ -62,8 +62,9 @@
 </ol>
 <h2>Data&nbsp;vizualization</h2>
 <p>Those of you who&#8217;ve been following this series know all the data are set and ready to be used. The rest of you, <em>shame on you by the way</em>, can go through the above posts to catch&nbsp;up.</p>
-<p>The result is available at <a href="https://www.zimmi.cz/kn-landuse-monitor">https://www.zimmi.cz/kn-landuse-monitor</a> and works like the gif&nbsp;below.</p>
-<div class="text-center"><img src="/posts/assets/plotting-the-czech-cadastre-land-use-with-d3-part-iv/screen.gif" /></div>
+<p style="text-decoration: line-through">The result is available at https://www.zimmi.cz/kn-landuse-monitor and works like the gif&nbsp;below.</p>
+
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/plotting-the-czech-cadastre-land-use-with-d3-part-iv/screen.gif" /></div>
 
 <h3>Features</h3>
 <ul>
@@ -166,7 +167,7 @@ EOF
 <li>profit (as&nbsp;usual)</li>
 </ol>
 <h3>Extract</h3>
-<p>See <a href="{filename}../2016/plotting-czech-cadastre-landuse-with-d3-part-i.md">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)</a>.</p>
+<p>See <a href="{filename}/2016/plotting-czech-cadastre-landuse-with-d3-part-i.md">Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)</a>.</p>
 <h3>Transform</h3>
 <p>Last time, I extracted the data from multiple <span class="caps">CSV</span> files to separate PostgreSQL tables named by <code>data_YYYYMMDD</code> pattern. My current goal is to transform it into the one big <code>data</code> table, where each row represents one cadastral area. Here&#8217;s what I&#8217;m trying to&nbsp;achieve:</p>
 <div class="highlight"><pre><span></span>-<span class="o">[</span> RECORD <span class="m">1</span> <span class="o">]</span>----------+----------------------------------

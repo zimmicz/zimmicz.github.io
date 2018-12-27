@@ -3,7 +3,7 @@ Date: 2014-12-02 17:59
 Tags: postgresql, postgis
 Category: SQL
 
-[VozejkMap.cz](http://www.vozejkmap.cz) is a Czech **open data** iniatitive that collects data about wheelchair accessible places, e.g. pubs, toilets, cafes etc. As part of being open, they offer a [JSON data download](http://www.vozejkmap.cz/opendata/). JSON is a great text format, not so great spatial format (leaving GeoJSON aside) though. Anyway, nothing that [PostGIS](http://posts.zimmi.cz/tag/postgis/) wouldn't be able to take care of.
+[VozejkMap.cz](http://www.vozejkmap.cz) is a Czech **open data** iniatitive that collects data about wheelchair accessible places, e.g. pubs, toilets, cafes etc. As part of being open, they offer a [JSON data download](http://www.vozejkmap.cz/opendata/). JSON is a great text format, not so great spatial format (leaving GeoJSON aside) though. Anyway, nothing that [PostGIS]({tag}postgis) wouldn't be able to take care of.
 
 ### Let's get some data
 Using curl or wget, let's download the JSON file:

@@ -71,7 +71,7 @@ I got a cadastre area dataset of the Czech Republic for testing, which contains 
 
 I got a bit confused by the docs of [ST_AsMVT](https://postgis.net/docs/manual-dev/ST_AsMVT.html) and [ST_AsMVTGeom](https://postgis.net/docs/manual-dev/ST_AsMVTGeom.html). Especially the latter one took me a few hours to get it right. What is essential (I guess) about Mapbox Vector Tiles is that you have to abstract from the real world coordinates and start thinking inside the tile coordinates. What PostGIS does with `ST_AsMVTGeom` (and what any other MVT implemenation should do for you) is that it takes real world coordinates and put them inside a tile.
 
-<div class="text-center"><img src="/posts/assets/postgis-as-a-mapbox-vector-tiles-generator/mvt.gif"/></div>
+<div class="text-center"><img src="{static}/assets/postgis-as-a-mapbox-vector-tiles-generator/mvt.gif"/></div>
 
 To make this work, you need to know every bounding box of every tile on every zoom level in a Web Mercator projection. Or you can use [TileBBox procedure by Mapbox](https://github.com/mapbox/postgis-vt-util/blob/master/src/TileBBox.sql), if you wish.
 

@@ -3,7 +3,7 @@ Date: 2015-11-6 22:00
 Tags: javascript, openshift, twitter
 Category: development
 
-More than a year ago I wrote about [analyzing Twitter languages with Streaming API](http://www.zimmi.cz/posts/2014/analyzing-twitter-languages-with-streaming-api/). Back then I kept my laptop running for a week to download data. Not a comfortable way, especially if you decide to get more data. One year uptime doesn't sound like anything you want to be part of. [OpenShift](https://www.openshift.com/) by Red Hat seems to be almost perfect replacement. Almost.
+More than a year ago I wrote about [analyzing Twitter languages with Streaming API]({filename}/2014/analyzing-twitter-languages-with-streaming-api.md). Back then I kept my laptop running for a week to download data. Not a comfortable way, especially if you decide to get more data. One year uptime doesn't sound like anything you want to be part of. [OpenShift](https://www.openshift.com/) by Red Hat seems to be almost perfect replacement. Almost.
 
 ## OpenShift setup
 
@@ -71,13 +71,13 @@ It runs the following code for me to keep the app writing data to the database.
     logfile=$workdir/restart-gear.log
     date > $logfile
 
-    { 
+    {
     HOME=/home/zimmi
     cd $workdir && \
     git merge origin/master && \
     git commit --allow-empty -m "Restart gear" && \
     git push && \
-    echo "Success" ; 
+    echo "Success" ;
     } >> $logfile 2>&1
 
 **UPDATE:** Spent a long time debugging the "Permission denied (publickey)."-like errors. What seems to help is:
@@ -87,7 +87,7 @@ It runs the following code for me to keep the app writing data to the database.
 
 I don't know which one did the magic though.
 
-I've been harvesting Twitter for a month with about 10-15K tweets a day (only interested in the Czech Republic). 
+I've been harvesting Twitter for a month with about 10-15K tweets a day (only interested in the Czech Republic).
 <sup>1</sup>&frasl;<sub>6</sub> to <sup>1</sup>&frasl;<sub>5</sub> of them is located with latitude and longitude. More on this next time.
         
         

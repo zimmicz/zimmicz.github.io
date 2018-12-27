@@ -34,4 +34,4 @@ Tags: ogc, wmts
 - <code>tileMatrixMaxX = tileMatrixMinX + tileSpanX × matrixWidth;</code>
 - <code>tileMatrixMinY = tileMatrixMaxY - tileSpanY × matrixHeight;</code>
 
-<img src="/posts/assets/wmts-few-things-i-want-to-remember/wmts.png" title="WMTS tiling schema" class="img-responsive centered">
+<img src="{static}/assets/wmts-few-things-i-want-to-remember/wmts.png" title="WMTS tiling schema" class="img-responsive centered">

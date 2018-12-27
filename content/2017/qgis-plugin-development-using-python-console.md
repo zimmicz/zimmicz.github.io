@@ -5,7 +5,7 @@ Tags: python, QGIS
 Series: QGIS Plugin Development
 Image: https://www.zimmi.cz/posts/assets/qgis-plugin-development-using-python-console/qgis.png
 
-As mentioned in [previous part]({filename}../2017/qgis-plugin-development-getting-started.md) of the series, the QGIS Python console is an entry point to GIS workflow automation within QGIS. Remember there's an `iface` object representing `qgis.gui.QgisInterface` instance within the console that gives you access to the whole QGIS GUI. Let's see what we can do inside the console.
+As mentioned in [previous part]({filename}/2017/qgis-plugin-development-getting-started.md) of the series, the QGIS Python console is an entry point to GIS workflow automation within QGIS. Remember there's an `iface` object representing `qgis.gui.QgisInterface` instance within the console that gives you access to the whole QGIS GUI. Let's see what we can do inside the console.
 
 ## Loading vector layers folder
 

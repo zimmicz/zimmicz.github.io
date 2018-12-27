@@ -5,17 +5,17 @@ Tags: d3, javascript, svg
 
 This post is the fourth part of the series summarizing the process of visualizing land use data with bash, PostgreSQL and d3.js. Read other parts:
 
-1. [Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)]({filename}../2016/plotting-czech-cadastre-land-use-with-d3-part-i.md)
-2. [Plotting the Czech Cadastre Land Use with d3: Data Transformation (part II)]({filename}../2016/plotting-czech-cadastre-land-use-with-d3-part-ii.md)
-3. [Plotting the Czech Cadastre Land Use with d3: Data Load (part III)]({filename}../2016/plotting-czech-cadastre-land-use-with-d3-part-iii.md)
+1. [Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)]({filename}/2016/plotting-czech-cadastre-land-use-with-d3-part-i.md)
+2. [Plotting the Czech Cadastre Land Use with d3: Data Transformation (part II)]({filename}/2016/plotting-czech-cadastre-land-use-with-d3-part-ii.md)
+3. [Plotting the Czech Cadastre Land Use with d3: Data Load (part III)]({filename}/2016/plotting-czech-cadastre-land-use-with-d3-part-iii.md)
 
 ## Data vizualization
 
 Those of you who've been following this series know all the data are set and ready to be used. The rest of you, _shame on you by the way_, can go through the above posts to catch up.
 
-The result is available at [https://www.zimmi.cz/kn-landuse-monitor](https://www.zimmi.cz/kn-landuse-monitor) and works like the gif below.
+<p style="text-decoration: line-through">The result is available at https://www.zimmi.cz/kn-landuse-monitor and works like the gif below.</p>
 
-<div class="text-center"><img src="/posts/assets/plotting-the-czech-cadastre-land-use-with-d3-part-iv/screen.gif" /></div>
+<div class="text-center"><img src="{static}/assets/plotting-the-czech-cadastre-land-use-with-d3-part-iv/screen.gif" /></div>
 
 ### Features
 
