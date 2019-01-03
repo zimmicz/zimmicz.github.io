@@ -14,7 +14,7 @@
 <meta property="og:title" content="PostgreSQL IN vs EXISTS" />
 <meta property="og:description" content="Until recently, SQL IN and EXISTS were almost exactly the same to me. There is a significant difference both in execution plans and time of execution though, as I found out after not being able to speed up my workmate’s query. Assume two..." />
 <meta property="og:url" content="https://www.zimmi.cz/posts/2015/postgresql-in-vs-exists/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?0c7c5d39">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9908e745">
 </head>
 <body>
     <nav role="navigation">
@@ -129,6 +129,10 @@
 <p>It took me ~750 ms to get the result with <code>EXISTS</code> expression. I kept <code>IN</code> running whole night with no result. I&#8217;m not really sure why <code>IN</code> is so much slower, it might be caused by checks for <code>NULL</code> values. The speed is also related to the size of the subquery, thus the difference when tables were&nbsp;switched.</p>
 <p><code>LEFT JOIN</code> can be used to achieve the same result, I find its syntax less obvious&nbsp;though.</p>
 <p>No indexes were built this time, I know they don&#8217;t help the <code>IN</code> performance at all from my previous tests. Tested with PostgreSQL&nbsp;9.3.9.</p>
+    <aside class="paypal">
+        <p>If you find this blog useful, you are welcome to make a donation to support it.</p>
+        <p><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=37LZSUU986DC6&source=url">Donate via PayPal</a></p>
+    </aside>
     <aside>
 
 <h3>More reading</h3>
@@ -136,8 +140,8 @@
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/upgrading-postgresql-95-to-postgresql-96-with-postgis/">Upgrading PostgreSQL 9.5 to PostgreSQL 9.6 with&nbsp;PostGIS</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-polygon-from-centroid/">PostGIS Custom Function to Create Polygon from&nbsp;Centroid</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-wind-rose/">PostGIS Custom Function to Create Wind&nbsp;Rose</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/looking-for-the-next-row-with-postgresql/">Looking for the Next Row with&nbsp;PostgreSQL</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/subdivide-and-conquer-effective-spatial-indexes-in-postgis/">Subdivide and Conquer: Effective Spatial Indexes in&nbsp;PostGIS</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/executing-dynamic-sql-query-right-away/">Executing dynamic <span class="caps">SQL</span> query right&nbsp;away</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/postgresql-dollar-quoting-inside-bash-heredoc/">PostgreSQL Dollar Quoting inside Bash&nbsp;Heredoc</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
 <script>

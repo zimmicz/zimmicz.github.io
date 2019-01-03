@@ -16,7 +16,7 @@
 <meta property="og:title" content="PostgreSQL Backup and Recovery Orchestration: systemd Automation" />
 <meta property="og:description" content="Posts in this series have described the basic automation of PostgreSQL backup/recovery strategy. The process itself consists of different periodic tasks that shouldn’t be executed manually. There are essentially two tools dedicated to periodic task..." />
 <meta property="og:url" content="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-systemd-automation/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?0c7c5d39">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9908e745">
 </head>
 <body>
     <nav role="navigation">
@@ -134,6 +134,10 @@
 
 <p>Targets might be called by other targets. Running <code>systemctl start cr-sunday.target</code> would eventually lead to running all the services wanted by that&nbsp;target.</p>
 <p>As I already mentioned, I find systemd services easy to code and test. If any of them should fail, you&#8217;d find a message in syslog or via <code>systemctl status pgsql-vacuumdb</code>.</p>
+    <aside class="paypal">
+        <p>If you find this blog useful, you are welcome to make a donation to support it.</p>
+        <p><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=37LZSUU986DC6&source=url">Donate via PayPal</a></p>
+    </aside>
     <aside>
 <h3>This post is part 4 of the "PostgreSQL Backup and Recovery Orchestration" series:</h3>
     <ol class="parts">
@@ -153,11 +157,11 @@
 
 <h3>More reading</h3>
     <ul>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-wal-archiving/">PostgreSQL Backup and Recovery Orchestration: <span class="caps">WAL</span>&nbsp;Archiving</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-bash-automation/">PostgreSQL Backup and Recovery Orchestration: Bash&nbsp;Automation</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/">Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span></a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-recovery/">PostgreSQL Backup and Recovery Orchestration:&nbsp;Recovery</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/">Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span></a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-bash-automation/">PostgreSQL Backup and Recovery Orchestration: Bash&nbsp;Automation</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/postgresql-remote-access/">PostgreSQL Remote&nbsp;Access</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-wal-archiving/">PostgreSQL Backup and Recovery Orchestration: <span class="caps">WAL</span>&nbsp;Archiving</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
 <script>

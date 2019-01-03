@@ -16,7 +16,7 @@
 <meta property="og:title" content="Dead Simple Random Points in Polygons with PostGIS" />
 <meta property="og:description" content="Since PostgreSQL 9.3 there has been a handy little keyword called LATERAL, which - combined with JOIN - might rock your GIS world in a second. To keep it simple, a LATERAL JOIN enables a subquery in the FROM part of a query to reference columns from..." />
 <meta property="og:url" content="https://www.zimmi.cz/posts/2016/dead-simple-random-points-in-polygons-with-postgis/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?0c7c5d39">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9908e745">
 </head>
 <body>
     <nav role="navigation">
@@ -116,6 +116,10 @@
 
 <p>The inner <code>SELECT</code> calculates random points based on the extent of the polygon. Note it directly calls <code>a.geom</code>, a value that comes from the previous <code>SELECT</code>! The <code>LATERAL JOIN</code> part is thus run for every row of the previous <code>SELECT</code> statement inside <code>FROM</code> part of the query. This means it will return 201 points for each of the two polygons (run the query inside <span class="caps">QGIS</span> to see the&nbsp;result).</p>
 <p>Note all the points fall inside the polygons by accident, because they are <strong>square</strong>. Otherwise a <code>ST_Contains</code> or <code>ST_Within</code> should be used inside the outermost <code>WHERE</code> query to filter outliers. This part could use some&nbsp;tweaking.</p>
+    <aside class="paypal">
+        <p>If you find this blog useful, you are welcome to make a donation to support it.</p>
+        <p><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=37LZSUU986DC6&source=url">Donate via PayPal</a></p>
+    </aside>
     <aside>
 
 <h3>More reading</h3>

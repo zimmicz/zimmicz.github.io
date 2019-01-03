@@ -14,7 +14,7 @@
 <meta property="og:title" content="Implementing Linked List with PostgreSQL Recursive CTE" />
 <meta property="og:description" content="I’ve been working on a book/storytelling pet project recently. Dealing with book events and keeping them in order was a task that was to be tackled sooner or later. While both frontend and backend of the app could deal with linked and ordered data,..." />
 <meta property="og:url" content="https://www.zimmi.cz/posts/2018/implementing-linked-list-with-postgresql-recursive-cte/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?0c7c5d39">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9908e745">
 </head>
 <body>
     <nav role="navigation">
@@ -86,15 +86,19 @@
 
 <p>It gathers the first event (the one having the previous pointer set to <code>NULL</code>) and iteratively adds the following ones. Note that this version is actually the <em>reverse</em> implementation of the linked list, pointing to the previous instead of the next event. All it would take to change that, would be finding the event id not present in <code>previous_id</code> column as the first one instead of <code>WHERE previous_id IS NULL</code>.</p>
 <p>With the data coming properly sorted to the client, all it has to do is rendering the&nbsp;list.</p>
+    <aside class="paypal">
+        <p>If you find this blog useful, you are welcome to make a donation to support it.</p>
+        <p><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=37LZSUU986DC6&source=url">Donate via PayPal</a></p>
+    </aside>
     <aside>
 
 <h3>More reading</h3>
     <ul>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/postgis-case-study-vozejkmap-open-data-part-i/">PostGIS Case Study: VozejkMap Open Data (Part&nbsp;I)</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-buffers-intersections-differences-and-collections/">PostGIS: Buffers, Intersections, Differences And&nbsp;Collections</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/postgresql-dollar-quoting-inside-bash-heredoc/">PostgreSQL Dollar Quoting inside Bash&nbsp;Heredoc</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-wal-archiving/">PostgreSQL Backup and Recovery Orchestration: <span class="caps">WAL</span>&nbsp;Archiving</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/postgis-rectangular-grid-creation/">PostGIS: Rectangular Grid&nbsp;Creation</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-systemd-automation/">PostgreSQL Backup and Recovery Orchestration: systemd&nbsp;Automation</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/dead-simple-random-points-in-polygons-with-postgis/">Dead Simple Random Points in Polygons with&nbsp;PostGIS</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2016/looking-for-the-next-row-with-postgresql/">Looking for the Next Row with&nbsp;PostgreSQL</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
 <script>

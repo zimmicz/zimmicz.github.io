@@ -414,3 +414,28 @@ ul#cloud li a:hover {
     background: #a31621;
     color: white;
 }
+
+.paypal {
+    border-top: 1px solid #CED3DC;
+    margin-bottom: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.paypal p {
+    width: 100%;
+    text-align: center;
+}
+
+.paypal a {
+    background: #A31621;
+    border: 1px solid #A31621;
+    color: white;
+    padding: .85rem;
+    text-decoration: none;
+}
+
+.paypal a:hover {
+    background: white;
+    color: #a31621;
+}

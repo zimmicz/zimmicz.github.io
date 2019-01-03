@@ -15,7 +15,7 @@
 <meta property="og:title" content="Blogging On Docker: Piecrust To The Rescue" />
 <meta property="og:description" content="I love blogging. I hate blogging systems. I hate content management systems. I just want to blog. That’s what PieCrust is all about - it lets you blog. It is powerful static website generator perfect for my needs (and for yours as well?). Blogging..." />
 <meta property="og:url" content="https://www.zimmi.cz/posts/2014/blogging-on-docker-piecrust-to-the-rescue/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?0c7c5d39">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9908e745">
 </head>
 <body>
     <nav role="navigation">
@@ -71,15 +71,19 @@
 <p>Running <code>sudo docker build --tag=piecrust .</code> will result in having docker container ready to run. Just run <code>sudo docker run -it -p 8080:8080 -v /host_piecrust_path/:/container_path piecrust /bin/bash</code> in terminal. While in container terminal, run <code>chef serve -n -p 8080 -a 0.0.0.0</code> and visit <a href="http://localhost:8080">http://localhost:8080</a>. You should see your PieCrust site up and&nbsp;running.</p>
 <p>The last command tells chef to serve your site on port 8080 (which should be free unless you&#8217;re running Tomcat or something like that) and make it listen on every available network interface. If you used 127.0.0.1 instead, you would never reach your site from outside the&nbsp;container.</p>
 <p>See?&nbsp;Easy.</p>
+    <aside class="paypal">
+        <p>If you find this blog useful, you are welcome to make a donation to support it.</p>
+        <p><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=37LZSUU986DC6&source=url">Donate via PayPal</a></p>
+    </aside>
     <aside>
 
 <h3>More reading</h3>
     <ul>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2017/postgis-as-a-mapbox-vector-tiles-generator/">PostGIS as a Mapbox Vector Tiles&nbsp;generator</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/color-relief-shaded-map-using-open-data-with-open-source-software/">Color Relief Shaded Map Using Open Data with Open Source&nbsp;Software</a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/">Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span></a></li>
-        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-recovery/">PostgreSQL Backup and Recovery Orchestration:&nbsp;Recovery</a></li>
         <li><a class="neighbor" href="https://www.zimmi.cz/posts/2014/ogr2ogr-unix-x-windows/">ogr2ogr <span class="caps">UNIX</span> x&nbsp;Windows</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2015/installing-postgis-22-with-sfcgal-on-ubuntu-based-os/">Installing PostGIS 2.2 with <span class="caps">SFCGAL</span> on Ubuntu-based <span class="caps">OS</span></a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-bash-automation/">PostgreSQL Backup and Recovery Orchestration: Bash&nbsp;Automation</a></li>
+        <li><a class="neighbor" href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-recovery/">PostgreSQL Backup and Recovery Orchestration:&nbsp;Recovery</a></li>
     </ul>
 <!-- Start of Async Drift Code -->
 <script>

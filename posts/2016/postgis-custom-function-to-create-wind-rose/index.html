@@ -16,7 +16,7 @@
 <meta property="og:title" content="PostGIS Custom Function to Create Wind Rose" />
 <meta property="og:description" content="I’ve come across the beautiful GIS StackExchange question recently, asking how to draw a wind rose within PostGIS. It’s pretty easy to accomplish this with a custom PLPGSQL procedure below, that takes line geometry, number of sections and radius of..." />
 <meta property="og:url" content="https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-wind-rose/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?0c7c5d39">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9908e745">
 </head>
 <body>
     <nav role="navigation">
@@ -107,6 +107,10 @@
 
 <div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">ST_WindRose</span><span class="p">(</span><span class="n">ST_MakeLine</span><span class="p">(</span><span class="n">ST_MakePoint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">ST_MakePoint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)),</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mi">01</span><span class="p">);</span>
 </pre></div>
+    <aside class="paypal">
+        <p>If you find this blog useful, you are welcome to make a donation to support it.</p>
+        <p><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=37LZSUU986DC6&source=url">Donate via PayPal</a></p>
+    </aside>
     <aside>
 
 <h3>More reading</h3>

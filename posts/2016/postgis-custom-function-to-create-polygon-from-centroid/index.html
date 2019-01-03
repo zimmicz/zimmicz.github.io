@@ -16,7 +16,7 @@
 <meta property="og:title" content="PostGIS Custom Function to Create Polygon from Centroid" />
 <meta property="og:description" content="Needed to create a polygon from a point defining its size in both axes, here’s a little syntax sugar to make life easier. CREATE OR REPLACE FUNCTION ST_PolygonFromCentroid(centroid geometry, xsize numeric, ysize numeric) RETURNS geometry AS..." />
 <meta property="og:url" content="https://www.zimmi.cz/posts/2016/postgis-custom-function-to-create-polygon-from-centroid/" />
-        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?0c7c5d39">
+        <link rel="stylesheet" href="https://www.zimmi.cz/posts/theme/css/style.min.css?9908e745">
 </head>
 <body>
     <nav role="navigation">
@@ -65,6 +65,10 @@
 
 <div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">ST_PolygonFromCentroid</span><span class="p">(</span><span class="n">ST_SetSRID</span><span class="p">(</span><span class="n">ST_MakePoint</span><span class="p">(</span><span class="mi">13</span><span class="p">.</span><span class="mi">912</span><span class="p">,</span><span class="mi">50</span><span class="p">.</span><span class="mi">633</span><span class="p">),</span><span class="mi">4326</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 </pre></div>
+    <aside class="paypal">
+        <p>If you find this blog useful, you are welcome to make a donation to support it.</p>
+        <p><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=37LZSUU986DC6&source=url">Donate via PayPal</a></p>
+    </aside>
     <aside>
 
 <h3>More reading</h3>
