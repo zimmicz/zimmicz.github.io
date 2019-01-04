@@ -125,7 +125,7 @@ Now the interesting part. All the routing functions are built on what's called [
 
 Using `pgr_pointsAsPolygon` renders resulting nodes accessible in 10-minute walk in polygons, but weird looking ones. Not bad, could be better though.
 
-<div class="text-center"><img src="/assets/routing-with-pgrouting-catchment-area-calculation/area1.png" width="70%" /></div>
+<div class="text-center"><img src="{static}/assets/routing-with-pgrouting-catchment-area-calculation/area1.png" width="70%" /></div>
 
 How about seeing only nodes instead of polygons?
 
@@ -143,7 +143,7 @@ How about seeing only nodes instead of polygons?
 
 Looks good, could be better though.
 
-<div class="text-center"><img src="/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png" width="70%" /></div>
+<div class="text-center"><img src="{static}/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png" width="70%" /></div>
 
 How about creating concave hulls from the extracted nodes?
 
@@ -168,7 +168,7 @@ How about creating concave hulls from the extracted nodes?
 
 This one looks the best I guess.
 
-<div class="text-center"><img src="/assets/routing-with-pgrouting-catchment-area-calculation/area2.png" width="70%" /></div>
+<div class="text-center"><img src="{static}/assets/routing-with-pgrouting-catchment-area-calculation/area2.png" width="70%" /></div>
 
 ## Remarks
 

@@ -1856,7 +1856,7 @@ v.net &lt;span class="nv"&gt;input&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&
 
 
 &lt;p&gt;Using &lt;code&gt;pgr_pointsAsPolygon&lt;/code&gt; renders resulting nodes accessible in 10-minute walk in polygons, but weird looking ones. Not bad, could be better&amp;nbsp;though.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img src="/assets/routing-with-pgrouting-catchment-area-calculation/area1.png" width="70%" /&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/routing-with-pgrouting-catchment-area-calculation/area1.png" width="70%" /&gt;&lt;/div&gt;
 
 &lt;p&gt;How about seeing only nodes instead of&amp;nbsp;polygons?&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt;
@@ -1873,7 +1873,7 @@ v.net &lt;span class="nv"&gt;input&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&
 
 
 &lt;p&gt;Looks good, could be better&amp;nbsp;though.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img src="/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png" width="70%" /&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/routing-with-pgrouting-catchment-area-calculation/nodes1.png" width="70%" /&gt;&lt;/div&gt;
 
 &lt;p&gt;How about creating concave hulls from the extracted&amp;nbsp;nodes?&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt;
@@ -1897,7 +1897,7 @@ v.net &lt;span class="nv"&gt;input&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&
 
 
 &lt;p&gt;This one looks the best I&amp;nbsp;guess.&lt;/p&gt;
-&lt;div class="text-center"&gt;&lt;img src="/assets/routing-with-pgrouting-catchment-area-calculation/area2.png" width="70%" /&gt;&lt;/div&gt;
+&lt;div class="text-center"&gt;&lt;img src="https://www.zimmi.cz/posts/assets/routing-with-pgrouting-catchment-area-calculation/area2.png" width="70%" /&gt;&lt;/div&gt;
 
 &lt;h2&gt;Remarks&lt;/h2&gt;
 &lt;ul&gt;
@@ -2226,7 +2226,7 @@ EOF
 &lt;li&gt;profit (as&amp;nbsp;usual)&lt;/li&gt;
 &lt;/ol&gt;
 &lt;h3&gt;Extract&lt;/h3&gt;
-&lt;p&gt;See &lt;a href="{filename}/2016/plotting-czech-cadastre-landuse-with-d3-part-i.md"&gt;Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;See &lt;a href="https://www.zimmi.cz/posts/2016/plotting-czech-cadastre-land-use-with-d3-data-extraction-part-i"&gt;Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)&lt;/a&gt;.&lt;/p&gt;
 &lt;h3&gt;Transform&lt;/h3&gt;
 &lt;p&gt;Last time, I extracted the data from multiple &lt;span class="caps"&gt;CSV&lt;/span&gt; files to separate PostgreSQL tables named by &lt;code&gt;data_YYYYMMDD&lt;/code&gt; pattern. My current goal is to transform it into the one big &lt;code&gt;data&lt;/code&gt; table, where each row represents one cadastral area. Here&amp;#8217;s what I&amp;#8217;m trying to&amp;nbsp;achieve:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;-&lt;span class="o"&gt;[&lt;/span&gt; RECORD &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt;----------+----------------------------------
@@ -2447,7 +2447,7 @@ rm &lt;span class="nv"&gt;$CSVFILE&lt;/span&gt; &lt;span class="nv"&gt;$CSVUTF8F
 &lt;li&gt;online at &lt;a href="https://outline-maps.world"&gt;Outline Maps of the World&lt;/a&gt; with the map of your choice (if&amp;nbsp;available)&lt;/li&gt;
 &lt;li&gt;offline, downloaded to your computer and filled with whatever data you&amp;nbsp;want&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;What I find great about this project is the ease of adding new dataset. For starters, I filled it with data coming from &lt;a href="naturalearthdata.com"&gt;Natural Earth&lt;/a&gt;:&lt;/p&gt;
+&lt;p&gt;What I find great about this project is the ease of adding new dataset. For starters, I filled it with data coming from &lt;a href="https://naturalearthdata.com"&gt;Natural Earth&lt;/a&gt;:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;span class="caps"&gt;CONUS&lt;/span&gt;&amp;nbsp;states&lt;/li&gt;
 &lt;li&gt;European&amp;nbsp;states&lt;/li&gt;

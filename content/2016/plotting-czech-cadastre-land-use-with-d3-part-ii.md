@@ -20,7 +20,7 @@ Before the d3 viz can be crafted, it's necessary to:
 4. profit (as usual)
 
 ### Extract
-See [Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)]({filename}/2016/plotting-czech-cadastre-landuse-with-d3-part-i.md).
+See [Plotting the Czech Cadastre Land Use with d3: Data Extraction (part I)]({filename}/2016/plotting-czech-cadastre-land-use-with-d3-part-i.md).
 
 ### Transform
 

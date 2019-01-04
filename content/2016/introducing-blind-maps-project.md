@@ -14,7 +14,7 @@ The app is ready and can be used:
 * online at [Outline Maps of the World](https://outline-maps.world) with the map of your choice (if available)
 * offline, downloaded to your computer and filled with whatever data you want
 
-What I find great about this project is the ease of adding new dataset. For starters, I filled it with data coming from [Natural Earth](naturalearthdata.com):
+What I find great about this project is the ease of adding new dataset. For starters, I filled it with data coming from [Natural Earth](https://naturalearthdata.com):
 
 * CONUS states
 * European states
