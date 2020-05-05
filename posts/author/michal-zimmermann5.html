@@ -31,6 +31,78 @@
 <h2>Articles by Michal Zimmermann</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2017/routing-with-grass-gis-catchment-area-calculation/" rel="bookmark" title="Permalink to Routing with GRASS GIS: Catchment Area Calculation">Routing with <span class="caps">GRASS</span> <span class="caps">GIS</span>: Catchment Area&nbsp;Calculation</a></h1>
+    <aside><span>Apr 20, 2017</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/grass.html">grass</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/gis.html">GIS</a></span>
+    </aside>
+    <p>I got my hands on <a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/">pgRouting</a> in the last post and I&#8217;m about to do the same with <span class="caps">GRASS</span> <span class="caps">GIS</span> in this&nbsp;one.</p>
+<p><span class="caps">GRASS</span> <span class="caps">GIS</span> stores the topology for the native vector format by default, which makes it easy to use for the network analysis. All the commands associated with the network analysis can be found in the <code>v.net</code> family. The ones I&#8217;m going to discuss in this post are <code>v.net</code> itself, <code>v.net.path</code>, <code>.v.net.alloc</code> and <code>v.net.iso</code>,&nbsp;respectively.</p>
+<h2>Data</h2>
+<p>I&#8217;m going to use the roads data <a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/">from the previous post</a> together with some random points used as catchment areas&nbsp;centers.</p>
+<div class="highlight"><pre><span></span><span class="c1"># create the new GRASS GIS location</span>
+grass -text -c ./osm/czech
+
+<span class="c1"># import the roads</span>
+v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&quot;PG:host=localhost dbname=pgrouting&quot;</span> <span class="nv">layer</span><span class="o">=</span>cze.roads <span class="nv">output</span><span class="o">=</span>roads -eo  --overwrite
+
+<span class="c1"># import the random points</span>
+v.in.ogr <span class="nv">input</span><span class="o">=</span><span class="s2">&quot;PG:host=localhost dbname=pgrouting&quot;</span> <span class="nv">layer</span><span class="o">=</span>temp.points <span class="nv">output</span><span class="o">=</span>points -eo --overwrite
+</pre></div>
+
+
+<p>I got six different points and the pretty dense road network. Note none of the points is connected to the existing&nbsp;network.</p>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/roads_points.png"/></div>
+
+<p>You have to have routable network to do the actual routing (the worst sentence ever written). To do so,&nbsp;let&#8217;s:</p>
+<ul>
+<li>connect the random points to the&nbsp;network</li>
+<li>add nodes to ends and intersections of the&nbsp;roads</li>
+</ul>
+<p>Note I&#8217;m using the 500m as the max distance in which to connect the points to the&nbsp;network.</p>
+<div class="highlight"><pre><span></span>v.net <span class="nv">input</span><span class="o">=</span>roads <span class="nv">points</span><span class="o">=</span>points <span class="nv">operation</span><span class="o">=</span>connect <span class="nv">threshold</span><span class="o">=</span><span class="m">500</span> <span class="nv">output</span><span class="o">=</span>network
+v.net <span class="nv">input</span><span class="o">=</span>network <span class="nv">output</span><span class="o">=</span>network_noded <span class="nv">operation</span><span class="o">=</span>nodes
+</pre></div>
+
+
+<h2>Finding the shortest path between two&nbsp;points</h2>
+<p>Once the network is routable, it is easy to find the shortest path between points number 1 and 4 and store it in the new&nbsp;map.</p>
+<div class="highlight"><pre><span></span><span class="nb">echo</span> <span class="s2">&quot;1 1 4&quot;</span> <span class="p">|</span> v.net.path <span class="nv">input</span><span class="o">=</span>network_noded <span class="nv">output</span><span class="o">=</span>path_1_4
+</pre></div>
+
+
+<p>The algorithm doesn&#8217;t take bridges, tunnels and oneways into account, it&#8217;s capable of doing so&nbsp;though.</p>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/shortest_path.png" width="70%"/></div>
+
+<h2>Distributing the subnets for nearest&nbsp;centers</h2>
+<div class="highlight"><pre><span></span>v.net.alloc <span class="nv">input</span><span class="o">=</span>network_noded <span class="nv">output</span><span class="o">=</span>network_alloc <span class="nv">center_cats</span><span class="o">=</span><span class="m">1</span>-6 <span class="nv">node_layer</span><span class="o">=</span><span class="m">2</span>
+</pre></div>
+
+
+<p><code>v.net.alloc</code> module takes the given centers and distributes the network so each of its parts belongs to exactly one center - the nearest one (speaking the distance, time units,&nbsp;&hellip;).</p>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/subnets.png" width="70%"/></div>
+
+<h2>Creating catchment&nbsp;areas</h2>
+<div class="highlight"><pre><span></span>v.net.iso <span class="nv">input</span><span class="o">=</span>network_noded <span class="nv">output</span><span class="o">=</span>network_iso <span class="nv">center_cats</span><span class="o">=</span><span class="m">1</span>-6 <span class="nv">costs</span><span class="o">=</span><span class="m">1000</span>,3000,5000
+</pre></div>
+
+
+<p><code>v.net.iso</code> splits net by cost isolines. Again, the costs might be specified as lengths, time units,&nbsp;&hellip;.</p>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/isolines.png" width="70%"/></div>
+
+<p>Two different ways lead to the actual catchment area creation. First, you extract nodes from the roads with their values, turn them into the raster grid and either extract contours or polygonize the raster. I find the last step suboptimal and would love to find another way of polygonizing the&nbsp;results.</p>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/routing-with-grass-gis-catchment-area-calculation/catchment_area.gif" width="70%"/></div>
+
+<p>Note when extracting contours the interval has to be set to the reasonable number depending on the nodes&nbsp;values.</p>
+<h2>Remarks</h2>
+<ul>
+<li>Once you grasp the basics, <span class="caps">GRASS</span> <span class="caps">GIS</span> is real fun. Grasping the basics is pretty tough&nbsp;though.</li>
+<li>Pedestrians usually don&#8217;t follow the road&nbsp;network.</li>
+<li>Bridges and tunnels might be an&nbsp;issue.</li>
+<li>Personally, I find <span class="caps">GRASS</span> <span class="caps">GIS</span> easier to use for the network analysis compared to&nbsp;pgRouting.</li>
+</ul>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2017/routing-with-pgrouting-catchment-area-calculation/" rel="bookmark" title="Permalink to Routing with pgRouting: Catchment Area Calculation">Routing with pgRouting: Catchment Area&nbsp;Calculation</a></h1>
     <aside><span>Apr 14, 2017</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/pgrouting.html">pgrouting</a>    </span>
@@ -357,76 +429,6 @@ Running this script will delete the old cluster<span class="err">&#39;</span>s d
 
 
 <p>Brilliant.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2017/subdivide-and-conquer-effective-spatial-indexes-in-postgis/" rel="bookmark" title="Permalink to Subdivide and Conquer: Effective Spatial Indexes in PostGIS">Subdivide and Conquer: Effective Spatial Indexes in&nbsp;PostGIS</a></h1>
-    <aside><span>Jan 10, 2017</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p>Spatial indexes are absolutely crucial part of any spatial database and - as I tend to say quite often - only a fool would try to query spatial data without building spatial indexes&nbsp;beforehand.</p>
-<p>Spatial indexes are based on bounding box comparisons, which are generally very fast. Yet, there are situations when spatial indexes don&#8217;t help much (or they don&#8217;t help as much as they could, if you&nbsp;wish).</p>
-<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/subdivide-and-conquer-effective-spatial-indexes-in-postgis/index.svg" /></div>
-
-<p>Bounding box comparisons are effective with lots of small bounding boxes rather then few large ones. Why? See the picture above. The curved line (imagine it&#8217;s a pipeline for example) clearly demonstrates when the spatial index/bounding box comparison might fall short of what you&#8217;d&nbsp;expect.</p>
-<p>Once the bounding box gets really big, it intersects so many other geometries&#8217; bounding boxes that the whole comparison starts to slow&nbsp;down.</p>
-<p>Luckily, PostGIS 2.2 introduced a <a href="http://postgis.net/docs/ST_Subdivide.html">ST_Subdivide</a> function that can lend a helping hand in&nbsp;here.</p>
-<p>Until today, we delivered the parcel geometries into our <a href="https://www.symap.cz">real estate acquisition process system</a> with the following query, that takes all the geometries from the <code>req_geom</code> table (pipelines, remember?) and intersects them with cadastral parcels. The second part of the query adds those parcels that haven&#8217;t been digitalized and were created manually by one of my&nbsp;workmates.</p>
-<div class="highlight"><pre><span></span><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">requested_parcels</span> <span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">par_id</span><span class="p">)</span>
-<span class="k">SELECT</span>
-    <span class="n">reqs</span><span class="p">.</span><span class="n">uid</span><span class="p">,</span>
-    <span class="n">b</span><span class="p">.</span><span class="n">id</span> <span class="n">par_id</span>
- <span class="k">FROM</span>
-    <span class="n">running_requests</span> <span class="n">reqs</span>
- <span class="k">JOIN</span>
-    <span class="n">req_geom</span> <span class="n">a</span> <span class="k">ON</span> <span class="p">(</span><span class="n">reqs</span><span class="p">.</span><span class="n">uid</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">uid</span><span class="p">)</span>
- <span class="k">JOIN</span>
-    <span class="n">pargeo</span> <span class="n">b</span> <span class="k">ON</span> <span class="p">(</span><span class="n">ST_Intersects</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span>
- <span class="k">UNION</span>
- <span class="k">SELECT</span>
-    <span class="n">reqs</span><span class="p">.</span><span class="n">uid</span><span class="p">,</span>
-    <span class="n">a</span><span class="p">.</span><span class="n">idpar</span><span class="p">::</span><span class="nb">numeric</span>
- <span class="k">FROM</span>
-    <span class="n">running_requests</span> <span class="n">reqs</span>
- <span class="k">JOIN</span>
-     <span class="n">req_man</span> <span class="n">a</span> <span class="k">ON</span> <span class="p">(</span><span class="n">reqs</span><span class="p">.</span><span class="n">uid</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">uid</span><span class="p">);</span>
-</pre></div>
-
-
-<p>It&#8217;s a perfectly standard query that intersects several request geometries with ~20M parcels, nothing really fancy. Except that it takes 25 minutes to finish. Why? Pipelines,&nbsp;remember?</p>
-<p>Yet, the query below takes only 30 seconds to finish (that&#8217;s a huge time saver considering that the whole process used to take ~40 minutes)! Why? Because the <code>ST_Subdivide</code> effectively shrinks the <code>req_geom</code> geometries until they have 50 vertices each at most. Such small geometries are perfect input for the bounding box comparison. Remember to call <code>DISTINCT</code> when using <code>ST_Subdivide</code>, you&#8217;d probably get duplicate parcel ids&nbsp;otherwise.</p>
-<p>I also replaced the <code>UNION</code> with the <a href="https://www.zimmi.cz/posts/2015/postgresql-in-vs-exists/"><code>WHERE NOT EXISTS</code></a> expression, as it&#8217;s reasonable to assume that numeric ids comparison will be&nbsp;faster.</p>
-<div class="highlight"><pre><span></span><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">requested_parcels</span> <span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">par_id</span><span class="p">)</span>
-<span class="k">SELECT</span> <span class="k">DISTINCT</span>
-    <span class="n">reqs</span><span class="p">.</span><span class="n">uid</span><span class="p">,</span>
-    <span class="n">b</span><span class="p">.</span><span class="n">id</span> <span class="n">par_id</span>
- <span class="k">FROM</span>
-    <span class="n">running_requests</span> <span class="n">reqs</span>
- <span class="k">JOIN</span>
-    <span class="p">(</span>
-        <span class="k">SELECT</span>
-            <span class="n">uid</span><span class="p">,</span>
-            <span class="n">ST_Subdivide</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span> <span class="n">geom</span>
-        <span class="k">FROM</span>
-            <span class="n">req_geom</span>
-     <span class="p">)</span> <span class="n">a</span> <span class="k">ON</span> <span class="p">(</span><span class="n">reqs</span><span class="p">.</span><span class="n">uid</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">uid</span><span class="p">)</span>
- <span class="k">JOIN</span>
-     <span class="n">pargeo</span> <span class="n">b</span> <span class="k">ON</span> <span class="p">(</span><span class="n">ST_Intersects</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">geom</span><span class="p">));</span>
-
- <span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">requested_parcels</span> <span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">par_id</span><span class="p">)</span>
- <span class="k">SELECT</span>
-     <span class="n">reqs</span><span class="p">.</span><span class="n">uid</span><span class="p">,</span>
-     <span class="n">a</span><span class="p">.</span><span class="n">idpar</span><span class="p">::</span><span class="nb">numeric</span>
- <span class="k">FROM</span>
-     <span class="n">running_requests</span> <span class="n">reqs</span>
- <span class="k">JOIN</span>
-     <span class="n">req_man</span> <span class="n">a</span> <span class="k">ON</span> <span class="p">(</span><span class="n">reqs</span><span class="p">.</span><span class="n">uid</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">uid</span><span class="p">)</span>
- <span class="k">WHERE</span> <span class="k">NOT</span> <span class="k">EXISTS</span> <span class="p">(</span>
-     <span class="k">SELECT</span> <span class="mi">1</span>
-     <span class="k">FROM</span> <span class="n">pozadovane_parcely</span> <span class="n">pp</span>
-     <span class="k">WHERE</span> <span class="n">pp</span><span class="p">.</span><span class="n">par_id</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">idpar</span>
-  <span class="p">);</span>
-</pre></div>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/author/michal-zimmermann4.html">&laquo; Previous page</a>

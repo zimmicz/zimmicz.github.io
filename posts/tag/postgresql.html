@@ -31,6 +31,68 @@
 <h2 class="text-center">Articles tagged with postgresql tag</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2020/postgis-data-anonymization/" rel="bookmark" title="Permalink to PostGIS Data Anonymization">PostGIS Data&nbsp;Anonymization</a></h1>
+    <aside><span>May 5, 2020</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p>Among all the sensitive spatial data being collected through cellphones and credit cards, our address of residency is probably the most delicate one. Can it be anonymized/pseudonymized/obscured before you share it with your business&nbsp;partners?</p>
+<p>Imagine given a set of address points for each of your clients and the set of all address points in the country, you should adjust it in the following&nbsp;way:</p>
+<ul>
+<li>find the two nearest address points for each address point of your&nbsp;client</li>
+<li>find the center of these two and the client address&nbsp;point</li>
+<li>measure the distance of the computed center to each of three points and keep the maximum&nbsp;value</li>
+<li>make the biggest distance even bigger by adding 10 % of its&nbsp;value</li>
+<li>ceil the&nbsp;value</li>
+<li>output the new position and the ceiled&nbsp;distance</li>
+</ul>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/postgis-data-anonymization/qgis.gif"/></div>
+
+<p>This shifts each address point by a dynamic distance, giving us at least three points within the given distance (one of them being the original address&nbsp;point).</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span>
+    <span class="n">tmp</span><span class="p">.</span><span class="n">code</span><span class="p">,</span>
+    <span class="n">ST_X</span><span class="p">(</span><span class="n">tmp</span><span class="p">.</span><span class="n">new_position</span><span class="p">)</span> <span class="n">x</span><span class="p">,</span>
+    <span class="n">ST_Y</span><span class="p">(</span><span class="n">tmp</span><span class="p">.</span><span class="n">new_position</span><span class="p">)</span> <span class="n">y</span><span class="p">,</span>
+    <span class="n">ceil</span><span class="p">(</span><span class="k">MAX</span><span class="p">(</span><span class="n">biggest_distance</span><span class="p">)</span> <span class="o">+</span> <span class="k">MAX</span><span class="p">(</span><span class="n">biggest_distance</span><span class="p">)</span> <span class="o">*</span> <span class="mi">0</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="n">round_distance</span>
+<span class="k">FROM</span> <span class="p">(</span>
+    <span class="k">SELECT</span>
+        <span class="n">tmp</span><span class="p">.</span><span class="n">code</span><span class="p">,</span>
+        <span class="n">tmp</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span>
+        <span class="n">ST_Centroid</span><span class="p">((</span><span class="n">ST_Union</span><span class="p">(</span><span class="n">two_closest_points</span><span class="p">,</span> <span class="n">tmp</span><span class="p">.</span><span class="n">geom</span><span class="p">)))</span> <span class="n">new_position</span><span class="p">,</span>
+        <span class="c1">-- get distance to two closest points and the client address point</span>
+        <span class="n">ST_Centroid</span><span class="p">((</span><span class="n">ST_Union</span><span class="p">(</span><span class="n">two_closest_points</span><span class="p">,</span> <span class="n">tmp</span><span class="p">.</span><span class="n">geom</span><span class="p">)))</span> <span class="o">&lt;-&gt;</span> <span class="p">(</span><span class="n">ST_DumpPoints</span><span class="p">(</span><span class="n">ST_Union</span><span class="p">(</span><span class="n">two_closest_points</span><span class="p">,</span> <span class="n">tmp</span><span class="p">.</span><span class="n">geom</span><span class="p">))).</span><span class="n">geom</span> <span class="n">biggest_distance</span>
+    <span class="k">FROM</span> <span class="p">(</span>
+        <span class="k">SELECT</span>
+            <span class="n">r1</span><span class="p">.</span><span class="n">code</span><span class="p">,</span>
+            <span class="n">r1</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span>
+            <span class="n">ST_Union</span><span class="p">(</span><span class="n">neighbours</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">two_closest_points</span>
+        <span class="k">FROM</span> <span class="n">address_points</span> <span class="n">r1</span><span class="p">,</span>
+        <span class="k">LATERAL</span> <span class="p">(</span>
+            <span class="c1">-- keep two closest points to each client address point</span>
+            <span class="k">SELECT</span>
+                <span class="n">r2</span><span class="p">.</span><span class="n">code</span><span class="p">,</span>
+                <span class="n">r2</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span>
+                <span class="n">r1</span><span class="p">.</span><span class="n">geom</span> <span class="o">&lt;-&gt;</span> <span class="n">r2</span><span class="p">.</span><span class="n">geom</span> <span class="n">distance</span>
+            <span class="k">FROM</span> <span class="n">address_points</span> <span class="n">r2</span>
+            <span class="k">WHERE</span> <span class="n">r1</span><span class="p">.</span><span class="n">code</span> <span class="o">&lt;&gt;</span> <span class="n">r2</span><span class="p">.</span><span class="n">code</span>
+            <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">r1</span><span class="p">.</span><span class="n">geom</span> <span class="o">&lt;-&gt;</span> <span class="n">r2</span><span class="p">.</span><span class="n">geom</span> <span class="k">ASC</span>
+            <span class="k">LIMIT</span> <span class="mi">2</span>
+        <span class="p">)</span> <span class="n">neighbours</span>
+        <span class="k">GROUP</span> <span class="k">BY</span>
+            <span class="n">r1</span><span class="p">.</span><span class="n">code</span><span class="p">,</span>
+            <span class="n">r1</span><span class="p">.</span><span class="n">geom</span>
+    <span class="p">)</span> <span class="n">tmp</span>
+<span class="p">)</span> <span class="n">tmp</span>
+<span class="k">GROUP</span> <span class="k">BY</span>
+    <span class="n">tmp</span><span class="p">.</span><span class="n">code</span><span class="p">,</span>
+    <span class="n">tmp</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span>
+    <span class="n">tmp</span><span class="p">.</span><span class="n">new_position</span><span class="p">;</span>
+</pre></div>
+
+
+<p>You might want to use <code>LATERAL</code> for tasks like&nbsp;this.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2018/centos-postgis-upgrade-hell-yet-again" rel="bookmark" title="Permalink to CentOS PostGIS Upgrade Hell… Yet Again">CentOS PostGIS Upgrade Hell&#8230; Yet&nbsp;Again</a></h1>
     <aside><span>Dec 19, 2018</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
@@ -463,53 +525,6 @@ tar -czf <span class="si">${</span><span class="nv">CR_BASE_BACKUP_DIR</span><sp
 
 <h2>Pitfalls</h2>
 <p>You do not want to run your bash scripts by hand. You probably do not want them to be run by cron. You want to run them with systemd. More on this next&nbsp;time.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-recovery/" rel="bookmark" title="Permalink to PostgreSQL Backup and Recovery Orchestration: Recovery">PostgreSQL Backup and Recovery Orchestration:&nbsp;Recovery</a></h1>
-    <aside><span>Feb 16, 2018</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p>PostgreSQL continuous backups are very powerful, if you know how to use them for recovery. There&#8217;s nothing else to do to be sure about that other than <strong>actually trying it</strong>. Personally, I see recovery as a single process with two possibly different&nbsp;outcomes:</p>
-<ul>
-<li>you&#8217;re recovering to the same state your cluster is/was in (because of a hardware failure, provider switch, &hellip;) - it&#8217;s more of a data migration, but you need your backup&nbsp;anyway</li>
-<li>you&#8217;re doing a point-in-time-recovery (someone dropped the wrong table, data got corrupted,&nbsp;&hellip;)</li>
-</ul>
-<p>Both scenarios follow the same steps and differ slighty at the&nbsp;end.</p>
-<ol>
-<li>Stop the PostgreSQL&nbsp;cluster.</li>
-<li>Copy the current <code>PGDATA_DIR</code> somewhere safe, just in case you screw&nbsp;up.</li>
-<li>Replace the <code>PGDATA_DIR</code> with the full backup. If you start the cluster right away, it will boot to the last full backup state (in my case, missing a week of <span class="caps">WAL</span> segments&nbsp;tops).</li>
-</ol>
-<h2>General&nbsp;recovery</h2>
-<p>In this case, you&#8217;re trying to recover as far as possible. With previous steps done succesfully, the next&nbsp;follow:</p>
-<ul>
-<li>Copy all archived <span class="caps">WAL</span> segments created after the last full backup to <code>PGDATA_DIR/pg_xlog</code>. These can be found with <code>find -newer</code> command run against the corresponding <code>.backup</code> file in your <code>wal-archive/u/p</code> directory.</li>
-<li>If your full backup strategy includes <code>recovery.conf</code> file creation, you cane safely move it or remove&nbsp;it.</li>
-<li>Start the database cluster again. It is going to boot to the last working&nbsp;state.</li>
-</ul>
-<p>If you&#8217;re about to migrate your data, you might be better off with simple <code>pg_dump</code>, <code>pg_dumpall</code> and <code>pg_restore</code> commands rather than using full backup/<span class="caps">WAL</span> segments&nbsp;combination.</p>
-<h2>Point-in-time-recovery</h2>
-<p>PostgreSQL&#8217;s <span class="caps">PITR</span> can help you restore your accidentally deleted/corrupted data. After the first three steps mentioned above, you should follow with&nbsp;these:</p>
-<ul>
-<li>Copy all archived segments created after the last full backup somewhere the PostgreSQL user can read them (<code>/your-wal-recovery-folder/</code> for&nbsp;example).</li>
-<li>Set up the <code>recovery.conf</code> file properly. If you know something nasty happened at 2018-01-29 08:00:00, try to recover right to that point (or to any other, as <a href="https://www.postgresql.org/docs/9.6/static/recovery-target-settings.html">described in the documentation</a>).</li>
-</ul>
-<!-- -->
-
-<div class="highlight"><pre><span></span><span class="nv">restore_command</span> <span class="o">=</span> <span class="s1">&#39;cp /your-wal-recovery-folder/%f &quot;%p&quot;&#39;</span>
-<span class="nv">recovery_target_time</span> <span class="o">=</span> <span class="s1">&#39;2018-01-29 08:00:00&#39;</span>
-</pre></div>
-
-
-<ul>
-<li>Start the database cluster again. It is going to boot to the last full backup and then play all the <span class="caps">WAL</span> segments until the recovery target. Depending on how many <span class="caps">WAL</span> segments are about to be used, this might take a&nbsp;while.</li>
-</ul>
-<h2>Pitfalls</h2>
-<p>You don&#8217;t want to find yourself in the middle of the biggest database failure of the century just to find out your <strong>backups don&#8217;t work</strong>, and even if they did, you would have <strong>no idea how to use them</strong>. Or, even worse, there are no backups at all, because your <strong>backup strategy has been failing silently</strong> without a single notice for several&nbsp;months.</p>
-<h2>Tips</h2>
-<p>Try to recover from your backups once in a&nbsp;while.</p>
-<p>I forget things and make mistakes. We all do. That&#8217;s why I built an ensemble that takes care of our database automatically. Nothing fancy, just a bunch of good old Bash scripts managed with systemd rathern than cron. Next time, I&#8217;d like to show you the code and walk you through our current&nbsp;setup.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/tag/postgresql2.html">Next page &raquo;</a>

@@ -30,6 +30,83 @@
     <main>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-finding-nearest-neighbors/" rel="bookmark" title="Permalink to QGIS Plugin Development: Finding Nearest Neighbors"><span class="caps">QGIS</span> Plugin Development: Finding Nearest&nbsp;Neighbors</a></h1>
+    <aside><span>Nov 9, 2017</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">QGIS</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/qgis.html">QGIS</a></span>
+    </aside>
+    <p>I described basics of vector layers manipulation in <a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/">the previous part</a> of the series. With my goal in mind (fully functional custom plugin capable of writing an attribute value from a source layer to a target layer based on a feature distance), I&#8217;d like to discuss <strong>spatial indexing</strong> and <strong>nearest neighbor analysis</strong>.</p>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/qgis-plugin-development-finding-nearest-neighbors/qgis.png"/></div>
+
+<p>The picture above illustrates the task that can be solved solely by using <span class="caps">QGIS</span> <span class="caps">API</span>. Imagine you&#8217;re given a source layer with an attribute filled with values. You&#8217;re given a target layer as well, sadly though, the values in this layer are missing (<em>not so rare in the <span class="caps">GIS</span> world, right?</em>). Yet you know that the missing attribute value of each feature in the target layer can be filled by the value of its nearest neighbor from the source layer. How do you do&nbsp;that?</p>
+<h2>Generating dummy&nbsp;data</h2>
+<p>Let&#8217;s create two memory data sets with id and value attributes. Both of them will have ten&nbsp;features.</p>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qgis.core</span> <span class="kn">import</span> <span class="n">QgsMapLayerRegistry</span><span class="p">,</span> <span class="n">QgsVectorLayer</span><span class="p">,</span> <span class="n">QgsFeature</span><span class="p">,</span> <span class="n">QgsGeometry</span><span class="p">,</span> <span class="n">QgsPoint</span><span class="p">,</span> <span class="n">QgsSpatialIndex</span>
+<span class="kn">from</span> <span class="nn">qgis.utils</span> <span class="kn">import</span> <span class="n">iface</span>
+
+<span class="n">source_layer</span> <span class="o">=</span> <span class="n">QgsVectorLayer</span><span class="p">(</span><span class="s2">&quot;point?crs=epsg:4326&amp;amp;field=id:integer&amp;amp;field=value:integer&quot;</span><span class="p">,</span> <span class="s2">&quot;Source layer&quot;</span><span class="p">,</span> <span class="s2">&quot;memory&quot;</span><span class="p">)</span>
+<span class="n">target_layer</span> <span class="o">=</span> <span class="n">QgsVectorLayer</span><span class="p">(</span><span class="s2">&quot;point?crs=epsg:4326&amp;amp;field=id:integer&amp;amp;field=value:integer&quot;</span><span class="p">,</span> <span class="s2">&quot;Target layer&quot;</span><span class="p">,</span> <span class="s2">&quot;memory&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">create_dummy_data</span><span class="p">():</span>
+
+    <span class="n">source_layer</span><span class="o">.</span><span class="n">startEditing</span><span class="p">()</span>
+    <span class="n">target_layer</span><span class="o">.</span><span class="n">startEditing</span><span class="p">()</span>
+
+    <span class="n">feature</span> <span class="o">=</span> <span class="n">QgsFeature</span><span class="p">(</span><span class="n">source_layer</span><span class="o">.</span><span class="n">pendingFields</span><span class="p">())</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+        <span class="n">feature</span><span class="o">.</span><span class="n">setGeometry</span><span class="p">(</span><span class="n">QgsGeometry</span><span class="o">.</span><span class="n">fromPoint</span><span class="p">(</span><span class="n">QgsPoint</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">)))</span>
+        <span class="n">feature</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+        <span class="n">feature</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+        <span class="n">source_layer</span><span class="o">.</span><span class="n">addFeature</span><span class="p">(</span><span class="n">feature</span><span class="p">)</span>
+
+    <span class="n">feature</span> <span class="o">=</span> <span class="n">QgsFeature</span><span class="p">(</span><span class="n">source_layer</span><span class="o">.</span><span class="n">pendingFields</span><span class="p">())</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+        <span class="n">feature</span><span class="o">.</span><span class="n">setGeometry</span><span class="p">(</span><span class="n">QgsGeometry</span><span class="o">.</span><span class="n">fromPoint</span><span class="p">(</span><span class="n">QgsPoint</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">)))</span>
+        <span class="n">feature</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+        <span class="n">target_layer</span><span class="o">.</span><span class="n">addFeature</span><span class="p">(</span><span class="n">feature</span><span class="p">)</span>
+
+    <span class="n">source_layer</span><span class="o">.</span><span class="n">commitChanges</span><span class="p">()</span>
+    <span class="n">target_layer</span><span class="o">.</span><span class="n">commitChanges</span><span class="p">()</span>
+
+    <span class="n">QgsMapLayerRegistry</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span><span class="o">.</span><span class="n">addMapLayer</span><span class="p">(</span><span class="n">source_layer</span><span class="p">)</span>
+    <span class="n">QgsMapLayerRegistry</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span><span class="o">.</span><span class="n">addMapLayer</span><span class="p">(</span><span class="n">target_layer</span><span class="p">)</span>
+
+<span class="n">create_dummy_data</span><span class="p">()</span>
+</pre></div>
+
+
+<h2>Writing values from the nearest&nbsp;neighbor</h2>
+<p>The actual nearest neighbor analysis can be done in ten lines of code! First, the <code>qgis.core.QgsSpatialIndex</code> is built from all the <code>source_layer</code> features. Then, you iterate over the <code>target_layer</code> features and for each of them, gets only one (<code>nearestNeighbor(f.geometry().asPoint(), 1)[0]</code>) nearest neighbor. At last, you just write the nearest neighbor&#8217;s attribute value to the target layer and commit changes. Just use the following code with the code&nbsp;above.</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">write_values_from_nn</span><span class="p">():</span>
+    <span class="n">source_layer_index</span> <span class="o">=</span> <span class="n">QgsSpatialIndex</span><span class="p">(</span><span class="n">source_layer</span><span class="o">.</span><span class="n">getFeatures</span><span class="p">())</span>
+    <span class="n">source_layer_features</span> <span class="o">=</span> <span class="p">{</span><span class="n">feature</span><span class="o">.</span><span class="n">id</span><span class="p">():</span> <span class="n">feature</span> <span class="k">for</span> <span class="p">(</span><span class="n">feature</span><span class="p">)</span> <span class="ow">in</span> <span class="n">source_layer</span><span class="o">.</span><span class="n">getFeatures</span><span class="p">()}</span>
+    <span class="n">target_layer_features</span> <span class="o">=</span> <span class="n">target_layer</span><span class="o">.</span><span class="n">getFeatures</span><span class="p">()</span>
+
+    <span class="n">target_layer</span><span class="o">.</span><span class="n">startEditing</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">target_layer_features</span><span class="p">:</span>
+        <span class="n">nearest</span> <span class="o">=</span> <span class="n">source_layer_index</span><span class="o">.</span><span class="n">nearestNeighbor</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">geometry</span><span class="p">()</span><span class="o">.</span><span class="n">asPoint</span><span class="p">(),</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">source_layer_features</span><span class="p">[</span><span class="n">nearest</span><span class="p">]</span><span class="o">.</span><span class="n">attribute</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">)</span>
+        <span class="n">target_layer</span><span class="o">.</span><span class="n">changeAttributeValue</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">id</span><span class="p">(),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="n">target_layer</span><span class="o">.</span><span class="n">commitChanges</span><span class="p">()</span>
+
+<span class="n">write_values_from_nn</span><span class="p">()</span>
+</pre></div>
+
+
+<h2>Missing pieces or what&#8217;s&nbsp;next</h2>
+<p>I&#8217;m one step closer to my goal. What&#8217;s&nbsp;missing?</p>
+<ul>
+<li>capabilities checks: does the target layer support edits? Check the layer data provider capabilities to find&nbsp;out.</li>
+<li>user logging: notices, warnings or errors are completely missing. It will be great to have them shown inside <code>qgis.gui.QgsMessageBar</code>.</li>
+<li>custom attributes: this version expects both layers to have the same attribute with the same data&nbsp;type.</li>
+<li><span class="caps">GUI</span>: a very simple PyQt widget will turn this console-based script into a custom plugin. That&#8217;s what&#8217;s going to be&nbsp;next.</li>
+</ul>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2017/qgis-plugin-development-using-python-console/" rel="bookmark" title="Permalink to QGIS Plugin Development: Using Python Console"><span class="caps">QGIS</span> Plugin Development: Using Python&nbsp;Console</a></h1>
     <aside><span>Nov 2, 2017</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/qgis.html">QGIS</a>    </span>
@@ -348,333 +425,6 @@ LINE <span class="m">2</span>: <span class="m">1111</span><span class="p">;</spa
 <span class="err">\$\$</span><span class="p">;</span>
 <span class="n">BACKUP</span>
 </pre></div>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2017/postgresql-development-history-revealed-with-postgresql/" rel="bookmark" title="Permalink to PostgreSQL Development History Revealed with PostgreSQL">PostgreSQL Development History Revealed with&nbsp;PostgreSQL</a></h1>
-    <aside><span>Aug 9, 2017</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/python.html">python</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p>I spend a lot of time reading <a href="https://www.postgresql.org/docs/manuals/">PostgreSQL docs</a>. It occurred to me just a few weeks ago that those versioned manuals are great opportunity to get an insight into PostgreSQL development history. Using PostgreSQL, of&nbsp;course.</p>
-<h2><span class="caps">TOP</span> 5 functions with the most verbose docs in each&nbsp;version</h2>
-<div class="highlight"><pre><span></span><span class="k">SELECT</span>
-    <span class="k">version</span><span class="p">,</span>
-    <span class="n">string_agg</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="s1">&#39; | &#39;</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">letter_count</span> <span class="k">DESC</span><span class="p">)</span>
-<span class="k">FROM</span> <span class="p">(</span>
-    <span class="k">SELECT</span>
-        <span class="k">version</span><span class="p">,</span>
-        <span class="n">func</span><span class="p">,</span>
-        <span class="n">letter_count</span><span class="p">,</span>
-        <span class="n">row_number</span><span class="p">()</span> <span class="n">OVER</span> <span class="p">(</span><span class="n">PARTITION</span> <span class="k">BY</span> <span class="k">version</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">letter_count</span> <span class="k">DESC</span><span class="p">)</span>
-    <span class="k">FROM</span> <span class="n">postgresql_development</span><span class="p">.</span><span class="k">data</span>
-<span class="p">)</span> <span class="n">a</span>
-<span class="k">WHERE</span> <span class="n">row_number</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">=</span> <span class="mi">10</span>
-<span class="k">GROUP</span> <span class="k">BY</span> <span class="k">version</span>
-<span class="k">ORDER</span> <span class="k">BY</span> <span class="k">version</span> <span class="k">DESC</span>
-</pre></div>
-
-
-<p>Seems like a huge comeback for <code>CREATE TABLE</code>.</p>
-<table>
-<thead>
-<tr>
-<th><span class="caps">VERSION</span></th>
-<th>1st</th>
-<th>2nd</th>
-<th>3rd</th>
-<th>4th</th>
-<th>5th</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>10.0</td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">REVOKE</span></td>
-<td><span class="caps">GRANT</span></td>
-<td><span class="caps">SELECT</span></td>
-</tr>
-<tr>
-<td>9.6</td>
-<td><span class="caps">REVOKE</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">GRANT</span></td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">SELECT</span></td>
-</tr>
-<tr>
-<td>9.5</td>
-<td><span class="caps">REVOKE</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">GRANT</span></td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">SELECT</span></td>
-</tr>
-<tr>
-<td>9.4</td>
-<td><span class="caps">REVOKE</span></td>
-<td><span class="caps">GRANT</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">SELECT</span></td>
-</tr>
-<tr>
-<td>9.3</td>
-<td><span class="caps">REVOKE</span></td>
-<td><span class="caps">GRANT</span></td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">DEFAULT</span> <span class="caps">PRIVILEGES</span></td>
-</tr>
-<tr>
-<td>9.2</td>
-<td><span class="caps">REVOKE</span></td>
-<td><span class="caps">GRANT</span></td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">DEFAULT</span> <span class="caps">PRIVILEGES</span></td>
-</tr>
-<tr>
-<td>9.1</td>
-<td><span class="caps">REVOKE</span></td>
-<td><span class="caps">GRANT</span></td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">DEFAULT</span> <span class="caps">PRIVILEGES</span></td>
-</tr>
-<tr>
-<td>9.0</td>
-<td><span class="caps">REVOKE</span></td>
-<td><span class="caps">GRANT</span></td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">DEFAULT</span> <span class="caps">PRIVILEGES</span></td>
-</tr>
-<tr>
-<td>8.4</td>
-<td><span class="caps">REVOKE</span></td>
-<td><span class="caps">GRANT</span></td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">SELECT</span></td>
-</tr>
-<tr>
-<td>8.3</td>
-<td><span class="caps">REVOKE</span></td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">GRANT</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">COMMENT</span></td>
-</tr>
-<tr>
-<td>8.2</td>
-<td><span class="caps">REVOKE</span></td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">GRANT</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">SELECT</span></td>
-</tr>
-<tr>
-<td>8.1</td>
-<td><span class="caps">REVOKE</span></td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">GRANT</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">SELECT</span></td>
-</tr>
-<tr>
-<td>8</td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">REVOKE</span></td>
-<td><span class="caps">GRANT</span></td>
-<td><span class="caps">SELECT</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-</tr>
-<tr>
-<td>7.4</td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">REVOKE</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">GRANT</span></td>
-<td><span class="caps">SELECT</span></td>
-</tr>
-<tr>
-<td>7.3</td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">SELECT</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">REVOKE</span></td>
-<td><span class="caps">GRANT</span></td>
-</tr>
-<tr>
-<td>7.2</td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">SELECT</span> <span class="caps">INTO</span></td>
-<td><span class="caps">SELECT</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">CREATE</span> <span class="caps">TYPE</span></td>
-</tr>
-<tr>
-<td>7.1</td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">SELECT</span> <span class="caps">INTO</span></td>
-<td><span class="caps">SELECT</span></td>
-<td><span class="caps">CREATE</span> <span class="caps">TYPE</span></td>
-<td><span class="caps">ALTER</span> <span class="caps">TABLE</span></td>
-</tr>
-<tr>
-<td>7.0</td>
-<td><span class="caps">SELECT</span></td>
-<td><span class="caps">SELECT</span> <span class="caps">INTO</span></td>
-<td><span class="caps">CREATE</span> <span class="caps">TYPE</span></td>
-<td><span class="caps">CREATE</span> <span class="caps">TABLE</span></td>
-<td><span class="caps">COMMENT</span></td>
-</tr>
-</tbody>
-</table>
-<h2>Number of functions available in each&nbsp;version</h2>
-<div class="highlight"><pre><span></span><span class="k">SELECT</span>
-    <span class="k">version</span><span class="p">,</span>
-    <span class="k">count</span><span class="p">(</span><span class="n">func</span><span class="p">),</span>
-    <span class="k">sum</span><span class="p">(</span><span class="n">letter_count</span><span class="p">)</span>
-<span class="k">FROM</span> <span class="n">postgresql_development</span><span class="p">.</span><span class="k">data</span>
-<span class="k">GROUP</span> <span class="k">BY</span> <span class="k">version</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="k">version</span><span class="p">;</span>
-</pre></div>
-
-
-<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/postgresql-development-history-revealed-with-postgresql/plot1.png"/></div>
-
-<h2>The most verbose docs in each&nbsp;version</h2>
-<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="k">DISTINCT</span> <span class="k">ON</span> <span class="p">(</span><span class="k">version</span><span class="p">)</span>
-    <span class="k">version</span><span class="p">,</span>
-    <span class="n">func</span><span class="p">,</span>
-    <span class="n">letter_count</span>
-<span class="k">FROM</span> <span class="n">postgresql_development</span><span class="p">.</span><span class="k">data</span>
-<span class="k">ORDER</span> <span class="k">BY</span> <span class="k">version</span><span class="p">,</span> <span class="n">letter_count</span> <span class="k">DESC</span><span class="p">;</span>
-</pre></div>
-
-
-<p>Poor <code>REVOKE</code>, the defeated&nbsp;champion.</p>
-<div class="text-center">
-    <table style="margin-left:auto; margin-right: auto">
-    <thead>
-    <tr>
-    <th><span class="caps"><span class="caps">VERSION</span></span></th>
-    <th><span class="caps"><span class="caps">FUNCTION</span></span></th>
-    <th><span class="caps"><span class="caps">LETTER</span></span> <span class="caps"><span class="caps">COUNT</span></span></th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-    <td>10</td>
-    <td><span class="caps"><span class="caps">CREATE</span></span> <span class="caps"><span class="caps">TABLE</span></span></td>
-    <td>3142</td>
-    </tr>
-    <tr>
-    <td>9.6</td>
-    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
-    <td>2856</td>
-    </tr>
-    <tr>
-    <td>9.5</td>
-    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
-    <td>2856</td>
-    </tr>
-    <tr>
-    <td>9.4</td>
-    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
-    <td>2856</td>
-    </tr>
-    <tr>
-    <td>9.3</td>
-    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
-    <td>2856</td>
-    </tr>
-    <tr>
-    <td>9.2</td>
-    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
-    <td>2856</td>
-    </tr>
-    <tr>
-    <td>9.1</td>
-    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
-    <td>2508</td>
-    </tr>
-    <tr>
-    <td>9</td>
-    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
-    <td>2502</td>
-    </tr>
-    <tr>
-    <td>8.4</td>
-    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
-    <td>2105</td>
-    </tr>
-    <tr>
-    <td>8.3</td>
-    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
-    <td>1485</td>
-    </tr>
-    <tr>
-    <td>8.2</td>
-    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
-    <td>1527</td>
-    </tr>
-    <tr>
-    <td>8.1</td>
-    <td><span class="caps"><span class="caps">REVOKE</span></span></td>
-    <td>1312</td>
-    </tr>
-    <tr>
-    <td>8</td>
-    <td><span class="caps"><span class="caps">CREATE</span></span> <span class="caps"><span class="caps">TABLE</span></span></td>
-    <td>1251</td>
-    </tr>
-    <tr>
-    <td>7.4</td>
-    <td><span class="caps"><span class="caps">CREATE</span></span> <span class="caps"><span class="caps">TABLE</span></span></td>
-    <td>1075</td>
-    </tr>
-    <tr>
-    <td>7.3</td>
-    <td><span class="caps"><span class="caps">CREATE</span></span> <span class="caps"><span class="caps">TABLE</span></span></td>
-    <td>929</td>
-    </tr>
-    <tr>
-    <td>7.2</td>
-    <td><span class="caps"><span class="caps">CREATE</span></span> <span class="caps"><span class="caps">TABLE</span></span></td>
-    <td>929</td>
-    </tr>
-    <tr>
-    <td>7.1</td>
-    <td><span class="caps"><span class="caps">CREATE</span></span> <span class="caps"><span class="caps">TABLE</span></span></td>
-    <td>871</td>
-    </tr>
-    <tr>
-    <td>7</td>
-    <td><span class="caps"><span class="caps">SELECT</span></span></td>
-    <td>450</td>
-    </tr>
-    </tbody>
-    </table>
-</div>
-
-<h2><span class="caps">CREATE</span> <span class="caps">TABLE</span> docs&nbsp;evolution</h2>
-<div class="highlight"><pre><span></span><span class="k">SELECT</span>
-    <span class="k">version</span><span class="p">,</span>
-    <span class="n">letter_count</span>
-<span class="k">FROM</span> <span class="n">postgresql_development</span><span class="p">.</span><span class="k">data</span>
-<span class="k">WHERE</span> <span class="n">func</span> <span class="o">=</span> <span class="s1">&#39;CREATE TABLE&#39;</span>
-<span class="k">ORDER</span> <span class="k">BY</span> <span class="n">func</span><span class="p">,</span> <span class="k">version</span><span class="p">;</span>
-</pre></div>
-
-
-<p>Something&#8217;s going on in an upcoming 10.0&nbsp;version.</p>
-<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/postgresql-development-history-revealed-with-postgresql/plot2.png"/></div>
-
-<p>All the data was obtained with the following Python script and processed inside the PostgreSQL database. Plots done with <a href="http://bokeh.pydata.org/en/latest/">Bokeh</a>, though I probably wouldn&#8217;t use it again, the docs site is absurdly sluggish and the info is just all over the&nbsp;place.</p>
-<script src="https://gist.github.com/zimmicz/f69a5ce5d3cf3a220e171553c35e0391.js"></script>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/index2.html">&laquo; Previous page</a>

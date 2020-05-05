@@ -31,6 +31,53 @@
 <h2 class="text-center">Articles tagged with postgresql tag</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-recovery/" rel="bookmark" title="Permalink to PostgreSQL Backup and Recovery Orchestration: Recovery">PostgreSQL Backup and Recovery Orchestration:&nbsp;Recovery</a></h1>
+    <aside><span>Feb 16, 2018</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p>PostgreSQL continuous backups are very powerful, if you know how to use them for recovery. There&#8217;s nothing else to do to be sure about that other than <strong>actually trying it</strong>. Personally, I see recovery as a single process with two possibly different&nbsp;outcomes:</p>
+<ul>
+<li>you&#8217;re recovering to the same state your cluster is/was in (because of a hardware failure, provider switch, &hellip;) - it&#8217;s more of a data migration, but you need your backup&nbsp;anyway</li>
+<li>you&#8217;re doing a point-in-time-recovery (someone dropped the wrong table, data got corrupted,&nbsp;&hellip;)</li>
+</ul>
+<p>Both scenarios follow the same steps and differ slighty at the&nbsp;end.</p>
+<ol>
+<li>Stop the PostgreSQL&nbsp;cluster.</li>
+<li>Copy the current <code>PGDATA_DIR</code> somewhere safe, just in case you screw&nbsp;up.</li>
+<li>Replace the <code>PGDATA_DIR</code> with the full backup. If you start the cluster right away, it will boot to the last full backup state (in my case, missing a week of <span class="caps">WAL</span> segments&nbsp;tops).</li>
+</ol>
+<h2>General&nbsp;recovery</h2>
+<p>In this case, you&#8217;re trying to recover as far as possible. With previous steps done succesfully, the next&nbsp;follow:</p>
+<ul>
+<li>Copy all archived <span class="caps">WAL</span> segments created after the last full backup to <code>PGDATA_DIR/pg_xlog</code>. These can be found with <code>find -newer</code> command run against the corresponding <code>.backup</code> file in your <code>wal-archive/u/p</code> directory.</li>
+<li>If your full backup strategy includes <code>recovery.conf</code> file creation, you cane safely move it or remove&nbsp;it.</li>
+<li>Start the database cluster again. It is going to boot to the last working&nbsp;state.</li>
+</ul>
+<p>If you&#8217;re about to migrate your data, you might be better off with simple <code>pg_dump</code>, <code>pg_dumpall</code> and <code>pg_restore</code> commands rather than using full backup/<span class="caps">WAL</span> segments&nbsp;combination.</p>
+<h2>Point-in-time-recovery</h2>
+<p>PostgreSQL&#8217;s <span class="caps">PITR</span> can help you restore your accidentally deleted/corrupted data. After the first three steps mentioned above, you should follow with&nbsp;these:</p>
+<ul>
+<li>Copy all archived segments created after the last full backup somewhere the PostgreSQL user can read them (<code>/your-wal-recovery-folder/</code> for&nbsp;example).</li>
+<li>Set up the <code>recovery.conf</code> file properly. If you know something nasty happened at 2018-01-29 08:00:00, try to recover right to that point (or to any other, as <a href="https://www.postgresql.org/docs/9.6/static/recovery-target-settings.html">described in the documentation</a>).</li>
+</ul>
+<!-- -->
+
+<div class="highlight"><pre><span></span><span class="nv">restore_command</span> <span class="o">=</span> <span class="s1">&#39;cp /your-wal-recovery-folder/%f &quot;%p&quot;&#39;</span>
+<span class="nv">recovery_target_time</span> <span class="o">=</span> <span class="s1">&#39;2018-01-29 08:00:00&#39;</span>
+</pre></div>
+
+
+<ul>
+<li>Start the database cluster again. It is going to boot to the last full backup and then play all the <span class="caps">WAL</span> segments until the recovery target. Depending on how many <span class="caps">WAL</span> segments are about to be used, this might take a&nbsp;while.</li>
+</ul>
+<h2>Pitfalls</h2>
+<p>You don&#8217;t want to find yourself in the middle of the biggest database failure of the century just to find out your <strong>backups don&#8217;t work</strong>, and even if they did, you would have <strong>no idea how to use them</strong>. Or, even worse, there are no backups at all, because your <strong>backup strategy has been failing silently</strong> without a single notice for several&nbsp;months.</p>
+<h2>Tips</h2>
+<p>Try to recover from your backups once in a&nbsp;while.</p>
+<p>I forget things and make mistakes. We all do. That&#8217;s why I built an ensemble that takes care of our database automatically. Nothing fancy, just a bunch of good old Bash scripts managed with systemd rathern than cron. Next time, I&#8217;d like to show you the code and walk you through our current&nbsp;setup.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2018/postgresql-backup-and-recovery-orchestration-wal-archiving/" rel="bookmark" title="Permalink to PostgreSQL Backup and Recovery Orchestration: WAL Archiving">PostgreSQL Backup and Recovery Orchestration: <span class="caps">WAL</span>&nbsp;Archiving</a></h1>
     <aside><span>Feb 12, 2018</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/linux.html">linux</a>    </span>
@@ -567,24 +614,6 @@ Running this script will delete the old cluster<span class="err">&#39;</span>s d
 
 
 <p>The old cluster can be removed and the new one switched back to port <code>5432</code>. Run <code>/usr/lib/postgresql/9.6/bin/vacuumdb -p 5433 --all --analyze-in-stages</code> to collect&nbsp;statistics.</p>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2017/executing-dynamic-sql-query-right-away/" rel="bookmark" title="Permalink to Executing dynamic SQL query right away">Executing dynamic <span class="caps">SQL</span> query right&nbsp;away</a></h1>
-    <aside><span>Feb 28, 2017</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p>PostgreSQL 9.6 comes with a handy <code>psql</code> command called <code>\gexec</code> that <em>sends the current query input buffer to the server and treats the result as a <span class="caps">SQL</span> statement to be executed</em> (right, whatever). What that means is that instead of doing&nbsp;this</p>
-<div class="highlight"><pre><span></span>psql -c <span class="s2">&quot;SELECT &#39;DROP TABLE &#39; || tablename FROM information_schema.tables WHERE table_name LIKE &#39;%to_be_dropped%&quot;</span> <span class="p">|</span> psql
-</pre></div>
-
-
-<p>you&#8217;ll do&nbsp;that</p>
-<div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="s1">&#39;DROP TABLE &#39;</span> <span class="o">||</span> <span class="n">tablename</span> <span class="k">FROM</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">tables</span> <span class="k">WHERE</span> <span class="k">table_name</span> <span class="k">LIKE</span> <span class="s1">&#39;%to_be_dropped%&#39;</span><span class="err">\</span><span class="n">gexec</span>
-</pre></div>
-
-
-<p>Brilliant.</p>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/tag/postgresql.html">&laquo; Previous page</a>

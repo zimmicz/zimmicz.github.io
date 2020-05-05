@@ -31,6 +31,68 @@
 <h2 class="text-center">Articles tagged with postgis tag</h2>
 
 <article>
+    <h1><a href="https://www.zimmi.cz/posts/2020/postgis-data-anonymization/" rel="bookmark" title="Permalink to PostGIS Data Anonymization">PostGIS Data&nbsp;Anonymization</a></h1>
+    <aside><span>May 5, 2020</span>
+    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
+    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
+    </aside>
+    <p>Among all the sensitive spatial data being collected through cellphones and credit cards, our address of residency is probably the most delicate one. Can it be anonymized/pseudonymized/obscured before you share it with your business&nbsp;partners?</p>
+<p>Imagine given a set of address points for each of your clients and the set of all address points in the country, you should adjust it in the following&nbsp;way:</p>
+<ul>
+<li>find the two nearest address points for each address point of your&nbsp;client</li>
+<li>find the center of these two and the client address&nbsp;point</li>
+<li>measure the distance of the computed center to each of three points and keep the maximum&nbsp;value</li>
+<li>make the biggest distance even bigger by adding 10 % of its&nbsp;value</li>
+<li>ceil the&nbsp;value</li>
+<li>output the new position and the ceiled&nbsp;distance</li>
+</ul>
+<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/postgis-data-anonymization/qgis.gif"/></div>
+
+<p>This shifts each address point by a dynamic distance, giving us at least three points within the given distance (one of them being the original address&nbsp;point).</p>
+<div class="highlight"><pre><span></span><span class="k">SELECT</span>
+    <span class="n">tmp</span><span class="p">.</span><span class="n">code</span><span class="p">,</span>
+    <span class="n">ST_X</span><span class="p">(</span><span class="n">tmp</span><span class="p">.</span><span class="n">new_position</span><span class="p">)</span> <span class="n">x</span><span class="p">,</span>
+    <span class="n">ST_Y</span><span class="p">(</span><span class="n">tmp</span><span class="p">.</span><span class="n">new_position</span><span class="p">)</span> <span class="n">y</span><span class="p">,</span>
+    <span class="n">ceil</span><span class="p">(</span><span class="k">MAX</span><span class="p">(</span><span class="n">biggest_distance</span><span class="p">)</span> <span class="o">+</span> <span class="k">MAX</span><span class="p">(</span><span class="n">biggest_distance</span><span class="p">)</span> <span class="o">*</span> <span class="mi">0</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="n">round_distance</span>
+<span class="k">FROM</span> <span class="p">(</span>
+    <span class="k">SELECT</span>
+        <span class="n">tmp</span><span class="p">.</span><span class="n">code</span><span class="p">,</span>
+        <span class="n">tmp</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span>
+        <span class="n">ST_Centroid</span><span class="p">((</span><span class="n">ST_Union</span><span class="p">(</span><span class="n">two_closest_points</span><span class="p">,</span> <span class="n">tmp</span><span class="p">.</span><span class="n">geom</span><span class="p">)))</span> <span class="n">new_position</span><span class="p">,</span>
+        <span class="c1">-- get distance to two closest points and the client address point</span>
+        <span class="n">ST_Centroid</span><span class="p">((</span><span class="n">ST_Union</span><span class="p">(</span><span class="n">two_closest_points</span><span class="p">,</span> <span class="n">tmp</span><span class="p">.</span><span class="n">geom</span><span class="p">)))</span> <span class="o">&lt;-&gt;</span> <span class="p">(</span><span class="n">ST_DumpPoints</span><span class="p">(</span><span class="n">ST_Union</span><span class="p">(</span><span class="n">two_closest_points</span><span class="p">,</span> <span class="n">tmp</span><span class="p">.</span><span class="n">geom</span><span class="p">))).</span><span class="n">geom</span> <span class="n">biggest_distance</span>
+    <span class="k">FROM</span> <span class="p">(</span>
+        <span class="k">SELECT</span>
+            <span class="n">r1</span><span class="p">.</span><span class="n">code</span><span class="p">,</span>
+            <span class="n">r1</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span>
+            <span class="n">ST_Union</span><span class="p">(</span><span class="n">neighbours</span><span class="p">.</span><span class="n">geom</span><span class="p">)</span> <span class="n">two_closest_points</span>
+        <span class="k">FROM</span> <span class="n">address_points</span> <span class="n">r1</span><span class="p">,</span>
+        <span class="k">LATERAL</span> <span class="p">(</span>
+            <span class="c1">-- keep two closest points to each client address point</span>
+            <span class="k">SELECT</span>
+                <span class="n">r2</span><span class="p">.</span><span class="n">code</span><span class="p">,</span>
+                <span class="n">r2</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span>
+                <span class="n">r1</span><span class="p">.</span><span class="n">geom</span> <span class="o">&lt;-&gt;</span> <span class="n">r2</span><span class="p">.</span><span class="n">geom</span> <span class="n">distance</span>
+            <span class="k">FROM</span> <span class="n">address_points</span> <span class="n">r2</span>
+            <span class="k">WHERE</span> <span class="n">r1</span><span class="p">.</span><span class="n">code</span> <span class="o">&lt;&gt;</span> <span class="n">r2</span><span class="p">.</span><span class="n">code</span>
+            <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">r1</span><span class="p">.</span><span class="n">geom</span> <span class="o">&lt;-&gt;</span> <span class="n">r2</span><span class="p">.</span><span class="n">geom</span> <span class="k">ASC</span>
+            <span class="k">LIMIT</span> <span class="mi">2</span>
+        <span class="p">)</span> <span class="n">neighbours</span>
+        <span class="k">GROUP</span> <span class="k">BY</span>
+            <span class="n">r1</span><span class="p">.</span><span class="n">code</span><span class="p">,</span>
+            <span class="n">r1</span><span class="p">.</span><span class="n">geom</span>
+    <span class="p">)</span> <span class="n">tmp</span>
+<span class="p">)</span> <span class="n">tmp</span>
+<span class="k">GROUP</span> <span class="k">BY</span>
+    <span class="n">tmp</span><span class="p">.</span><span class="n">code</span><span class="p">,</span>
+    <span class="n">tmp</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span>
+    <span class="n">tmp</span><span class="p">.</span><span class="n">new_position</span><span class="p">;</span>
+</pre></div>
+
+
+<p>You might want to use <code>LATERAL</code> for tasks like&nbsp;this.</p>
+</article>
+<article>
     <h1><a href="https://www.zimmi.cz/posts/2018/centos-postgis-upgrade-hell-yet-again" rel="bookmark" title="Permalink to CentOS PostGIS Upgrade Hell… Yet Again">CentOS PostGIS Upgrade Hell&#8230; Yet&nbsp;Again</a></h1>
     <aside><span>Dec 19, 2018</span>
     <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
@@ -566,76 +628,6 @@ su - postgres -c <span class="s2">&quot;psql -c \&quot;CREATE EXTENSION IF NOT E
 <li>Pedestrians usually don&#8217;t follow the road&nbsp;network.</li>
 <li>Bridges and tunnels might be an&nbsp;issue.</li>
 </ul>
-</article>
-<article>
-    <h1><a href="https://www.zimmi.cz/posts/2017/subdivide-and-conquer-effective-spatial-indexes-in-postgis/" rel="bookmark" title="Permalink to Subdivide and Conquer: Effective Spatial Indexes in PostGIS">Subdivide and Conquer: Effective Spatial Indexes in&nbsp;PostGIS</a></h1>
-    <aside><span>Jan 10, 2017</span>
-    <span>    <a class="tag-url" href="https://www.zimmi.cz/posts/tag/sql.html">sql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgresql.html">postgresql</a>     <a class="tag-url" href="https://www.zimmi.cz/posts/tag/postgis.html">postgis</a>    </span>
-    <span><a class="category-url" href="https://www.zimmi.cz/posts/category/sql.html">SQL</a></span>
-    </aside>
-    <p>Spatial indexes are absolutely crucial part of any spatial database and - as I tend to say quite often - only a fool would try to query spatial data without building spatial indexes&nbsp;beforehand.</p>
-<p>Spatial indexes are based on bounding box comparisons, which are generally very fast. Yet, there are situations when spatial indexes don&#8217;t help much (or they don&#8217;t help as much as they could, if you&nbsp;wish).</p>
-<div class="text-center"><img src="https://www.zimmi.cz/posts/assets/subdivide-and-conquer-effective-spatial-indexes-in-postgis/index.svg" /></div>
-
-<p>Bounding box comparisons are effective with lots of small bounding boxes rather then few large ones. Why? See the picture above. The curved line (imagine it&#8217;s a pipeline for example) clearly demonstrates when the spatial index/bounding box comparison might fall short of what you&#8217;d&nbsp;expect.</p>
-<p>Once the bounding box gets really big, it intersects so many other geometries&#8217; bounding boxes that the whole comparison starts to slow&nbsp;down.</p>
-<p>Luckily, PostGIS 2.2 introduced a <a href="http://postgis.net/docs/ST_Subdivide.html">ST_Subdivide</a> function that can lend a helping hand in&nbsp;here.</p>
-<p>Until today, we delivered the parcel geometries into our <a href="https://www.symap.cz">real estate acquisition process system</a> with the following query, that takes all the geometries from the <code>req_geom</code> table (pipelines, remember?) and intersects them with cadastral parcels. The second part of the query adds those parcels that haven&#8217;t been digitalized and were created manually by one of my&nbsp;workmates.</p>
-<div class="highlight"><pre><span></span><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">requested_parcels</span> <span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">par_id</span><span class="p">)</span>
-<span class="k">SELECT</span>
-    <span class="n">reqs</span><span class="p">.</span><span class="n">uid</span><span class="p">,</span>
-    <span class="n">b</span><span class="p">.</span><span class="n">id</span> <span class="n">par_id</span>
- <span class="k">FROM</span>
-    <span class="n">running_requests</span> <span class="n">reqs</span>
- <span class="k">JOIN</span>
-    <span class="n">req_geom</span> <span class="n">a</span> <span class="k">ON</span> <span class="p">(</span><span class="n">reqs</span><span class="p">.</span><span class="n">uid</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">uid</span><span class="p">)</span>
- <span class="k">JOIN</span>
-    <span class="n">pargeo</span> <span class="n">b</span> <span class="k">ON</span> <span class="p">(</span><span class="n">ST_Intersects</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">geom</span><span class="p">))</span>
- <span class="k">UNION</span>
- <span class="k">SELECT</span>
-    <span class="n">reqs</span><span class="p">.</span><span class="n">uid</span><span class="p">,</span>
-    <span class="n">a</span><span class="p">.</span><span class="n">idpar</span><span class="p">::</span><span class="nb">numeric</span>
- <span class="k">FROM</span>
-    <span class="n">running_requests</span> <span class="n">reqs</span>
- <span class="k">JOIN</span>
-     <span class="n">req_man</span> <span class="n">a</span> <span class="k">ON</span> <span class="p">(</span><span class="n">reqs</span><span class="p">.</span><span class="n">uid</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">uid</span><span class="p">);</span>
-</pre></div>
-
-
-<p>It&#8217;s a perfectly standard query that intersects several request geometries with ~20M parcels, nothing really fancy. Except that it takes 25 minutes to finish. Why? Pipelines,&nbsp;remember?</p>
-<p>Yet, the query below takes only 30 seconds to finish (that&#8217;s a huge time saver considering that the whole process used to take ~40 minutes)! Why? Because the <code>ST_Subdivide</code> effectively shrinks the <code>req_geom</code> geometries until they have 50 vertices each at most. Such small geometries are perfect input for the bounding box comparison. Remember to call <code>DISTINCT</code> when using <code>ST_Subdivide</code>, you&#8217;d probably get duplicate parcel ids&nbsp;otherwise.</p>
-<p>I also replaced the <code>UNION</code> with the <a href="https://www.zimmi.cz/posts/2015/postgresql-in-vs-exists/"><code>WHERE NOT EXISTS</code></a> expression, as it&#8217;s reasonable to assume that numeric ids comparison will be&nbsp;faster.</p>
-<div class="highlight"><pre><span></span><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">requested_parcels</span> <span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">par_id</span><span class="p">)</span>
-<span class="k">SELECT</span> <span class="k">DISTINCT</span>
-    <span class="n">reqs</span><span class="p">.</span><span class="n">uid</span><span class="p">,</span>
-    <span class="n">b</span><span class="p">.</span><span class="n">id</span> <span class="n">par_id</span>
- <span class="k">FROM</span>
-    <span class="n">running_requests</span> <span class="n">reqs</span>
- <span class="k">JOIN</span>
-    <span class="p">(</span>
-        <span class="k">SELECT</span>
-            <span class="n">uid</span><span class="p">,</span>
-            <span class="n">ST_Subdivide</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span> <span class="n">geom</span>
-        <span class="k">FROM</span>
-            <span class="n">req_geom</span>
-     <span class="p">)</span> <span class="n">a</span> <span class="k">ON</span> <span class="p">(</span><span class="n">reqs</span><span class="p">.</span><span class="n">uid</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">uid</span><span class="p">)</span>
- <span class="k">JOIN</span>
-     <span class="n">pargeo</span> <span class="n">b</span> <span class="k">ON</span> <span class="p">(</span><span class="n">ST_Intersects</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">geom</span><span class="p">,</span> <span class="n">b</span><span class="p">.</span><span class="n">geom</span><span class="p">));</span>
-
- <span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">requested_parcels</span> <span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">par_id</span><span class="p">)</span>
- <span class="k">SELECT</span>
-     <span class="n">reqs</span><span class="p">.</span><span class="n">uid</span><span class="p">,</span>
-     <span class="n">a</span><span class="p">.</span><span class="n">idpar</span><span class="p">::</span><span class="nb">numeric</span>
- <span class="k">FROM</span>
-     <span class="n">running_requests</span> <span class="n">reqs</span>
- <span class="k">JOIN</span>
-     <span class="n">req_man</span> <span class="n">a</span> <span class="k">ON</span> <span class="p">(</span><span class="n">reqs</span><span class="p">.</span><span class="n">uid</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">uid</span><span class="p">)</span>
- <span class="k">WHERE</span> <span class="k">NOT</span> <span class="k">EXISTS</span> <span class="p">(</span>
-     <span class="k">SELECT</span> <span class="mi">1</span>
-     <span class="k">FROM</span> <span class="n">pozadovane_parcely</span> <span class="n">pp</span>
-     <span class="k">WHERE</span> <span class="n">pp</span><span class="p">.</span><span class="n">par_id</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">idpar</span>
-  <span class="p">);</span>
-</pre></div>
 </article>
 <aside id="pagination">
             <a href="https://www.zimmi.cz/posts/tag/postgis2.html">Next page &raquo;</a>
